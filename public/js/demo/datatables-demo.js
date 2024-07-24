@@ -18,8 +18,17 @@ $(document).ready(function() {
 
 // Call the dataTables jQuery plugin
 $(document).ready(function() {
+    $('#pencapaianModal').DataTable({
+      "order": [[ 0, "desc" ]],
+      "lengthMenu": [[3, 5, 10 -1], [3, 5, 10, "All"]],
+      "pageLength": 3
+    } );
+} );
+
+// Call the dataTables jQuery plugin
+$(document).ready(function() {
   $('#dataPr').DataTable({
-    "order": [[ 0, "desc" ]],
+    "order": [[ 0, "asc" ]],
     "lengthMenu": [[5, 7, 10, 25, 50, -1], [5, 7, 10, 25, 50, "All"]],
     "pageLength": 7
   } );
@@ -28,15 +37,24 @@ $(document).ready(function() {
 // Call the dataTables jQuery plugin
 $(document).ready(function() {
   $('#dataPo').DataTable({
-    "order": [[ 0, "desc" ]],
+    "order": [[ 0, "asc" ]],
     "lengthMenu": [[5, 7, 10, 25, 50, -1], [5, 7, 10, 25, 50, "All"]],
     "pageLength": 7
   } );
 } );
 
+// Call the dataTables jQuery plugin
+$(document).ready(function() {
+    $('#listPencapaianUser').DataTable({
+      "order": [[ 0, "asc" ]],
+      "lengthMenu": [[5, 7, 10, 25, 50, -1], [5, 7, 10, 25, 50, "All"]],
+      "pageLength": 7
+    } );
+  } );
+
 $(document).ready(function() {
   $('#docLetter').DataTable({
-    "order": [[ 0, "desc" ]],
+    "order": [[ 0, "asc" ]],
     "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
     "pageLength": 25
   } );

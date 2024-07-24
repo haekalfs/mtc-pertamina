@@ -11,10 +11,10 @@ class Usr_role extends Model
     protected $fillable = ["id", "role_name", "role_id", "user_id", "created_at", "updated_at"];
 
     public function user(){
-    	return $this->belongsTo('App\Models\Users');
+    	return $this->belongsTo('App\Models\User');
     }
 
     public function role(){
-    	return $this->belongsTo('App\Models\Role');
+    	return $this->belongsTo('App\Models\Role', 'role_id', 'id');
     }
 }

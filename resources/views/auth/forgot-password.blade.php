@@ -1,4 +1,4 @@
-<x-guest-layout>
+{{-- <x-guest-layout>
     <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
         {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
     </div>
@@ -22,4 +22,53 @@
             </x-primary-button>
         </div>
     </form>
-</x-guest-layout>
+</x-guest-layout> --}}
+
+@extends('layouts.login-layout')
+
+@section('content')
+<x-auth-session-status class="mb-4" :status="session('status')" />
+<div class="wrap-login100" style="zoom: 80%;">
+    <div class="login100-pic text-center js-tilt" data-tilt>
+        <img src="img/mtc-logo-1.png" style="zoom: 150%;" alt="IMG">
+    </div>
+
+    <form class="login100-form validate-form" method="POST" action="{{ route('password.email') }}">
+        @csrf
+        <span class="login100-form-title">
+            Reset Password
+        </span>
+
+        <div class="wrap-input100 validate-input" data-validate = "Valid email is required: ex@abc.xyz">
+            <input class="input100" id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" >
+            <span class="focus-input100"></span>
+            <span class="symbol-input100">
+                <i class="fa fa-envelope" aria-hidden="true"></i>
+            </span>
+        </div>
+        <x-input-error :messages="$errors->get('email')" class="mt-2" />
+
+        <div class="container-login100-form-btn">
+            <button class="login100-form-btn" type="submit">
+                Send Me Reset Password Link
+            </button>
+        </div>
+
+        <div class="text-center p-t-12">
+            <span class="txt1">
+                Already have an Accout?
+            </span>
+            <a class="txt2" href="/login">
+                Login
+            </a>
+        </div>
+
+        <div class="text-center p-t-136">
+            <a class="txt2" href="#">
+                {{-- Create your Account
+                <i class="fa fa-long-arrow-right m-l-5" aria-hidden="true"></i> --}}
+            </a>
+        </div>
+    </form>
+</div>
+@endsection

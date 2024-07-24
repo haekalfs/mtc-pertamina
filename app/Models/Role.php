@@ -11,7 +11,7 @@ class Role extends Model
     use HasFactory;
 
     protected $table = "roles";
-    protected $fillable = ["id", "role", "description", "role_id", "created_at", "updated_at"];
+    protected $fillable = ["id", "role", "description", "role_description", "created_at", "updated_at"];
 
     public function role(){
     	return $this->hasMany('App\Models\Usr_role');

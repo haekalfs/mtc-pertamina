@@ -10,12 +10,12 @@
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
 * Tags: html, themplate, Ela Admin
 --------------------------------------------------------- */
-/* 
+/*
 
 
 Googel Fonts  */
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:400,600,700");
-/* Googel Fonts End  
+/* Googel Fonts End
 
 */
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:400,600,700");
@@ -133,11 +133,11 @@ Googel Fonts  */
 .mb-15 {
   margin-bottom: 15px; }
 
-/* 
+/*
 
 
 Googel Fonts  */
-/* Googel Fonts End  
+/* Googel Fonts End
 
 */
 .bg-flat-color-1 {
@@ -1195,7 +1195,7 @@ header .form-inline {
 
 .content {
   float: left;
-  padding: 1.875em;
+  padding: 1.5em;
   width: 100%; }
 
 .card {
@@ -1370,7 +1370,7 @@ header .form-inline {
       color: #b5bcc2;
       font-size: 12px;
       font-weight: 700;
-      padding: .25em .5em;
+      padding: 10px 14px;
       text-transform: uppercase; }
       .card .nav-tabs a:hover {
         border-color: transparent; }
@@ -2503,3 +2503,103 @@ footer.site-footer {
     right: 20px !important; }
 
 /*# sourceMappingURL=style.css.map */
+#weatherWidget .currentDesc {
+    color: #ffffff!important;
+}
+.traffic-chart {
+    min-height: 335px;
+}
+#flotPie1  {
+    height: 150px;
+}
+#flotPie1 td {
+    padding:3px;
+}
+#flotPie1 table {
+    top: 20px!important;
+    right: -10px!important;
+}
+.chart-container {
+    display: table;
+    min-width: 270px ;
+    text-align: left;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+#flotLine5  {
+        height: 105px;
+}
+
+#flotBarChart {
+    height: 150px;
+}
+#cellPaiChart{
+    height: 160px;
+}
+
+.sidebar-user {
+border-radius: 10px;
+padding: 5px;
+display: flex;
+align-items: center;
+flex-wrap: wrap;
+background-color: rgba(63, 101, 255, 0.1);
+}
+
+.sidebar-user-img {
+display: flex;
+justify-content: center;
+align-items: flex-end;
+margin-right: 8px;
+border-radius: 50%;
+width: 48px;
+height: 48px;
+overflow: hidden;
+background-color: #fff;
+}
+
+.sidebar-user-img img {
+width: 100%;
+height: 100%;
+object-fit: cover;
+}
+
+.sidebar-user-info {
+display: flex;
+flex-direction: column;
+}
+
+.sidebar-user__title {
+font-weight: 600;
+font-size: 14px;
+letter-spacing: 0.75px;
+color: #000000;
+}
+
+.sidebar-user__subtitle {
+font-weight: 500;
+font-size: 10px;
+line-height: 1.5;
+letter-spacing: 0.86px;
+color: rgba(0, 0, 0, 0.5);
+}
+
+.zoom80{
+    zoom: 80%;
+}
+
+.zoom85{
+zoom: 85%;
+}
+
+.zoom90{
+zoom: 90%;
+}
+
+.zoom95{
+zoom: 95%;
+}
+
+.zoom70{
+zoom: 70%;
+}
