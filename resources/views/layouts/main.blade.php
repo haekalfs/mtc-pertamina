@@ -11,6 +11,10 @@
     <link href="{{ asset('img/mtc-logo.png') }}" rel="icon">
     <link href="{{ asset('img/mtc-logo.png') }}" rel="apple-touch-icon">
 
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.7.3/dist/Chart.bundle.min.js"></script>
+    <script src="{{ asset('js/chartjs-plugin-annotation') }}"></script>
+
     <!-- CSS Libraries -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.0/normalize.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css">
@@ -25,6 +29,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jqvmap@1.5.1/dist/jqvmap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/weathericons@2.1.0/css/weather-icons.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@3.9.0/dist/fullcalendar.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+
 
     <!-- Fonts -->
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
@@ -45,6 +51,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <!-- Bootstrap -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
 
 </head>
 
@@ -52,9 +59,15 @@
     <!-- Left Panel -->
     <aside id="left-panel" class="left-panel">
         <div class="sidebar-footer">
-            <a href="##" class="sidebar-user mr-4 ml-3 mt-2 mb-2">
+            <a href="{{ route('profile.view') }}" class="sidebar-user mr-4 ml-3 mt-2 mb-2">
                 <span class="sidebar-user-img">
-                    <picture><img src="{{ asset('/img/avatar/avatar-illustrated-01.png') }}" alt="User name"></picture>
+                    <picture>
+                        @if(Auth::user()->users_detail->profile_pic)
+                        <img src="{{ asset('/img/avatar/'. Auth::user()->users_detail->profile_pic) }}" alt="User name">
+                        @else
+                        <img src="{{ asset('images/admin.jpg') }}" alt="User name">
+                        @endif
+                    </picture>
                 </span>
                 <div class="sidebar-user-info" id="sidebar-info">
                     <span class="sidebar-user__title">
@@ -73,47 +86,58 @@
                     </li>
                     <li class="menu-title">Main Menu</li><!-- /.menu-title -->
                     @usr_acc(101)
-                    <li class="menu-item-has-children dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-cogs"></i>Operasi</a>
-                        <ul class="sub-menu children dropdown-menu">
-                            <li><i class="fa fa-exchange"></i><a href="#">Dashboard</a></li>
-                            <li><i class="fa fa-cog"></i><a href="#">Manage</a></li>
+                    <li class="menu-item-has-children dropdown @yield('active-operation')">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="menu-icon fa fa-cogs"></i> Operasi</a>
+                        <ul class="sub-menu children dropdown-menu font-weight-normal">
+                            <li><i class="fa fa-tachometer"></i><a href="{{ route('operation') }}">Dashboard</a></li>
+                            <li><i class="fa fa-users"></i><a href="{{ route('participant-infographics') }}">Infografis Peserta</a></li>
+                            <li><i class="fa fa-fire-extinguisher"></i><a href="{{ route('tool-inventory') }}">Inventaris Alat</a></li>
+                            <li><i class="fa fa-building-o"></i><a href="{{ route('room-inventory') }}">Inventaris Ruangan</a></li>
+                            <li><i class="fa fa-check-square-o"></i><a href="{{ route('tool-requirement-penlat') }}">Kebutuhan Alat Penlat</a></li>
+                            <li><i class="fa fa-cog"></i><a href="{{ route('utility') }}">Utilitas</a></li>
                         </ul>
                     </li>
                     @endusr_acc
                     @usr_acc(102)
-                    <li class="menu-item-has-children dropdown">
+                    <li class="menu-item-has-children dropdown @yield('active-finance')">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-money"></i>Finance</a>
-                        <ul class="sub-menu children dropdown-menu">
-                            <li><i class="fa fa-table"></i><a href="{{ route('finance') }}">Dashboard</a></li>
+                        <ul class="sub-menu children dropdown-menu font-weight-normal">
+                            <li><i class="fa fa-tachometer"></i><a href="{{ route('finance') }}">Dashboard</a></li>
                             <li><i class="fa fa-cog"></i><a href="{{ route('manage-finance') }}">Manage</a></li>
                         </ul>
                     </li>
                     @endusr_acc
                     @usr_acc(103)
-                    <li class="menu-item-has-children dropdown">
+                    <li class="menu-item-has-children dropdown @yield('active-pd')">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-th"></i>P&D</a>
-                        <ul class="sub-menu children dropdown-menu">
-                            <li><i class="fa fa-table"></i><a href="#">Dashboard</a></li>
-                            <li><i class="fa fa-table"></i><a href="#">Manage</a></li>
+                        <ul class="sub-menu children dropdown-menu font-weight-normal">
+                            <li><i class="fa fa-tachometer"></i><a href="#">Dashboard</a></li>
+                            <li><i class="fa fa-cog"></i><a href="#">Feedback Report</a></li>
+                            <li><i class="fa fa-cog"></i><a href="#">Referensi Pelatihan</a></li>
+                            <li><i class="fa fa-cog"></i><a href="#">Regulasi</a></li>
+                            <li><i class="fa fa-cog"></i><a href="#">Monitoring Approval</a></li>
+                            <li><i class="fa fa-cog"></i><a href="#">Instruktur</a></li>
+                            <li><i class="fa fa-cog"></i><a href="#">Certification</a></li>
                         </ul>
                     </li>
                     @endusr_acc
                     @usr_acc(104)
-                    <li class="menu-item-has-children dropdown">
+                    <li class="menu-item-has-children dropdown @yield('active-marketing')">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-suitcase"></i>Marketing</a>
-                        <ul class="sub-menu children dropdown-menu">
-                            <li><i class="menu-icon fa fa-suitcase"></i><a href="#">Dashboard</a></li>
-                            <li><i class="fa fa-cog"></i><a href="#">Manage</a></li>
+                        <ul class="sub-menu children dropdown-menu font-weight-normal">
+                            <li><i class="menu-icon fa fa-tachometer"></i><a href="#">Dashboard</a></li>
+                            <li><i class="fa fa-cog"></i><a href="#">Marketing Campaign</a></li>
+                            <li><i class="fa fa-cog"></i><a href="#">Social Media Enggagement</a></li>
+                            <li><i class="fa fa-cog"></i><a href="#">Company Agreement</a></li>
                         </ul>
                     </li>
                     @endusr_acc
                     @usr_acc(105)
                     <li class="menu-item-has-children dropdown @yield('active-kpi')">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-bar-chart-o"></i>KPI</a>
-                        <ul class="sub-menu children dropdown-menu">
-                            <li><i class="fa fa-signal"></i><a href="{{ route('kpi') }}">Dashboard</a></li>
-                            <li><i class="fa fa-cog"></i><a href="{{ route('manage-kpi') }}">Manage</a></li>
+                        <ul class="sub-menu children dropdown-menu font-weight-normal">
+                            <li><i class="fa fa-tachometer"></i><a href="{{ route('kpi') }}">Dashboard</a></li>
+                            {{-- <li><i class="fa fa-cog"></i><a href="{{ route('manage-kpi') }}">Manage</a></li> --}}
                             <li><i class="fa fa-file"></i><a href="{{ route('report-kpi') }}">Laporan</a></li>
                         </ul>
                     </li>
@@ -121,8 +145,8 @@
                     @usr_acc(106)
                     <li class="menu-item-has-children dropdown @yield('active-akhlak')">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-star-half-empty"></i>Akhlak</a>
-                        <ul class="sub-menu children dropdown-menu">
-                            <li><i class="menu-icon fa fa-star-half-empty"></i><a href="{{ route('akhlak.achievements') }}">Dashboard</a></li>
+                        <ul class="sub-menu children dropdown-menu font-weight-normal">
+                            <li><i class="menu-icon fa fa-tachometer"></i><a href="{{ route('akhlak.achievements') }}">Dashboard</a></li>
                             <li><i class="fa fa-file"></i><a href="{{ route('report-akhlak') }}">Laporan</a></li>
                         </ul>
                     </li>
@@ -132,7 +156,7 @@
                     <li class="menu-title">Settings</li><!-- /.menu-title -->
                     <li class="menu-item-has-children dropdown @yield('active-user')">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-users"></i>Users</a>
-                        <ul class="sub-menu children dropdown-menu">
+                        <ul class="sub-menu children dropdown-menu font-weight-normal">
                             <li><i class="menu-icon fa fa-sign-in"></i><a href="{{ route('manage.users') }}">Manage Users</a></li>
                             <li><i class="menu-icon fa fa-sign-in"></i><a href="{{ route('manage.dept.post') }}">Dept. & Position</a></li>
                             <li><i class="menu-icon fa fa-sign-in"></i><a href="{{ route('manage.roles') }}">Manage Roles</a></li>
@@ -143,7 +167,7 @@
                     @usr_acc(202)
                     <li class="menu-item-has-children dropdown @yield('active-access')" style="padding-bottom: 15%;">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-ban"></i>User Access Control</a>
-                        <ul class="sub-menu children dropdown-menu">
+                        <ul class="sub-menu children dropdown-menu font-weight-normal">
                             <li><i class="menu-icon fa fa-sign-in"></i><a href="{{ route('manage.access') }}">Manage Access</a></li>
                         </ul>
                     </li>
@@ -202,11 +226,15 @@
 
                     <div class="user-area dropdown float-right">
                         <a href="#" class="dropdown-toggle active" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @if(Auth::user()->users_detail->profile_pic)
+                            <img class="user-avatar rounded-circle" src="{{ asset('/img/avatar/'. Auth::user()->users_detail->profile_pic) }}" alt="User Avatar">
+                            @else
                             <img class="user-avatar rounded-circle" src="{{ asset('images/admin.jpg') }}" alt="User Avatar">
+                            @endif
                         </a>
 
                         <div class="user-menu dropdown-menu">
-                            <a class="nav-link" href="#"><i class="fa fa-user"></i>My Profile</a>
+                            <a class="nav-link" href="{{ route('profile.view') }}"><i class="fa fa-user"></i>My Profile</a>
 
                             {{-- <a class="nav-link" href="#"><i class="fa fa- user"></i>Notifications</a> --}}
                             {{-- <a class="nav-link" href="#"><i class="fa fa- user"></i>Notifications <span class="count">13</span></a> --}}
@@ -251,9 +279,6 @@
     <!-- Custom Scripts -->
     <script src="{{ asset('assets/js/main.js') }}"></script>
     <script src="{{ asset('assets/js/lib/chosen/chosen.jquery.min.js') }}"></script>
-
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.7.3/dist/Chart.bundle.min.js"></script>
 
     <!-- Chartist Chart -->
     <script src="https://cdn.jsdelivr.net/npm/chartist@0.11.0/dist/chartist.min.js"></script>

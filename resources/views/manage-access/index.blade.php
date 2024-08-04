@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('active-access')
-active
+active font-weight-bold
 @endsection
 
 

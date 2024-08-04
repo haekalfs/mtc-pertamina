@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('active-kpi')
-active
+active font-weight-bold
 @endsection
 
 @section('content')
@@ -56,7 +56,62 @@ active
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-secondary" id="judul">Report</h6>
+                    <h6 class="m-0 font-weight-bold text-secondary" id="judul">Search Report</h6>
+                    <div class="text-right">
+                        {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-icon fa fa-download"></i> Download</a> --}}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form method="GET" action="/key-performance-indicators/report">
+                        @csrf
+                        <div class="row d-flex justify-content-start mb-3">
+                            <div class="col-md-12">
+                                <div class="row align-items-center">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="position_id">Indicator :</label>
+                                            <select name="nilai_akhlak" class="form-control" id="nilai_akhlak">
+                                                <option value="7">All Indicators</option>
+                                                @foreach ($kpiPoin as $item)
+                                                <option value="{{ $item->id }}" @if ($item->id == $kpiSelected) selected @endif>{{ $item->indicator }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="form-group">
+                                            <label for="status">Periode :</label>
+                                            <select class="form-control" id="periode" name="periode" required>
+                                                <option value="1" selected>All</option>
+                                                @foreach (array_reverse($yearsBefore) as $year)
+                                                    <option value="{{ $year }}" @if ($year == $periode) selected @endif>{{ $year }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1 d-flex align-self-end justify-content-start">
+                                        <div class="form-group">
+                                            <div class="align-self-center">
+                                                <input type="submit" class="btn btn-primary" value="Show"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@if($kpiSelected)
+<div class="animated fadeIn zoom90">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> Laporan Pencapaian <span style="color: #403D4D;">AKH</span><span style="color: #029195;">LAK</span></h6>
                     <div class="text-right">
                         <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-icon fa fa-download"></i> Download</a>
                     </div>
@@ -64,34 +119,22 @@ active
                 <div class="card-body">
                     <div class="row d-flex justify-content-start mb-3">
                         <div class="col-md-12">
-                            <div class="row align-items-center">
-                                <div class="col-md-5">
-                                    <div class="form-group">
-                                        <label for="position_id">KPI :</label>
-                                        <select name="position_id" class="form-control" id="position_id">
-                                            <option value="">All Indicators</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="status">Filter by Periode :</label>
-                                        <select name="status" class="form-control" id="status">
-                                            <option value="">All</option>
-                                            <option value="Active" @if(request('status') == 'Active') selected @endif>Active</option>
-                                            <option value="nonActive" @if(request('status') == 'nonActive') selected @endif>Non Active</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-1 d-flex align-self-end justify-content-start">
-                                    <div class="form-group">
-                                        <div class="align-self-center">
-                                            <input type="submit" class="btn btn-primary" value="Show"/>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <table id="docLetter" class="table table-striped table-bordered mt-4">
+                            <table class='table table-bordered table-sm mt-4 mb-4'>
+                                <thead>
+                                    <tr>
+                                        <th>User ID</th>
+                                        <th>Nilai Akhlak</th>
+                                        <th>Periode</th>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>asd</td>
+                                        <td>Kompeten</td>
+                                        <td>2022</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table class="table table-bordered">
                                 <thead>
                                     <tr>
                                         <th>Employee Name</th>
@@ -113,6 +156,28 @@ active
                                     </tr>
                                 </tbody>
                             </table>
+                            {{-- <table class="table table-borderless mt-4">
+                                <tbody>
+                                    <tr class="table-sm">
+                                        <td class="m-0" width="250px">
+                                            <div class="font-weight-bold">Average Nilai Akhlak</div>
+                                            <div>Avg. Amanah</div>
+                                            <div>Avg. Amanah</div>
+                                            <div>Avg. Amanah</div>
+                                            <div>Avg. Amanah</div>
+                                            <div>Avg. Amanah</div>
+                                        </td>
+                                        <td>
+                                            <div>&nbsp;</div>
+                                            <div>:</div>
+                                            <div>:</div>
+                                            <div>:</div>
+                                            <div>:</div>
+                                            <div>:</div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table> --}}
                         </div>
                     </div>
                 </div>
@@ -120,7 +185,25 @@ active
         </div>
     </div>
 </div>
-
+@else
+<div class="animated fadeIn zoom90">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> Laporan Pencapaian KPI</h6>
+                    <div class="text-right">
+                        {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-icon fa fa-download"></i> Download</a> --}}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="text-center">No Data Available, Filter out to show data!.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
 <script>
     const ctx = document.getElementById('radarChart').getContext('2d');
     const radarChart = new Chart(ctx, {

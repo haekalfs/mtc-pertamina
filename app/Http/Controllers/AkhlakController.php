@@ -3,29 +3,28 @@
 namespace App\Http\Controllers;
 
 use App\Models\Akhlak;
+use App\Models\Quarter;
 use App\Models\User;
 use App\Models\User_pencapaian_akhlak;
 use App\Models\User_pencapaian_akhlak_files;
 use Carbon\Carbon;
+use PDF;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class AkhlakController extends Controller
 {
-    public function index(Request $request, $yearSelected = 1)
+    public function index(Request $request)
     {
         // Determine the current year and generate the range of years
         $nowYear = date('Y');
         $yearsBefore = range($nowYear - 4, $nowYear);
 
-        // Set the selected year
-        $currentYear = $yearSelected ?? $nowYear;
-
         // Validate the request inputs
         $validator = Validator::make($request->all(), [
             'userId' => 'required|integer',
-            'periode_start' => 'required|date',
-            'periode_end' => 'required|date'
+            'quarter' => 'required',
+            'periode' => 'required'
         ]);
 
         // Initialize variables
@@ -36,8 +35,12 @@ class AkhlakController extends Controller
         $pencapaianChart = User_pencapaian_akhlak::query();
 
         // Extract period dates from the request
-        $periode_start = $request->periode_start;
-        $periode_end = $request->periode_end;
+        $quarter = $request->quarter;
+        $periode = $request->year;
+
+        // Set the selected year
+        $currentYear = $periode ?? 1;
+        $quarterSelected = $quarter ?? 99;
 
         // If userId is not 1, find the user and filter pencapaian
         if ($request->userId != 1) {
@@ -47,17 +50,14 @@ class AkhlakController extends Controller
                 $pencapaianQuery->where('user_id', $request->userId);
                 $pencapaianChart->where('user_id', $request->userId);
 
-                // Add whereBetween condition if both periode_start and periode_end exist
-                if ($periode_start && $periode_end) {
-                    $startDate = Carbon::createFromFormat('Y-m-d', $periode_start);
-                    $endDate = Carbon::createFromFormat('Y-m-d', $periode_end);
-                    $pencapaianQuery->whereBetween('periode_start', [$startDate, $endDate])->whereBetween('periode_end', [$startDate, $endDate]);
-                    $pencapaianChart->whereBetween('periode_start', [$startDate, $endDate])->whereBetween('periode_end', [$startDate, $endDate]);
+                if ($periode != 1) {
+                    $pencapaianChart->where('periode', $currentYear);
+                    $pencapaianQuery->where('periode', $currentYear);
                 }
 
-                if ($yearSelected != 1) {
-                    $pencapaianChart->whereYear('periode_start', $currentYear)->whereYear('periode_end', $currentYear);
-                    $pencapaianQuery->whereYear('periode_start', $currentYear)->whereYear('periode_end', $currentYear);
+                if ($quarter != 99) {
+                    $pencapaianChart->where('quarter_id', $quarter);
+                    $pencapaianQuery->where('quarter_id', $quarter);
                 }
 
                 $results = $pencapaianChart->selectRaw('akhlak_id, AVG(score) as average_score')
@@ -68,16 +68,14 @@ class AkhlakController extends Controller
             } else {
                 // Add whereBetween condition if both periode_start and periode_end exist
 
-                if ($yearSelected != 1) {
-                    $pencapaianChart->whereYear('periode_start', $currentYear)->whereYear('periode_end', $currentYear);
-                    $pencapaianQuery->whereYear('periode_start', $currentYear)->whereYear('periode_end', $currentYear);
+                if ($periode != 1) {
+                    $pencapaianChart->where('periode', $currentYear);
+                    $pencapaianQuery->where('periode', $currentYear);
                 }
 
-                if ($periode_start && $periode_end) {
-                    $startDate = Carbon::createFromFormat('Y-m-d', $periode_start);
-                    $endDate = Carbon::createFromFormat('Y-m-d', $periode_end);
-                    $pencapaianQuery->whereBetween('periode_start', [$startDate, $endDate])->whereBetween('periode_end', [$startDate, $endDate]);
-                    $pencapaianChart->whereBetween('periode_start', [$startDate, $endDate])->whereBetween('periode_end', [$startDate, $endDate]);
+                if ($quarter != 99) {
+                    $pencapaianChart->where('quarter_id', $quarter);
+                    $pencapaianQuery->where('quarter_id', $quarter);
                 }
 
                 $results = $pencapaianChart->selectRaw('akhlak_id, AVG(score) as average_score')
@@ -88,17 +86,14 @@ class AkhlakController extends Controller
             }
         } else {
 
-            if ($yearSelected != 1) {
-                $pencapaianChart->whereYear('periode_start', $currentYear)->whereYear('periode_end', $currentYear);
-                $pencapaianQuery->whereYear('periode_start', $currentYear)->whereYear('periode_end', $currentYear);
+            if ($periode != 1) {
+                $pencapaianChart->where('periode', $currentYear);
+                $pencapaianQuery->where('periode', $currentYear);
             }
 
-            // Add whereBetween condition if both periode_start and periode_end exist
-            if ($periode_start && $periode_end) {
-                $startDate = Carbon::createFromFormat('Y-m-d', $periode_start);
-                $endDate = Carbon::createFromFormat('Y-m-d', $periode_end);
-                $pencapaianQuery->whereBetween('periode_start', [$startDate, $endDate])->whereBetween('periode_end', [$startDate, $endDate]);
-                $pencapaianChart->whereBetween('periode_start', [$startDate, $endDate])->whereBetween('periode_end', [$startDate, $endDate]);
+            if ($quarter != 99) {
+                $pencapaianChart->where('quarter_id', $quarter);
+                $pencapaianQuery->where('quarter_id', $quarter);
             }
 
             $results = $pencapaianChart->selectRaw('akhlak_id, AVG(score) as average_score')
@@ -114,6 +109,7 @@ class AkhlakController extends Controller
         // Get all users and akhlak points
         $users = User::all();
         $akhlakPoin = Akhlak::all();
+        $quarterList = Quarter::all();
 
         // Map data for the radar chart
         $labels = ['Kompeten', 'Harmonis', 'Loyal', 'Adaptif', 'Kolaboratif', 'Amanah'];
@@ -139,20 +135,75 @@ class AkhlakController extends Controller
             'akhlakPoin' => $akhlakPoin,
             'pencapaian' => $pencapaian,
             'users' => $users,
+            'quarterSelected' => $quarterSelected,
+            'quarterList' => $quarterList,
             'yearsBefore' => $yearsBefore,
             'yearSelected' => $currentYear,
             'userSelected' => $userSelected,
-            'periode_start' => $periode_start,
-            'periode_end' => $periode_end,
             'userSelectedOpt' => $userSelectedOpt,
             'data' => $data,
             'labels' => $labels
         ]);
     }
 
-    public function report()
+    public function report(Request $request, $userId = 1, $akhlak = 7, $periode = 1)
     {
-        return view('akhlak-view.admin.report');
+        // Determine the current year and generate the range of years
+        $nowYear = date('Y');
+        $yearsBefore = range($nowYear - 4, $nowYear);
+
+        // Set the selected year
+        $periode = $periode ?? $nowYear;
+
+        // Validate the request inputs
+        $validator = Validator::make($request->all(), [
+            'userId' => 'required',
+            'nilai_akhlak' => 'required',
+            'periode' => 'required|date'
+        ]);
+
+        // Extract period dates from the request
+        $userId = $request->userId;
+        $periode = $request->periode;
+        $akhlak = $request->nilai_akhlak;
+
+        $userInfo = User::find($userId);
+
+        // Get all users and akhlak points
+        $users = User::all();
+        $akhlakPoin = Akhlak::all();
+
+        $pencapaianQuery = User_pencapaian_akhlak::query();
+
+        if ($userId != 1) {
+            $userSelected = User::find($userId);
+            if ($userSelected) {
+                $pencapaianQuery->where('user_id', $userId);
+            }
+        }
+
+        if ($periode != 1) {
+            $pencapaianQuery->where('periode', $periode);
+        }
+
+        if ($akhlak != 7) {
+            $pencapaianQuery->where('akhlak_id', $akhlak);
+        }
+
+        // Execute the query
+        $pencapaian = $pencapaianQuery->get();
+
+        return view('akhlak-view.admin.report', [
+            'yearsBefore' => $yearsBefore,
+            'pencapaian' => $pencapaian,
+            'periode' => $periode,
+            'akhlakSelected' => $akhlak,
+            'akhlakPoin' => $akhlakPoin,
+            'userInfo' => $userInfo,
+            'userSelected' => $userId,
+            'users' => $users,
+            'periode' => $periode
+        ]);
     }
 
     public function store(Request $request)
@@ -201,5 +252,46 @@ class AkhlakController extends Controller
         }
 
         return redirect()->back()->with('success', 'Data Pencapaian Akhlak has been successfully saved.');
+    }
+
+    public function print($userId, $akhlak, $periode)
+    {
+        // Set the default time zone to Jakarta
+        date_default_timezone_set("Asia/Jakarta");
+
+        $userInfo = User::find($userId);
+        $users = User::all();
+        $akhlakPoin = Akhlak::all();
+
+        $pencapaianQuery = User_pencapaian_akhlak::query();
+
+        if ($userId != 1) {
+            $userSelected = User::find($userId);
+            if ($userSelected) {
+                $pencapaianQuery->where('user_id', $userId);
+            }
+        }
+
+        if ($periode != 1) {
+            $pencapaianQuery->whereYear('periode_start', $periode)->whereYear('periode_end', $periode);
+        }
+
+        if ($akhlak != 7) {
+            $pencapaianQuery->where('akhlak_id', $akhlak);
+        }
+
+        $pencapaian = $pencapaianQuery->get();
+
+        $pdf = PDF::loadView('akhlak-view.laporan.pdf', [
+            'pencapaian' => $pencapaian,
+            'periode' => $periode,
+            'akhlakSelected' => $akhlak,
+            'akhlakPoin' => $akhlakPoin,
+            'userInfo' => $userInfo,
+            'userSelected' => $userId,
+            'users' => $users,
+        ]);
+
+        return $pdf->download('laporan-akhlak.pdf');
     }
 }

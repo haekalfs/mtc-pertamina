@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('active-user')
-active
+active font-weight-bold
 @endsection
 
 @section('content')

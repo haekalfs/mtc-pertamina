@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('active-akhlak')
-active
+active font-weight-bold
 @endsection
 
 @section('content')
@@ -68,60 +68,137 @@ active
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-secondary" id="judul">Report</h6>
+                    <h6 class="m-0 font-weight-bold text-secondary" id="judul">Search Report</h6>
                     <div class="text-right">
-                        <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-icon fa fa-download"></i> Download</a>
+                        {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-icon fa fa-download"></i> Download</a> --}}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form method="GET" action="/akhlak-report">
+                        @csrf
+                        <div class="row d-flex justify-content-start mb-3">
+                            <div class="col-md-12">
+                                <div class="row align-items-center">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="email">Nama Pekerja :</label>
+                                            <select class="custom-select" id="userId" name="userId">
+                                                <option value="1" selected>Show All</option>
+                                                @foreach ($users as $user)
+                                                    <option value="{{ $user->id }}" @if ($user->id == $userSelected) selected @endif>{{ $user->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="position_id">Nilai Akhlak :</label>
+                                            <select name="nilai_akhlak" class="form-control" id="nilai_akhlak">
+                                                <option value="7">All Indicators</option>
+                                                @foreach ($akhlakPoin as $item)
+                                                <option value="{{ $item->id }}" @if ($item->id == $akhlakSelected) selected @endif>{{ $item->indicator }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="status">Periode :</label>
+                                            <select class="form-control" id="periode" name="periode" required>
+                                                <option value="1" selected>All</option>
+                                                @foreach (array_reverse($yearsBefore) as $year)
+                                                    <option value="{{ $year }}" @if ($year == $periode) selected @endif>{{ $year }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1 d-flex align-self-end justify-content-start">
+                                        <div class="form-group">
+                                            <div class="align-self-center">
+                                                <input type="submit" class="btn btn-primary" value="Show"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@if($userInfo)
+<div class="animated fadeIn zoom90">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> Laporan Pencapaian <span style="color: #403D4D;">AKH</span><span style="color: #029195;">LAK</span></h6>
+                    <div class="text-right">
+                        <a class="btn btn-primary btn-sm text-white" href="/akhlak-print/{{$userSelected}}/{{$akhlakSelected}}/{{$periode}}"><i class="menu-icon fa fa-download"></i> Download</a>
                     </div>
                 </div>
                 <div class="card-body">
                     <div class="row d-flex justify-content-start mb-3">
                         <div class="col-md-12">
-                            <div class="row align-items-center">
-                                <div class="col-md-5">
-                                    <div class="form-group">
-                                        <label for="position_id">Filter Data :</label>
-                                        <select name="position_id" class="form-control" id="position_id">
-                                            <option value="">All Indicators</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="status">Filter by Periode :</label>
-                                        <select name="status" class="form-control" id="status">
-                                            <option value="">All</option>
-                                            <option value="Active" @if(request('status') == 'Active') selected @endif>Active</option>
-                                            <option value="nonActive" @if(request('status') == 'nonActive') selected @endif>Non Active</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-1 d-flex align-self-end justify-content-start">
-                                    <div class="form-group">
-                                        <div class="align-self-center">
-                                            <input type="submit" class="btn btn-primary" value="Show"/>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <table  id="docLetter" class="table table-striped table-bordered">
+                            <table class='table table-bordered table-sm mt-4 mb-4'>
                                 <thead>
                                     <tr>
-                                        <th>Employee Name</th>
-                                        <th>Average Score</th>
+                                        <th>User ID</th>
+                                        <th>Nilai Akhlak</th>
+                                        <th>Periode</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>John Doe</td>
-                                        <td>75</td>
+                                        <td>{{ $userInfo->name }}</td>
+                                        <td>Kompeten</td>
+                                        <td>2022</td>
                                     </tr>
+                                </tbody>
+                            </table>
+                            <table class="table table-bordered">
+                                <thead>
                                     <tr>
-                                        <td>Jane Smith</td>
-                                        <td>85</td>
+                                        <th>Judul Kegiatan</th>
+                                        <th>Score</th>
+                                        <th>Periode Start</th>
+                                        <th>Periode End</th>
                                     </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($pencapaian as $item)
                                     <tr>
-                                        <td>Bob Johnson</td>
-                                        <td>90</td>
+                                        <td>{{ $item->judul_kegiatan }}</td>
+                                        <td>{{ $item->score }} %</td>
+                                        <td>{{ $item->periode_start }}</td>
+                                        <td>{{ $item->periode_end }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                            <table class="table table-borderless mt-4">
+                                <tbody>
+                                    <tr class="table-sm">
+                                        <td class="m-0" width="200px">
+                                            <div class="font-weight-bold">Average Nilai Akhlak</div>
+                                            <div>Avg. Amanah</div>
+                                            <div>Avg. Kompeten</div>
+                                            <div>Avg. Harmonis</div>
+                                            <div>Avg. Loyal</div>
+                                            <div>Avg. Adaptif</div>
+                                            <div>Avg. Kolaboratif</div>
+                                        </td>
+                                        <td>
+                                            <div>&nbsp;</div>
+                                            <div>: 33 %</div>
+                                            <div>: 50 %</div>
+                                            <div>: 78 %</div>
+                                            <div>: 90 %</div>
+                                            <div>: 45 %</div>
+                                            <div>: 0 %</div>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -132,7 +209,25 @@ active
         </div>
     </div>
 </div>
-
+@else
+<div class="animated fadeIn zoom90">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> Laporan Pencapaian <span style="color: #403D4D;">AKH</span><span style="color: #029195;">LAK</span></h6>
+                    <div class="text-right">
+                        {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-icon fa fa-download"></i> Download</a> --}}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="text-center">No Data Available, Generate Payment to show data!.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
 <script>
     const ctx = document.getElementById('radarChart').getContext('2d');
     const radarChart = new Chart(ctx, {

@@ -1,10 +1,10 @@
 @extends('layouts.main')
 
 @section('active-user')
-active
+active font-weight-bold
 @endsection
 
-@section('breadcumbs')
+{{-- @section('breadcumbs')
 <div class="breadcrumbs">
     <div class="breadcrumbs-inner">
         <div class="row m-0">
@@ -28,9 +28,18 @@ active
         </div>
     </div>
 </div>
-@endsection
+@endsection --}}
 
 @section('content')
+<div class="d-sm-flex align-items-center zoom90 justify-content-between">
+    <div>
+        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-users"></i> User Registration</h1>
+        <p class="mb-4">Managing Users Account</a></p>
+    </div>
+    <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
+        {{-- <a class="btn btn-secondary btn-sm shadow-sm mr-2" href="/invoicing/list"><i class="fas fa-solid fa-backward fa-sm text-white-50"></i> Go Back</a> --}}
+    </div>
+</div>
 <form action="{{ route('register.user') }}" method="post" enctype="multipart/form-data" class="form-horizontal">
     @csrf
     <div class="animated fadeIn zoom90">

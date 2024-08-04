@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('active-akhlak')
-active
+active font-weight-bold
 @endsection
 
 @section('content')
@@ -134,20 +134,20 @@ active
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-secondary" id="judul">Pencapaian AKHLAK - @if ($userSelected) {{ $userSelected->name }} @else Overall @endif</h6>
-                    {{-- <div class="text-right">
-                        <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-icon fa fa-plus"></i> Insert Pencapaian</a>
-                    </div> --}}
                     <div class="text-right">
+                        <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-icon fa fa-plus"></i> Insert Pencapaian</a>
+                    </div>
+                    {{-- <div class="text-right">
                         <select class="form-control" id="yearSelected" name="yearSelected" required onchange="redirectToPage()">
                             <option value="1" selected>All</option>
                             @foreach (array_reverse($yearsBefore) as $year)
                                 <option value="{{ $year }}" @if ($year == $yearSelected) selected @endif>{{ $year }}</option>
                             @endforeach
                         </select>
-                    </div>
+                    </div> --}}
                 </div>
                 <div class="card-body">
-                    <form method="GET" action="/akhlak-achievements/{{$yearSelected}}">
+                    <form method="GET" action="/akhlak-achievements">
                         @csrf
                         <div class="row d-flex justify-content-start mb-4 zoom90">
                             <div class="col-md-12">
@@ -165,14 +165,24 @@ active
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-group">
-                                            <label for="position_id">Start Periode :</label>
-                                            <input type="date" class="form-control" id="periode_start" name="periode_start" @if ($periode_start) value="{{ $periode_start }}" @endif>
+                                            <label for="periode_start">Periode</label>
+                                            <select class="form-control" name="quarter" required>
+                                                <option value="99" selected>Show All</option>
+                                                @foreach ($quarterList as $quarter)
+                                                    <option value="{{ $quarter->id }}" @if ($quarter->id == $quarterSelected) selected @endif>{{ $quarter->quarter_name }}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-group">
-                                            <label for="status">End Periode :</label>
-                                            <input type="date" class="form-control" id="periode_end" name="periode_end" @if ($periode_end) value="{{ $periode_end }}" @endif>
+                                            <label for="periode_end">Year</label>
+                                            <select class="form-control" name="year" required>
+                                                <option value="1" selected>Show All</option>
+                                                @foreach (array_reverse($yearsBefore) as $year)
+                                                    <option value="{{ $year }}" @if ($year == $yearSelected) selected @endif>{{ $year }}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="col-md-1 d-flex align-self-end justify-content-start">
@@ -189,7 +199,7 @@ active
                     <div class="col-md-12">
                         <div class="d-flex align-items-center justify-content-between mb-4">
                             <h6 class="h6 m-0 font-weight-bold text-secondary"><i class="fa fa-user"></i> Avg. Pencapaian <span style="color: #403D4D;">AKH</span><span style="color: #029195;">LAK</span> @if ($userSelected) {{ $userSelected->name }} @else Pekerja @endif </h6>
-                            <a class="btn btn-primary btn-sm text-white" href="#" id="btn-insert" data-toggle="modal" data-target="#inputDataModal"><i class="menu-icon fa fa-plus"></i> Insert Pencapaian</a>
+                            {{-- <a class="btn btn-primary btn-sm text-white" href="#" id="btn-insert" data-toggle="modal" data-target="#inputDataModal"><i class="menu-icon fa fa-plus"></i> Insert Pencapaian</a> --}}
                         </div>
                         <hr class="sidebar-divider">
                     </div>
@@ -251,8 +261,8 @@ active
                                         <th>Judul Kegiatan</th>
                                         <th>Score</th>
                                         <th>Intended to</th>
-                                        <th>Periode Start</th>
-                                        <th>Periode End</th>
+                                        <th>Quarter</th>
+                                        <th>Periode</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -262,8 +272,8 @@ active
                                         <td>{{ $item->judul_kegiatan }}</td>
                                         <td>{{ $item->score }} %</td>
                                         <td>{{ $item->akhlak->indicator }}</td>
-                                        <td>{{ $item->periode_start }}</td>
-                                        <td>{{ $item->periode_end }}</td>
+                                        <td>{{ $item->quarter_id }}</td>
+                                        <td>{{ $item->periode }}</td>
                                         <td class="text-center">
                                             <a href="#" class="btn btn-outline-secondary btn-sm btn-details mr-2"><i class="fa fa-info-circle"></i> Preview</a>
                                             {{-- <a data-toggle="modal" data-target="#editInvoiceModal" data-item-id="{{ $docs->id }}" class="btn btn-danger btn-sm"><i class="fas fa-fw fa-trash-alt"></i> Delete</a> --}}
@@ -282,8 +292,8 @@ active
                                         <th>Judul Kegiatan</th>
                                         <th>Score</th>
                                         <th>Intended to</th>
-                                        <th>Periode Start</th>
-                                        <th>Periode End</th>
+                                        <th>Quarter</th>
+                                        <th>Periode</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -294,8 +304,8 @@ active
                                         <td>{{ $item->judul_kegiatan }}</td>
                                         <td>{{ $item->score }} %</td>
                                         <td>{{ $item->akhlak->indicator }}</td>
-                                        <td>{{ $item->periode_start }}</td>
-                                        <td>{{ $item->periode_end }}</td>
+                                        <td>{{ $item->quarter->quarter_name }}</td>
+                                        <td>{{ $item->periode }}</td>
                                         <td class="text-center">
                                             <a href="#" class="btn btn-outline-secondary btn-sm btn-details mr-2"><i class="fa fa-info-circle"></i> Preview</a>
                                             {{-- <a data-toggle="modal" data-target="#editInvoiceModal" data-item-id="{{ $docs->id }}" class="btn btn-danger btn-sm"><i class="fas fa-fw fa-trash-alt"></i> Delete</a> --}}
@@ -387,6 +397,27 @@ active
                             </div>
                         </div>
                         <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="periode_start">Periode</label>
+                                    <select class="form-control" name="quarter" required>
+                                        <option value="1">Quarter 1</option>
+                                        <option value="2">Quarter 2</option>
+                                        <option value="3">Quarter 3</option>
+                                        <option value="4">Quarter 4</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="periode_end">Year</label>
+                                    <select class="form-control" name="year" required>
+                                        @foreach (array_reverse($yearsBefore) as $year)
+                                            <option value="{{ $year }}">{{ $year }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        {{-- <div class="form-group">
                             <label for="period">Periode</label>
                             <div class="row">
                                 @php
@@ -402,7 +433,7 @@ active
                                     <input type="date" class="form-control" id="period_end" name="period_end" @if ($periode_end) value="{{ $periode_end }}" @endif>
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
                 <div class="modal-footer">

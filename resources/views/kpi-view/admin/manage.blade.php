@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('active-kpi')
-active
+active font-weight-bold
 @endsection
 
 @section('content')
@@ -67,8 +67,8 @@ active
                                 <td>{{ $item->periode_end }}</td>
                                 <td class="text-center">
                                     <a href="{{ route('preview-kpi', ['id' => $item->id]) }}" class="btn btn-outline-secondary btn-sm mr-2"><i class="ti-eye"></i> Preview</a>
-                                    <a href="#" class="btn btn-outline-danger btn-sm btn-details" onclick="event.preventDefault(); document.getElementById('delete-role-form-{{ $item->id }}').submit();"><i class="fa fa-ban"></i> Delete</a>
-                                    <form id="delete-role-form-{{ $item->id }}" action="{{ route('roles.destroy', $item->id) }}" method="POST" style="display: none;">
+                                    <a href="#" class="btn btn-outline-danger btn-sm btn-details" onclick="confirmDelete({{ $item->id }});"><i class="fa fa-ban"></i> Delete</a>
+                                    <form id="delete-kpi-{{ $item->id }}" action="{{ route('kpi.destroy', $item->id) }}" method="POST" style="display: none;">
                                         @csrf
                                         @method('DELETE')
                                     </form>
@@ -125,4 +125,20 @@ active
         </div>
     </div>
 </div>
+<script>
+    function confirmDelete(itemId) {
+        event.preventDefault();
+        swal({
+            title: "Are you sure?",
+            text: "Once deleted, you will not be able to recover this KPI!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then((willDelete) => {
+            if (willDelete) {
+                document.getElementById('delete-kpi-' + itemId).submit();
+            }
+        });
+    }
+</script>
 @endsection

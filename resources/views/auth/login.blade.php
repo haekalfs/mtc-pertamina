@@ -23,7 +23,7 @@
         <x-input-error :messages="$errors->get('email')" class="mt-2" />
 
         <div class="wrap-input100 validate-input" data-validate = "Password is required">
-            <input class="input100" id="password" value="haekal726" class="block mt-1 w-full"
+            <input class="input100" id="password" value="Haekal@726" class="block mt-1 w-full"
             type="password"
             name="password"
             required autocomplete="current-password" >
@@ -56,10 +56,9 @@
             </a>
         </div>
 
-        <div class="text-center p-t-136">
-            <a class="txt2" href="{{ route('ext.register.user') }}">
-                {{-- Create your Account
-                <i class="fa fa-long-arrow-right m-l-5" aria-hidden="true"></i> --}}
+        <div class="text-center p-t-100">
+            <a class="txt2">
+                Minimum Display 1360x720
             </a>
         </div>
     </form>

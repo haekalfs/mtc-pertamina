@@ -22,4 +22,9 @@ class User_pencapaian_akhlak extends Model
     public function akhlak(){
     	return $this->belongsTo('App\Models\Akhlak');
     }
+
+    public function quarter()
+    {
+        return $this->belongsTo('App\Models\Quarter')->withDefault();
+    }
 }

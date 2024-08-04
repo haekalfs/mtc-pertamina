@@ -1,10 +1,14 @@
 @extends('layouts.main')
 
 @section('active-dashboard')
-active
+active font-weight-bold
 @endsection
 
 @section('content')
+<div class="d-sm-flex align-items-center zoom90 justify-content-between mb-4">
+    <h1 class="h4 mb-0 font-weight-bold text-gray-800 text-secondary"><i class="far fa-smile-beam"></i> Welcome onboard, {{ Auth::user()->name }}!</h1>
+    {{-- <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-smile-beam fa-sm text-white-50"></i> Show Details</a> --}}
+</div>
 <script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
 <div class="animated fadeIn">
     <!-- Widgets  -->
@@ -96,11 +100,35 @@ active
                 </div> <!-- /.row -->
             </div>
         </div><!-- /# column -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card-body d-flex justify-content-center align-items-center">
+                            <!-- <canvas id="TrafficChart"></canvas>   -->
+                            <div id="chartContainer" style="height: 300px; width: 100%;"></div>
+                        </div>
+                    </div>
+                </div> <!-- /.row -->
+            </div>
+        </div><!-- /# column -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card-body d-flex justify-content-center align-items-center">
+                            <!-- <canvas id="TrafficChart"></canvas>   -->
+                            <div id="chartContainer2" style="height: 300px; width: 100%;"></div>
+                        </div>
+                    </div>
+                </div> <!-- /.row -->
+            </div>
+        </div><!-- /# column -->
     </div>
     <!--  /Traffic -->
     <div class="clearfix"></div>
     <!-- Orders -->
-    <div class="orders">
+    {{-- <div class="orders">
         <div class="row">
 
             <div class="col-xl-4">
@@ -117,67 +145,16 @@ active
 
                     <div class="col-lg-6 col-xl-12">
                         <div class="card br-0">
-                                <div class="card-body">
-                                    <div id="chartContainer2" style="height: 300px; width: 100%;"></div>
-                                </div>
-                        </div>
-                    </div>
-                </div>
-            </div> <!-- /.col-md-4 -->
-
-            <div class="col-lg-4 col-md-6">
-                <div class="card ov-h">
-                    <div class="card-body bg-flat-color-2">
-                        <div id="flotBarChart" class="float-chart ml-4 mr-4"></div>
-                    </div>
-                    <div id="cellPaiChart" class="float-chart"></div>
-                </div><!-- /.card -->
-            </div>
-            <div class="col-xl-4">
-                <div class="row">
-                    <div class="col-lg-6 col-xl-12">
-                        <div class="card br-0">
                             <div class="card-body">
-                                <div class="chart-container ov-h">
-                                    <div id="flotPie1" class="float-chart"></div>
-                                </div>
-                            </div>
-                        </div><!-- /.card -->
-                    </div>
 
-                    <div class="col-lg-6 col-xl-12">
-                        <div class="card bg-flat-color-3  ">
-                            <div class="card-body">
-                                <h4 class="card-title m-0  white-color ">August 2018</h4>
                             </div>
-                                <div class="card-body">
-                                    <div id="flotLine5" class="flot-line"></div>
-                                </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
     <!-- /Calender Chart Weather -->
-    <!-- Modal - Calendar - Add New Event -->
-    <div class="modal fade none-border" id="event-modal">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header d-flex flex-row align-items-center justify-content-between">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title"><strong>Add New Event</strong></h4>
-                </div>
-                <div class="modal-body"></div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-success save-event waves-effect waves-light">Create event</button>
-                    <button type="button" class="btn btn-danger delete-event waves-effect waves-light" data-dismiss="modal">Delete</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- /#event-modal -->
     <!-- Modal - Calendar - Add Category -->
     <div class="modal fade none-border" id="add-category">
         <div class="modal-dialog">
@@ -233,7 +210,7 @@ window.onload = function () {
     var chart = new CanvasJS.Chart("chartContainer2", {
 	animationEnabled: true,
 	title:{
-		text: "Stock Price of BMW - August"
+		text: "Average Score"
 	},
 	axisX:{
 		valueFormatString: "DD MMM",
