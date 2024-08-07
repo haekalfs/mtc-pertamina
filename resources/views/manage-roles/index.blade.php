@@ -4,6 +4,14 @@
 active font-weight-bold
 @endsection
 
+@section('show-user')
+show
+@endsection
+
+@section('manage-roles')
+font-weight-bold
+@endsection
+
 @section('content')
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>

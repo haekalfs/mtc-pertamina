@@ -1,25 +1,25 @@
 @extends('layouts.main')
 
-@section('active-operation')
+@section('active-pd')
 active font-weight-bold
 @endsection
 
-@section('show-operation')
+@section('show-pd')
 show
 @endsection
 
-@section('participant-infographics')
+@section('certificate')
 font-weight-bold
 @endsection
 
 @section('content')
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
-        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="menu-icon fa fa-users"></i> Participants Infographics</h1>
-        <p class="mb-4">Managing Access based on roles.</a></p>
+        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="menu-icon fa fa-certificate"></i> Certificate</h1>
+        <p class="mb-4">Plan & Development.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
-        <a href="{{ route('participant-infographics-import-page') }}" class="btn btn-sm btn-primary shadow-sm text-white"><i class="fa fa-file-text fa-sm"></i> Import Data</a>
+        {{-- <a href="{{ route('feedback-report-import-page') }}" class="btn btn-sm btn-primary shadow-sm text-white"><i class="fa fa-file-text fa-sm"></i> Import Data</a> --}}
     </div>
 </div>
 <div class="overlay overlay-mid" style="display: none;"></div>
@@ -76,7 +76,7 @@ font-weight-bold
                     </div>
                 </div>
                 <div class="card-body zoom80">
-                    <form method="GET" action="{{ route('participant-infographics') }}">
+                    <form method="GET" action="">
                         @csrf
                         <div class="row d-flex justify-content-start mb-4">
                             <div class="col-md-12">
@@ -86,9 +86,6 @@ font-weight-bold
                                             <label for="email">Nama Penlat :</label>
                                             <select class="custom-select" id="namaPenlat" name="namaPenlat">
                                                 <option value="1" selected>Show All</option>
-                                                @foreach($listPenlat as $participant)
-                                                    <option value="{{ $participant->nama_program }}" @if (in_array($participant->nama_program, $selectedArray)) selected @endif>{{ $participant->nama_program }}</option>
-                                                @endforeach
                                             </select>
                                         </div>
                                     </div>
@@ -97,9 +94,6 @@ font-weight-bold
                                             <label for="position_id">STCW/Non :</label>
                                             <select name="stcw" class="form-control" id="stcw">
                                                 <option value="1">Show All</option>
-                                                @foreach($listStcw as $participant)
-                                                    <option value="{{ $participant->kategori_program }}" @if (in_array($participant->kategori_program, $selectedArray)) selected @endif>{{ $participant->kategori_program }}</option>
-                                                @endforeach
                                             </select>
                                         </div>
                                     </div>
@@ -108,9 +102,6 @@ font-weight-bold
                                             <label for="status">Jenis Penlat :</label>
                                             <select class="form-control" id="jenisPenlat" name="jenisPenlat" required>
                                                 <option value="1" selected>Show All</option>
-                                                @foreach($listJenisPenlat as $participant)
-                                                    <option value="{{ $participant->jenis_pelatihan }}" @if (in_array($participant->jenis_pelatihan, $selectedArray)) selected @endif>{{ $participant->jenis_pelatihan }}</option>
-                                                @endforeach
                                             </select>
                                         </div>
                                     </div>
@@ -119,9 +110,6 @@ font-weight-bold
                                             <label for="position_id">TW :</label>
                                             <select name="tw" class="form-control" id="tw">
                                                 <option value="1">Show All</option>
-                                                @foreach($listTw as $participant)
-                                                    <option value="{{ $participant->realisasi }}" @if (in_array($participant->realisasi, $selectedArray)) selected @endif>{{ $participant->realisasi }}</option>
-                                                @endforeach
                                             </select>
                                         </div>
                                     </div>
@@ -130,9 +118,6 @@ font-weight-bold
                                             <label for="position_id">Periode :</label>
                                             <select name="periode" class="form-control" id="periode">
                                                 <option value="1" selected>Show All</option>
-                                                @foreach (array_reverse($yearsBefore) as $year)
-                                                    <option value="{{ $year }}" @if (in_array($year, $selectedArray)) selected @endif>{{ $year }}</option>
-                                                @endforeach
                                             </select>
                                         </div>
                                     </div>
@@ -150,37 +135,25 @@ font-weight-bold
                     <table id="docLetter" class="table table-bordered">
                         <thead>
                             <tr>
-                                <th>Nama Peserta</th>
-                                <th>Nama Program</th>
-                                <th>Tgl Pelaksanaan</th>
-                                <th>Tempat Pelaksanaan</th>
-                                <th>Jenis Pelatihan</th>
+                                <th>Alias</th>
+                                <th>Nama Penlat</th>
+                                <th>Batch</th>
+                                <th>Status</th>
                                 <th>Keterangan</th>
-                                <th>Subholding</th>
-                                <th>Perusahaan</th>
-                                <th>Kategori Program</th>
-                                <th>Realisasi</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($data as $participant)
-                                <tr id="participant-{{ $participant->id }}">
-                                    <td>{{ $participant->nama_peserta }}</td>
-                                    <td>{{ $participant->nama_program }}</td>
-                                    <td>{{ $participant->tgl_pelaksanaan }}</td>
-                                    <td>{{ $participant->tempat_pelaksanaan }}</td>
-                                    <td>{{ $participant->jenis_pelatihan }}</td>
-                                    <td>{{ $participant->keterangan }}</td>
-                                    <td>{{ $participant->subholding }}</td>
-                                    <td>{{ $participant->perusahaan }}</td>
-                                    <td>{{ $participant->kategori_program }}</td>
-                                    <td>{{ $participant->realisasi }}</td>
-                                    <td>
-                                        <a data-item-id="{{ $participant->id }}" class="btn btn-outline-secondary btn-sm mr-2 edit-btn"><i class="ti-eye"></i> Edit</a>
-                                    </td>
-                                </tr>
-                            @endforeach
+                            <tr>
+                                <td>BSS</td>
+                                <td>Basic Sea Survival</td>
+                                <td>....</td>
+                                <td>Issued</td>
+                                <td>Done</td>
+                                <td class="text-center">
+                                    <a class="btn btn-outline-secondary btn-sm" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-eye"></i> Action</a>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -247,62 +220,6 @@ font-weight-bold
         </div>
     </div>
 </div>
-<script>
-$(document).ready(function() {
-    $('.edit-btn').click(function() {
-        var id = $(this).data('item-id');
-        $.ajax({
-            url: '/infografis-peserta/' + id + '/edit',
-            method: 'GET',
-            success: function(data) {
-                $('#editId').val(data.id);
-                $('#editNamaPeserta').val(data.nama_peserta);
-                $('#editNamaProgram').val(data.nama_program);
-                $('#editTglPelaksanaan').val(data.tgl_pelaksanaan);
-                $('#editTempatPelaksanaan').val(data.tempat_pelaksanaan);
-                $('#editJenisPelatihan').val(data.jenis_pelatihan);
-                $('#editKeterangan').val(data.keterangan);
-                $('#editSubholding').val(data.subholding);
-                $('#editPerusahaan').val(data.perusahaan);
-                $('#editKategoriProgram').val(data.kategori_program);
-                $('#editRealisasi').val(data.realisasi);
-                $('#editModal').modal('show');
-            }
-        });
-    });
-
-    $('#editForm').submit(function(e) {
-        e.preventDefault();
-        var id = $('#editId').val();
-        $.ajax({
-            url: '/infografis-peserta/' + id,
-            method: 'PUT',
-            data: $(this).serialize(),
-            success: function(response) {
-                $('#participant-' + id + ' td:nth-child(1)').text(response.nama_peserta);
-                $('#participant-' + id + ' td:nth-child(2)').text(response.nama_program);
-                $('#participant-' + id + ' td:nth-child(3)').text(response.tgl_pelaksanaan);
-                $('#participant-' + id + ' td:nth-child(4)').text(response.tempat_pelaksanaan);
-                $('#participant-' + id + ' td:nth-child(5)').text(response.jenis_pelatihan);
-                $('#participant-' + id + ' td:nth-child(6)').text(response.keterangan);
-                $('#participant-' + id + ' td:nth-child(7)').text(response.subholding);
-                $('#participant-' + id + ' td:nth-child(8)').text(response.perusahaan);
-                $('#participant-' + id + ' td:nth-child(9)').text(response.kategori_program);
-                $('#participant-' + id + ' td:nth-child(10)').text(response.realisasi);
-                $('#editModal').modal('hide');
-                $('.alert-success-saving-mid').show();
-                $('.overlay-mid').show();
-                $('.alert-success-saving-mid').text(response.message);
-                setTimeout(function() {
-                    $('.alert-success-saving-mid').fadeOut('slow');
-                    $('.overlay-mid').fadeOut('slow');
-                    window.location.reload();
-                }, 1000);
-            }
-        });
-    });
-});
-</script>
 <script>
     document.getElementById('addApproversBtn').addEventListener('click', function() {
         // Hide the "Add Approvers" button

@@ -4,6 +4,14 @@
 active font-weight-bold
 @endsection
 
+@section('show-kpi')
+show
+@endsection
+
+@section('kpi')
+font-weight-bold
+@endsection
+
 @section('content')
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>

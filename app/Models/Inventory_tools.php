@@ -28,4 +28,9 @@ class Inventory_tools extends Model
     public function img(){
     	return $this->hasOne('App\Models\Tool_img', 'inventory_tool_id', 'id');
     }
+
+    public function penlat_usage()
+    {
+        return $this->hasMany('App\Models\Penlat_utility_usage', 'inventory_tool_id', 'id');
+    }
 }

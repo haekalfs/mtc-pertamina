@@ -4,6 +4,14 @@
 active font-weight-bold
 @endsection
 
+@section('show-kpi')
+show
+@endsection
+
+@section('kpi')
+font-weight-bold
+@endsection
+
 @section('content')
 <style>
     /* Form Labels */
@@ -112,7 +120,6 @@ active font-weight-bold
         display: flex;
         justify-content: space-around;
         align-items: center;
-        margin-top: 20px;
         flex-wrap: wrap;
     }
 
@@ -157,29 +164,43 @@ active font-weight-bold
         background-size: 1rem 1rem;
     }
 </style>
+{{-- circle progress bar --}}
+{{-- <a class="progress-circle-wrapper">
+    <div class="progress-circle p99 over50">
+        <span>99%</span>
+        <div class="left-half-clipper">
+            <div class="first50-bar"></div>
+            <div class="value-bar"></div>
+        </div>
+    </div>
+</a> --}}
 <div class="animated fadeIn zoom90">
     <div class="row">
         <div class="col-md-12">
             <div class="card">
+                <div class="card-header py-3">
+                    <div class="text-center">
+                        <h6 class="font-weight-bold">List Indicators</h6>
+                    </div>
+                </div>
                 <div class="badge-container">
                     @foreach ($kpis as $kpi)
-                        <div class="badge-item">
-                            <div class="mx-auto d-block">
-                                <a href="{{ route('pencapaian-kpi', $kpi->id) }}">
-                                    <img class="align-self-center rounded-circle mb-2" alt="" src="{{ asset('img/kpi-default-logo.png') }}">
-                                </a>
-                            </div>
-                            <div class="mx-auto d-block">
-                                <small class="badge-label">{{ $kpi->indicator }}</small>
-                            </div>
+                    <div class="badge-item mt-4">
+                        <div class="mx-auto d-block">
+                            <a href="{{ route('pencapaian-kpi', $kpi->id) }}">
+                                <img class="align-self-center rounded-circle mb-2" alt="" src="{{ asset('img/kpi-default-logo.png') }}">
+                            </a>
                         </div>
+                        <div class="mx-auto d-block">
+                            <small class="badge-label">{{ $kpi->indicator }}</small>
+                        </div>
+                    </div>
                     @endforeach
                 </div>
-
                 <div class="progress-box-modified">
-                    <h4 class="por-title mb-2">Realisasi Pencapaian Overall</h4>
+                    <h4 class="por-title mb-2">Realisasi KPI Overall</h4>
                     <div class="progress mb-2">
-                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ $percentage ?? 0 }}%;" aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-bar" role="progressbar" style="width: {{ $percentage ?? 0 }}%; background-color: #53777A;" aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100">
                             {{ $percentage ?? 0 }}%
                         </div>
                     </div>
@@ -188,15 +209,15 @@ active font-weight-bold
 
             <div class="card">
                 <div class="card-header d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold" id="judul">List Indicators</h6>
+                    <h6 class="m-0 font-weight-bold" id="judul">Data Pencapaian Overall</h6>
                     <div class="text-right">
                         <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Create KPI</a>
                     </div>
                 </div>
                 <nav>
                     <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                        <a class="nav-item nav-link active" id="custom-nav-home-tab" data-toggle="tab" href="#custom-nav-home" role="tab" aria-controls="custom-nav-home" aria-selected="true"> Show Data</a>
-                        <a class="nav-item nav-link" id="custom-nav-profile-tab" data-toggle="tab" href="#custom-nav-profile" role="tab" aria-controls="custom-nav-profile" aria-selected="false"> Show Charts</a>
+                        <a class="nav-item nav-link active" id="custom-nav-home-tab" data-toggle="tab" href="#custom-nav-home" role="tab" aria-controls="custom-nav-home" aria-selected="true"> List Pencapaian</a>
+                        <a class="nav-item nav-link" id="custom-nav-profile-tab" data-toggle="tab" href="#custom-nav-profile" role="tab" aria-controls="custom-nav-profile" aria-selected="false"> Grafik Pencapaian</a>
                     </div>
                 </nav>
                 <div class="card-body">
@@ -206,26 +227,30 @@ active font-weight-bold
                                 <thead>
                                     <tr>
                                         <th>No.</th>
-                                        <th>Indicator</th>
-                                        <th>Target</th>
+                                        <th>Pencapaian</th>
+                                        <th>Target Tercapai</th>
+                                        <th>Quarter</th>
                                         <th>Periode</th>
+                                        <th>Indicator</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>@php $no = 1; @endphp
-                                    @foreach ($indicators as $item)
+                                    @foreach ($pencapaian as $item)
                                     <tr>
                                         <td>{{ $no++ }}</td>
-                                        <td>{{ $item->indicator }}</td>
-                                        <td>{{ $item->target }}</td>
+                                        <td>{{ $item->pencapaian }}</td>
+                                        <td>{{ $item->score }}</td>
+                                        <td>{{ $item->quarter->quarter_name }}</td>
                                         <td>{{ $item->periode }}</td>
+                                        <td>{{ $item->indicator->indicator}} </td>
                                         <td class="text-center">
-                                            <a href="{{ route('preview-kpi', ['id' => $item->id]) }}" class="btn btn-outline-secondary btn-sm mr-2"><i class="ti-eye"></i> Preview</a>
-                                            <a href="#" class="btn btn-outline-danger btn-sm btn-details" onclick="confirmDelete({{ $item->id }});"><i class="fa fa-ban"></i> Delete</a>
+                                            <a href="{{ route('preview-kpi', ['id' => $item->kpi_id]) }}" class="btn btn-outline-secondary btn-sm mr-2"><i class="ti-eye"></i> Preview</a>
+                                            {{-- <a href="#" class="btn btn-outline-danger btn-sm btn-details" onclick="confirmDelete({{ $item->id }});"><i class="fa fa-ban"></i> Delete</a>
                                             <form id="delete-kpi-{{ $item->id }}" action="{{ route('kpi.destroy', $item->id) }}" method="POST" style="display: none;">
                                                 @csrf
                                                 @method('DELETE')
-                                            </form>
+                                            </form> --}}
                                         </td>
                                     </tr>
                                     @endforeach

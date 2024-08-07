@@ -4,6 +4,14 @@
 active font-weight-bold
 @endsection
 
+@section('show-user')
+show
+@endsection
+
+@section('manage-users')
+font-weight-bold
+@endsection
+
 {{-- @section('breadcumbs')
 <div class="breadcrumbs">
     <div class="breadcrumbs-inner">

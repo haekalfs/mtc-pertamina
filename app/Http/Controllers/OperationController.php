@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Infografis_peserta;
 use App\Models\Inventory_tools;
 use App\Models\Location;
+use App\Models\Penlat_utility;
+use App\Models\Penlat_utility_usage;
+use App\Models\Utility;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -145,6 +148,19 @@ class OperationController extends Controller
 
     public function tool_requirement_penlat()
     {
-        return view('operation.submenu.requirement_penlat');
+        $locations = Location::all();
+        return view('operation.submenu.requirement_penlat', ['locations' => $locations]);
+    }
+
+    public function utility()
+    {
+        $data = Penlat_utility::all();
+        $utility = Utility::all();
+        return view('operation.submenu.utility', ['data' => $data, 'utilities' => $utility]);
+    }
+
+    public function preview_utility($id)
+    {
+        return view('operation.submenu.preview-utility', []);
     }
 }

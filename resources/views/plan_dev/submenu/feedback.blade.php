@@ -1,25 +1,25 @@
 @extends('layouts.main')
 
-@section('active-operation')
+@section('active-pd')
 active font-weight-bold
 @endsection
 
-@section('show-operation')
+@section('show-pd')
 show
 @endsection
 
-@section('participant-infographics')
+@section('feedback-report')
 font-weight-bold
 @endsection
 
 @section('content')
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
-        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="menu-icon fa fa-users"></i> Participants Infographics</h1>
-        <p class="mb-4">Managing Access based on roles.</a></p>
+        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="menu-icon fa fa-trophy"></i> Feedback Report</h1>
+        <p class="mb-4">Feedback Report.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
-        <a href="{{ route('participant-infographics-import-page') }}" class="btn btn-sm btn-primary shadow-sm text-white"><i class="fa fa-file-text fa-sm"></i> Import Data</a>
+        <a href="{{ route('feedback-report-import-page') }}" class="btn btn-sm btn-primary shadow-sm text-white"><i class="fa fa-file-text fa-sm"></i> Import Data</a>
     </div>
 </div>
 <div class="overlay overlay-mid" style="display: none;"></div>
@@ -76,7 +76,7 @@ font-weight-bold
                     </div>
                 </div>
                 <div class="card-body zoom80">
-                    <form method="GET" action="{{ route('participant-infographics') }}">
+                    <form method="GET" action="">
                         @csrf
                         <div class="row d-flex justify-content-start mb-4">
                             <div class="col-md-12">
@@ -86,9 +86,6 @@ font-weight-bold
                                             <label for="email">Nama Penlat :</label>
                                             <select class="custom-select" id="namaPenlat" name="namaPenlat">
                                                 <option value="1" selected>Show All</option>
-                                                @foreach($listPenlat as $participant)
-                                                    <option value="{{ $participant->nama_program }}" @if (in_array($participant->nama_program, $selectedArray)) selected @endif>{{ $participant->nama_program }}</option>
-                                                @endforeach
                                             </select>
                                         </div>
                                     </div>
@@ -97,9 +94,6 @@ font-weight-bold
                                             <label for="position_id">STCW/Non :</label>
                                             <select name="stcw" class="form-control" id="stcw">
                                                 <option value="1">Show All</option>
-                                                @foreach($listStcw as $participant)
-                                                    <option value="{{ $participant->kategori_program }}" @if (in_array($participant->kategori_program, $selectedArray)) selected @endif>{{ $participant->kategori_program }}</option>
-                                                @endforeach
                                             </select>
                                         </div>
                                     </div>
@@ -108,9 +102,6 @@ font-weight-bold
                                             <label for="status">Jenis Penlat :</label>
                                             <select class="form-control" id="jenisPenlat" name="jenisPenlat" required>
                                                 <option value="1" selected>Show All</option>
-                                                @foreach($listJenisPenlat as $participant)
-                                                    <option value="{{ $participant->jenis_pelatihan }}" @if (in_array($participant->jenis_pelatihan, $selectedArray)) selected @endif>{{ $participant->jenis_pelatihan }}</option>
-                                                @endforeach
                                             </select>
                                         </div>
                                     </div>
@@ -119,9 +110,6 @@ font-weight-bold
                                             <label for="position_id">TW :</label>
                                             <select name="tw" class="form-control" id="tw">
                                                 <option value="1">Show All</option>
-                                                @foreach($listTw as $participant)
-                                                    <option value="{{ $participant->realisasi }}" @if (in_array($participant->realisasi, $selectedArray)) selected @endif>{{ $participant->realisasi }}</option>
-                                                @endforeach
                                             </select>
                                         </div>
                                     </div>
@@ -130,9 +118,6 @@ font-weight-bold
                                             <label for="position_id">Periode :</label>
                                             <select name="periode" class="form-control" id="periode">
                                                 <option value="1" selected>Show All</option>
-                                                @foreach (array_reverse($yearsBefore) as $year)
-                                                    <option value="{{ $year }}" @if (in_array($year, $selectedArray)) selected @endif>{{ $year }}</option>
-                                                @endforeach
                                             </select>
                                         </div>
                                     </div>
@@ -164,23 +149,7 @@ font-weight-bold
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($data as $participant)
-                                <tr id="participant-{{ $participant->id }}">
-                                    <td>{{ $participant->nama_peserta }}</td>
-                                    <td>{{ $participant->nama_program }}</td>
-                                    <td>{{ $participant->tgl_pelaksanaan }}</td>
-                                    <td>{{ $participant->tempat_pelaksanaan }}</td>
-                                    <td>{{ $participant->jenis_pelatihan }}</td>
-                                    <td>{{ $participant->keterangan }}</td>
-                                    <td>{{ $participant->subholding }}</td>
-                                    <td>{{ $participant->perusahaan }}</td>
-                                    <td>{{ $participant->kategori_program }}</td>
-                                    <td>{{ $participant->realisasi }}</td>
-                                    <td>
-                                        <a data-item-id="{{ $participant->id }}" class="btn btn-outline-secondary btn-sm mr-2 edit-btn"><i class="ti-eye"></i> Edit</a>
-                                    </td>
-                                </tr>
-                            @endforeach
+
                         </tbody>
                     </table>
                 </div>

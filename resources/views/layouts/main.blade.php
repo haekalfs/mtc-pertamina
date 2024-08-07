@@ -86,89 +86,89 @@
                     </li>
                     <li class="menu-title">Main Menu</li><!-- /.menu-title -->
                     @usr_acc(101)
-                    <li class="menu-item-has-children dropdown @yield('active-operation')">
+                    <li class="menu-item-has-children dropdown @yield('active-operation') @yield('show-operation')">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="menu-icon fa fa-cogs"></i> Operasi</a>
-                        <ul class="sub-menu children dropdown-menu font-weight-normal">
-                            <li><i class="fa fa-tachometer"></i><a href="{{ route('operation') }}">Dashboard</a></li>
-                            <li><i class="fa fa-users"></i><a href="{{ route('participant-infographics') }}">Infografis Peserta</a></li>
-                            <li><i class="fa fa-fire-extinguisher"></i><a href="{{ route('tool-inventory') }}">Inventaris Alat</a></li>
-                            <li><i class="fa fa-building-o"></i><a href="{{ route('room-inventory') }}">Inventaris Ruangan</a></li>
-                            <li><i class="fa fa-check-square-o"></i><a href="{{ route('tool-requirement-penlat') }}">Kebutuhan Alat Penlat</a></li>
-                            <li><i class="fa fa-cog"></i><a href="{{ route('utility') }}">Utilitas</a></li>
+                        <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-operation')">
+                            <li><i class="fa fa-tachometer"></i><a href="{{ route('operation') }}" class="@yield('operation')">Dashboard</a></li>
+                            <li><i class="fa fa-users"></i><a href="{{ route('participant-infographics') }}" class="@yield('participant-infographics')">Infografis Peserta</a></li>
+                            <li><i class="fa fa-fire-extinguisher"></i><a href="{{ route('tool-inventory') }}" class="@yield('tool-inventory')">Inventaris Alat</a></li>
+                            <li><i class="fa fa-building-o"></i><a href="{{ route('room-inventory') }}" class="@yield('room-inventory')">Inventaris Ruangan</a></li>
+                            <li><i class="fa fa-check-square-o"></i><a href="{{ route('tool-requirement-penlat') }}" class="@yield('tool-requirement-penlat')">Kebutuhan Alat Penlat</a></li>
+                            <li><i class="fa fa-cog"></i><a href="{{ route('utility') }}" class="@yield('utility')">Utilitas</a></li>
                         </ul>
                     </li>
                     @endusr_acc
                     @usr_acc(102)
-                    <li class="menu-item-has-children dropdown @yield('active-finance')">
+                    <li class="menu-item-has-children dropdown @yield('active-finance') @yield('show-finance')">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-money"></i>Finance</a>
-                        <ul class="sub-menu children dropdown-menu font-weight-normal">
+                        <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-finance')">
                             <li><i class="fa fa-tachometer"></i><a href="{{ route('finance') }}">Dashboard</a></li>
                             <li><i class="fa fa-cog"></i><a href="{{ route('manage-finance') }}">Manage</a></li>
                         </ul>
                     </li>
                     @endusr_acc
                     @usr_acc(103)
-                    <li class="menu-item-has-children dropdown @yield('active-pd')">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-th"></i>P&D</a>
-                        <ul class="sub-menu children dropdown-menu font-weight-normal">
-                            <li><i class="fa fa-tachometer"></i><a href="#">Dashboard</a></li>
-                            <li><i class="fa fa-cog"></i><a href="#">Feedback Report</a></li>
-                            <li><i class="fa fa-cog"></i><a href="#">Referensi Pelatihan</a></li>
-                            <li><i class="fa fa-cog"></i><a href="#">Regulasi</a></li>
-                            <li><i class="fa fa-cog"></i><a href="#">Monitoring Approval</a></li>
-                            <li><i class="fa fa-cog"></i><a href="#">Instruktur</a></li>
-                            <li><i class="fa fa-cog"></i><a href="#">Certification</a></li>
+                    <li class="menu-item-has-children dropdown @yield('active-pd') @yield('show-pd')">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-chain"></i>Plan & Development</a>
+                        <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-pd')">
+                            <li><i class="fa fa-tachometer"></i><a href="{{ route('plan-dev') }}" class="@yield('plan-dev')">Dashboard</a></li>
+                            <li><i class="fa fa-trophy"></i><a href="{{ route('feedback-report') }}" class="@yield('feedback-report')">Feedback Report</a></li>
+                            <li><i class="fa fa-tag"></i><a href="{{ route('training-reference') }}" class="@yield('training-reference')">Referensi Pelatihan</a></li>
+                            {{-- <li><i class="fa fa-cog"></i><a href="#">Monitoring Approval</a></li> --}}
+                            <li><i class="fa fa-male"></i><a href="{{ route('instructor') }}" class="@yield('instructor')">Instruktur</a></li>
+                            <li><i class="fa fa-certificate"></i><a href="{{ route('certificate') }}" class="@yield('certificate')">Certification</a></li>
+                            <li><i class="fa fa-warning"></i><a href="{{ route('regulation') }}" class="@yield('regulation')">Regulasi</a></li>
                         </ul>
                     </li>
                     @endusr_acc
                     @usr_acc(104)
-                    <li class="menu-item-has-children dropdown @yield('active-marketing')">
+                    <li class="menu-item-has-children dropdown @yield('active-marketing') @yield('show-marketing')">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-suitcase"></i>Marketing</a>
-                        <ul class="sub-menu children dropdown-menu font-weight-normal">
-                            <li><i class="menu-icon fa fa-tachometer"></i><a href="#">Dashboard</a></li>
-                            <li><i class="fa fa-cog"></i><a href="#">Marketing Campaign</a></li>
-                            <li><i class="fa fa-cog"></i><a href="#">Social Media Enggagement</a></li>
-                            <li><i class="fa fa-cog"></i><a href="#">Company Agreement</a></li>
+                        <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-marketing')">
+                            <li><i class="menu-icon fa fa-tachometer"></i><a href="{{ route('marketing') }}" class="@yield('marketing')">Dashboard</a></li>
+                            <li><i class="fa fa-bullhorn"></i><a href="{{ route('marketing-campaign') }}" class="@yield('marketing-campaign')">Marketing Campaign</a></li>
+                            <li><i class="ti-instagram"></i><a href="#" class="@yield('socmed')">Social Media Enggagement</a></li>
+                            <li><i class="fa fa-sitemap"></i><a href="{{ route('company-agreement') }}" class="@yield('company-agreement')">Company Agreement</a></li>
                         </ul>
                     </li>
                     @endusr_acc
                     @usr_acc(105)
-                    <li class="menu-item-has-children dropdown @yield('active-kpi')">
+                    <li class="menu-item-has-children dropdown @yield('active-kpi') @yield('show-kpi')">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-bar-chart-o"></i>KPI</a>
-                        <ul class="sub-menu children dropdown-menu font-weight-normal">
-                            <li><i class="fa fa-tachometer"></i><a href="{{ route('kpi') }}">Dashboard</a></li>
+                        <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-kpi')">
+                            <li><i class="fa fa-tachometer"></i><a href="{{ route('kpi') }}" class="@yield('kpi')">Dashboard</a></li>
                             {{-- <li><i class="fa fa-cog"></i><a href="{{ route('manage-kpi') }}">Manage</a></li> --}}
-                            <li><i class="fa fa-file"></i><a href="{{ route('report-kpi') }}">Laporan</a></li>
+                            <li><i class="fa fa-file"></i><a href="{{ route('report-kpi') }}" class="@yield('report-kpi')">Laporan</a></li>
                         </ul>
                     </li>
                     @endusr_acc
                     @usr_acc(106)
-                    <li class="menu-item-has-children dropdown @yield('active-akhlak')">
+                    <li class="menu-item-has-children dropdown @yield('active-akhlak') @yield('show-akhlak')">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-star-half-empty"></i>Akhlak</a>
-                        <ul class="sub-menu children dropdown-menu font-weight-normal">
-                            <li><i class="menu-icon fa fa-tachometer"></i><a href="{{ route('akhlak.achievements') }}">Dashboard</a></li>
-                            <li><i class="fa fa-file"></i><a href="{{ route('report-akhlak') }}">Laporan</a></li>
+                        <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-akhlak')">
+                            <li><i class="menu-icon fa fa-tachometer"></i><a href="{{ route('akhlak.achievements') }}" class="@yield('akhlak')">Dashboard</a></li>
+                            <li><i class="fa fa-file"></i><a href="{{ route('report-akhlak') }}" class="@yield('report-akhlak')">Laporan</a></li>
                         </ul>
                     </li>
                     @endusr_acc
 
                     @usr_acc(201)
                     <li class="menu-title">Settings</li><!-- /.menu-title -->
-                    <li class="menu-item-has-children dropdown @yield('active-user')">
+                    <li class="menu-item-has-children dropdown @yield('active-user') @yield('show-user')">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-users"></i>Users</a>
-                        <ul class="sub-menu children dropdown-menu font-weight-normal">
-                            <li><i class="menu-icon fa fa-sign-in"></i><a href="{{ route('manage.users') }}">Manage Users</a></li>
-                            <li><i class="menu-icon fa fa-sign-in"></i><a href="{{ route('manage.dept.post') }}">Dept. & Position</a></li>
-                            <li><i class="menu-icon fa fa-sign-in"></i><a href="{{ route('manage.roles') }}">Manage Roles</a></li>
+                        <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-user')">
+                            <li><i class="menu-icon fa fa-sign-in"></i><a href="{{ route('manage.users') }}" class="@yield('manage-users')">Manage Users</a></li>
+                            <li><i class="menu-icon fa fa-sign-in"></i><a href="{{ route('manage.dept.post') }}" class="@yield('manage-dept')">Dept. & Position</a></li>
+                            <li><i class="menu-icon fa fa-sign-in"></i><a href="{{ route('manage.roles') }}" class="@yield('manage-roles')">Manage Roles</a></li>
                         </ul>
                     </li>
                     @endusr_acc
 
                     @usr_acc(202)
-                    <li class="menu-item-has-children dropdown @yield('active-access')" style="padding-bottom: 15%;">
+                    <li class="menu-item-has-children dropdown @yield('active-access') @yield('show-access')" style="padding-bottom: 15%;">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-ban"></i>User Access Control</a>
-                        <ul class="sub-menu children dropdown-menu font-weight-normal">
-                            <li><i class="menu-icon fa fa-sign-in"></i><a href="{{ route('manage.access') }}">Manage Access</a></li>
+                        <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-access')">
+                            <li><i class="menu-icon fa fa-sign-in"></i><a href="{{ route('manage.access') }}" class="@yield('manage-access')">Manage Access</a></li>
                         </ul>
                     </li>
                     @endusr_acc

@@ -4,6 +4,14 @@
 active font-weight-bold
 @endsection
 
+@section('show-operation')
+show
+@endsection
+
+@section('tool-inventory')
+font-weight-bold
+@endsection
+
 @section('content')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
@@ -42,78 +50,6 @@ active font-weight-bold
     <strong>{{ $message }}</strong>
 </div>
 @endif
-<style>
-.alert-success-saving-mid {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    padding: 20px;
-    border-radius: 5px;
-    text-align: center;
-    z-index: 10000;
-}
-
-.custom-card {
-    border: none;
-    color: white;
-    border-radius: 15px;
-}
-
-.card-text {
-    margin-bottom: 0;
-    color: rgb(0, 0, 0);
-}
-
-.out-of-stock {
-    background-color: #dc3545;
-    color: white;
-    font-weight: bold;
-}
-
-.card-icons {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.card-icons .badge {
-    background-color: red;
-    color: rgb(255, 255, 255);
-}
-
-.card-icons i {
-    font-size: 20px;
-    color: rgb(0, 0, 0);
-}
-
-.card-icons a {
-    color: rgb(0, 0, 0);
-    text-decoration: none;
-}
-
-.card-icons a:hover {
-    color: lightgray;
-}
-
-.img-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-}
-
-.img-container img {
-    max-height: 100%;
-    max-width: 100%;
-    object-fit: cover;
-}
-
-</style>
 <style>
     .drop-zone {
     border: 2px dashed #ccc;
@@ -176,38 +112,38 @@ active font-weight-bold
                         <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Register Tool</a>
                     </div>
                 </div>
-                <div class="card-body">
-                    <div class="row-toolbar">
-                        <div class="col">
-                            <select style="max-width: 18%;" class="form-control" id="rowsPerPage">
-                                <option value="-1">Show All</option>
-                                @foreach($locations as $item)
-                                <option value="{{ $item->id }}">{{ $item->description }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-auto text-right">
-                            <input class="form-control" type="text" id="searchInput" placeholder="Search...">
-                        </div>
+                <div class="row-toolbar mt-4 ml-2">
+                    <div class="col">
+                        <select style="max-width: 18%;" class="form-control" id="rowsPerPage">
+                            <option value="-1">Show All</option>
+                            @foreach($locations as $item)
+                            <option value="{{ $item->id }}">{{ $item->description }}</option>
+                            @endforeach
+                        </select>
                     </div>
+                    <div class="col-auto text-right mr-2">
+                        <input class="form-control" type="text" id="searchInput" placeholder="Search...">
+                    </div>
+                </div>
+                <div class="card-body">
                     <div class="row zoom80 p-2">
                         @foreach($assets as $item)
                         <div class="col-md-6 mt-2">
                             <div class="card custom-card mb-3 shadow" style="background-color: #ffffff;">
                                 <div class="row no-gutters">
-                                    <div class="col-md-4 d-flex align-items-center justify-content-center" style="padding-left: 1em;">
-                                        <img src="{{ asset($item->img->filepath) }}" style="border-radius: 15px;" class="card-img" alt="...">
+                                    <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding-left: 1em;">
+                                        <img src="{{ asset($item->img->filepath) }}" style="height: 150px; width: 150px; border-radius: 15px;" class="card-img" alt="...">
                                     </div>
-                                    <div class="col-md-8">
-                                        <div class="card-body text-secondary mt-3">
+                                    <div class="col-md-9">
+                                        <div class="card-body text-secondary">
                                             <div>
                                                 <h5 class="card-title font-weight-bold">{{ $item->asset_name }}</h5>
-                                                <ul class="ml-3">
+                                                <ul class="ml-4">
                                                     <li class="card-text">Nomor Aset : {{ $item->asset_id }}</li>
                                                     <li class="card-text">Maker : {{ $item->asset_maker }}</li>
                                                     <li class="card-text">Kondisi Alat : {{ $item->asset_condition }}</li>
                                                     <li class="card-text">Stock : {{ $item->asset_stock }}</li>
-                                                    <li class="card-text">Panduan Maintenance : <a href="#" class="text-secondary"><i class="fa fa-location-arrow fa-sm"></i>&nbsp;<i>View</i></a></li>
+                                                    <li class="card-text">Panduan Maintenance : <a href="#" class="text-secondary"><i class="fa fa-external-link fa-sm"></i>&nbsp;<i>View</i></a></li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -220,6 +156,17 @@ active font-weight-bold
                             </div>
                         </div>
                         @endforeach
+                        <div class="col-md-12 text-center d-flex align-items-center justify-content-center mt-4">
+                            <nav aria-label="Page navigation example">
+                                <ul class="pagination">
+                                  <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                                  <li class="page-item"><a class="page-link" href="#">1</a></li>
+                                  <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                  <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                  <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                                </ul>
+                              </nav>
+                        </div>
                     </div>
                 </div>
             </div>

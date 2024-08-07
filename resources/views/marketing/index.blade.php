@@ -1,22 +1,55 @@
 @extends('layouts.main')
 
-@section('active-operation')
+@section('active-marketing')
 active font-weight-bold
 @endsection
 
-@section('show-operation')
+@section('show-marketing')
 show
 @endsection
 
-@section('operation')
+@section('marketing')
 font-weight-bold
 @endsection
 
 @section('content')
+<style>
+    .border-left-primary {
+      border-left: 0.25rem solid #4e73df !important;
+    }
+
+    .border-bottom-primary {
+      border-bottom: 0.25rem solid #4e73df !important;
+    }
+
+    .border-left-secondary {
+      border-left: 0.25rem solid #858796 !important;
+    }
+
+    .border-bottom-secondary {
+      border-bottom: 0.25rem solid #858796 !important;
+    }
+
+    .border-left-success {
+      border-left: 0.25rem solid #1cc88a !important;
+    }
+
+    .border-bottom-success {
+      border-bottom: 0.25rem solid #1cc88a !important;
+    }
+
+    .border-left-info {
+      border-left: 0.25rem solid #36b9cc !important;
+    }
+
+    .border-bottom-info {
+      border-bottom: 0.25rem solid #36b9cc !important;
+    }
+</style>
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
-        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="menu-icon fa fa-cogs"></i> Dashboard Operation</h1>
-        <p class="mb-4">Dashboard Operation.</a></p>
+        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="menu-icon fa fa-suitcase"></i> Dashboard Marketing</h1>
+        <p class="mb-4">Dashboard Marketing.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
     </div>
@@ -25,59 +58,53 @@ font-weight-bold
     <div class="row">
         <!-- Earnings (Monthly) Card Example -->
         <div class="col-xl-4 col-md-6 timesheet">
-            <a href="{{ route('participant-infographics') }}" class="clickable-card">
-                <div class="card border-left-primary shadow py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="stat-heading mb-1">
-                                    Infografis Peserta</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fa fa-users fa-2x text-primary"></i>
-                            </div>
+            <div class="card border-left-primary shadow py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="stat-heading mb-1">
+                                Marketing Campaign</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fa fa-bullhorn fa-2x text-primary"></i>
                         </div>
                     </div>
                 </div>
-            </a>
+            </div>
         </div>
 
         <!-- Earnings (Monthly) Card Example -->
         <div class="col-xl-4 col-md-6 medical">
-            <a href="{{ route('tool-inventory') }}" class="clickable-card">
-                <div class="card border-left-success shadow py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="stat-heading mb-1">
-                                    Inventaris Alat</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fa fa-fire-extinguisher fa-2x text-success"></i>
-                            </div>
+            <div class="card border-left-success shadow py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="stat-heading mb-1">
+                                Enggagement Social Media</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="ti-instagram fa-2x text-success"></i>
                         </div>
                     </div>
                 </div>
-            </a>
+            </div>
         </div>
 
         <!-- Earnings (Monthly) Card Example -->
         <div class="col-xl-4 col-md-6 reimburse">
-            <a href="{{ route('tool-requirement-penlat') }}" class="clickable-card">
-                <div class="card border-left-info shadow py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="stat-heading mb-1">
-                                    Kebutuhan Alat</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fa fa-check-square-o fa-2x text-info"></i>
-                            </div>
+            <div class="card border-left-info shadow py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="stat-heading mb-1">
+                                Company Agreement</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fa fa-sitemap fa-2x text-info"></i>
                         </div>
                     </div>
                 </div>
-            </a>
+            </div>
         </div>
     </div>
     <div class="row">

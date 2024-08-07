@@ -15,4 +15,9 @@ class PencapaianKPI extends Model
     {
         return $this->belongsTo('App\Models\Quarter')->withDefault();
     }
+
+    public function indicator()
+    {
+        return $this->belongsTo('App\Models\Kpi', 'kpi_id', 'id')->withDefault();
+    }
 }

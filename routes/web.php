@@ -5,10 +5,13 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentPositionController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\ImportController;
+use App\Http\Controllers\InstagramController;
 use App\Http\Controllers\KpiController;
 use App\Http\Controllers\ManageAccessController;
+use App\Http\Controllers\MarketingController;
 use App\Http\Controllers\MyProfileController;
 use App\Http\Controllers\OperationController;
+use App\Http\Controllers\PDController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\RolesController;
@@ -61,9 +64,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/finances/report', [FinanceController::class, 'report'])->name('finance-report');
     Route::post('/finances-store', [FinanceController::class, 'store'])->name('finance.store');
 
+
     //Operation
     Route::get('/operation', [OperationController::class, 'index'])->name('operation');
-    Route::get('/operation/utility', [OperationController::class, 'utility'])->name('utility');
 
     //participant-infographics
     Route::get('/operation/participant-infographics', [OperationController::class, 'participant_infographics'])->name('participant-infographics');
@@ -80,6 +83,31 @@ Route::middleware('auth')->group(function () {
 
     //Penlat Requirement
     Route::get('/operation/tool-requirement-penlat', [OperationController::class, 'tool_requirement_penlat'])->name('tool-requirement-penlat');
+
+    //Operation
+    Route::get('/operation/utility', [OperationController::class, 'utility'])->name('utility');
+    Route::get('/operation/utility/preview-item/{id}', [OperationController::class, 'preview_utility'])->name('preview-utility');
+
+
+    //Marketing
+    Route::get('/marketing', [MarketingController::class, 'index'])->name('marketing');
+    Route::get('/marketing-campaign', [MarketingController::class, 'campaign'])->name('marketing-campaign');
+    Route::get('/instagram', [InstagramController::class, 'fetchInstagramData']);
+    //Company Agreement
+    Route::get('/marketing/company-agreement', [MarketingController::class, 'company_agreement'])->name('company-agreement');
+
+
+
+    //Plan & Dev
+    Route::get('/planning-development', [PDController::class, 'index'])->name('plan-dev');
+    Route::get('/planning-development/feedback-report', [PDController::class, 'feedback_report'])->name('feedback-report');
+    Route::get('/planning-development/feedback-report-import', [PDController::class, 'feedback_report_import'])->name('feedback-report-import-page');
+    Route::get('/planning-development/regulation', [PDController::class, 'regulation'])->name('regulation');
+    Route::get('/planning-development/certificate', [PDController::class, 'certificate'])->name('certificate');
+    Route::get('/planning-development/instructor', [PDController::class, 'instructor'])->name('instructor');
+    Route::get('/planning-development/training-reference', [PDController::class, 'training_reference'])->name('training-reference');
+
+
 
     //my profile
     Route::get('/profile', [MyProfileController::class, 'index'])->name('profile.view');

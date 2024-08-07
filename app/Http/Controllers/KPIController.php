@@ -20,6 +20,8 @@ class KpiController extends Controller
         // Set the selected year
         $currentYear = $yearSelected ?? $nowYear;
 
+        $pencapaian = PencapaianKPI::whereYear('created_at', $currentYear)->get();
+
         // Fetch all indicators
         $indicators = Kpi::where('periode', $currentYear)->get();
 
@@ -63,7 +65,8 @@ class KpiController extends Controller
             'indicators' => $indicators,
             'chartData' => $chartData,
             'yearsBefore' => $yearsBefore,
-            'yearSelected' => $currentYear
+            'yearSelected' => $currentYear,
+            'pencapaian' => $pencapaian
         ]);
     }
 

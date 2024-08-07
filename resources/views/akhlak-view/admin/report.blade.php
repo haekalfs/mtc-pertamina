@@ -4,6 +4,14 @@
 active font-weight-bold
 @endsection
 
+@section('show-akhlak')
+show
+@endsection
+
+@section('report-akhlak')
+font-weight-bold
+@endsection
+
 @section('content')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
