@@ -2,40 +2,46 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ImportParticipantInfographics;
 use App\Models\Infografis_peserta;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\HeadingRowImport;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use Illuminate\Support\Facades\File;
+use PhpOffice\PhpSpreadsheet\Writer\Csv;
 
 class ImportController extends Controller
 {
     public function import(Request $request)
     {
-        $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv',
+        // Validate and upload the file as before
+        $validator = Validator::make($request->all(), [
+            'file' => 'required|file|mimes:xlsx,xls,csv',
         ]);
 
-        $path = $request->file('file')->getRealPath();
-        $data = Excel::toArray([], $path)[0];
-
-        // Remove the header row
-        $header = array_shift($data);
-
-        foreach ($data as $row) {
-            Infografis_peserta::create([
-                'nama_peserta' => $row[0],
-                'nama_program' => $row[1],
-                'tgl_pelaksanaan' => $row[2],
-                'tempat_pelaksanaan' => $row[3],
-                'jenis_pelatihan' => $row[4],
-                'keterangan' => $row[5],
-                'subholding' => $row[6],
-                'perusahaan' => $row[7],
-                'kategori_program' => $row[8],
-                'realisasi' => $row[9],
-            ]);
+        if ($validator->fails()) {
+            Session::flash('failed', "Error: Invalid file type.");
+            return redirect('/operation/participant-infographics/import-page');
         }
 
-        return redirect()->back()->with('success', 'Data imported successfully.');
+        $file = $request->file('file');
+        $filename = time() . '_' . $file->getClientOriginalName();
+        $destinationPath = public_path('uploads');
+        $file->move($destinationPath, $filename);
+
+        $filePath = $destinationPath . '/' . $filename;
+
+        try {
+            // Dispatch the job
+            ImportParticipantInfographics::dispatch($filePath);
+
+            return redirect()->back()->with('success', 'Data import started successfully, please wait until the data is all processed.');
+        } catch (\Exception $e) {
+            Session::flash('failed', 'Error dispatching the job: ' . $e->getMessage());
+            return redirect()->back();
+        }
     }
 }

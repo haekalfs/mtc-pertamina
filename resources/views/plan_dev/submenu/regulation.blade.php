@@ -17,7 +17,7 @@ font-weight-bold
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
         <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-building-o"></i> Regulation</h1>
-        <p class="mb-4">Unduh Pencapaian Akhlak.</a></p>
+        <p class="mb-4">Regulation in MTC.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
     </div>

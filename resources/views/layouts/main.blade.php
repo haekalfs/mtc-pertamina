@@ -98,16 +98,6 @@
                         </ul>
                     </li>
                     @endusr_acc
-                    @usr_acc(102)
-                    <li class="menu-item-has-children dropdown @yield('active-finance') @yield('show-finance')">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-money"></i>Finance</a>
-                        <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-finance')">
-                            <li><i class="fa fa-tachometer"></i><a href="{{ route('finance') }}" class="@yield('finance')">Dashboard</a></li>
-                            <li><i class="fa fa-list-alt"></i><a href="{{ route('vendor-payment') }}" class="@yield('vendor-payment')">Pembayaran Vendor</a></li>
-                            <li><i class="ti-stats-down"></i><a href="{{ route('cost') }}" class="@yield('cost')">Cost</a></li>
-                        </ul>
-                    </li>
-                    @endusr_acc
                     @usr_acc(103)
                     <li class="menu-item-has-children dropdown @yield('active-pd') @yield('show-pd')">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-chain"></i>Plan & Development</a>
@@ -119,6 +109,16 @@
                             <li><i class="fa fa-male"></i><a href="{{ route('instructor') }}" class="@yield('instructor')">Instruktur</a></li>
                             <li><i class="fa fa-certificate"></i><a href="{{ route('certificate') }}" class="@yield('certificate')">Certification</a></li>
                             <li><i class="fa fa-warning"></i><a href="{{ route('regulation') }}" class="@yield('regulation')">Regulasi</a></li>
+                        </ul>
+                    </li>
+                    @endusr_acc
+                    @usr_acc(102)
+                    <li class="menu-item-has-children dropdown @yield('active-finance') @yield('show-finance')">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-money"></i>Finance</a>
+                        <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-finance')">
+                            <li><i class="fa fa-tachometer"></i><a href="{{ route('finance') }}" class="@yield('finance')">Dashboard</a></li>
+                            <li><i class="fa fa-list-alt"></i><a href="{{ route('vendor-payment') }}" class="@yield('vendor-payment')">Pembayaran Vendor</a></li>
+                            <li><i class="ti-stats-down"></i><a href="{{ route('cost') }}" class="@yield('cost')">Cost</a></li>
                         </ul>
                     </li>
                     @endusr_acc

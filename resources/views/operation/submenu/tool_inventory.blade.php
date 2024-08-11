@@ -17,10 +17,10 @@ font-weight-bold
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
         <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="menu-icon fa fa-fire-extinguisher"></i> Tool Inventory</h1>
-        <p class="mb-4">Unduh Pencapaian Akhlak.</a></p>
+        <p class="mb-4">Inventaris Alat/Assets.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
-        <a href="{{ route('tool-usage') }}" class="btn btn-sm btn-primary shadow-sm text-white"> Penggunaan Alat</a>
+        {{-- <a href="{{ route('tool-usage') }}" class="btn btn-sm btn-primary shadow-sm text-white"> Penggunaan Alat</a> --}}
     </div>
 </div>
 <div class="overlay overlay-mid" style="display: none;"></div>
@@ -113,7 +113,7 @@ font-weight-bold
                         <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Register Tool</a>
                     </div>
                 </div>
-                <div class="row-toolbar mt-4 ml-2">
+                {{-- <div class="row-toolbar mt-4 ml-2">
                     <div class="col">
                         <select style="max-width: 18%;" class="form-control" id="rowsPerPage">
                             <option value="-1">Show All</option>
@@ -125,52 +125,72 @@ font-weight-bold
                     <div class="col-auto text-right mr-2">
                         <input class="form-control" type="text" id="searchInput" placeholder="Search...">
                     </div>
-                </div>
-                <div class="card-body">
-                    <div class="row zoom80 p-2">
-                        @foreach($assets as $item)
-                        <div class="col-md-6 mt-2">
-                            <div class="card custom-card mb-3 shadow" style="background-color: #ffffff;">
-                                <div class="row no-gutters">
-                                    <div class="col-md-3 d-flex align-items-top justify-content-center" style="padding-left: 1em; padding-top: 30px;">
-                                        <img src="{{ asset($item->img->filepath) }}" style="height: 150px; width: 150px; border-radius: 15px;" class="card-img" alt="...">
-                                    </div>
-                                    <div class="col-md-9">
-                                        <div class="card-body text-secondary">
-                                            <div>
+                </div> --}}
+                <div class="card-body zoom90">
+                    <div class="table-responsive">
+                        <table id="dataTable" class="table table-bordered mt-4">
+                            <thead>
+                                <tr>
+                                    <th>Tool</th>
+                                    <th>Stock</th>
+                                    <th>Kondisi Alat</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($assets as $item)
+                                <tr>
+                                    <td data-th="Product">
+                                        <div class="row">
+                                            <div class="col-md-3 text-left">
+                                                <img src="{{ asset($item->img->filepath) }}" style="height: 150px; width: 150px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow ">
+                                            </div>
+                                            <div class="col-md-9 text-left mt-sm-2">
                                                 <h5 class="card-title font-weight-bold">{{ $item->asset_name }}</h5>
                                                 <ul class="ml-4">
                                                     <li class="card-text mb-1">Nomor Aset : {{ $item->asset_id }}</li>
                                                     <li class="card-text mb-1">Maker : {{ $item->asset_maker }}</li>
-                                                    <li class="card-text mb-1">Stock : {{ $item->asset_stock }}</li>
-                                                    <li class="card-text mb-1">Running Hour : {{ $item->asset_condition }}</li>
-                                                    <li class="card-text mb-1">Kondisi Alat : {{ $item->asset_condition }}</li>
-                                                    <li class="card-text mb-1">Jadwal Maintenance Next : 01-January-2024</li>
-                                                    <li class="card-text mb-1">Last Maintenance : 01-January-2023</li>
-                                                    <li class="card-text mb-1">Panduan Maintenance : <a href="{{ asset('maintenance_file_example.pdf') }}" target="_blank" class="text-secondary">&nbsp;&nbsp;<i class="fa fa-external-link fa-sm"></i> <u>View</u></a></li>
+                                                    <li class="card-text mb-1">Running Hour : {{ $item->used_time }} Hours</li>
+                                                    <li class="card-text mb-1">Jadwal Maintenance Next : {{ $item->next_maintenance }}</li>
+                                                    <li class="card-text mb-1">Last Maintenance : {{ $item->last_maintenance }}</li>
+                                                    <li class="card-text mb-1">Panduan Maintenance : <a href="{{ asset($item->asset_guidance) }}" target="_blank" class="text-secondary">&nbsp;&nbsp;<i class="fa fa-external-link fa-sm"></i> <u>View</u></a></li>
                                                 </ul>
                                             </div>
                                         </div>
-                                        <div class="card-icons">
-                                            <span class="badge out-of-stock">Maintenance Required</span>
-                                            <a href="#" data-toggle="modal" data-target="#editDataModal"><i class="fa fa-edit"></i></a>
+                                    </td>
+                                    <td data-th="Price">
+                                        {{ $item->asset_stock }} <small><span class="text-danger"><i>Out of {{ $item->initial_stock }}</i></span></small>
+                                    </td>
+                                    <td data-th="Quantity">
+                                        {!! $item->condition->badge !!}<br>
+                                        @php
+                                            // Convert $item->next_maintenance to a timestamp
+                                            $nextMaintenanceDate = strtotime($item->next_maintenance);
+                                            $currentDate = strtotime(date('Y-m-d'));
+                                        @endphp
+
+                                        @if($nextMaintenanceDate < $currentDate)
+                                            <span class="badge out-of-stock">Maintenance Required</span><br>
+                                        @endif
+
+                                        @if($item->asset_stock <= 0)
+                                            <span class="badge out-of-stock">Out of Stock</span><br>
+                                        @endif
+                                    </td>
+                                    <td class="actions text-center" data-th="">
+                                        <div>
+                                            <a data-id="{{ $item->id }}" href="#" class="btn btn-outline-secondary btn-md mb-2 edit-tool">
+                                                <i class="fa fa-edit"></i>
+                                            </a>
+                                            <button class="btn btn-outline-danger btn-md mb-2">
+                                                <i class="fa fa-trash-o"></i>
+                                            </button>
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        @endforeach
-                        <div class="col-md-12 text-center d-flex align-items-center justify-content-center mt-4">
-                            <nav aria-label="Page navigation example">
-                                <ul class="pagination">
-                                  <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                                  <li class="page-item"><a class="page-link" href="#">1</a></li>
-                                  <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                  <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                  <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                                </ul>
-                              </nav>
-                        </div>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -187,12 +207,17 @@ font-weight-bold
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="post" enctype="multipart/form-data" action="{{ route('kpis.store') }}">
+            <form method="post" enctype="multipart/form-data" action="{{ route('asset.store') }}">
                 @csrf
                 <div class="modal-body mr-2 ml-2">
                     <div class="row no-gutters">
-                        <div class="col-md-3 d-flex align-items-top justify-content-center" style="padding-top: 1em;">
-                            <img src="https://via.placeholder.com/50x50/5fa9f8/ffffff" style="height: 150px; width: 150px; border-radius: 15px;" class="card-img" alt="...">
+                        <div class="col-md-3 d-flex align-items-top justify-content-center">
+                            <label for="file-upload" style="cursor: pointer;">
+                                <img id="image-preview" src="https://via.placeholder.com/50x50/5fa9f8/ffffff"
+                                     style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #000;" class="card-img" alt="..."><br>
+                                     <small><i><u>Click above to upload image!</u></i></small>
+                            </label>
+                            <input id="file-upload" type="file" name="tool_image" style="display: none;" accept="image/*" onchange="previewImage(event)">
                         </div>
                         <div class="col-md-9">
                             <div class="card-body text-secondary">
@@ -203,7 +228,7 @@ font-weight-bold
                                                 <p style="margin: 0;">Asset Name :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <input type="text" class="form-control" name="number" required>
+                                                <input type="text" class="form-control" name="asset_name" required>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-4">
@@ -211,7 +236,7 @@ font-weight-bold
                                                 <p style="margin: 0;">Nomor Asset :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <input type="text" class="form-control" name="date_released">
+                                                <input type="text" class="form-control" name="asset_number">
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-4">
@@ -219,23 +244,57 @@ font-weight-bold
                                                 <p style="margin: 0;">Maker :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <input type="text" class="form-control" name="date_released">
+                                                <input type="text" class="form-control" name="maker">
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-4">
                                             <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Kondisi Alat :</p>
+                                                <p style="margin: 0;">Running Hour :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <input type="text" class="form-control" name="number" required>
+                                                <input type="text" class="form-control" name="running_hour">
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-8">
+                                                <div class="d-flex align-items-center mb-4">
+                                                    <div style="width: 140px;" class="mr-2">
+                                                        <p style="margin: 0;">Kondisi Alat :</p>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <select name="condition" class="form-control">
+                                                            @foreach($assetCondition as $item)
+                                                            <option value="{{ $item->id }}">{{ $item->condition }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="d-flex align-items-center mb-4">
+                                                    <div style="width: 140px;" class="mr-2">
+                                                        <p style="margin: 0;">Stock :</p>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <input type="text" class="form-control" name="stock">
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Stock :</p>
+                                            <div style="width: 145px;" class="mr-1">
+                                                <p style="margin: 0;">Last Maintenance :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <input type="text" class="form-control" name="date_released">
+                                                <input type="date" class="form-control" name="last_maintenance">
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 145px;" class="mr-1">
+                                                <p style="margin: 0;">Next Maintenance :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="date" class="form-control" name="next_maintenance">
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-4">
@@ -243,7 +302,7 @@ font-weight-bold
                                                 <p style="margin: 0;">Panduan Maintenance :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <input type="file" class="form-control" name="number" required>
+                                                <input type="file" class="form-control" name="maintenance_guide" required>
                                             </div>
                                         </div>
                                     </div>
@@ -260,23 +319,28 @@ font-weight-bold
         </div>
     </div>
 </div>
-
-
-<div class="modal fade zoom90" id="editDataModal" tabindex="-1" role="dialog" aria-labelledby="editDataModalLabel" aria-hidden="true">
+<div class="modal fade zoom90" id="editToolModal" tabindex="-1" role="dialog" aria-labelledby="editToolModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header d-flex flex-row align-items-center justify-content-between">
-                <h5 class="modal-title" id="editDataModalLabel">Edit Data</h5>
+                <h5 class="modal-title" id="editToolModalLabel">Edit Tool</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="post" enctype="multipart/form-data" action="{{ route('kpis.store') }}">
+            <form id="editToolForm" method="post" enctype="multipart/form-data">
                 @csrf
+                @method('PUT')
+                <input type="hidden" name="id" id="tool_id">
                 <div class="modal-body mr-2 ml-2">
                     <div class="row no-gutters">
-                        <div class="col-md-3 d-flex align-items-top justify-content-center" style="padding-top: 1em;">
-                            <img src="https://via.placeholder.com/50x50/5fa9f8/ffffff" style="height: 150px; width: 150px; border-radius: 15px;" class="card-img" alt="...">
+                        <div class="col-md-3 d-flex align-items-top justify-content-center">
+                            <label for="edit-file-upload" style="cursor: pointer;">
+                                <img id="edit-image-preview" src="https://via.placeholder.com/50x50/5fa9f8/ffffff"
+                                     style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #000;" class="card-img" alt="..."><br>
+                                     <small><i><u>Click above to upload image!</u></i></small>
+                            </label>
+                            <input id="edit-file-upload" type="file" name="tool_image" style="display: none;" accept="image/*" onchange="previewImage(event)">
                         </div>
                         <div class="col-md-9">
                             <div class="card-body text-secondary">
@@ -287,7 +351,7 @@ font-weight-bold
                                                 <p style="margin: 0;">Asset Name :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <input type="text" class="form-control" name="number" required>
+                                                <input type="text" class="form-control" name="asset_name" id="edit_asset_name" required>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-4">
@@ -295,7 +359,7 @@ font-weight-bold
                                                 <p style="margin: 0;">Nomor Asset :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <input type="text" class="form-control" name="date_released">
+                                                <input type="text" class="form-control" name="asset_number" id="edit_asset_number">
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-4">
@@ -303,23 +367,67 @@ font-weight-bold
                                                 <p style="margin: 0;">Maker :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <input type="text" class="form-control" name="date_released">
+                                                <input type="text" class="form-control" name="maker" id="edit_maker">
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-4">
                                             <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Kondisi Alat :</p>
+                                                <p style="margin: 0;">Running Hour :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <input type="text" class="form-control" name="number" required>
+                                                <input type="text" class="form-control" name="running_hour" id="edit_running_hour">
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="d-flex align-items-center mb-4">
+                                                    <div style="width: 140px;" class="mr-2">
+                                                        <p style="margin: 0;">Kondisi Alat :</p>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <select name="condition" id="edit_condition" class="form-control">
+                                                            @foreach($assetCondition as $item)
+                                                            <option value="{{ $item->id }}">{{ $item->condition }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="d-flex align-items-center mb-4">
+                                                    <div style="width: 290px;" class="mr-2">
+                                                        <p style="margin: 0;">Initial Stock :</p>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <input type="text" class="form-control" name="stock" id="edit_initial_stock">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="d-flex align-items-center mb-4">
+                                                    <div style="width: 290px;" class="mr-2">
+                                                        <p style="margin: 0;">Used :</p>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <input type="text" class="form-control" name="stock" id="edit_used_amount">
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Stock :</p>
+                                            <div style="width: 145px;" class="mr-1">
+                                                <p style="margin: 0;">Last Maintenance :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <input type="text" class="form-control" name="date_released">
+                                                <input type="date" class="form-control" name="last_maintenance" id="edit_last_maintenance">
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 145px;" class="mr-1">
+                                                <p style="margin: 0;">Next Maintenance :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="date" class="form-control" name="next_maintenance" id="edit_next_maintenance">
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-4">
@@ -327,7 +435,7 @@ font-weight-bold
                                                 <p style="margin: 0;">Panduan Maintenance :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <input type="file" class="form-control" name="number" required>
+                                                <input type="file" class="form-control" name="maintenance_guide" id="edit_maintenance_guide" required>
                                             </div>
                                         </div>
                                     </div>
@@ -338,12 +446,13 @@ font-weight-bold
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Submit Request</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
 <script>
     function displayFileName() {
         const input = document.getElementById('file');
@@ -363,107 +472,67 @@ font-weight-bold
             discardButton.style.display = "inline-block";
             dropZoneText.style.display = "none";
         }
-
-        // Handle file input change
-        fileInput.addEventListener("change", function() {
-            if (fileInput.files && fileInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    displayImagePreview(e.target.result);
-                };
-                reader.readAsDataURL(fileInput.files[0]);
-            }
-        });
-
-        // Handle drag and drop
-        dropZone.addEventListener("dragover", function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            dropZone.classList.add("dragging");
-        });
-
-        dropZone.addEventListener("dragleave", function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            dropZone.classList.remove("dragging");
-        });
-
-        dropZone.addEventListener("drop", function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            dropZone.classList.remove("dragging");
-
-            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-                fileInput.files = e.dataTransfer.files;
-                const event = new Event("change");
-                fileInput.dispatchEvent(event);
-            }
-        });
-
-        // Handle paste
-        dropZone.addEventListener("paste", function(e) {
-            const items = (e.clipboardData || e.originalEvent.clipboardData).items;
-            for (let i = 0; i < items.length; i++) {
-                if (items[i].type.indexOf("image") !== -1) {
-                    const file = items[i].getAsFile();
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        displayImagePreview(e.target.result);
-                    };
-                    reader.readAsDataURL(file);
-                }
-            }
-        });
-
-        // Handle discard button
-        discardButton.addEventListener("click", function() {
-            imgPreview.src = "";
-            imgPreview.style.display = "none";
-            discardButton.style.display = "none";
-            dropZoneText.style.display = "block";
-            fileInput.value = ""; // Reset file input
-        });
+</script>
+<script>
+    function previewImage(event) {
+        const reader = new FileReader();
+        reader.onload = function(){
+            const output = document.getElementById('image-preview');
+            output.src = reader.result;
+        };
+        reader.readAsDataURL(event.target.files[0]);
     }
+</script>
+<script>
+    $(document).on('click', '.edit-tool', function(e) {
+        e.preventDefault();
+        var toolId = $(this).data('id');
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const dropZone = document.getElementById("drop_zone");
-        const fileInput = document.getElementById("picture");
-        const imgPreview = document.getElementById("preview");
-        const discardButton = document.getElementById("discard");
-        const dropZoneText = document.getElementById("drop_zone_text");
-
-        dropZone.addEventListener("click", function() {
-            dropZone.classList.add("clicked");
-            setTimeout(() => {
-                dropZone.classList.remove("clicked");
-            }, 500);
-        });
-
-        dropZone.addEventListener("dragover", function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            dropZone.classList.add("dragging");
-        });
-
-        dropZone.addEventListener("dragleave", function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            dropZone.classList.remove("dragging");
-        });
-
-        dropZone.addEventListener("drop", function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            dropZone.classList.remove("dragging");
-
-            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-                fileInput.files = e.dataTransfer.files;
-                const event = new Event("change");
-                fileInput.dispatchEvent(event);
+        $.ajax({
+            url: '/inventory-tools/' + toolId + '/edit',
+            method: 'GET',
+            success: function(response) {
+                // Populate the fields with the tool data
+                $('#tool_id').val(response.id);
+                $('#edit_asset_name').val(response.asset_name);
+                $('#edit_asset_number').val(response.asset_id);
+                $('#edit_maker').val(response.asset_maker);
+                $('#edit_running_hour').val(response.used_time);
+                $('#edit_condition').val(response.asset_condition_id);
+                $('#edit_initial_stock').val(response.initial_stock);
+                $('#edit_used_amount').val(response.used_amount);
+                $('#edit_last_maintenance').val(response.last_maintenance);
+                $('#edit_next_maintenance').val(response.next_maintenance);
+                $('#edit-image-preview').attr('src', response.tool_image ? response.tool_image : 'https://via.placeholder.com/150x150');
+                // Show the modal
+                $('#editToolModal').modal('show');
             }
         });
+    });
 
-        addImagePreviewListener(fileInput, imgPreview, discardButton, dropZone, dropZoneText);
+    $('#editToolForm').on('submit', function(e) {
+        e.preventDefault();
+
+        var toolId = $('#tool_id').val();
+        var formData = new FormData(this);
+
+        $.ajax({
+            url: '/inventory-tools/' + toolId,
+            method: 'POST', // Use POST since we're sending FormData with files
+            data: formData,
+            processData: false, // Prevent jQuery from processing the data
+            contentType: false, // Prevent jQuery from setting the content type
+            success: function(response) {
+                // Handle success (e.g., close modal, show success message, refresh table)
+                $('#editToolModal').modal('hide');
+                alert('Tool updated successfully');
+                location.reload(); // Reload the page or update the table dynamically
+            },
+            error: function(xhr) {
+                // Handle errors
+                alert('Failed to update the tool. Please check the input and try again.');
+            }
+        });
     });
 </script>
 @endsection

@@ -16,8 +16,8 @@ font-weight-bold
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
-        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="menu-icon fa fa-users"></i> Participants Infographics</h1>
-        <p class="mb-4">Unduh Pencapaian Akhlak.</a></p>
+        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="menu-icon fa fa-users"></i> Importer Participants Infographics</h1>
+        <p class="mb-4">Import Data From Excel.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
         <a href="{{ route('participant-infographics') }}" class="btn btn-sm btn-secondary shadow-sm text-white"><i class="fa fa-backward"></i> Go Back</a>
@@ -97,23 +97,19 @@ font-weight-bold
                     </form>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
-<div class="animated fadeIn zoom90">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> List Data</h6>
-                    <div class="text-right">
-                        {{-- <a class="btn btn-primary btn-sm text-white"><i class="menu-icon fa fa-download"></i> Download</a> --}}
-                    </div>
+            <div class="card mb-4">
+                <div class="card-header">
+                    <span class="text-danger font-weight-bold">Data Import Guidelines</span>
                 </div>
-                <div class="card-body">
-                    <div id="excel-preview" class="mt-4 zoom80">
-                        <!-- Excel preview will be inserted here -->
-                    </div>
+                <div class="card-body" style="background-color: rgb(247, 247, 247);">
+                    <h6 class="h6 mb-2 font-weight-bold text-gray-800">Import Rules</h6>
+                    <ul class="ml-4">
+                        <li>Ensure all import files are in the correct format (e.g., CSV, XLSX) as specified in the guidelines.</li>
+                        <li>Verify the data in the files for accuracy and completeness before importing.</li>
+                        <li>Check for and resolve any data inconsistencies or errors in the file to prevent import issues.</li>
+                        <li>Unauthorized changes to import files or procedures are strictly prohibited.</li>
+                        <li>Double-check the mapping of data fields to ensure they align with the database schema.</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -127,52 +123,7 @@ font-weight-bold
         const file = input.files[0];
         if (file) {
             label.textContent = file.name;
-            previewExcel(file);
         }
-    }
-    function previewExcel(file) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            const data = new Uint8Array(event.target.result);
-            const workbook = XLSX.read(data, {type: 'array'});
-            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-            const excelRows = XLSX.utils.sheet_to_json(firstSheet, {header: 1});
-            displayExcelData(excelRows);
-        };
-        reader.readAsArrayBuffer(file);
-    }
-
-    function displayExcelData(rows) {
-        const previewDiv = document.getElementById('excel-preview');
-        previewDiv.innerHTML = '';
-
-        if (rows.length === 0) {
-            previewDiv.textContent = 'No data found in the file.';
-            return;
-        }
-
-        const table = document.createElement('table');
-        table.className = 'table table-bordered';
-        const thead = document.createElement('thead');
-        const tbody = document.createElement('tbody');
-
-        rows.forEach((row, index) => {
-            const tr = document.createElement('tr');
-            row.forEach(cell => {
-                const td = document.createElement(index === 0 ? 'th' : 'td');
-                td.textContent = cell;
-                tr.appendChild(td);
-            });
-            if (index === 0) {
-                thead.appendChild(tr);
-            } else {
-                tbody.appendChild(tr);
-            }
-        });
-
-        table.appendChild(thead);
-        table.appendChild(tbody);
-        previewDiv.appendChild(table);
     }
 </script>
 @endsection

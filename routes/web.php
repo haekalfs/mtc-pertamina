@@ -6,6 +6,7 @@ use App\Http\Controllers\DepartmentPositionController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\InstagramController;
+use App\Http\Controllers\InventoryToolController;
 use App\Http\Controllers\KpiController;
 use App\Http\Controllers\ManageAccessController;
 use App\Http\Controllers\MarketingController;
@@ -71,6 +72,11 @@ Route::middleware('auth')->group(function () {
     //inventaris Alat
     Route::get('/operation/tool-inventory', [OperationController::class, 'tool_inventory'])->name('tool-inventory');
     Route::get('/operation/tool-inventory/usages', [OperationController::class, 'tool_usage'])->name('tool-usage');
+
+    Route::post('/store-asset', [InventoryToolController::class, 'store'])->name('asset.store');
+    Route::get('/inventory-tools/{id}/edit', [InventoryToolController::class, 'edit']);
+    Route::put('/inventory-tools/{id}', [InventoryToolController::class, 'update']);
+
 
     //inventaris ruangan
     Route::get('/operation/room-inventory', [OperationController::class, 'room_inventory'])->name('room-inventory');

@@ -17,7 +17,7 @@ font-weight-bold
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
         <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-building-o"></i> Room Inventory</h1>
-        <p class="mb-4">Unduh Pencapaian Akhlak.</a></p>
+        <p class="mb-4">Inventaris Ruangan.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
     </div>
@@ -60,59 +60,46 @@ font-weight-bold
                         <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Register Room</a>
                     </div>
                 </div>
-                <div class="row-toolbar mt-4 ml-2">
-                    <div class="col">
-                        <select style="max-width: 18%;" class="form-control" id="rowsPerPage">
-                            <option value="-1">Show All</option>
-                            @foreach($locations as $item)
-                            <option value="{{ $item->id }}">{{ $item->description }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-auto text-right mr-2">
-                        <input class="form-control" type="text" id="searchInput" placeholder="Search...">
-                    </div>
-                </div>
                 <div class="card-body">
-                    <div class="row zoom80">
-                        <div class="col-md-6 mt-2">
-                            <div class="card custom-card mb-3 bg-white shadow">
-                                <div class="row no-gutters">
-                                    <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding-left: 1em;">
-                                        <img src="https://via.placeholder.com/50x50/5fa9f8/ffffff" style="height: 150px; width: 150px; border-radius: 15px;" class="card-img" alt="...">
-                                    </div>
-                                    <div class="col-md-9">
-                                        <div class="card-body text-secondary">
-                                            <div>
-                                                <h5 class="card-title font-weight-bold">Nama Ruangan</h5>
-                                                <ul class="ml-4">
-                                                    <li class="card-text">Jumlah Kursi : 1</li>
-                                                    <li class="card-text">Jumlah Meja : 1</li>
-                                                    <li class="card-text">Jumlah Kelas : 1</li>
-                                                    <li class="card-text">Jumlah Ruangan : 1</li>
-                                                    <li class="card-text">Jumlah Simulator : 1</li>
-                                                </ul>
-                                            </div>
+                    <table id="dataTable" class="table table-bordered mt-4">
+                        <thead>
+                            <tr>
+                                <th>Tool</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td data-th="Product">
+                                    <div class="row">
+                                        <div class="col-md-3 text-left">
+                                            <img src="https://via.placeholder.com/250x250/5fa9f8/ffffff" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow ">
                                         </div>
-                                        <div class="card-icons">
-                                            <a href="#" data-toggle="modal" data-target="#editDataModal"><i class="fa fa-edit"></i></a>
+                                        <div class="col-md-9 text-left mt-sm-2">
+                                            <h5 class="card-title font-weight-bold">Nama Ruangan</h5>
+                                            <ul class="ml-4">
+                                                <li class="card-text">Jumlah Kursi : 1</li>
+                                                <li class="card-text">Jumlah Meja : 1</li>
+                                                <li class="card-text">Jumlah Kelas : 1</li>
+                                                <li class="card-text">Jumlah Ruangan : 1</li>
+                                                <li class="card-text">Jumlah Simulator : 1</li>
+                                            </ul>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-12 text-center d-flex align-items-center justify-content-center mt-4">
-                        <nav aria-label="Page navigation example">
-                            <ul class="pagination">
-                              <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                              <li class="page-item"><a class="page-link" href="#">1</a></li>
-                              <li class="page-item"><a class="page-link" href="#">2</a></li>
-                              <li class="page-item"><a class="page-link" href="#">3</a></li>
-                              <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                            </ul>
-                          </nav>
-                    </div>
+                                </td>
+                                <td class="actions text-center" data-th="">
+                                    <div>
+                                        <button class="btn btn-white border-secondary bg-white btn-md mb-2">
+                                            <i class="fa fa-save"></i>
+                                        </button>
+                                        <button class="btn btn-white border-secondary bg-white btn-md mb-2">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

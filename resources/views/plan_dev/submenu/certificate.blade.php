@@ -16,7 +16,7 @@ font-weight-bold
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
         <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="menu-icon fa fa-certificate"></i> Certificate</h1>
-        <p class="mb-4">Plan & Development.</a></p>
+        <p class="mb-4">Sertifikat Trainee.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
         {{-- <a href="{{ route('feedback-report-import-page') }}" class="btn btn-sm btn-primary shadow-sm text-white"><i class="fa fa-file-text fa-sm"></i> Import Data</a> --}}
@@ -91,33 +91,9 @@ font-weight-bold
                                     </div>
                                     <div class="col-md-2">
                                         <div class="form-group">
-                                            <label for="position_id">STCW/Non :</label>
+                                            <label for="position_id">Batch :</label>
                                             <select name="stcw" class="form-control" id="stcw">
                                                 <option value="1">Show All</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="form-group">
-                                            <label for="status">Jenis Penlat :</label>
-                                            <select class="form-control" id="jenisPenlat" name="jenisPenlat" required>
-                                                <option value="1" selected>Show All</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="form-group">
-                                            <label for="position_id">TW :</label>
-                                            <select name="tw" class="form-control" id="tw">
-                                                <option value="1">Show All</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="form-group">
-                                            <label for="position_id">Periode :</label>
-                                            <select name="periode" class="form-control" id="periode">
-                                                <option value="1" selected>Show All</option>
                                             </select>
                                         </div>
                                     </div>
@@ -140,6 +116,7 @@ font-weight-bold
                                 <th>Batch</th>
                                 <th>Status</th>
                                 <th>Keterangan</th>
+                                <th>Total</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -150,8 +127,9 @@ font-weight-bold
                                 <td>....</td>
                                 <td>Issued</td>
                                 <td>Done</td>
+                                <td>10</td>
                                 <td class="text-center">
-                                    <a class="btn btn-outline-secondary btn-sm" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-eye"></i> Action</a>
+                                    <a class="btn btn-outline-secondary btn-sm" href="#" data-toggle="modal" data-target="#updateProcessModal"><i class="menu-Logo fa fa-eye"></i> Action</a>
                                 </td>
                             </tr>
                         </tbody>
@@ -161,63 +139,64 @@ font-weight-bold
         </div>
     </div>
 </div>
-<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-			<div class="modal-header d-flex flex-row align-items-center justify-content-between border-bottom-1">
-                <h5 class="modal-title" id="editModalLabel">Edit Participant</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="editForm">
-                    @csrf
-                    <input type="hidden" id="editId" name="id">
-                    <div class="form-group">
-                        <label for="editNamaPeserta">Nama Peserta</label>
-                        <input type="text" class="form-control" id="editNamaPeserta" name="nama_peserta" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editNamaProgram">Nama Program</label>
-                        <input type="text" class="form-control" id="editNamaProgram" name="nama_program" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editTglPelaksanaan">Tgl Pelaksanaan</label>
-                        <input type="date" class="form-control" id="editTglPelaksanaan" name="tgl_pelaksanaan" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editTempatPelaksanaan">Tempat Pelaksanaan</label>
-                        <input type="text" class="form-control" id="editTempatPelaksanaan" name="tempat_pelaksanaan" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editJenisPelatihan">Jenis Pelatihan</label>
-                        <input type="text" class="form-control" id="editJenisPelatihan" name="jenis_pelatihan" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editKeterangan">Keterangan</label>
-                        <input type="text" class="form-control" id="editKeterangan" name="keterangan" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editSubholding">Subholding</label>
-                        <input type="text" class="form-control" id="editSubholding" name="subholding" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editPerusahaan">Perusahaan</label>
-                        <input type="text" class="form-control" id="editPerusahaan" name="perusahaan" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editKategoriProgram">Kategori Program</label>
-                        <input type="text" class="form-control" id="editKategoriProgram" name="kategori_program" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editRealise">Realisasi</label>
-                        <input type="text" class="form-control" id="editRealisasi" name="realisasi" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Save changes</button>
-                </form>
-            </div>
+<div class="modal fade zoom90" id="updateProcessModal" tabindex="-1" role="dialog" aria-labelledby="updateProcessModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header d-flex flex-row align-items-center justify-content-between border-bottom-1">
+          <h5 class="modal-title" id="updateProcessModalLabel">Update Process</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
+        <div class="modal-body">
+          <form>
+            <div class="d-flex align-items-center mb-4">
+                <div style="width: 140px;" class="mr-2">
+                    <p style="margin: 0;">Nama Penlat :</p>
+                </div>
+                <div class="flex-grow-1">
+                    <input type="text" class="form-control" name="number" required>
+                </div>
+            </div>
+            <div class="d-flex align-items-center mb-4">
+                <div style="width: 140px;" class="mr-2">
+                    <p style="margin: 0;">Batch Penlat :</p>
+                </div>
+                <div class="flex-grow-1">
+                    <input type="text" class="form-control" name="date_released">
+                </div>
+            </div>
+            <div class="d-flex align-items-center mb-4">
+                <div style="width: 140px;" class="mr-2">
+                    <p style="margin: 0;">Status :</p>
+                </div>
+                <div class="flex-grow-1">
+                    <select class="form-control" id="status">
+                      <option value="option1">Option 1</option>
+                      <option value="option2">Option 2</option>
+                      <option value="option3">Option 3</option>
+                    </select>
+                </div>
+            </div>
+          </form>
+          <!-- DataTable -->
+          <table id="dataTable" class="table table-striped table-bordered">
+            <thead>
+              <tr>
+                <th>Nama Peserta</th>
+                <th>Checkbox</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- DataTable rows will be populated here -->
+            </tbody>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Save changes</button>
+        </div>
+      </div>
     </div>
 </div>
 <script>

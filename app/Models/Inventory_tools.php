@@ -20,13 +20,22 @@ class Inventory_tools extends Model
         'asset_id',
         'asset_name',
         'asset_maker',
-        'asset_condition',
+        'asset_condition_id',
         'asset_stock',
-        'asset_guidance_id'
+        'asset_guidance',
+        'next_maintenance',
+        'last_maintenance',
+        'initial_stock',
+        'used_time',
+        'used_amount'
     ];
 
     public function img(){
     	return $this->hasOne('App\Models\Tool_img', 'inventory_tool_id', 'id');
+    }
+
+    public function condition(){
+    	return $this->belongsTo('App\Models\Asset_condition', 'asset_condition_id', 'id');
     }
 
     public function penlat_usage()

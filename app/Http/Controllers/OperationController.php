@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Asset_condition;
 use App\Models\Infografis_peserta;
 use App\Models\Inventory_tools;
 use App\Models\Location;
 use App\Models\Penlat_utility;
 use App\Models\Penlat_utility_usage;
+use App\Models\Tool_img;
 use App\Models\Utility;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -136,8 +138,9 @@ class OperationController extends Controller
     {
         $assets = Inventory_tools::all();
         $locations = Location::all();
+        $assetCondition = Asset_condition::all();
 
-        return view('operation.submenu.tool_inventory', ['assets' => $assets, 'locations' => $locations]);
+        return view('operation.submenu.tool_inventory', ['assets' => $assets, 'locations' => $locations, 'assetCondition' => $assetCondition]);
     }
 
     public function tool_usage()

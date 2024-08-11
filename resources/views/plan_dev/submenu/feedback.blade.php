@@ -81,7 +81,7 @@ font-weight-bold
                         <div class="row d-flex justify-content-start mb-4">
                             <div class="col-md-12">
                                 <div class="row align-items-center">
-                                    <div class="col-md-3">
+                                    <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="email">Nama Penlat :</label>
                                             <select class="custom-select" id="namaPenlat" name="namaPenlat">
@@ -91,7 +91,7 @@ font-weight-bold
                                     </div>
                                     <div class="col-md-2">
                                         <div class="form-group">
-                                            <label for="position_id">STCW/Non :</label>
+                                            <label for="position_id">Kelompok :</label>
                                             <select name="stcw" class="form-control" id="stcw">
                                                 <option value="1">Show All</option>
                                             </select>
@@ -99,25 +99,17 @@ font-weight-bold
                                     </div>
                                     <div class="col-md-2">
                                         <div class="form-group">
-                                            <label for="status">Jenis Penlat :</label>
+                                            <label for="status">Tanggal :</label>
                                             <select class="form-control" id="jenisPenlat" name="jenisPenlat" required>
                                                 <option value="1" selected>Show All</option>
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-md-2">
+                                    <div class="col-md-3">
                                         <div class="form-group">
-                                            <label for="position_id">TW :</label>
+                                            <label for="position_id">Jenis Feedback :</label>
                                             <select name="tw" class="form-control" id="tw">
                                                 <option value="1">Show All</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="form-group">
-                                            <label for="position_id">Periode :</label>
-                                            <select name="periode" class="form-control" id="periode">
-                                                <option value="1" selected>Show All</option>
                                             </select>
                                         </div>
                                     </div>
