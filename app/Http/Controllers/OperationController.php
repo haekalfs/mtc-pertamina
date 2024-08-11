@@ -140,6 +140,11 @@ class OperationController extends Controller
         return view('operation.submenu.tool_inventory', ['assets' => $assets, 'locations' => $locations]);
     }
 
+    public function tool_usage()
+    {
+        return view('operation.submenu.tool_usage');
+    }
+
     public function room_inventory()
     {
         $locations = Location::all();

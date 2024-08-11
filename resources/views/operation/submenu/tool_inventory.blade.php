@@ -20,6 +20,7 @@ font-weight-bold
         <p class="mb-4">Unduh Pencapaian Akhlak.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
+        <a href="{{ route('tool-usage') }}" class="btn btn-sm btn-primary shadow-sm text-white"> Penggunaan Alat</a>
     </div>
 </div>
 <div class="overlay overlay-mid" style="display: none;"></div>
@@ -131,7 +132,7 @@ font-weight-bold
                         <div class="col-md-6 mt-2">
                             <div class="card custom-card mb-3 shadow" style="background-color: #ffffff;">
                                 <div class="row no-gutters">
-                                    <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding-left: 1em;">
+                                    <div class="col-md-3 d-flex align-items-top justify-content-center" style="padding-left: 1em; padding-top: 30px;">
                                         <img src="{{ asset($item->img->filepath) }}" style="height: 150px; width: 150px; border-radius: 15px;" class="card-img" alt="...">
                                     </div>
                                     <div class="col-md-9">
@@ -139,17 +140,20 @@ font-weight-bold
                                             <div>
                                                 <h5 class="card-title font-weight-bold">{{ $item->asset_name }}</h5>
                                                 <ul class="ml-4">
-                                                    <li class="card-text">Nomor Aset : {{ $item->asset_id }}</li>
-                                                    <li class="card-text">Maker : {{ $item->asset_maker }}</li>
-                                                    <li class="card-text">Kondisi Alat : {{ $item->asset_condition }}</li>
-                                                    <li class="card-text">Stock : {{ $item->asset_stock }}</li>
-                                                    <li class="card-text">Panduan Maintenance : <a href="#" class="text-secondary"><i class="fa fa-external-link fa-sm"></i>&nbsp;<i>View</i></a></li>
+                                                    <li class="card-text mb-1">Nomor Aset : {{ $item->asset_id }}</li>
+                                                    <li class="card-text mb-1">Maker : {{ $item->asset_maker }}</li>
+                                                    <li class="card-text mb-1">Stock : {{ $item->asset_stock }}</li>
+                                                    <li class="card-text mb-1">Running Hour : {{ $item->asset_condition }}</li>
+                                                    <li class="card-text mb-1">Kondisi Alat : {{ $item->asset_condition }}</li>
+                                                    <li class="card-text mb-1">Jadwal Maintenance Next : 01-January-2024</li>
+                                                    <li class="card-text mb-1">Last Maintenance : 01-January-2023</li>
+                                                    <li class="card-text mb-1">Panduan Maintenance : <a href="{{ asset('maintenance_file_example.pdf') }}" target="_blank" class="text-secondary">&nbsp;&nbsp;<i class="fa fa-external-link fa-sm"></i> <u>View</u></a></li>
                                                 </ul>
                                             </div>
                                         </div>
                                         <div class="card-icons">
-                                            <span class="badge out-of-stock">OUT OF STOCK</span>
-                                            <a href="#"><i class="fa fa-cog"></i></a>
+                                            <span class="badge out-of-stock">Maintenance Required</span>
+                                            <a href="#" data-toggle="modal" data-target="#editDataModal"><i class="fa fa-edit"></i></a>
                                         </div>
                                     </div>
                                 </div>
@@ -173,8 +177,9 @@ font-weight-bold
         </div>
     </div>
 </div>
-<div class="modal fade" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
+
+<div class="modal fade zoom90" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header d-flex flex-row align-items-center justify-content-between">
                 <h5 class="modal-title" id="inputDataModalLabel">Input Data</h5>
@@ -184,46 +189,147 @@ font-weight-bold
             </div>
             <form method="post" enctype="multipart/form-data" action="{{ route('kpis.store') }}">
                 @csrf
-                <div class="modal-body zoom80">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label for="kpi">Asset ID</label>
-                            <input type="text" class="form-control" id="kpi" name="kpi" placeholder="Yearly Revenue..." required>
+                <div class="modal-body mr-2 ml-2">
+                    <div class="row no-gutters">
+                        <div class="col-md-3 d-flex align-items-top justify-content-center" style="padding-top: 1em;">
+                            <img src="https://via.placeholder.com/50x50/5fa9f8/ffffff" style="height: 150px; width: 150px; border-radius: 15px;" class="card-img" alt="...">
                         </div>
-                        <div class="form-group">
-                            <label for="target">Asset Name</label>
-                            <input type="text" class="form-control" id="target" name="target" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="periode">Asset Maker</label>
-                            <select class="form-control" id="periode" name="periode" required>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="periode">Asset Condition</label>
-                            <select class="form-control" id="periode" name="periode" required>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="periode">Asset Stock</label>
-                            <select class="form-control" id="periode" name="periode" required>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="periode">Asset Guidance</label>
-                            <input type="file" class="form-control" id="target" name="target" required>
-                        </div>
-                        <label for="target">Asset Image <small>Optional</small></label>
-                        <div class="form-group mb-0 drop-zone" id="drop_zone">
-                            <span id="drop_zone_text">Paste or drag image here</span>
-                            <input type="file" class="form-control-file underline-input d-none" name="picture" id="picture" accept="image/*">
-                            <div class="col-md-12">
+                        <div class="col-md-9">
+                            <div class="card-body text-secondary">
                                 <div class="row">
-                                    <div class="col-md-4 d-flex align-items-start">
-                                        <img id="preview" style="max-width: 100px; max-height: 100px; display: none;">
-                                        <button type="button" class="btn btn-sm btn-danger" id="discard" style="display: none;">
-                                            <i class="fa fa-times"></i>
-                                        </button>
+                                    <div class="col-md-12">
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Asset Name :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="text" class="form-control" name="number" required>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Nomor Asset :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="text" class="form-control" name="date_released">
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Maker :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="text" class="form-control" name="date_released">
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Kondisi Alat :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="text" class="form-control" name="number" required>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Stock :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="text" class="form-control" name="date_released">
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 200px;" class="mr-2">
+                                                <p style="margin: 0;">Panduan Maintenance :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="file" class="form-control" name="number" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Submit Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade zoom90" id="editDataModal" tabindex="-1" role="dialog" aria-labelledby="editDataModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header d-flex flex-row align-items-center justify-content-between">
+                <h5 class="modal-title" id="editDataModalLabel">Edit Data</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" enctype="multipart/form-data" action="{{ route('kpis.store') }}">
+                @csrf
+                <div class="modal-body mr-2 ml-2">
+                    <div class="row no-gutters">
+                        <div class="col-md-3 d-flex align-items-top justify-content-center" style="padding-top: 1em;">
+                            <img src="https://via.placeholder.com/50x50/5fa9f8/ffffff" style="height: 150px; width: 150px; border-radius: 15px;" class="card-img" alt="...">
+                        </div>
+                        <div class="col-md-9">
+                            <div class="card-body text-secondary">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Asset Name :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="text" class="form-control" name="number" required>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Nomor Asset :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="text" class="form-control" name="date_released">
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Maker :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="text" class="form-control" name="date_released">
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Kondisi Alat :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="text" class="form-control" name="number" required>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Stock :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="text" class="form-control" name="date_released">
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 200px;" class="mr-2">
+                                                <p style="margin: 0;">Panduan Maintenance :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="file" class="form-control" name="number" required>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

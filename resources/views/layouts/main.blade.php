@@ -102,8 +102,9 @@
                     <li class="menu-item-has-children dropdown @yield('active-finance') @yield('show-finance')">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-money"></i>Finance</a>
                         <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-finance')">
-                            <li><i class="fa fa-tachometer"></i><a href="{{ route('finance') }}">Dashboard</a></li>
-                            <li><i class="fa fa-cog"></i><a href="{{ route('manage-finance') }}">Manage</a></li>
+                            <li><i class="fa fa-tachometer"></i><a href="{{ route('finance') }}" class="@yield('finance')">Dashboard</a></li>
+                            <li><i class="fa fa-list-alt"></i><a href="{{ route('vendor-payment') }}" class="@yield('vendor-payment')">Pembayaran Vendor</a></li>
+                            <li><i class="ti-stats-down"></i><a href="{{ route('cost') }}" class="@yield('cost')">Cost</a></li>
                         </ul>
                     </li>
                     @endusr_acc

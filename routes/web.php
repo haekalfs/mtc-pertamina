@@ -58,13 +58,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/akhlak-store/{userSelected?}/{akhlakSelected?}/{periodeSelected?}', [AkhlakController::class, 'store'])->name('akhlak.store');
     Route::get('/akhlak-print/{userSelected}/{akhlakSelected}/{periodeSelected}', [AkhlakController::class, 'print'])->name('akhlak.print');
 
-    //Finance
-    Route::get('/finances', [FinanceController::class, 'index'])->name('finance');
-    Route::get('/finances/manage-items', [FinanceController::class, 'manage'])->name('manage-finance');
-    Route::get('/finances/report', [FinanceController::class, 'report'])->name('finance-report');
-    Route::post('/finances-store', [FinanceController::class, 'store'])->name('finance.store');
-
-
     //Operation
     Route::get('/operation', [OperationController::class, 'index'])->name('operation');
 
@@ -77,6 +70,7 @@ Route::middleware('auth')->group(function () {
 
     //inventaris Alat
     Route::get('/operation/tool-inventory', [OperationController::class, 'tool_inventory'])->name('tool-inventory');
+    Route::get('/operation/tool-inventory/usages', [OperationController::class, 'tool_usage'])->name('tool-usage');
 
     //inventaris ruangan
     Route::get('/operation/room-inventory', [OperationController::class, 'room_inventory'])->name('room-inventory');
@@ -92,10 +86,13 @@ Route::middleware('auth')->group(function () {
     //Marketing
     Route::get('/marketing', [MarketingController::class, 'index'])->name('marketing');
     Route::get('/marketing-campaign', [MarketingController::class, 'campaign'])->name('marketing-campaign');
-    Route::get('/instagram', [InstagramController::class, 'fetchInstagramData']);
     //Company Agreement
     Route::get('/marketing/company-agreement', [MarketingController::class, 'company_agreement'])->name('company-agreement');
 
+    //finances
+    Route::get('/finances', [FinanceController::class, 'dashboard'])->name('finance');
+    Route::get('/finances/vendor-payment', [FinanceController::class, 'vendor_payment'])->name('vendor-payment');
+    Route::get('/finances/costs', [FinanceController::class, 'costs'])->name('cost');
 
 
     //Plan & Dev
@@ -106,6 +103,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/planning-development/certificate', [PDController::class, 'certificate'])->name('certificate');
     Route::get('/planning-development/instructor', [PDController::class, 'instructor'])->name('instructor');
     Route::get('/planning-development/training-reference', [PDController::class, 'training_reference'])->name('training-reference');
+
+
+    Route::get('/planning-development/instructor/upload-certificate', [PDController::class, 'upload_certificate'])->name('upload-certificate');
 
 
 

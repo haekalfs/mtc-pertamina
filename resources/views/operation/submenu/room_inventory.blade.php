@@ -95,7 +95,7 @@ font-weight-bold
                                             </div>
                                         </div>
                                         <div class="card-icons">
-                                            <a href="#"><i class="fa fa-cog"></i></a>
+                                            <a href="#" data-toggle="modal" data-target="#editDataModal"><i class="fa fa-edit"></i></a>
                                         </div>
                                     </div>
                                 </div>
@@ -119,6 +119,170 @@ font-weight-bold
     </div>
 </div>
 
+<div class="modal fade zoom90" id="editDataModal" tabindex="-1" role="dialog" aria-labelledby="editDataModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header d-flex flex-row align-items-center justify-content-between">
+                <h5 class="modal-title" id="editDataModalLabel">Edit Data</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" enctype="multipart/form-data" action="{{ route('kpis.store') }}">
+                @csrf
+                <div class="modal-body mr-2 ml-2">
+                    <div class="row no-gutters">
+                        <div class="col-md-3 d-flex align-items-top justify-content-center" style="padding-top: 1em;">
+                            <img src="https://via.placeholder.com/50x50/5fa9f8/ffffff" style="height: 150px; width: 150px; border-radius: 15px;" class="card-img" alt="...">
+                        </div>
+                        <div class="col-md-9">
+                            <div class="card-body text-secondary">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Nama Ruangan :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="text" class="form-control" name="number" required>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Jumlah Kursi :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="number" class="form-control" name="date_released">
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Jumlah Meja :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="number" class="form-control" name="date_released">
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Jumlah Kelas :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="number" class="form-control" name="date_released">
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Jumlah Ruangan :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="number" class="form-control" name="date_released">
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Jumlah Simulator :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="number" class="form-control" name="date_released">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Submit Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade zoom90" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header d-flex flex-row align-items-center justify-content-between">
+                <h5 class="modal-title" id="inputDataModalLabel">Input Data</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" enctype="multipart/form-data" action="{{ route('kpis.store') }}">
+                @csrf
+                <div class="modal-body mr-2 ml-2">
+                    <div class="row no-gutters">
+                        <div class="col-md-3 d-flex align-items-top justify-content-center" style="padding-top: 1em;">
+                            <img src="https://via.placeholder.com/50x50/5fa9f8/ffffff" style="height: 150px; width: 150px; border-radius: 15px;" class="card-img" alt="...">
+                        </div>
+                        <div class="col-md-9">
+                            <div class="card-body text-secondary">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Nama Ruangan :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="text" class="form-control" name="number" required>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Jumlah Kursi :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="number" class="form-control" name="date_released">
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Jumlah Meja :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="number" class="form-control" name="date_released">
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Jumlah Kelas :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="number" class="form-control" name="date_released">
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Jumlah Ruangan :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="number" class="form-control" name="date_released">
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Jumlah Simulator :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="number" class="form-control" name="date_released">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Submit Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <script>
     function displayFileName() {
         const input = document.getElementById('file');

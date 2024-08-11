@@ -144,62 +144,75 @@ font-weight-bold
         </div>
     </div>
 </div>
-<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+
+<div class="modal fade" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
-			<div class="modal-header d-flex flex-row align-items-center justify-content-between border-bottom-1">
-                <h5 class="modal-title" id="editModalLabel">Edit Participant</h5>
+            <div class="modal-header d-flex flex-row align-items-center justify-content-between">
+                <h5 class="modal-title" id="inputDataModalLabel">Input Data</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
-                <form id="editForm">
-                    @csrf
-                    <input type="hidden" id="editId" name="id">
-                    <div class="form-group">
-                        <label for="editNamaPeserta">Nama Peserta</label>
-                        <input type="text" class="form-control" id="editNamaPeserta" name="nama_peserta" required>
+            <form method="post" enctype="multipart/form-data" action="{{ route('kpis.store') }}">
+                @csrf
+                <div class="modal-body mr-2 ml-2">
+                    <div class="row no-gutters">
+                        <div class="col-md-12">
+                            <div class="card-body text-secondary">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Asset Name :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="text" class="form-control" name="number" required>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Asset Maker :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="text" class="form-control" name="date_released">
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Kondisi Alat :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="text" class="form-control" name="number" required>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Stock :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="text" class="form-control" name="date_released">
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 200px;" class="mr-2">
+                                                <p style="margin: 0;">Panduan Maintenance :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="file" class="form-control" name="number" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="editNamaProgram">Nama Program</label>
-                        <input type="text" class="form-control" id="editNamaProgram" name="nama_program" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editTglPelaksanaan">Tgl Pelaksanaan</label>
-                        <input type="date" class="form-control" id="editTglPelaksanaan" name="tgl_pelaksanaan" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editTempatPelaksanaan">Tempat Pelaksanaan</label>
-                        <input type="text" class="form-control" id="editTempatPelaksanaan" name="tempat_pelaksanaan" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editJenisPelatihan">Jenis Pelatihan</label>
-                        <input type="text" class="form-control" id="editJenisPelatihan" name="jenis_pelatihan" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editKeterangan">Keterangan</label>
-                        <input type="text" class="form-control" id="editKeterangan" name="keterangan" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editSubholding">Subholding</label>
-                        <input type="text" class="form-control" id="editSubholding" name="subholding" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editPerusahaan">Perusahaan</label>
-                        <input type="text" class="form-control" id="editPerusahaan" name="perusahaan" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editKategoriProgram">Kategori Program</label>
-                        <input type="text" class="form-control" id="editKategoriProgram" name="kategori_program" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editRealise">Realisasi</label>
-                        <input type="text" class="form-control" id="editRealisasi" name="realisasi" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Save changes</button>
-                </form>
-            </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Submit Request</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

@@ -50,6 +50,17 @@ font-weight-bold
     <strong>{{ $message }}</strong>
 </div>
 @endif
+<style>
+    #dataTable tbody tr {
+        margin: 0;
+        padding: 0;
+    }
+
+    #dataTable tbody td {
+        padding: 0;
+        border: none; /* Optional: removes the borders */
+    }
+</style>
 <div class="animated fadeIn zoom90">
     <div class="row">
         <div class="col-md-12">
@@ -61,55 +72,50 @@ font-weight-bold
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="card mb-3">
-                        <div class="card-body custom-card">
-                            <div class="row no-gutters">
-                                <div class="col-md-10 mt-2">
-                                    <h5 class="card-title text-secondary font-weight-bold">Nama Regulasi</h5>
-                                    <a href="" class="card-text"><u>Lampiran Dokumen</u> <i class="fa fa-external-link fa-sm"></i></a>
-                                </div>
-                                <div class="col-md-2 d-flex align-items-center justify-content-center">
-                                    <a class="btn btn-outline-secondary btn-sm" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-eye"></i> Review Regulation</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card mb-3">
-                        <div class="card-body custom-card">
-                            <div class="row no-gutters">
-                                <div class="col-md-10 mt-2">
-                                    <h5 class="card-title text-secondary font-weight-bold">Nama Regulasi</h5>
-                                    <a href="" class="card-text"><u>Lampiran Dokumen</u> <i class="fa fa-external-link fa-sm"></i></a>
-                                </div>
-                                <div class="col-md-2 d-flex align-items-center justify-content-center">
-                                    <a class="btn btn-outline-secondary btn-sm" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-eye"></i> Review Regulation</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card mb-3">
-                        <div class="card-body custom-card">
-                            <div class="row no-gutters">
-                                <div class="col-md-10 mt-2">
-                                    <h5 class="card-title text-secondary font-weight-bold">Nama Regulasi</h5>
-                                    <a href="" class="card-text"><u>Lampiran Dokumen</u> <i class="fa fa-external-link fa-sm"></i></a>
-                                </div>
-                                <div class="col-md-2 d-flex align-items-center justify-content-center">
-                                    <a class="btn btn-outline-secondary btn-sm" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-eye"></i> Review Regulation</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-12 text-center d-flex align-items-center justify-content-center mt-4">
-                        <nav aria-label="Page navigation example">
-                            <ul class="pagination">
-                              <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                              <li class="page-item"><a class="page-link" href="#">1</a></li>
-                              <li class="page-item"><a class="page-link" href="#">2</a></li>
-                              <li class="page-item"><a class="page-link" href="#">3</a></li>
-                              <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                            </ul>
-                          </nav>
+                    <div>
+                        <table id="dataTable" class="table table-borderless mt-4">
+                            <thead class="text-center" style="display: none;">
+                                <tr>
+                                    <th>Regulations</th>
+                                </tr>
+                            </thead>
+                            <tbody class="mt-2">
+                                <tr>
+                                    <td>
+                                        <div class="card mb-3">
+                                            <div class="card-body custom-card">
+                                                <div class="row no-gutters">
+                                                    <div class="col-md-10 mt-2">
+                                                        <h5 class="card-title text-secondary font-weight-bold">Nama Regulasi</h5>
+                                                        <a href="" class="card-text"><u>Lampiran Dokumen</u> <i class="fa fa-external-link fa-sm"></i></a>
+                                                    </div>
+                                                    <div class="col-md-2 d-flex align-items-center justify-content-center">
+                                                        <a class="btn btn-outline-secondary btn-sm" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-eye"></i> Review Regulation</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="card mb-3">
+                                            <div class="card-body custom-card">
+                                                <div class="row no-gutters">
+                                                    <div class="col-md-10 mt-2">
+                                                        <h5 class="card-title text-secondary font-weight-bold">Testing</h5>
+                                                        <a href="" class="card-text"><u>Lampiran Dokumen</u> <i class="fa fa-external-link fa-sm"></i></a>
+                                                    </div>
+                                                    <div class="col-md-2 d-flex align-items-center justify-content-center">
+                                                        <a class="btn btn-outline-secondary btn-sm" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-eye"></i> Review Regulation</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

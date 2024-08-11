@@ -1,14 +1,14 @@
 @extends('layouts.main')
 
-@section('active-operation')
+@section('active-pd')
 active font-weight-bold
 @endsection
 
-@section('show-operation')
+@section('show-pd')
 show
 @endsection
 
-@section('participant-infographics')
+@section('instructor')
 font-weight-bold
 @endsection
 
@@ -16,11 +16,11 @@ font-weight-bold
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
-        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="menu-icon fa fa-users"></i> Participants Infographics</h1>
-        <p class="mb-4">Unduh Pencapaian Akhlak.</a></p>
+        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="menu-icon fa fa-users"></i> Upload Certificates</h1>
+        <p class="mb-4">Upload Certificate.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
-        <a href="{{ route('participant-infographics') }}" class="btn btn-sm btn-secondary shadow-sm text-white"><i class="fa fa-backward"></i> Go Back</a>
+        <a href="{{ route('certificate') }}" class="btn btn-sm btn-secondary shadow-sm text-white"><i class="fa fa-backward"></i> Go Back</a>
     </div>
 </div>
 <div class="overlay overlay-mid" style="display: none;"></div>
@@ -72,7 +72,7 @@ font-weight-bold
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-secondary" id="judul">Search Report</h6>
                     <div class="text-right">
-                        <a class="btn btn-primary btn-sm text-white" href="{{ asset('participants_dummy_data_50.xlsx') }}"><i class="menu-icon fa fa-download"></i> Download Template</a>
+                        {{-- <a class="btn btn-primary btn-sm text-white" href="{{ asset('participants_dummy_data_50.xlsx') }}"><i class="menu-icon fa fa-download"></i> Download Template</a> --}}
                     </div>
                 </div>
                 <div class="card-body">
@@ -81,7 +81,7 @@ font-weight-bold
                         <div class="row">
                             <div class="col-md-11">
                                 <div class="form-group">
-                                    <label for="file">CSV File :</label>
+                                    <label for="file">PDF File :</label>
                                     <div class="custom-file">
                                         <input type="file" class="custom-file-input" id="file" name="file" aria-describedby="file" onchange="displayFileName()">
                                         <label class="custom-file-label" for="file" id="file-label">Choose file</label>
@@ -105,7 +105,7 @@ font-weight-bold
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> List Data</h6>
+                    <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> View Data</h6>
                     <div class="text-right">
                         {{-- <a class="btn btn-primary btn-sm text-white"><i class="menu-icon fa fa-download"></i> Download</a> --}}
                     </div>
@@ -119,60 +119,4 @@ font-weight-bold
         </div>
     </div>
 </div>
-
-<script>
-    function displayFileName() {
-        const input = document.getElementById('file');
-        const label = document.getElementById('file-label');
-        const file = input.files[0];
-        if (file) {
-            label.textContent = file.name;
-            previewExcel(file);
-        }
-    }
-    function previewExcel(file) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            const data = new Uint8Array(event.target.result);
-            const workbook = XLSX.read(data, {type: 'array'});
-            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-            const excelRows = XLSX.utils.sheet_to_json(firstSheet, {header: 1});
-            displayExcelData(excelRows);
-        };
-        reader.readAsArrayBuffer(file);
-    }
-
-    function displayExcelData(rows) {
-        const previewDiv = document.getElementById('excel-preview');
-        previewDiv.innerHTML = '';
-
-        if (rows.length === 0) {
-            previewDiv.textContent = 'No data found in the file.';
-            return;
-        }
-
-        const table = document.createElement('table');
-        table.className = 'table table-bordered';
-        const thead = document.createElement('thead');
-        const tbody = document.createElement('tbody');
-
-        rows.forEach((row, index) => {
-            const tr = document.createElement('tr');
-            row.forEach(cell => {
-                const td = document.createElement(index === 0 ? 'th' : 'td');
-                td.textContent = cell;
-                tr.appendChild(td);
-            });
-            if (index === 0) {
-                thead.appendChild(tr);
-            } else {
-                tbody.appendChild(tr);
-            }
-        });
-
-        table.appendChild(thead);
-        table.appendChild(tbody);
-        previewDiv.appendChild(table);
-    }
-</script>
 @endsection

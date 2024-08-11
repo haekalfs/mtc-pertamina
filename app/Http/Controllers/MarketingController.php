@@ -16,8 +16,17 @@ class MarketingController extends Controller
         return view('marketing.submenu.campaign');
     }
 
-    public function company_agreement()
+    public function company_agreement(Request $request)
     {
-        return view('marketing.submenu.agreement');
+        // Determine the current year and generate the range of years
+        $nowYear = date('Y');
+        $yearsBefore = range($nowYear - 4, $nowYear);
+
+        // Set the selected year
+        $currentYear = $periodeSelected ?? $nowYear;
+
+        return view('marketing.submenu.agreement', [
+            'yearsBefore' => $yearsBefore
+        ]);
     }
 }

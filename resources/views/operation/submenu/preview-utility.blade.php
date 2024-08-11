@@ -220,19 +220,23 @@ font-weight-bold
                                             <img src="https://via.placeholder.com/250x250/5fa9f8/ffffff" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow ">
                                         </div>
                                         <div class="col-md-9 text-left mt-sm-2">
-                                            <h4>Product Name</h4>
-                                            <p class="font-weight-light">Brand &amp; Name</p>
+                                            <h4>APAR</h4>
+                                            <p class="font-weight-light">Satuan Default</p>
                                         </div>
                                     </div>
                                 </td>
                                 <td data-th="Quantity">
                                     <input type="number" class="form-control form-control-lg text-center" value="1">
                                 </td>
-                                <td data-th="Price">$49.00</td>
+                                <td data-th="Price">
+                                    <select class="custom-select" id="namaPenlat" name="namaPenlat">
+                                        <option value="1" selected>Pcs</option>
+                                    </select>
+                                </td>
                                 <td class="actions text-center" data-th="">
                                     <div>
                                         <button class="btn btn-white border-secondary bg-white btn-md mb-2">
-                                            <i class="fa fa-external-link"></i>
+                                            <i class="fa fa-save"></i>
                                         </button>
                                         <button class="btn btn-white border-secondary bg-white btn-md mb-2">
                                             <i class="fa fa-trash"></i>
@@ -247,19 +251,23 @@ font-weight-bold
                                             <img src="https://via.placeholder.com/250x250/5fa9f8/ffffff" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow ">
                                         </div>
                                         <div class="col-md-9 text-left mt-sm-2">
-                                            <h4>Product Name</h4>
-                                            <p class="font-weight-light">Brand &amp; Name</p>
+                                            <h4>APAR</h4>
+                                            <p class="font-weight-light">Satuan Default</p>
                                         </div>
                                     </div>
                                 </td>
                                 <td data-th="Quantity">
                                     <input type="number" class="form-control form-control-lg text-center" value="1">
                                 </td>
-                                <td data-th="Price">$49.00</td>
+                                <td data-th="Price">
+                                    <select class="custom-select" id="namaPenlat" name="namaPenlat">
+                                        <option value="1" selected>Pcs</option>
+                                    </select>
+                                </td>
                                 <td class="actions text-center" data-th="">
                                     <div>
                                         <button class="btn btn-white border-secondary bg-white btn-md mb-2">
-                                            <i class="fa fa-external-link"></i>
+                                            <i class="fa fa-save"></i>
                                         </button>
                                         <button class="btn btn-white border-secondary bg-white btn-md mb-2">
                                             <i class="fa fa-trash"></i>
@@ -274,19 +282,23 @@ font-weight-bold
                                             <img src="https://via.placeholder.com/250x250/5fa9f8/ffffff" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow ">
                                         </div>
                                         <div class="col-md-9 text-left mt-sm-2">
-                                            <h4>Product Name</h4>
-                                            <p class="font-weight-light">Brand &amp; Name</p>
+                                            <h4>APAR</h4>
+                                            <p class="font-weight-light">Satuan Default</p>
                                         </div>
                                     </div>
                                 </td>
                                 <td data-th="Quantity">
                                     <input type="number" class="form-control form-control-lg text-center" value="1">
                                 </td>
-                                <td data-th="Price">$49.00</td>
+                                <td data-th="Price">
+                                    <select class="custom-select" id="namaPenlat" name="namaPenlat">
+                                        <option value="1" selected>Pcs</option>
+                                    </select>
+                                </td>
                                 <td class="actions text-center" data-th="">
                                     <div>
                                         <button class="btn btn-white border-secondary bg-white btn-md mb-2">
-                                            <i class="fa fa-external-link"></i>
+                                            <i class="fa fa-save"></i>
                                         </button>
                                         <button class="btn btn-white border-secondary bg-white btn-md mb-2">
                                             <i class="fa fa-trash"></i>

@@ -8,7 +8,7 @@ active font-weight-bold
 show
 @endsection
 
-@section('marketing-agreement')
+@section('company-agreement')
 font-weight-bold
 @endsection
 
@@ -50,6 +50,17 @@ font-weight-bold
     <strong>{{ $message }}</strong>
 </div>
 @endif
+<style>
+    #dataTable tbody tr {
+        margin: 0;
+        padding: 0;
+    }
+
+    #dataTable tbody td {
+        padding: 0;
+        border: none; /* Optional: removes the borders */
+    }
+</style>
 
 <div class="animated fadeIn zoom90">
     <div class="row">
@@ -61,116 +72,64 @@ font-weight-bold
                         <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Register Vendor</a>
                     </div>
                 </div>
-                <div class="row-toolbar mt-4 ml-2 zoom90">
-                    <div class="col">
-                        <select style="max-width: 18%;" class="form-control" id="rowsPerPage">
-                            <option value="-1">Show All</option>
-                        </select>
-                    </div>
-                    <div class="col-auto text-right mr-2">
-                        <input class="form-control" type="text" id="searchInput" placeholder="Search...">
-                    </div>
-                </div>
                 <div class="card-body">
-                    <div class="row zoom90">
-                        <div class="col-md-12 mt-2">
-                            <div class="card custom-card mb-3 bg-white shadow">
-                                <div class="row no-gutters">
-                                    <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding: 2em;">
-                                        <img src="https://via.placeholder.com/250x150/5fa9f8/ffffff" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
-                                    </div>
-                                    <div class="col-md-7 mt-2">
-                                        <div class="card-body text-secondary">
-                                            <div>
-                                                <h4 class="card-title font-weight-bold">Charity and cultural night</h4>
-                                                <ul class="ml-3">
-                                                    <li class="card-text">Jumlah Kursi : 1</li>
-                                                    <li class="card-text">Jumlah Meja : 1</li>
-                                                    <li class="card-text">Jumlah Kelas : 1</li>
-                                                    <li class="card-text">Jumlah Ruangan : 1</li>
-                                                    <li class="card-text">Jumlah Simulator : 1</li>
-                                                </ul>
-                                            </div>
+                    <form method="GET" action="{{ route('company-agreement') }}">
+                        @csrf
+                        <div class="row d-flex justify-content-right mb-4">
+                            <div class="col-md-12">
+                                <div class="row align-items-center">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="email">Nama Penlat :</label>
+                                            <select class="custom-select" id="namaPenlat" name="namaPenlat">
+                                                <option value="1" selected>Show All</option>
+                                            </select>
                                         </div>
                                     </div>
-                                    <div class="col-md-2 d-flex align-items-center justify-content-center">
-                                        <a class="btn btn-outline-secondary btn-sm" href="#" data-toggle="modal" data-target="#inputDataModal">Review Agreement</a>
-                                    </div>
-                                    <div class="card-icons">
-                                        <a href="#"><i class="fa fa-download fa-2x text-secondary" style="font-size: 1.5em;"></i></a>
+                                    <div class="col-md-1 d-flex align-self-end justify-content-start">
+                                        <div class="form-group">
+                                            <div class="align-self-center">
+                                                <button type="submit" class="btn btn-primary" style="padding-left: 1.2em; padding-right: 1.2em;"><i class="ti-search"></i></button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-12 mt-2">
-                            <div class="card custom-card mb-3 bg-white shadow">
-                                <div class="row no-gutters">
-                                    <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding: 2em;">
-                                        <img src="https://via.placeholder.com/250x150/5fa9f8/ffffff" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
-                                    </div>
-                                    <div class="col-md-7 mt-2">
-                                        <div class="card-body text-secondary">
-                                            <div>
-                                                <h4 class="card-title font-weight-bold">Charity and cultural night</h4>
-                                                <ul class="ml-3">
-                                                    <li class="card-text">Jumlah Kursi : 1</li>
-                                                    <li class="card-text">Jumlah Meja : 1</li>
-                                                    <li class="card-text">Jumlah Kelas : 1</li>
-                                                    <li class="card-text">Jumlah Ruangan : 1</li>
-                                                    <li class="card-text">Jumlah Simulator : 1</li>
-                                                </ul>
+                    </form>
+                    <div>
+                        <table id="dataTable" class="table table-borderless mt-4">
+                            <thead class="text-center" style="display: none;">
+                                <tr>
+                                    <th>Agreement</th>
+                                </tr>
+                            </thead>
+                            <tbody class="mt-2">
+                                <tr>
+                                    <td>
+                                        <div class="card custom-card mb-3 bg-white shadow">
+                                            <div class="row no-gutters">
+                                                <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding: 2em;">
+                                                    <img src="https://via.placeholder.com/250x150/5fa9f8/ffffff" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
+                                                </div>
+                                                <div class="col-md-7 mt-2">
+                                                    <div class="card-body text-secondary">
+                                                        <div class="mt-1">
+                                                            <h4 class="font-weight-bold">PT CCD JAYA EKSPRES</h4>
+                                                            <p class="font-weight-light">Document SPK</p>
+                                                            <p>Status : <i class="fa  fa-check-square-o"></i></p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2 d-flex align-items-center justify-content-start">
+                                                    <a class="btn btn-outline-secondary btn-sm" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-eye"></i> Preview Agreement</a>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-2 d-flex align-items-center justify-content-center">
-                                        <a class="btn btn-outline-secondary btn-sm" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-eye"></i> Review Agreement</a>
-                                    </div>
-                                    <div class="card-icons">
-                                        <a href="#"><i class="fa fa-download fa-2x text-secondary" style="font-size: 1.5em;"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-12 mt-2">
-                            <div class="card custom-card mb-3 bg-white shadow">
-                                <div class="row no-gutters">
-                                    <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding: 2em;">
-                                        <img src="https://via.placeholder.com/250x150/5fa9f8/ffffff" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
-                                    </div>
-                                    <div class="col-md-7 mt-2">
-                                        <div class="card-body text-secondary">
-                                            <div>
-                                                <h4 class="card-title font-weight-bold">Charity and cultural night</h4>
-                                                <ul class="ml-3">
-                                                    <li class="card-text">Jumlah Kursi : 1</li>
-                                                    <li class="card-text">Jumlah Meja : 1</li>
-                                                    <li class="card-text">Jumlah Kelas : 1</li>
-                                                    <li class="card-text">Jumlah Ruangan : 1</li>
-                                                    <li class="card-text">Jumlah Simulator : 1</li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2 d-flex align-items-center justify-content-center">
-                                        <a class="btn btn-outline-secondary btn-sm" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-eye"></i> Review Agreement</a>
-                                    </div>
-                                    <div class="card-icons">
-                                        <a href="#"><i class="fa fa-download fa-2x text-secondary" style="font-size: 1.5em;"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-12 text-center d-flex align-items-center justify-content-center mt-4">
-                        <nav aria-label="Page navigation example">
-                            <ul class="pagination">
-                              <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                              <li class="page-item"><a class="page-link" href="#">1</a></li>
-                              <li class="page-item"><a class="page-link" href="#">2</a></li>
-                              <li class="page-item"><a class="page-link" href="#">3</a></li>
-                              <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                            </ul>
-                          </nav>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

@@ -40,4 +40,9 @@ class PDController extends Controller
     {
         return view('plan_dev.submenu.training-reference');
     }
+
+    public function upload_certificate()
+    {
+        return view('plan_dev.submenu.upload_certificate');
+    }
 }

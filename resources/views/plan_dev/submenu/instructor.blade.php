@@ -20,6 +20,7 @@ font-weight-bold
         <p class="mb-4">Menu Instruktur.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
+        <a href="{{ route('upload-certificate') }}" class="btn btn-sm btn-primary shadow-sm text-white"><i class="fa fa-file-text fa-sm"></i> Import Cerficate</a>
     </div>
 </div>
 <div class="overlay overlay-mid" style="display: none;"></div>
@@ -50,7 +51,24 @@ font-weight-bold
     <strong>{{ $message }}</strong>
 </div>
 @endif
+<style>
+    .badge-custom {
+        font-size: 0.9rem; /* Adjust the font size */
+        padding: 0.5rem 1rem; /* Adjust the padding for height and width */
+        border-radius: 0.5rem; /* Optional: Adjust the border radius */
+    }
+</style>
+<style>
+    #dataTable tbody tr {
+        margin: 0;
+        padding: 0;
+    }
 
+    #dataTable tbody td {
+        padding: 0;
+        border: none; /* Optional: removes the borders */
+    }
+</style>
 <div class="animated fadeIn zoom90">
     <div class="row">
         <div class="col-md-12">
@@ -61,112 +79,119 @@ font-weight-bold
                         <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Register Instructor</a>
                     </div>
                 </div>
-                <div class="row-toolbar mt-4 ml-2 zoom90">
-                    <div class="col">
-                        <select style="max-width: 18%;" class="form-control" id="rowsPerPage">
-                            <option value="-1">Show All</option>
-                        </select>
-                    </div>
-                    <div class="col-auto text-right mr-2">
-                        <input class="form-control" type="text" id="searchInput" placeholder="Search...">
-                    </div>
-                </div>
                 <div class="card-body">
-                    <div class="row zoom90">
-                        <div class="col-md-12 mt-2">
-                            <div class="card custom-card mb-3 bg-white shadow">
-                                <div class="row no-gutters">
-                                    <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding: 2em;">
-                                        <img src="https://via.placeholder.com/150x150/5fa9f8/ffffff" style="height: 150px; width: 150px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
-                                    </div>
-                                    <div class="col-md-7 mt-2">
-                                        <div class="card-body text-secondary">
-                                            <div>
-                                                <h4 class="card-title font-weight-bold">Haekal Sastradilaga</h4>
-                                                <ul class="ml-3">
-                                                    <li class="card-text">Nilai Feedback</li>
-                                                    <li class="card-text">Umur</li>
-                                                </ul>
+                    <div>
+                        <table id="dataTable" class="table table-borderless mt-4">
+                            <thead class="text-center" style="display: none;">
+                                <tr>
+                                    <th>Instructors</th>
+                                </tr>
+                            </thead>
+                            <tbody class="mt-2">
+                                <tr>
+                                    <td>
+                                        <div class="card custom-card mb-3 bg-white shadow">
+                                            <div class="row no-gutters">
+                                                <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding: 2em;">
+                                                    <img src="https://via.placeholder.com/250x150/5fa9f8/ffffff" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
+                                                </div>
+                                                <div class="col-md-7 mt-2">
+                                                    <div class="card-body text-secondary">
+                                                        <div>
+                                                            <h4 class="card-title font-weight-bold">Haekal Sastradilaga</h4>
+                                                            <ul class="ml-3">
+                                                                <li class="card-text">Nilai Feedback</li>
+                                                                <li class="card-text">Umur</li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2 d-flex align-items-center justify-content-center">
+                                                    <a class="btn btn-outline-secondary btn-sm" href="#" data-toggle="modal" data-target="#customModal"><i class="menu-Logo fa fa-eye"></i> Review Pelatihan</a>
+                                                </div>
+                                                <div class="card-icons">
+                                                    <a href="#"><i class="fa fa-download fa-2x text-secondary" style="font-size: 1.5em;"></i></a>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-2 d-flex align-items-center justify-content-center">
-                                        <a class="btn btn-outline-secondary btn-sm" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-eye"></i> Review Instructor</a>
-                                    </div>
-                                    <div class="card-icons">
-                                        <a href="#"><i class="fa fa-download fa-2x text-secondary" style="font-size: 1.5em;"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-12 mt-2">
-                            <div class="card custom-card mb-3 bg-white shadow">
-                                <div class="row no-gutters">
-                                    <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding: 2em;">
-                                        <img src="https://via.placeholder.com/150x150/5fa9f8/ffffff" style="height: 150px; width: 150px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
-                                    </div>
-                                    <div class="col-md-7 mt-2">
-                                        <div class="card-body text-secondary">
-                                            <div>
-                                                <h4 class="card-title font-weight-bold">Nuri Bayu Anggoro</h4>
-                                                <ul class="ml-3">
-                                                    <li class="card-text">Nilai Feedback</li>
-                                                    <li class="card-text">Umur</li>
-                                                </ul>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="card custom-card mb-3 bg-white shadow">
+                                            <div class="row no-gutters">
+                                                <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding: 2em;">
+                                                    <img src="https://via.placeholder.com/250x150/5fa9f8/ffffff" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
+                                                </div>
+                                                <div class="col-md-7 mt-2">
+                                                    <div class="card-body text-secondary">
+                                                        <div>
+                                                            <h4 class="card-title font-weight-bold">Henry</h4>
+                                                            <ul class="ml-3">
+                                                                <li class="card-text">Nilai Feedback</li>
+                                                                <li class="card-text">Umur</li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2 d-flex align-items-center justify-content-center">
+                                                    <a class="btn btn-outline-secondary btn-sm" href="#" data-toggle="modal" data-target="#customModal"><i class="menu-Logo fa fa-eye"></i> Review Pelatihan</a>
+                                                </div>
+                                                <div class="card-icons">
+                                                    <a href="#"><i class="fa fa-download fa-2x text-secondary" style="font-size: 1.5em;"></i></a>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-2 d-flex align-items-center justify-content-center">
-                                        <a class="btn btn-outline-secondary btn-sm" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-eye"></i> Review Instructor</a>
-                                    </div>
-                                    <div class="card-icons">
-                                        <a href="#"><i class="fa fa-download fa-2x text-secondary" style="font-size: 1.5em;"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-12 mt-2">
-                            <div class="card custom-card mb-3 bg-white shadow">
-                                <div class="row no-gutters">
-                                    <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding: 2em;">
-                                        <img src="https://via.placeholder.com/150x150/5fa9f8/ffffff" style="height: 150px; width: 150px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
-                                    </div>
-                                    <div class="col-md-7 mt-2">
-                                        <div class="card-body text-secondary">
-                                            <div>
-                                                <h4 class="card-title font-weight-bold">Henry Ivan</h4>
-                                                <ul class="ml-3">
-                                                    <li class="card-text">Nilai Feedback</li>
-                                                    <li class="card-text">Umur</li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2 d-flex align-items-center justify-content-center">
-                                        <a class="btn btn-outline-secondary btn-sm" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-eye"></i> Review Instructor</a>
-                                    </div>
-                                    <div class="card-icons">
-                                        <a href="#"><i class="fa fa-download fa-2x text-secondary" style="font-size: 1.5em;"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-12 text-center d-flex align-items-center justify-content-center mt-4">
-                        <nav aria-label="Page navigation example">
-                            <ul class="pagination">
-                              <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                              <li class="page-item"><a class="page-link" href="#">1</a></li>
-                              <li class="page-item"><a class="page-link" href="#">2</a></li>
-                              <li class="page-item"><a class="page-link" href="#">3</a></li>
-                              <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                            </ul>
-                          </nav>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<div class="modal fade" id="customModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content custom-modal-content">
+        <div class="modal-header d-flex flex-row align-items-center justify-content-between border-bottom-1">
+          <h5 class="modal-title" id="exampleModalLabel">Instructor Detail</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <h6>Serfifikat</h6>
+          <div class="badge-container mt-2 mb-4">
+            <span class="badge badge-success badge-custom mb-2">Certificate 1 <i class="fa fa-check-square-o"></i></span>
+            <span class="badge badge-success badge-custom">Certificate 3 <i class="fa fa-check-square-o"></i></span>
+            <span class="badge badge-success badge-custom">Certificate 4 <i class="fa fa-check-square-o"></i></span>
+            <span class="badge badge-secondary badge-custom">Badge 2</span>
+            <span class="badge badge-secondary badge-custom">Badge 2</span>
+          </div>
+          <hr>
+          <h6>Profil Diri</h6>
+          <div class="list-group mt-2">
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    Curriculum Vitae
+                    <a href="path_to_curriculum_vitae.pdf" download class="btn btn-primary btn-sm"><i class="fa fa-download fa-2x" style="font-size: 1.5em;"></i></a>
+                </div>
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    Ijazah
+                    <a href="path_to_ijazah.pdf" download class="btn btn-primary btn-sm"><i class="fa fa-download fa-2x" style="font-size: 1.5em;"></i></a>
+                </div>
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    Dokumen Pendukung
+                    <a href="path_to_dokumen_pendukung.pdf" download class="btn btn-primary btn-sm"><i class="fa fa-download fa-2x" style="font-size: 1.5em;"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 @endsection
 
