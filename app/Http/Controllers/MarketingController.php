@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Agreement;
+use App\Models\Campaign;
+use App\Models\Status;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class MarketingController extends Controller
@@ -13,20 +17,16 @@ class MarketingController extends Controller
 
     public function campaign()
     {
-        return view('marketing.submenu.campaign');
+        $data = Campaign::all();
+        $users = User::all();
+        return view('marketing.submenu.campaign', ['data' => $data, 'users' => $users]);
     }
 
     public function company_agreement(Request $request)
     {
-        // Determine the current year and generate the range of years
-        $nowYear = date('Y');
-        $yearsBefore = range($nowYear - 4, $nowYear);
+        $data = Agreement::all();
+        $statuses = Status::all();
 
-        // Set the selected year
-        $currentYear = $periodeSelected ?? $nowYear;
-
-        return view('marketing.submenu.agreement', [
-            'yearsBefore' => $yearsBefore
-        ]);
+        return view('marketing.submenu.agreement', ['data' => $data, 'statuses' => $statuses]);
     }
 }

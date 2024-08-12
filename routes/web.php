@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\AgreementController;
 use App\Http\Controllers\AkhlakController;
+use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentPositionController;
 use App\Http\Controllers\FinanceController;
@@ -13,6 +15,7 @@ use App\Http\Controllers\MarketingController;
 use App\Http\Controllers\MyProfileController;
 use App\Http\Controllers\OperationController;
 use App\Http\Controllers\PDController;
+use App\Http\Controllers\PenlatController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\RolesController;
@@ -62,6 +65,12 @@ Route::middleware('auth')->group(function () {
     //Operation
     Route::get('/operation', [OperationController::class, 'index'])->name('operation');
 
+    //penlat
+    Route::get('/penlat/list-pelatihan', [PenlatController::class, 'index'])->name('penlat');
+    Route::post('/store-penlat', [PenlatController::class, 'store'])->name('penlat.store');
+    Route::get('/penlat/{id}/edit', [PenlatController::class, 'edit'])->name('penlat.edit');
+    Route::put('/penlat-update/{id}', [PenlatController::class, 'update'])->name('penlat.update');
+
     //participant-infographics
     Route::get('/operation/participant-infographics', [OperationController::class, 'participant_infographics'])->name('participant-infographics');
     Route::get('/operation/participant-infographics/import-page', [OperationController::class, 'participant_infographics_import_page'])->name('participant-infographics-import-page');
@@ -82,18 +91,24 @@ Route::middleware('auth')->group(function () {
     Route::get('/operation/room-inventory', [OperationController::class, 'room_inventory'])->name('room-inventory');
 
     //Penlat Requirement
-    Route::get('/operation/tool-requirement-penlat', [OperationController::class, 'tool_requirement_penlat'])->name('tool-requirement-penlat');
+    Route::get('/penlat/tool-requirement-penlat', [PenlatController::class, 'tool_requirement_penlat'])->name('tool-requirement-penlat');
+    Route::post('/store-penlat-requirement', [PenlatController::class, 'requirement_store'])->name('requirement.store');
 
     //Operation
     Route::get('/operation/utility', [OperationController::class, 'utility'])->name('utility');
     Route::get('/operation/utility/preview-item/{id}', [OperationController::class, 'preview_utility'])->name('preview-utility');
+    Route::post('/store-penlat-utility', [OperationController::class, 'utility_store'])->name('utility.store');
 
 
     //Marketing
     Route::get('/marketing', [MarketingController::class, 'index'])->name('marketing');
     Route::get('/marketing-campaign', [MarketingController::class, 'campaign'])->name('marketing-campaign');
+    Route::get('/marketing-campaign/preview/{id}', [CampaignController::class, 'preview_campaign'])->name('preview-campaign');
+    Route::post('/store-campaign', [CampaignController::class, 'store'])->name('campaign.store');
+    Route::get('/marketing-campaign/delete-item/{id}', [CampaignController::class, 'delete_campaign'])->name('delete-campaign');
     //Company Agreement
     Route::get('/marketing/company-agreement', [MarketingController::class, 'company_agreement'])->name('company-agreement');
+    Route::post('/store-agreement', [AgreementController::class, 'store'])->name('agreement.store');
 
     //finances
     Route::get('/finances', [FinanceController::class, 'dashboard'])->name('finance');
@@ -106,6 +121,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/planning-development/feedback-report', [PDController::class, 'feedback_report'])->name('feedback-report');
     Route::get('/planning-development/feedback-report-import', [PDController::class, 'feedback_report_import'])->name('feedback-report-import-page');
     Route::get('/planning-development/regulation', [PDController::class, 'regulation'])->name('regulation');
+    Route::post('/store-regulation', [PDController::class, 'regulation_store'])->name('regulation.store');
     Route::get('/planning-development/certificate', [PDController::class, 'certificate'])->name('certificate');
     Route::get('/planning-development/instructor', [PDController::class, 'instructor'])->name('instructor');
     Route::get('/planning-development/training-reference', [PDController::class, 'training_reference'])->name('training-reference');

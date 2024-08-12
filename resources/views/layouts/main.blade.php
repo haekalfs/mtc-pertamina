@@ -86,6 +86,15 @@
                     </li>
                     <li class="menu-title">Main Menu</li><!-- /.menu-title -->
                     @usr_acc(101)
+                    <li class="menu-item-has-children dropdown @yield('active-penlat') @yield('show-penlat')">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="menu-icon ti-layout-list-thumb-alt"></i> Penlat</a>
+                        <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-penlat')">
+                            <li><i class="fa fa-list-alt"></i><a href="{{ route('penlat') }}" class="@yield('penlat')">List Penlat</a></li>
+                            <li><i class="fa fa-check-square-o"></i><a href="{{ route('tool-requirement-penlat') }}" class="@yield('tool-requirement-penlat')">Kebutuhan Alat Penlat</a></li>
+                        </ul>
+                    </li>
+                    @endusr_acc
+                    @usr_acc(101)
                     <li class="menu-item-has-children dropdown @yield('active-operation') @yield('show-operation')">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="menu-icon fa fa-cogs"></i> Operasi</a>
                         <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-operation')">
@@ -93,7 +102,6 @@
                             <li><i class="fa fa-users"></i><a href="{{ route('participant-infographics') }}" class="@yield('participant-infographics')">Infografis Peserta</a></li>
                             <li><i class="fa fa-fire-extinguisher"></i><a href="{{ route('tool-inventory') }}" class="@yield('tool-inventory')">Inventaris Alat</a></li>
                             <li><i class="fa fa-building-o"></i><a href="{{ route('room-inventory') }}" class="@yield('room-inventory')">Inventaris Ruangan</a></li>
-                            <li><i class="fa fa-check-square-o"></i><a href="{{ route('tool-requirement-penlat') }}" class="@yield('tool-requirement-penlat')">Kebutuhan Alat Penlat</a></li>
                             <li><i class="fa fa-cog"></i><a href="{{ route('utility') }}" class="@yield('utility')">Utilitas</a></li>
                         </ul>
                     </li>

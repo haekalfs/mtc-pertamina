@@ -6,6 +6,8 @@ use App\Models\Asset_condition;
 use App\Models\Infografis_peserta;
 use App\Models\Inventory_tools;
 use App\Models\Location;
+use App\Models\Penlat;
+use App\Models\Penlat_requirement;
 use App\Models\Penlat_utility;
 use App\Models\Penlat_utility_usage;
 use App\Models\Tool_img;
@@ -134,6 +136,53 @@ class OperationController extends Controller
         }
     }
 
+    public function utility_store(Request $request)
+    {
+        // Validate the request
+        $request->validate([
+            'penlat' => 'required',
+            'batch' => 'required',
+            'date' => 'required',
+            'image' => 'required',
+        ]);
+
+        // Handle the image upload
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+
+            $image = $request->file('image');
+            $filename = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('uploads/penlat_utility'), $filename);
+            $imagePath = 'uploads/penlat_utility/' . $filename;
+        }
+
+        // Create a new PenlatUtility entry
+        $penlatUtility = Penlat_utility::create([
+            'penlat_id' => $request->penlat,
+            'batch' => $request->batch,
+            'date' => $request->date,
+            'filepath' => $imagePath,
+        ]);
+
+        // Loop through the tools and save the PenlatUtilityUsage entries
+        foreach ($request->all() as $key => $value) {
+            if (strpos($key, 'qty_') === 0) {
+                $id = substr($key, 4); // Extract the tool id from the key
+                $quantity = $value;
+                $unit = $request->input('unit_' . $id);
+
+                Penlat_utility_usage::create([
+                    'penlat_utility_id' => $penlatUtility->id,
+                    'utility_id' => $id, // Assuming you want to store the tool's id as utility_id
+                    'amount' => $quantity,
+                ]);
+            }
+        }
+
+        // Redirect back with a success message
+        return redirect()->back()->with('success', 'Penlat utility data saved successfully!');
+    }
+
     public function tool_inventory()
     {
         $assets = Inventory_tools::all();
@@ -154,21 +203,17 @@ class OperationController extends Controller
         return view('operation.submenu.room_inventory', ['locations' => $locations]);
     }
 
-    public function tool_requirement_penlat()
-    {
-        $locations = Location::all();
-        return view('operation.submenu.requirement_penlat', ['locations' => $locations]);
-    }
-
     public function utility()
     {
+        $penlatList = Penlat::all();
         $data = Penlat_utility::all();
         $utility = Utility::all();
-        return view('operation.submenu.utility', ['data' => $data, 'utilities' => $utility]);
+        return view('operation.submenu.utility', ['data' => $data, 'utilities' => $utility, 'penlatList' => $penlatList]);
     }
 
     public function preview_utility($id)
     {
-        return view('operation.submenu.preview-utility', []);
+        $utility = Penlat_utility::find($id);
+        return view('operation.submenu.preview-utility', ['data' => $utility]);
     }
 }

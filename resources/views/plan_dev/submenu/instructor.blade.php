@@ -81,7 +81,7 @@ font-weight-bold
                 </div>
                 <div class="card-body">
                     <div>
-                        <table id="dataTable" class="table table-borderless mt-4">
+                        <table id="dataTable" class="table table-borderless mt-4 zoom90">
                             <thead class="text-center" style="display: none;">
                                 <tr>
                                     <th>Instructors</th>
@@ -93,7 +93,7 @@ font-weight-bold
                                         <div class="card custom-card mb-3 bg-white shadow">
                                             <div class="row no-gutters">
                                                 <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding: 2em;">
-                                                    <img src="https://via.placeholder.com/250x150/5fa9f8/ffffff" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
+                                                    <img src="https://via.placeholder.com/150x150/5fa9f8/ffffff" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
                                                 </div>
                                                 <div class="col-md-7 mt-2">
                                                     <div class="card-body text-secondary">
@@ -107,7 +107,7 @@ font-weight-bold
                                                     </div>
                                                 </div>
                                                 <div class="col-md-2 d-flex align-items-center justify-content-center">
-                                                    <a class="btn btn-outline-secondary btn-sm" href="#" data-toggle="modal" data-target="#customModal"><i class="menu-Logo fa fa-eye"></i> Review Pelatihan</a>
+                                                    <a class="btn btn-outline-secondary btn-sm" href="#" data-toggle="modal" data-target="#customModal"><i class="menu-Logo fa fa-eye"></i> View Details</a>
                                                 </div>
                                                 <div class="card-icons">
                                                     <a href="#"><i class="fa fa-download fa-2x text-secondary" style="font-size: 1.5em;"></i></a>
@@ -121,7 +121,7 @@ font-weight-bold
                                         <div class="card custom-card mb-3 bg-white shadow">
                                             <div class="row no-gutters">
                                                 <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding: 2em;">
-                                                    <img src="https://via.placeholder.com/250x150/5fa9f8/ffffff" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
+                                                    <img src="https://via.placeholder.com/150x150/5fa9f8/ffffff" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
                                                 </div>
                                                 <div class="col-md-7 mt-2">
                                                     <div class="card-body text-secondary">
@@ -135,7 +135,7 @@ font-weight-bold
                                                     </div>
                                                 </div>
                                                 <div class="col-md-2 d-flex align-items-center justify-content-center">
-                                                    <a class="btn btn-outline-secondary btn-sm" href="#" data-toggle="modal" data-target="#customModal"><i class="menu-Logo fa fa-eye"></i> Review Pelatihan</a>
+                                                    <a class="btn btn-outline-secondary btn-sm" href="#" data-toggle="modal" data-target="#customModal"><i class="menu-Logo fa fa-eye"></i> View Details</a>
                                                 </div>
                                                 <div class="card-icons">
                                                     <a href="#"><i class="fa fa-download fa-2x text-secondary" style="font-size: 1.5em;"></i></a>

@@ -9,7 +9,7 @@ class Penlat_requirement extends Model
 {
     use HasFactory;
     protected $table = "penlat_requirement";
-    protected $fillable = ["id", "penlat_id", "inventory_tool_id", "amount","created_at", "updated_at"];
+    protected $fillable = ["id", "penlat_id", "requirement", "amount","created_at", "updated_at"];
 
     public function penlat()
     {

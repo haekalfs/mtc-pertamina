@@ -16,7 +16,7 @@ font-weight-bold
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
-        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-building-o"></i> Regulation</h1>
+        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-warning"></i> Regulation</h1>
         <p class="mb-4">Regulation in MTC.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
@@ -80,14 +80,15 @@ font-weight-bold
                                 </tr>
                             </thead>
                             <tbody class="mt-2">
+                                @foreach($data as $item)
                                 <tr>
                                     <td>
                                         <div class="card mb-3">
                                             <div class="card-body custom-card">
                                                 <div class="row no-gutters">
                                                     <div class="col-md-10 mt-2">
-                                                        <h5 class="card-title text-secondary font-weight-bold">Nama Regulasi</h5>
-                                                        <a href="" class="card-text"><u>Lampiran Dokumen</u> <i class="fa fa-external-link fa-sm"></i></a>
+                                                        <h5 class="card-title text-secondary font-weight-bold">{{ $item->description }}</h5>
+                                                        <a href="{{ asset($item->filepath) }}" class="card-text"><u>Lampiran Dokumen</u> <i class="fa fa-external-link fa-sm"></i></a>
                                                     </div>
                                                     <div class="col-md-2 d-flex align-items-center justify-content-center">
                                                         <a class="btn btn-outline-secondary btn-sm" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-eye"></i> Review Regulation</a>
@@ -97,23 +98,7 @@ font-weight-bold
                                         </div>
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td>
-                                        <div class="card mb-3">
-                                            <div class="card-body custom-card">
-                                                <div class="row no-gutters">
-                                                    <div class="col-md-10 mt-2">
-                                                        <h5 class="card-title text-secondary font-weight-bold">Testing</h5>
-                                                        <a href="" class="card-text"><u>Lampiran Dokumen</u> <i class="fa fa-external-link fa-sm"></i></a>
-                                                    </div>
-                                                    <div class="col-md-2 d-flex align-items-center justify-content-center">
-                                                        <a class="btn btn-outline-secondary btn-sm" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-eye"></i> Review Regulation</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -123,5 +108,64 @@ font-weight-bold
     </div>
 </div>
 
+<div class="modal fade zoom90" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header d-flex flex-row align-items-center justify-content-between">
+                <h5 class="modal-title" id="inputDataModalLabel">Input Data</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" enctype="multipart/form-data" action="{{ route('regulation.store') }}">
+                @csrf
+                <div class="modal-body mr-2 ml-2">
+                    <div class="row no-gutters">
+                        <div class="col-md-12">
+                            <div class="card-body text-secondary">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="d-flex align-items-start mb-4">
+                                            <div style="width: 160px;" class="mr-2">
+                                                <p style="margin: 0;">Nama Regulation :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <textarea class="form-control" rows="3" name="regulation_name"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 160px;" class="mr-2">
+                                                <p style="margin: 0;">Status :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <select class="custom-select" name="status">
+                                                    @foreach($statuses as $status)
+                                                    <option value="{{ $status->id}}">{{ $status->description }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 160px;" class="mr-2">
+                                                <p style="margin: 0;">Dokumen :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="file" class="form-control" name="file" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Submit Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection
 

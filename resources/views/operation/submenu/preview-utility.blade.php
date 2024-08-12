@@ -136,21 +136,21 @@ font-weight-bold
                 <div class="col-md-12 mb-3">
                     <div class="row">
                         <div class="col-md-2 d-flex align-items-center justify-content-center" style="padding-left: 1em;">
-                            <img src="https://via.placeholder.com/50x50/5fa9f8/ffffff" style="height: 150px; width: 150px; border-radius: 15px;" class="card-img" alt="...">
+                            <img src="{{ $data->filepath ? asset($data->filepath) : 'https://via.placeholder.com/50x50/5fa9f8/ffffff' }}" style="height: 150px; width: 150px; border-radius: 15px;" class="card-img" alt="...">
                         </div>
                         <div class="col-md-8">
                             <table class="table table-borderless table-sm">
                                 <tr>
                                     <th style="width: 200px;">Penlat Name</th>
-                                    <td style="text-align: start; font-weight:500">: Publish sites without the "Made with Carrd</td>
+                                    <td style="text-align: start; font-weight:500">: {{ $data->penlat->description }}</td>
                                 </tr>
                                 <tr>
                                     <th>Batch</th>
-                                    <td style="text-align: start; font-weight:500">: 1</td>
+                                    <td style="text-align: start; font-weight:500">: {{ $data->batch }}</td>
                                 </tr>
                                 <tr>
                                     <th>Tanggal Pelaksanaan</th>
-                                    <td style="text-align: start; font-weight:500">: 1</td>
+                                    <td style="text-align: start; font-weight:500">: {{ $data->date }}</td>
                                 </tr>
                                 <tr>
                                     <th>Reference</th>
@@ -213,99 +213,40 @@ font-weight-bold
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td data-th="Product">
-                                    <div class="row">
-                                        <div class="col-md-3 text-left">
-                                            <img src="https://via.placeholder.com/250x250/5fa9f8/ffffff" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow ">
+                            @foreach($data->penlat_usage as $tool)
+                                <tr>
+                                    <td data-th="Product">
+                                        <div class="row">
+                                            <div class="col-md-3 text-left">
+                                                <img src="{{ asset($tool->utility->filepath) }}" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow ">
+                                            </div>
+                                            <div class="col-md-8 text-left mt-sm-2">
+                                                <h5>{{ $tool->utility->utility_name }}</h5>
+                                                <p class="font-weight-light">Satuan Default ({{$tool->utility->utility_unit}})</p>
+                                            </div>
                                         </div>
-                                        <div class="col-md-9 text-left mt-sm-2">
-                                            <h4>APAR</h4>
-                                            <p class="font-weight-light">Satuan Default</p>
+                                    </td>
+                                    <td data-th="Quantity" style="width:20%">
+                                        <input type="number" class="form-control form-control-md text-center" name="qty_{{ $tool->utility->id }}" value="1">
+                                    </td>
+                                    <td data-th="Price" style="width:20%">
+                                        <select class="custom-select form-control form-control-sm" name="unit_{{ $tool->utility->id }}">
+                                            <option value="{{ $tool->utility->utility_unit }}" selected>{{ $tool->utility->utility_unit }}</option>
+                                            <!-- Add other options if necessary -->
+                                        </select>
+                                    </td>
+                                    <td class="actions text-center" data-th="">
+                                        <div>
+                                            <button class="btn btn-white border-secondary bg-white btn-md mb-2">
+                                                <i class="fa fa-save"></i>
+                                            </button>
+                                            <button class="btn btn-white border-secondary bg-white btn-md mb-2">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
                                         </div>
-                                    </div>
-                                </td>
-                                <td data-th="Quantity">
-                                    <input type="number" class="form-control form-control-lg text-center" value="1">
-                                </td>
-                                <td data-th="Price">
-                                    <select class="custom-select" id="namaPenlat" name="namaPenlat">
-                                        <option value="1" selected>Pcs</option>
-                                    </select>
-                                </td>
-                                <td class="actions text-center" data-th="">
-                                    <div>
-                                        <button class="btn btn-white border-secondary bg-white btn-md mb-2">
-                                            <i class="fa fa-save"></i>
-                                        </button>
-                                        <button class="btn btn-white border-secondary bg-white btn-md mb-2">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td data-th="Product">
-                                    <div class="row">
-                                        <div class="col-md-3 text-left">
-                                            <img src="https://via.placeholder.com/250x250/5fa9f8/ffffff" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow ">
-                                        </div>
-                                        <div class="col-md-9 text-left mt-sm-2">
-                                            <h4>APAR</h4>
-                                            <p class="font-weight-light">Satuan Default</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td data-th="Quantity">
-                                    <input type="number" class="form-control form-control-lg text-center" value="1">
-                                </td>
-                                <td data-th="Price">
-                                    <select class="custom-select" id="namaPenlat" name="namaPenlat">
-                                        <option value="1" selected>Pcs</option>
-                                    </select>
-                                </td>
-                                <td class="actions text-center" data-th="">
-                                    <div>
-                                        <button class="btn btn-white border-secondary bg-white btn-md mb-2">
-                                            <i class="fa fa-save"></i>
-                                        </button>
-                                        <button class="btn btn-white border-secondary bg-white btn-md mb-2">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td data-th="Product">
-                                    <div class="row">
-                                        <div class="col-md-3 text-left">
-                                            <img src="https://via.placeholder.com/250x250/5fa9f8/ffffff" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow ">
-                                        </div>
-                                        <div class="col-md-9 text-left mt-sm-2">
-                                            <h4>APAR</h4>
-                                            <p class="font-weight-light">Satuan Default</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td data-th="Quantity">
-                                    <input type="number" class="form-control form-control-lg text-center" value="1">
-                                </td>
-                                <td data-th="Price">
-                                    <select class="custom-select" id="namaPenlat" name="namaPenlat">
-                                        <option value="1" selected>Pcs</option>
-                                    </select>
-                                </td>
-                                <td class="actions text-center" data-th="">
-                                    <div>
-                                        <button class="btn btn-white border-secondary bg-white btn-md mb-2">
-                                            <i class="fa fa-save"></i>
-                                        </button>
-                                        <button class="btn btn-white border-secondary bg-white btn-md mb-2">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
+                                    </td>
+                                </tr>
+                            @endforeach
                         </tbody>
                     </table>
                 </div>

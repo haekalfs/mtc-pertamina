@@ -1,10 +1,10 @@
 @extends('layouts.main')
 
-@section('active-operation')
+@section('active-penlat')
 active font-weight-bold
 @endsection
 
-@section('show-operation')
+@section('show-penlat')
 show
 @endsection
 
@@ -61,7 +61,7 @@ font-weight-bold
                     </div>
                 </div>
                 <div class="card-body">
-                    <table id="dataTable" class="table table-bordered mt-4">
+                    <table id="dataTable" class="table table-bordered mt-4 zoom90">
                         <thead>
                             <tr>
                                 <th>Tool</th>
@@ -69,21 +69,19 @@ font-weight-bold
                             </tr>
                         </thead>
                         <tbody>
+                            @foreach ($penlat as $item)
                             <tr>
                                 <td data-th="Product">
                                     <div class="row">
-                                        <div class="col-md-3 justify-content-center align-items-center text-center">
-                                            <img src="https://via.placeholder.com/150x150/5fa9f8/ffffff" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow ">
+                                        <div class="col-md-3 d-flex justify-content-center align-items-center text-center">
+                                            <img src="{{ asset($item->filepath) }}" style="height: 150px; width: 150px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
                                         </div>
                                         <div class="col-md-9 text-left mt-sm-2">
-                                            <h5 class="card-title font-weight-bold">Nama Penlat</h5>
+                                            <h5 class="card-title font-weight-bold">{{ $item->description }}</h5>
                                             <ul class="ml-4">
-                                                <li class="card-text">Kebutuhan Tool 1</li>
-                                                <li class="card-text">Kebutuhan Tool 2</li>
-                                                <li class="card-text">Kebutuhan Tool 3</li>
-                                                <li class="card-text">Kebutuhan Tool 4</li>
-                                                <li class="card-text">Kebutuhan Tool 5</li>
-                                                <li class="card-text"><i>Show More...</i></li>
+                                                @foreach ($item->requirement as $requirement)
+                                                <li class="card-text">{{ $requirement->requirement }} </li>
+                                                @endforeach
                                             </ul>
                                         </div>
                                     </div>
@@ -99,6 +97,7 @@ font-weight-bold
                                     </div>
                                 </td>
                             </tr>
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -107,8 +106,8 @@ font-weight-bold
     </div>
 </div>
 
-<div class="modal fade" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+<div class="modal fade zoom90" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 700px;" role="document">
         <div class="modal-content">
             <div class="modal-header d-flex flex-row align-items-center justify-content-between">
                 <h5 class="modal-title" id="inputDataModalLabel">Input Data</h5>
@@ -116,18 +115,27 @@ font-weight-bold
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="post" enctype="multipart/form-data" action="{{ route('kpis.store') }}">
+            <form method="post" enctype="multipart/form-data" action="{{ route('requirement.store') }}">
                 @csrf
                 <div class="modal-body mr-2 ml-2">
                     <div class="row no-gutters">
-                        <div class="col-md-3 d-flex align-items-top justify-content-center" style="padding-top: 10px;">
-                            <img src="https://via.placeholder.com/50x50/5fa9f8/ffffff" style="height: 150px; width: 150px; border-radius: 15px;" class="card-img" alt="...">
-                        </div>
-                        <div class="col-md-9">
+                        <div class="col-md-12">
                             <div>
                                 <div class="document-list-item mb-4 mt-3">
+                                    <div class="d-flex align-items-center mb-4">
+                                        <div style="width: 140px;" class="mr-2">
+                                            <p style="margin: 0;">Nama Penlat :</p>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <select class="form-control" id="penlat" name="penlat" required>
+                                                @foreach($penlatList as $item)
+                                                    <option value="{{ $item->id }}">{{ $item->description }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
                                     <div class="d-flex align-items-start">
-                                        <div style="width: 130px;" class="mr-2">
+                                        <div style="width: 140px;" class="mr-2">
                                             <p style="margin: 0;">Kebutuhan :</p>
                                         </div>
                                         <div class="flex-grow-1 textarea-container" id="documents-list-container">
@@ -158,56 +166,6 @@ font-weight-bold
     </div>
 </div>
 
-<div class="modal fade" id="editDataModal" tabindex="-1" role="dialog" aria-labelledby="editDataModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header d-flex flex-row align-items-center justify-content-between">
-                <h5 class="modal-title" id="editDataModalLabel">Edit Data</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form method="post" enctype="multipart/form-data" action="{{ route('kpis.store') }}">
-                @csrf
-                <div class="modal-body mr-2 ml-2">
-                    <div class="row no-gutters">
-                        <div class="col-md-3 d-flex align-items-top justify-content-center" style="padding-top: 10px;">
-                            <img src="https://via.placeholder.com/50x50/5fa9f8/ffffff" style="height: 150px; width: 150px; border-radius: 15px;" class="card-img" alt="...">
-                        </div>
-                        <div class="col-md-9">
-                            <div>
-                                <div class="document-list-item mb-4 mt-3">
-                                    <div class="d-flex align-items-start">
-                                        <div style="width: 140px;" class="mr-2">
-                                            <p style="margin: 0;">Kebutuhan :</p>
-                                        </div>
-                                        <div class="flex-grow-1 textarea-container" id="documents-list-container">
-                                            <div class="document-item">
-                                                <input type="text" class="form-control mb-2" rows="2" name="documents[]" value="Kebutuhan 1" required/>
-                                            </div>
-                                        </div>
-                                        <div class="ml-2 text-white">
-                                            <div class="col-md-12">
-                                                <button type="button" class="btn btn-success mb-2 shadow-sm btn-sm add-document-list"><i class="fa fa-plus"></i> Add More &nbsp;&nbsp;</button>
-                                            </div>
-                                            <div class="col-md-12">
-                                                <a class="btn shadow-sm btn-sm btn-danger delete-document-list" style="display: none;"><i class="fa fa-trash-alt"></i> Delete Item</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Submit Request</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 <script>
     $(document).ready(function () {
         // Handle click event for the "Add More" button

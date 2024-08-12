@@ -9,7 +9,7 @@ class Penlat_utility extends Model
 {
     use HasFactory;
     protected $table = "penlat_utility";
-    protected $fillable = ["id", "penlat_id", "penlat_utility_usage_id", "batch", "date","created_at", "updated_at"];
+    protected $fillable = ["id", "penlat_id", "filepath", "batch", "date","created_at", "updated_at"];
 
 
     public function penlat()
@@ -19,6 +19,6 @@ class Penlat_utility extends Model
 
     public function penlat_usage()
     {
-        return $this->hasMany('App\Models\Penlat_utility_usage');
+        return $this->hasMany('App\Models\Penlat_utility_usage', 'penlat_utility_id', 'id');
     }
 }

@@ -74,7 +74,7 @@ font-weight-bold
                         <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> New Penlat Usage</a>
                     </div>
                 </div>
-                <div class="card-body zoom80">
+                <div class="card-body zoom90">
                     <form method="GET" action="{{ route('utility') }}">
                         @csrf
                         <div class="row d-flex justify-content-start mb-4">
@@ -108,7 +108,7 @@ font-weight-bold
                         </div>
                     </form>
                     <table id="docLetter" class="table table-bordered">
-                        <thead class="bg-primary text-white">
+                        <thead class="bg-secondary text-white">
                             <tr>
                                 <th>Display</th>
                                 <th>Penlat</th>
@@ -123,7 +123,7 @@ font-weight-bold
                             @foreach($data as $item)
                             <tr>
                                 <td class="text-center  d-flex flex-row align-items-center justify-content-center">
-                                    <a href="{{ route('preview-utility', $item->id) }}"><img src="https://via.placeholder.com/100x100/5fa9f8/ffffff" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow "></a>
+                                    <a href="{{ route('preview-utility', $item->id) }}"><img src="{{ $item->filepath ? asset($item->filepath) : 'https://via.placeholder.com/50x50/5fa9f8/ffffff' }}" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow "></a>
                                 </td>
                                 <td>{{ $item->penlat->description }}</td>
                                 @foreach($utilities as $tool)
@@ -145,8 +145,8 @@ font-weight-bold
     </div>
 </div>
 
-<div class="modal fade" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+<div class="modal fade zoom90" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 900px;" role="document">
         <div class="modal-content">
             <div class="modal-header d-flex flex-row align-items-center justify-content-between">
                 <h5 class="modal-title" id="inputDataModalLabel">Input Data</h5>
@@ -154,58 +154,85 @@ font-weight-bold
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="post" enctype="multipart/form-data" action="{{ route('kpis.store') }}">
+            <form method="post" enctype="multipart/form-data" action="{{ route('utility.store') }}">
                 @csrf
                 <div class="modal-body mr-2 ml-2">
-                    <div class="row no-gutters">
-                        <div class="col-md-12">
-                            <div class="card-body text-secondary">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Asset Name :</p>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <input type="text" class="form-control" name="number" required>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Asset Maker :</p>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <input type="text" class="form-control" name="date_released">
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Kondisi Alat :</p>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <input type="text" class="form-control" name="number" required>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Stock :</p>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <input type="text" class="form-control" name="date_released">
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 200px;" class="mr-2">
-                                                <p style="margin: 0;">Panduan Maintenance :</p>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <input type="file" class="form-control" name="number" required>
-                                            </div>
-                                        </div>
-                                    </div>
+                    <div class="row no-gutters mb-3">
+                        <div class="col-md-3 d-flex align-items-top justify-content-center text-center">
+                            <label for="file-upload" style="cursor: pointer;">
+                                <img id="image-preview" src="https://via.placeholder.com/50x50/5fa9f8/ffffff"
+                                     style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
+                                     <small style="font-size: 10px;"><i><u>Click above to upload image!</u></i></small>
+                            </label>
+                            <input id="file-upload" type="file" name="image" style="display: none;" accept="image/*" onchange="previewImage(event)">
+                        </div>
+                        <div class="col-md-9">
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Nama Penlat :</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <select class="form-control" name="penlat">
+                                        @foreach ($penlatList as $item)
+                                        <option value="{{ $item->id }}">{{ $item->description }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Batch Penlat :</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="text" class="form-control" name="batch">
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Tgl Pelaksanaan :</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="date" class="form-control" name="date">
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div class="table-responsive zoom90">
+                        <table class="table table-bordered mt-4">
+                            <thead>
+                                <tr>
+                                    <th>Tool</th>
+                                    <th>Quantity</th>
+                                    <th>Satuan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($utilities as $tool)
+                                <tr>
+                                    <td data-th="Product">
+                                        <div class="row">
+                                            <div class="col-md-3 text-left">
+                                                <img src="{{ asset($tool->filepath) }}" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow ">
+                                            </div>
+                                            <div class="col-md-8 text-left mt-sm-2">
+                                                <h5>{{ $tool->utility_name }}</h5>
+                                                <p class="font-weight-light">Satuan Default ({{$tool->utility_unit}})</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td data-th="Quantity" style="width:20%">
+                                        <input type="number" class="form-control form-control-md text-center" name="qty_{{ $tool->id }}" value="1">
+                                    </td>
+                                    <td data-th="Price" style="width:20%">
+                                        <select class="custom-select form-control form-control-sm" name="unit_{{ $tool->id }}">
+                                            <option value="{{ $tool->utility_unit }}" selected>{{ $tool->utility_unit }}</option>
+                                            <!-- Add other options if necessary -->
+                                        </select>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -216,4 +243,14 @@ font-weight-bold
         </div>
     </div>
 </div>
+<script>
+    function previewImage(event) {
+        const reader = new FileReader();
+        reader.onload = function(){
+            const output = document.getElementById('image-preview');
+            output.src = reader.result;
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    }
+</script>
 @endsection

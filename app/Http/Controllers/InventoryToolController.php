@@ -65,8 +65,24 @@ class InventoryToolController extends Controller
 
     public function edit($id)
     {
-        $tool = Inventory_tools::findOrFail($id);
-        return response()->json($tool);
+        $tool = Inventory_tools::with('img')->findOrFail($id);
+
+        // Prepare the data, including the image path if available
+        $toolData = [
+            'id' => $tool->id,
+            'asset_name' => $tool->asset_name,
+            'asset_id' => $tool->asset_id,
+            'asset_maker' => $tool->asset_maker,
+            'used_time' => $tool->used_time,
+            'asset_condition_id' => $tool->asset_condition_id,
+            'initial_stock' => $tool->initial_stock,
+            'used_amount' => $tool->used_amount,
+            'last_maintenance' => $tool->last_maintenance,
+            'next_maintenance' => $tool->next_maintenance,
+            'tool_image' => $tool->img ? asset($tool->img->filepath) : null,
+        ];
+
+        return response()->json($toolData);
     }
 
     public function update(Request $request, $id)
