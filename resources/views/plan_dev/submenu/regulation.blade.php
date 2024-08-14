@@ -72,8 +72,8 @@ font-weight-bold
                     </div>
                 </div>
                 <div class="card-body">
-                    <div>
-                        <table id="dataTable" class="table table-borderless mt-4">
+                    <div class="table-responsive p-2">
+                        <table id="dataTable" class="table table-borderless">
                             <thead class="text-center" style="display: none;">
                                 <tr>
                                     <th>Regulations</th>

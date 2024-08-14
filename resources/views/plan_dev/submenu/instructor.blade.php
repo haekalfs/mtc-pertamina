@@ -80,8 +80,8 @@ font-weight-bold
                     </div>
                 </div>
                 <div class="card-body">
-                    <div>
-                        <table id="dataTable" class="table table-borderless mt-4 zoom90">
+                    <div class="table-responsive p-2">
+                        <table id="dataTable" class="table table-borderless mt-2 zoom90">
                             <thead class="text-center" style="display: none;">
                                 <tr>
                                     <th>Instructors</th>

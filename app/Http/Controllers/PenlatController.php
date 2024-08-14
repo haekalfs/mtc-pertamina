@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Location;
 use App\Models\Penlat;
+use App\Models\Penlat_batch;
 use App\Models\Penlat_requirement;
 use Illuminate\Http\Request;
 
@@ -125,5 +126,56 @@ class PenlatController extends Controller
 
         // Redirect back with a success message
         return redirect()->back()->with('success', 'Requirements submitted successfully!');
+    }
+
+    public function batch()
+    {
+        $data = Penlat_batch::all();
+        $penlatList = Penlat::all();
+        return view('penlat.batch', ['data' => $data, 'penlatList' => $penlatList]);
+    }
+
+    public function batch_store(Request $request)
+    {
+        // Validate the request
+        $request->validate([
+            'penlat' => 'required',
+            'batch' => 'required',
+            'date' => 'required',
+            'image' => 'required',
+            'program' => 'sometimes',
+        ]);
+
+        // Handle the image upload
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+
+            $image = $request->file('image');
+            $filename = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('uploads/penlat_utility'), $filename);
+            $imagePath = 'uploads/penlat_utility/' . $filename;
+        }
+
+        // Create a new entry
+        $penlatUtility = Penlat_batch::updateOrCreate(
+            [
+                'penlat_id' => $request->penlat,
+                'batch' => $request->batch,
+            ],
+            [
+                'nama_program' => $request->program,
+                'date' => $request->date,
+                'filepath' => $imagePath,
+            ]
+        );
+
+        // Redirect back with a success message
+        return redirect()->back()->with('success', 'Penlat Batch data saved successfully!');
+    }
+
+    public function preview_batch($id)
+    {
+        $data = Penlat_batch::find($id);
+        return view('penlat.preview-batch', ['data' => $data]);
     }
 }

@@ -82,7 +82,7 @@ font-weight-bold
                                 <div class="row align-items-center">
                                     <div class="col-md-3">
                                         <div class="form-group">
-                                            <label for="email">Nama Penlat :</label>
+                                            <label for="email">Nama Pelatihan :</label>
                                             <select class="custom-select" id="namaPenlat" name="namaPenlat">
                                                 <option value="1" selected>Show All</option>
                                             </select>
@@ -127,7 +127,7 @@ font-weight-bold
                         <thead>
                             <tr>
                                 <th>Display</th>
-                                <th>Nama Program</th>
+                                <th>Nama Pelatihan</th>
                                 <th>Alias</th>
                                 <th>Jenis Pelatihan</th>
                                 <th>Kategori Program</th>
@@ -191,7 +191,7 @@ font-weight-bold
                                     <div class="col-md-12">
                                         <div class="d-flex align-items-center mb-4">
                                             <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Nama Program :</p>
+                                                <p style="margin: 0;">Nama Pelatihan :</p>
                                             </div>
                                             <div class="flex-grow-1">
                                                 <input type="text" class="form-control" name="nama_program" required>

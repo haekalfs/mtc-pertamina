@@ -133,6 +133,7 @@ font-weight-bold
                                 <tr>
                                     <th>Tool</th>
                                     <th>Stock</th>
+                                    <th>Used</th>
                                     <th>Kondisi Alat</th>
                                     <th>Action</th>
                                 </tr>
@@ -142,10 +143,10 @@ font-weight-bold
                                 <tr>
                                     <td data-th="Product">
                                         <div class="row">
-                                            <div class="col-md-3 text-left">
-                                                <img src="{{ asset($item->img->filepath) }}" style="height: 150px; width: 150px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow ">
+                                            <div class="col-md-4 d-flex justify-content-center align-items-start mt-2">
+                                                <img src="{{ asset($item->img->filepath) }}" style="height: 150px; width: 160px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
                                             </div>
-                                            <div class="col-md-9 text-left mt-sm-2">
+                                            <div class="col-md-8 text-left mt-sm-2">
                                                 <h5 class="card-title font-weight-bold">{{ $item->asset_name }}</h5>
                                                 <ul class="ml-4">
                                                     <li class="card-text mb-1">Nomor Aset : {{ $item->asset_id }}</li>
@@ -159,7 +160,10 @@ font-weight-bold
                                         </div>
                                     </td>
                                     <td data-th="Price">
-                                        {{ $item->asset_stock }} <small><span class="text-danger"><i>Out of {{ $item->initial_stock }}</i></span></small>
+                                        {{ $item->asset_stock }} @if($item->asset_stock > 1) Units @else Unit @endif
+                                    </td>
+                                    <td data-th="Price">
+                                        {{ $item->used_amount }} @if($item->used_amount > 1) Units @else Unit @endif
                                     </td>
                                     <td data-th="Quantity">
                                         {!! $item->condition->badge !!}<br>
@@ -179,7 +183,7 @@ font-weight-bold
                                     </td>
                                     <td class="actions text-center" data-th="">
                                         <div>
-                                            <a data-id="{{ $item->id }}" href="#" class="btn btn-outline-secondary btn-md mb-2 edit-tool">
+                                            <a data-id="{{ $item->id }}" href="#" class="btn btn-outline-secondary btn-md mb-2 mr-2 edit-tool">
                                                 <i class="fa fa-edit"></i>
                                             </a>
                                             <button class="btn btn-outline-danger btn-md mb-2">
@@ -393,9 +397,9 @@ font-weight-bold
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-md-6">
+                                            <div class="col-md-7">
                                                 <div class="d-flex align-items-center mb-4">
-                                                    <div style="width: 290px;" class="mr-2">
+                                                    <div style="width: 200px;" class="mr-2">
                                                         <p style="margin: 0;">Initial Stock :</p>
                                                     </div>
                                                     <div class="flex-grow-1">
@@ -403,9 +407,9 @@ font-weight-bold
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-md-6">
+                                            <div class="col-md-5">
                                                 <div class="d-flex align-items-center mb-4">
-                                                    <div style="width: 290px;" class="mr-2">
+                                                    <div style="width: 140px;" class="mr-2">
                                                         <p style="margin: 0;">Used :</p>
                                                     </div>
                                                     <div class="flex-grow-1">

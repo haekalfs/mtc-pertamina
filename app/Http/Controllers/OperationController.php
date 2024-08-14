@@ -4,22 +4,65 @@ namespace App\Http\Controllers;
 
 use App\Models\Asset_condition;
 use App\Models\Infografis_peserta;
+use App\Models\Inventory_room;
 use App\Models\Inventory_tools;
 use App\Models\Location;
 use App\Models\Penlat;
+use App\Models\Penlat_batch;
 use App\Models\Penlat_requirement;
-use App\Models\Penlat_utility;
 use App\Models\Penlat_utility_usage;
+use App\Models\Room;
 use App\Models\Tool_img;
 use App\Models\Utility;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Yajra\DataTables\Facades\DataTables;
 
 class OperationController extends Controller
 {
     public function index()
     {
-        return view('operation.index');
+        $getPesertaCount = Infografis_peserta::count();
+        $getKebutuhanCount = Penlat_requirement::count();
+        $getAssetCount = Inventory_tools::count();
+        $getAssetStock = Inventory_tools::sum('initial_stock');
+
+        return view('operation.index', compact('getPesertaCount', 'getKebutuhanCount', 'getAssetCount', 'getAssetStock'));
+    }
+
+    public function getChartData()
+    {
+        $data = Infografis_peserta::select('nama_program', DB::raw('count(*) as total'))
+                                ->groupBy('batch', 'nama_program')
+                                ->get();
+
+        $dataByDate = Infografis_peserta::select('tgl_pelaksanaan', DB::raw('count(*) as total'))
+                                ->groupBy('tgl_pelaksanaan')
+                                ->get();
+
+        $dataPointsPie = [];
+        foreach ($data as $row) {
+            $dataPointsPie[] = [
+                "label" => $row->nama_program,
+                "symbol" => substr($row->nama_program, 0, 2),
+                "y" => $row->total
+            ];
+        }
+
+        $dataPointsSpline = [];
+        foreach ($dataByDate as $row) {
+            $dataPointsSpline[] = [
+                "x" => Carbon::parse($row->tgl_pelaksanaan)->timestamp * 1000,
+                "y" => $row->total
+            ];
+        }
+
+        return response()->json([
+            'splineDataPoints' => $dataPointsSpline,
+            'pieDataPoints' => $dataPointsPie
+        ]);
     }
 
     public function participant_infographics(Request $request)
@@ -48,29 +91,37 @@ class OperationController extends Controller
             'periode' => $request->input('periode'),
         ];
 
-        $query = Infografis_peserta::query();
+        if ($request->ajax()) {
+            $query = Infografis_peserta::query();
 
-        if($request->namaPenlat != 1){
-            $query->where('nama_program', $request->namaPenlat);
-        }
+            // Apply filters based on the request
+            if($request->namaPenlat != 1){
+                $query->where('nama_program', $request->namaPenlat);
+            }
 
-        if($request->stcw != 1){
-            $query->where('kategori_program', $request->stcw);
-        }
+            if($request->stcw != 1){
+                $query->where('kategori_program', $request->stcw);
+            }
 
-        if($request->jenisPenlat != 1){
-            $query->where('jenis_pelatihan', $request->jenisPenlat);
-        }
+            if($request->jenisPenlat != 1){
+                $query->where('jenis_pelatihan', $request->jenisPenlat);
+            }
 
-        if($request->tw != 1){
-            $query->where('realisasi', $request->tw);
-        }
+            if($request->tw != 1){
+                $query->where('realisasi', $request->tw);
+            }
 
-        if($request->periode != 1){
-            $query->whereYear('tgl_pelaksanaan', $request->periode);
+            if($request->periode != 1){
+                $query->whereYear('tgl_pelaksanaan', $request->periode);
+            }
+
+            // Return the DataTables response
+            return DataTables::of($query)
+                ->addColumn('action', function($row) {
+                    return '<a data-item-id="' . $row->id . '" class="btn btn-outline-secondary btn-sm mr-2 edit-btn"  href="#" data-toggle="modal" data-target="#editModal"><i class="ti-eye"></i> Edit</a>';
+                })
+                ->make(true);
         }
-        // Execute the query
-        $data = $query->get();
 
         $filter = Infografis_peserta::all();
         //filtering list
@@ -80,7 +131,6 @@ class OperationController extends Controller
         $listTw = $filter->unique('realisasi');
 
         return view('operation.submenu.participant-infographics', [
-            'data' => $data,
             'yearsBefore' => $yearsBefore,
             'listPenlat' => $listPenlat,
             'listStcw' => $listStcw,
@@ -144,6 +194,7 @@ class OperationController extends Controller
             'batch' => 'required',
             'date' => 'required',
             'image' => 'required',
+            'program' => 'sometimes'
         ]);
 
         // Handle the image upload
@@ -156,13 +207,18 @@ class OperationController extends Controller
             $imagePath = 'uploads/penlat_utility/' . $filename;
         }
 
-        // Create a new PenlatUtility entry
-        $penlatUtility = Penlat_utility::create([
-            'penlat_id' => $request->penlat,
-            'batch' => $request->batch,
-            'date' => $request->date,
-            'filepath' => $imagePath,
-        ]);
+        // Create a new entry
+        $penlatUtility = Penlat_batch::updateOrCreate(
+            [
+                'penlat_id' => $request->penlat,
+                'batch' => $request->batch,
+            ],
+            [
+                'nama_program' => $request->program,
+                'date' => $request->date,
+                'filepath' => $imagePath,
+            ]
+        );
 
         // Loop through the tools and save the PenlatUtilityUsage entries
         foreach ($request->all() as $key => $value) {
@@ -171,16 +227,57 @@ class OperationController extends Controller
                 $quantity = $value;
                 $unit = $request->input('unit_' . $id);
 
-                Penlat_utility_usage::create([
-                    'penlat_utility_id' => $penlatUtility->id,
-                    'utility_id' => $id, // Assuming you want to store the tool's id as utility_id
-                    'amount' => $quantity,
-                ]);
+                Penlat_utility_usage::updateOrCreate(
+                    [
+                        'penlat_batch_id' => $penlatUtility->id,
+                        'utility_id' => $id, // Assuming you want to store the tool's id as utility_id
+                    ],
+                    [
+                        'amount' => $quantity,
+                    ]
+                );
             }
         }
 
         // Redirect back with a success message
         return redirect()->back()->with('success', 'Penlat utility data saved successfully!');
+    }
+
+    public function room_inventory_store(Request $request)
+    {
+        // Validate the request
+        $validated = $request->validate([
+            'nama_ruangan' => 'required',
+            'room_image' => 'nullable',
+            'tool.*' => 'required',
+            'amount.*' => 'required',
+        ]);
+
+        // Handle the image upload
+        $imagePath = null;
+        if ($request->hasFile('room_image')) {
+            $image = $request->file('room_image');
+            $filename = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('uploads/room_images'), $filename);
+            $imagePath = 'uploads/room_images/' . $filename;
+        }
+
+        // Create the inventory room entry
+        $inventoryRoom = Room::create([
+            'room_name' => $validated['nama_ruangan'],
+            'filepath' => $imagePath,
+        ]);
+
+         // Save the tools associated with this room
+        foreach ($validated['tool'] as $key => $toolId) {
+            Inventory_room::create([
+                'room_id' => $inventoryRoom->id,
+                'inventory_tool_id' => $toolId,
+                'amount' => $validated['amount'][$key],
+            ]);
+        }
+
+        return redirect()->route('room-inventory')->with('success', 'Room inventory saved successfully!');
     }
 
     public function tool_inventory()
@@ -199,21 +296,28 @@ class OperationController extends Controller
 
     public function room_inventory()
     {
+        $assets = Inventory_tools::all();
         $locations = Location::all();
-        return view('operation.submenu.room_inventory', ['locations' => $locations]);
+        $rooms = Room::all();
+        return view('operation.submenu.room_inventory', ['assets' => $assets, 'locations' => $locations, 'rooms' => $rooms]);
     }
 
     public function utility()
     {
         $penlatList = Penlat::all();
-        $data = Penlat_utility::all();
+
+        $validateData = Penlat_utility_usage::groupBy('penlat_batch_id')->pluck('penlat_batch_id')->toArray();
+        $data = Penlat_batch::whereIn('id', $validateData)->get();
+
+        $batchList = Penlat_batch::all();
+
         $utility = Utility::all();
-        return view('operation.submenu.utility', ['data' => $data, 'utilities' => $utility, 'penlatList' => $penlatList]);
+        return view('operation.submenu.utility', ['data' => $data, 'utilities' => $utility, 'penlatList' => $penlatList, 'batchList' => $batchList]);
     }
 
     public function preview_utility($id)
     {
-        $utility = Penlat_utility::find($id);
+        $utility = Penlat_batch::find($id);
         return view('operation.submenu.preview-utility', ['data' => $utility]);
     }
 }

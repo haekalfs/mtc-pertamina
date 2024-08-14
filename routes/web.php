@@ -41,6 +41,7 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['au
 
 
 Route::middleware('auth')->group(function () {
+    Route::get('/api/chart-data', [OperationController::class, 'getChartData']);
     //External User Registration
     Route::get('/user-registration', [RegistrationController::class, 'index'])->name('ext.register.user');
     //KPI
@@ -89,10 +90,16 @@ Route::middleware('auth')->group(function () {
 
     //inventaris ruangan
     Route::get('/operation/room-inventory', [OperationController::class, 'room_inventory'])->name('room-inventory');
+    Route::post('/store-room-inventory', [OperationController::class, 'room_inventory_store'])->name('room.store');
 
     //Penlat Requirement
     Route::get('/penlat/tool-requirement-penlat', [PenlatController::class, 'tool_requirement_penlat'])->name('tool-requirement-penlat');
     Route::post('/store-penlat-requirement', [PenlatController::class, 'requirement_store'])->name('requirement.store');
+
+    //batch penlat
+    Route::get('/penlat/list-batch', [PenlatController::class, 'batch'])->name('batch-penlat');
+    Route::get('/penlat/list-batch/preview-batch/{id}', [PenlatController::class, 'preview_batch'])->name('preview-batch');
+    Route::post('/store-batch-penlat', [PenlatController::class, 'batch_store'])->name('batch.store');
 
     //Operation
     Route::get('/operation/utility', [OperationController::class, 'utility'])->name('utility');
@@ -122,7 +129,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/planning-development/feedback-report-import', [PDController::class, 'feedback_report_import'])->name('feedback-report-import-page');
     Route::get('/planning-development/regulation', [PDController::class, 'regulation'])->name('regulation');
     Route::post('/store-regulation', [PDController::class, 'regulation_store'])->name('regulation.store');
+
     Route::get('/planning-development/certificate', [PDController::class, 'certificate'])->name('certificate');
+    Route::post('/store-certificates', [PDController::class, 'certificate_store'])->name('certificate.store');
+    Route::get('/planning-development/certificate/preview-item/{id}', [PDController::class, 'preview_certificate'])->name('preview-certificate');
+
     Route::get('/planning-development/instructor', [PDController::class, 'instructor'])->name('instructor');
     Route::get('/planning-development/training-reference', [PDController::class, 'training_reference'])->name('training-reference');
 

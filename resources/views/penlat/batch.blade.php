@@ -1,22 +1,22 @@
 @extends('layouts.main')
 
-@section('active-operation')
+@section('active-penlat')
 active font-weight-bold
 @endsection
 
-@section('show-operation')
+@section('show-penlat')
 show
 @endsection
 
-@section('utility')
+@section('batch-penlat')
 font-weight-bold
 @endsection
 
 @section('content')
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
-        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-cogs"></i> Utility Usage</h1>
-        <p class="mb-4">Penggunaan Utilities.</a></p>
+        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-folder"></i> List Batch Penlat</h1>
+        <p class="mb-4">List Pelatihan at MTC.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
         {{-- <a href="{{ route('participant-infographics-import-page') }}" class="btn btn-sm btn-primary shadow-sm text-white"><i class="fa fa-file-text fa-sm"></i> Import Data</a> --}}
@@ -70,32 +70,21 @@ font-weight-bold
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold" id="judul">List Data</h6>
-                    <div class="d-flex">
-                        <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> New Penlat Usage</a>
+                    <div class="text-right">
+                        <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Register New Batch</a>
                     </div>
                 </div>
                 <div class="card-body zoom90">
-                    <form method="GET" action="{{ route('utility') }}">
+                    <form method="GET" action="{{ route('participant-infographics') }}">
                         @csrf
                         <div class="row d-flex justify-content-start mb-4">
                             <div class="col-md-12">
                                 <div class="row align-items-center">
-                                    <div class="col-md-6">
+                                    <div class="col-md-3">
                                         <div class="form-group">
                                             <label for="email">Nama Pelatihan :</label>
                                             <select class="custom-select" id="namaPenlat" name="namaPenlat">
                                                 <option value="1" selected>Show All</option>
-                                                @foreach ($penlatList as $item)
-                                                <option value="{{ $item->id }}">{{ $item->description }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-5">
-                                        <div class="form-group">
-                                            <label for="position_id">Batch :</label>
-                                            <select name="stcw" class="form-control" id="stcw">
-                                                <option value="1">Show All</option>
                                             </select>
                                         </div>
                                     </div>
@@ -111,33 +100,36 @@ font-weight-bold
                         </div>
                     </form>
                     <table id="docLetter" class="table table-bordered">
-                        <thead class="bg-secondary text-white">
+                        <thead>
                             <tr>
                                 <th>Display</th>
-                                <th>Pelatihan</th>
-                                @foreach($utilities as $tool)
-                                    <th>{{ $tool->utility_name }} ({{$tool->utility_unit}})</th>
-                                @endforeach
+                                <th>Nama Pelatihan</th>
                                 <th>Batch</th>
-                                <th>Date</th>
+                                <th>Jenis Pelatihan</th>
+                                <th>Tgl Pelaksanaan</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($data as $item)
+                            @foreach ($data as $item)
                             <tr>
                                 <td class="text-center  d-flex flex-row align-items-center justify-content-center">
-                                    <a href="{{ route('preview-utility', $item->id) }}"><img src="{{ $item->filepath ? asset($item->filepath) : 'https://via.placeholder.com/50x50/5fa9f8/ffffff' }}" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow "></a>
+                                    <a href="{{ route('preview-batch', $item->id) }}"><img src="{{ asset($item->filepath) }}" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow "></a>
                                 </td>
                                 <td>{{ $item->penlat->description }}</td>
-                                @foreach($utilities as $tool)
-                                    @php
-                                        // Find the matching utility record for the current tool
-                                        $utility = $item->penlat_usage->firstWhere('utility_id', $tool->id);
-                                    @endphp
-                                    <td class="text-center">{{ $utility ? $utility->amount : '-' }}</td> <!-- Assuming 'value' column in penlat_utilities -->
-                                @endforeach
-                                <td class="text-center font-weight-bold">{{ $item->batch }}</td>
+                                <td class="font-weight-bold">{{ $item->batch }}</td>
+                                <td>{{ $item->penlat->jenis_pelatihan }}</td>
                                 <td>{{ $item->date }}</td>
+                                <td class="actions text-center" data-th="">
+                                    <div>
+                                        <a data-id="{{ $item->id }}" href="#" class="btn btn-outline-secondary btn-md mb-2 mr-2 edit-tool" data-toggle="modal" data-target="#editDataModal">
+                                            <i class="fa fa-edit"></i>
+                                        </a>
+                                        <button class="btn btn-outline-danger btn-md mb-2">
+                                            <i class="fa fa-trash-o"></i>
+                                        </button>
+                                    </div>
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -157,7 +149,7 @@ font-weight-bold
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="post" enctype="multipart/form-data" action="{{ route('utility.store') }}">
+            <form method="post" enctype="multipart/form-data" action="{{ route('batch.store') }}">
                 @csrf
                 <div class="modal-body mr-2 ml-2">
                     <div class="row no-gutters mb-3">
@@ -196,11 +188,7 @@ font-weight-bold
                                     <p style="margin: 0;">Batch :</p>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <select id="mySelect2" class="form-control" name="batch">
-                                        @foreach ($batchList as $item)
-                                            <option value="{{ $item->batch }}">{{ $item->batch }}</option>
-                                        @endforeach
-                                    </select>
+                                    <input type="text" class="form-control" name="batch">
                                 </div>
                             </div>
                             <div class="d-flex align-items-center mb-4">
@@ -213,43 +201,6 @@ font-weight-bold
                             </div>
                         </div>
                     </div>
-                    <div class="table-responsive zoom90">
-                        <table class="table table-bordered mt-4">
-                            <thead>
-                                <tr>
-                                    <th>Tool</th>
-                                    <th>Quantity</th>
-                                    <th>Satuan</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($utilities as $tool)
-                                <tr>
-                                    <td data-th="Product">
-                                        <div class="row">
-                                            <div class="col-md-3 text-left">
-                                                <img src="{{ asset($tool->filepath) }}" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow ">
-                                            </div>
-                                            <div class="col-md-8 text-left mt-sm-2">
-                                                <h5>{{ $tool->utility_name }}</h5>
-                                                <p class="font-weight-light">Satuan Default ({{$tool->utility_unit}})</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td data-th="Quantity" style="width:20%">
-                                        <input type="number" class="form-control form-control-md text-center" name="qty_{{ $tool->id }}" value="1">
-                                    </td>
-                                    <td data-th="Price" style="width:20%">
-                                        <select class="custom-select form-control form-control-sm" name="unit_{{ $tool->id }}">
-                                            <option value="{{ $tool->utility_unit }}" selected>{{ $tool->utility_unit }}</option>
-                                            <!-- Add other options if necessary -->
-                                        </select>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -259,55 +210,7 @@ font-weight-bold
         </div>
     </div>
 </div>
-<script>
-    document.getElementById('penlatSelect').addEventListener('change', function() {
-        var selectedOption = this.options[this.selectedIndex].text;
-        document.getElementById('programInput').value = selectedOption;
-    });
-</script>
-<script>
-$(document).ready(function() {
-    $('#mySelect2').select2({
-        dropdownParent: $('#inputDataModal'),
-        theme: "classic",
-        placeholder: "Select or add a Batch",
-        width: '100%',
-        tags: true,
-        createTag: function(params) {
-            var term = $.trim(params.term);
-            if (term === '') {
-                return null;
-            }
-            return {
-                id: term,
-                text: term,
-                newTag: true // Mark this as a new tag
-            };
-        },
-        templateResult: function(data) {
-            // Only show the "Add new" label if it's a new tag
-            if (data.newTag) {
-                return $('<span><em>Add new: "' + data.text + '"</em></span>');
-            }
-            return data.text;
-        },
-        templateSelection: function(data) {
-            // Show only the text for the selected item
-            return data.text;
-        }
-    });
 
-    $('#mySelect2').on('select2:select', function(e) {
-        if (e.params.data.newTag) {
-            // Show a notification that a new record is added
-
-            // After the new option is added, remove the "newTag" property
-            var newOption = new Option(e.params.data.text, e.params.data.id, true, true);
-            $(this).append(newOption).trigger('change');
-        }
-    });
-});
-</script>
 <script>
     function previewImage(event) {
         const reader = new FileReader();
@@ -317,5 +220,20 @@ $(document).ready(function() {
         };
         reader.readAsDataURL(event.target.files[0]);
     }
+
+    function previewEditImage(event) {
+        const output = document.getElementById('edit-image-preview');
+        output.src = URL.createObjectURL(event.target.files[0]);
+        output.onload = function () {
+            URL.revokeObjectURL(output.src) // Free up memory
+        }
+    }
+</script>
+
+<script>
+    document.getElementById('penlatSelect').addEventListener('change', function() {
+        var selectedOption = this.options[this.selectedIndex].text;
+        document.getElementById('programInput').value = selectedOption;
+    });
 </script>
 @endsection

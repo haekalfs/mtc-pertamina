@@ -88,11 +88,11 @@ font-weight-bold
                                 </td>
                                 <td class="actions text-center" data-th="">
                                     <div>
-                                        <button class="btn btn-white border-secondary bg-white btn-md mb-2">
-                                            <i class="fa fa-save"></i>
+                                        <button class="btn btn-outline-secondary btn-md mb-2 mr-2">
+                                            <i class="fa fa-edit"></i>
                                         </button>
-                                        <button class="btn btn-white border-secondary bg-white btn-md mb-2">
-                                            <i class="fa fa-trash"></i>
+                                        <button class="btn btn-outline-danger btn-md mb-2">
+                                            <i class="fa fa-trash-o"></i>
                                         </button>
                                     </div>
                                 </td>
@@ -206,52 +206,7 @@ font-weight-bold
         const file = input.files[0];
         if (file) {
             label.textContent = file.name;
-            previewExcel(file);
         }
-    }
-    function previewExcel(file) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            const data = new Uint8Array(event.target.result);
-            const workbook = XLSX.read(data, {type: 'array'});
-            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-            const excelRows = XLSX.utils.sheet_to_json(firstSheet, {header: 1});
-            displayExcelData(excelRows);
-        };
-        reader.readAsArrayBuffer(file);
-    }
-
-    function displayExcelData(rows) {
-        const previewDiv = document.getElementById('excel-preview');
-        previewDiv.innerHTML = '';
-
-        if (rows.length === 0) {
-            previewDiv.textContent = 'No data found in the file.';
-            return;
-        }
-
-        const table = document.createElement('table');
-        table.className = 'table table-bordered';
-        const thead = document.createElement('thead');
-        const tbody = document.createElement('tbody');
-
-        rows.forEach((row, index) => {
-            const tr = document.createElement('tr');
-            row.forEach(cell => {
-                const td = document.createElement(index === 0 ? 'th' : 'td');
-                td.textContent = cell;
-                tr.appendChild(td);
-            });
-            if (index === 0) {
-                thead.appendChild(tr);
-            } else {
-                tbody.appendChild(tr);
-            }
-        });
-
-        table.appendChild(thead);
-        table.appendChild(tbody);
-        previewDiv.appendChild(table);
     }
 </script>
 @endsection

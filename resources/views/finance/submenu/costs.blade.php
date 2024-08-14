@@ -8,7 +8,7 @@ active font-weight-bold
 show
 @endsection
 
-@section('costs')
+@section('cost')
 font-weight-bold
 @endsection
 

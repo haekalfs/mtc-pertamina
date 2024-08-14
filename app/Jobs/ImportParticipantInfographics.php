@@ -35,6 +35,8 @@ class ImportParticipantInfographics implements ShouldQueue
      */
     public function handle()
     {
+        ini_set('memory_limit', '1024M'); // Adjust the memory limit as needed
+
         $csvFilePath = pathinfo($this->filePath, PATHINFO_DIRNAME) . '/' . pathinfo($this->filePath, PATHINFO_FILENAME) . '.csv';
 
         try {
@@ -66,6 +68,7 @@ class ImportParticipantInfographics implements ShouldQueue
                 Infografis_peserta::create([
                     'nama_peserta' => $row[2],
                     'nama_program' => $row[11],
+                    'batch' => $row[10],
                     'tgl_pelaksanaan' => $row[12],
                     'tempat_pelaksanaan' => $row[13],
                     'jenis_pelatihan' => $row[14],

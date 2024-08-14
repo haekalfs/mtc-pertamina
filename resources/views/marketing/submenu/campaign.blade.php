@@ -78,6 +78,48 @@ font-weight-bold
                     </div>
                 </div>
                 <div class="card-body">
+                    <form method="GET" action="{{ route('marketing-campaign') }}">
+                        @csrf
+                        <div class="row d-flex justify-content-right mb-4">
+                            <div class="col-md-12">
+                                <div class="row align-items-center">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="year">Year:</label>
+                                            <select class="custom-select" id="year" name="year">
+                                                <option value="all" @if ($yearSelected == 'all') selected @endif>Show All</option>
+                                                @for ($i = $currentYear; $i >= $currentYear - 5; $i--)
+                                                    <option value="{{ $i }}" @if ($yearSelected == $i) selected @endif>{{ $i }}</option>
+                                                @endfor
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Month Dropdown -->
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="month">Month:</label>
+                                            <select class="custom-select" id="month" name="month">
+                                                <option value="all" @if ($monthSelected == 'all') selected @endif>Show All</option>
+                                                @for ($m = 1; $m <= 12; $m++)
+                                                    <option value="{{ $m }}" @if ($monthSelected == $m) selected @endif>
+                                                        {{ \Carbon\Carbon::create()->month($m)->format('F') }}
+                                                    </option>
+                                                @endfor
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1 d-flex align-self-end justify-content-start">
+                                        <div class="form-group">
+                                            <div class="align-self-center">
+                                                <button type="submit" class="btn btn-primary" style="padding-left: 1.2em; padding-right: 1.2em;"><i class="ti-search"></i></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                     <div>
                         <table id="dataTable" class="table table-borderless mt-4">
                             <thead class="text-center" style="display: none;">

@@ -147,11 +147,12 @@ font-weight-bold
                             </div>
                         </div>
                     </form>
-                    <table id="docLetter" class="table table-bordered">
+                    <table id="listPeserta" class="table table-bordered">
                         <thead>
                             <tr>
                                 <th>Nama Peserta</th>
                                 <th>Nama Program</th>
+                                <th>Batch</th>
                                 <th>Tgl Pelaksanaan</th>
                                 <th>Tempat Pelaksanaan</th>
                                 <th>Jenis Pelatihan</th>
@@ -164,23 +165,6 @@ font-weight-bold
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($data as $participant)
-                                <tr id="participant-{{ $participant->id }}">
-                                    <td>{{ $participant->nama_peserta }}</td>
-                                    <td>{{ $participant->nama_program }}</td>
-                                    <td>{{ $participant->tgl_pelaksanaan }}</td>
-                                    <td>{{ $participant->tempat_pelaksanaan }}</td>
-                                    <td>{{ $participant->jenis_pelatihan }}</td>
-                                    <td>{{ $participant->keterangan }}</td>
-                                    <td>{{ $participant->subholding }}</td>
-                                    <td>{{ $participant->perusahaan }}</td>
-                                    <td>{{ $participant->kategori_program }}</td>
-                                    <td>{{ $participant->realisasi }}</td>
-                                    <td>
-                                        <a data-item-id="{{ $participant->id }}" class="btn btn-outline-secondary btn-sm mr-2 edit-btn"><i class="ti-eye"></i> Edit</a>
-                                    </td>
-                                </tr>
-                            @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -249,7 +233,43 @@ font-weight-bold
 </div>
 <script>
 $(document).ready(function() {
-    $('.edit-btn').click(function() {
+
+    var table = $('#listPeserta').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: "{{ route('participant-infographics') }}",
+            data: function (d) {
+                d.namaPenlat = $('#namaPenlat').val();
+                d.stcw = $('#stcw').val();
+                d.jenisPenlat = $('#jenisPenlat').val();
+                d.tw = $('#tw').val();
+                d.periode = $('#periode').val();
+            }
+        },
+        columns: [
+            { data: 'nama_peserta', name: 'nama_peserta' },
+            { data: 'nama_program', name: 'nama_program' },
+            { data: 'batch', name: 'batch' },
+            { data: 'tgl_pelaksanaan', name: 'tgl_pelaksanaan' },
+            { data: 'tempat_pelaksanaan', name: 'tempat_pelaksanaan' },
+            { data: 'jenis_pelatihan', name: 'jenis_pelatihan' },
+            { data: 'keterangan', name: 'keterangan' },
+            { data: 'subholding', name: 'subholding' },
+            { data: 'perusahaan', name: 'perusahaan' },
+            { data: 'kategori_program', name: 'kategori_program' },
+            { data: 'realisasi', name: 'realisasi' },
+            { data: 'action', name: 'action', orderable: false, searchable: false },
+        ]
+    });
+
+    // Re-draw the table when filters are changed
+    $('#namaPenlat, #stcw, #jenisPenlat, #tw, #periode').change(function(){
+        table.draw();
+    });
+
+    // Use event delegation to handle clicks on dynamically generated elements
+    $('#listPeserta').on('click', '.edit-btn', function() {
         var id = $(this).data('item-id');
         $.ajax({
             url: '/infografis-peserta/' + id + '/edit',

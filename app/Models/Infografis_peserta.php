@@ -22,6 +22,7 @@ class Infografis_peserta extends Model
         'tgl_pelaksanaan',
         'tempat_pelaksanaan',
         'jenis_pelatihan',
+        'batch',
         'keterangan',
         'subholding',
         'perusahaan',

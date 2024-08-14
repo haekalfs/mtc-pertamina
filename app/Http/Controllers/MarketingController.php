@@ -15,11 +15,34 @@ class MarketingController extends Controller
         return view('marketing.index');
     }
 
-    public function campaign()
+    public function campaign(Request $request)
     {
-        $data = Campaign::all();
+        // Get current year and the selected year and month from the request
+        $currentYear = now()->year;
+        $yearSelected = $request->input('year', 'all');  // Default to 'all' if not provided
+        $monthSelected = $request->input('month', 'all'); // Default to 'all' if not provided
+
+        // Query to filter data based on year and month
+        $query = Campaign::query();
+
+        if ($yearSelected !== 'all') {
+            $query->whereYear('created_at', $yearSelected);
+        }
+
+        if ($monthSelected !== 'all') {
+            $query->whereMonth('created_at', $monthSelected);
+        }
+
+        $data = $query->get();
         $users = User::all();
-        return view('marketing.submenu.campaign', ['data' => $data, 'users' => $users]);
+
+        return view('marketing.submenu.campaign', [
+            'data' => $data,
+            'users' => $users,
+            'yearSelected' => $yearSelected,
+            'monthSelected' => $monthSelected,
+            'currentYear' => $currentYear
+        ]);
     }
 
     public function company_agreement(Request $request)

@@ -89,7 +89,8 @@
                     <li class="menu-item-has-children dropdown @yield('active-penlat') @yield('show-penlat')">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="menu-icon ti-layout-list-thumb-alt"></i> Penlat</a>
                         <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-penlat')">
-                            <li><i class="fa fa-list-alt"></i><a href="{{ route('penlat') }}" class="@yield('penlat')">List Penlat</a></li>
+                            <li><i class="fa fa-list-alt"></i><a href="{{ route('penlat') }}" class="@yield('penlat')">List Pelatihan</a></li>
+                            <li><i class="fa fa-folder"></i><a href="{{ route('batch-penlat') }}" class="@yield('batch-penlat')">Batch Program</a></li>
                             <li><i class="fa fa-check-square-o"></i><a href="{{ route('tool-requirement-penlat') }}" class="@yield('tool-requirement-penlat')">Kebutuhan Alat Penlat</a></li>
                         </ul>
                     </li>
@@ -120,16 +121,6 @@
                         </ul>
                     </li>
                     @endusr_acc
-                    @usr_acc(102)
-                    <li class="menu-item-has-children dropdown @yield('active-finance') @yield('show-finance')">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-money"></i>Finance</a>
-                        <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-finance')">
-                            <li><i class="fa fa-tachometer"></i><a href="{{ route('finance') }}" class="@yield('finance')">Dashboard</a></li>
-                            <li><i class="fa fa-list-alt"></i><a href="{{ route('vendor-payment') }}" class="@yield('vendor-payment')">Pembayaran Vendor</a></li>
-                            <li><i class="ti-stats-down"></i><a href="{{ route('cost') }}" class="@yield('cost')">Cost</a></li>
-                        </ul>
-                    </li>
-                    @endusr_acc
                     @usr_acc(104)
                     <li class="menu-item-has-children dropdown @yield('active-marketing') @yield('show-marketing')">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-suitcase"></i>Marketing</a>
@@ -138,6 +129,16 @@
                             <li><i class="fa fa-bullhorn"></i><a href="{{ route('marketing-campaign') }}" class="@yield('marketing-campaign')">Marketing Campaign</a></li>
                             <li><i class="ti-instagram"></i><a href="#" class="@yield('socmed')">Social Media Enggagement</a></li>
                             <li><i class="fa fa-sitemap"></i><a href="{{ route('company-agreement') }}" class="@yield('company-agreement')">Company Agreement</a></li>
+                        </ul>
+                    </li>
+                    @endusr_acc
+                    @usr_acc(102)
+                    <li class="menu-item-has-children dropdown @yield('active-finance') @yield('show-finance')">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-money"></i>Finance</a>
+                        <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-finance')">
+                            <li><i class="fa fa-tachometer"></i><a href="{{ route('finance') }}" class="@yield('finance')">Dashboard</a></li>
+                            <li><i class="fa fa-list-alt"></i><a href="{{ route('vendor-payment') }}" class="@yield('vendor-payment')">Pembayaran Vendor</a></li>
+                            <li><i class="ti-stats-down"></i><a href="{{ route('cost') }}" class="@yield('cost')">Cost</a></li>
                         </ul>
                     </li>
                     @endusr_acc
@@ -279,7 +280,8 @@
             </div>
         </footer>
     </div>
-
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <!-- jQuery -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@2.2.4/dist/jquery.min.js"></script>
 

@@ -19,7 +19,7 @@ class ImportController extends Controller
     {
         // Validate and upload the file as before
         $validator = Validator::make($request->all(), [
-            'file' => 'required|file|mimes:xlsx,xls,csv',
+            'file' => 'required|file|mimes:csv,xlsx,xls',
         ]);
 
         if ($validator->fails()) {
