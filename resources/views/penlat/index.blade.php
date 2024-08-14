@@ -75,7 +75,7 @@ font-weight-bold
                     </div>
                 </div>
                 <div class="card-body zoom90">
-                    <form method="GET" action="{{ route('participant-infographics') }}">
+                    <form method="GET" action="{{ route('penlat') }}">
                         @csrf
                         <div class="row d-flex justify-content-start mb-4">
                             <div class="col-md-12">
