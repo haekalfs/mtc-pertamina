@@ -233,7 +233,7 @@ font-weight-bold
                                         </div>
                                     </td>
                                     <td data-th="Quantity" style="width:10%">
-                                        <input type="number" class="form-control form-control-md text-center" name="qty_{{ $tool->utility->id }}" value="1">
+                                        <input type="number" class="form-control form-control-md text-center" name="qty_{{ $tool->utility->id }}" value="{{ $tool->amount }}">
                                     </td>
                                     <td data-th="Price" style="width:10%" class="text-center">
                                         {{-- <select class="custom-select form-control form-control-sm" name="unit_{{ $tool->utility->id }}">
