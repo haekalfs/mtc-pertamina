@@ -8,6 +8,7 @@ use App\Http\Controllers\DepartmentPositionController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\InstagramController;
+use App\Http\Controllers\InstructorController;
 use App\Http\Controllers\InventoryToolController;
 use App\Http\Controllers\KpiController;
 use App\Http\Controllers\ManageAccessController;
@@ -130,11 +131,20 @@ Route::middleware('auth')->group(function () {
     Route::get('/planning-development/regulation', [PDController::class, 'regulation'])->name('regulation');
     Route::post('/store-regulation', [PDController::class, 'regulation_store'])->name('regulation.store');
 
-    Route::get('/planning-development/certificate', [PDController::class, 'certificate'])->name('certificate');
+
+    Route::get('/planning-development/certification', [PDController::class, 'main_certificate'])->name('certificate-main');
+    Route::get('/planning-development/certification/participants-certificate', [PDController::class, 'certificate'])->name('certificate');
+    Route::get('/planning-development/certification/instructors-certificate', [PDController::class, 'certificate_instructor'])->name('certificate-instructor');
+
     Route::post('/store-certificates', [PDController::class, 'certificate_store'])->name('certificate.store');
+    Route::post('/store-certificate-catalog', [PDController::class, 'certificate_catalog_store'])->name('certificate-catalog.store');
     Route::get('/planning-development/certificate/preview-item/{id}', [PDController::class, 'preview_certificate'])->name('preview-certificate');
 
     Route::get('/planning-development/instructor', [PDController::class, 'instructor'])->name('instructor');
+    Route::get('/planning-development/instructor-preview/{id}/{penlatId}', [PDController::class, 'preview_instructor'])->name('preview-instructor');
+    Route::get('/planning-development/instructor-register', [PDController::class, 'register_instructor'])->name('register-instructor');
+    Route::post('/planning-development/instructor-store', [InstructorController::class, 'store'])->name('instructor.store');
+
     Route::get('/planning-development/training-reference', [PDController::class, 'training_reference'])->name('training-reference');
 
 

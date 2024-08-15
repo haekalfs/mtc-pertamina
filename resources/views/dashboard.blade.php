@@ -88,6 +88,53 @@ active font-weight-bold
     <!-- /Widgets -->
     <!--  Traffic  -->
     <div class="row">
+        <div class="col-xl-12 col-md-12 zoom90 mb-3">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold">News & Event Information</h6>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div id="carouselExampleIndicators2" class="carousel slide" data-ride="carousel">
+
+                                <div class="carousel-inner">
+                                    @foreach($headline->chunk(3) as $index => $chunk)
+                                    <div class="carousel-item{{ $index === 0 ? ' active' : '' }}">
+                                        <div class="row">
+                                            @foreach($chunk as $hl)
+                                            <div class="col-md-4 mb-1">
+                                                <div class="card" style=" border: 1px solid #e1e1e1;">
+                                                    <img class="img-fluid" alt="100%x280" style="max-height: 200px;" src="{{ asset($hl->img_filepath) }}">
+                                                    <div class="card-body">
+                                                        <h4 class="card-title">{{ $hl->campaign_name }}</h4>
+                                                        <div class="card-text short-news mb-3">{!! substr($hl->campaign_result, 0, 150) !!}</div>
+                                                        <a class="btn btn-secondary btn-sm read-more-button" href="{{ route('preview-campaign', $hl->id) }}">Read More</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <div class="col-12 text-right p-0">
+                                <a class="btn btn-primary mr-1" href="#carouselExampleIndicators2" role="button" data-slide="prev">
+                                    <i class="fa fa-arrow-left"></i>
+                                </a>
+                                <a class="btn btn-primary " href="#carouselExampleIndicators2" role="button" data-slide="next">
+                                    <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="col-lg-12">
             <div class="card">
                 <div class="row">
@@ -127,34 +174,6 @@ active font-weight-bold
     </div>
     <!--  /Traffic -->
     <div class="clearfix"></div>
-    <!-- Orders -->
-    {{-- <div class="orders">
-        <div class="row">
-
-            <div class="col-xl-4">
-                <div class="row">
-                    <div class="col-lg-6 col-xl-12">
-                        <div class="card br-0">
-                            <div class="card-body">
-                                <div class="chart-container ov-h">
-                                    <div id="chartContainer" style="height: 300px; width: 100%;"></div>
-                                </div>
-                            </div>
-                        </div><!-- /.card -->
-                    </div>
-
-                    <div class="col-lg-6 col-xl-12">
-                        <div class="card br-0">
-                            <div class="card-body">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> --}}
-    <!-- /Calender Chart Weather -->
     <!-- Modal - Calendar - Add Category -->
     <div class="modal fade none-border" id="add-category">
         <div class="modal-dialog">

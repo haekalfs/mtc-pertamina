@@ -20,8 +20,8 @@ font-weight-bold
         <p class="mb-3">Kegiatan Marketing MTC.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
-        <a href="{{ route('marketing-campaign') }}" class="btn btn-sm btn-secondary shadow-sm text-white mr-3"><i class="fa fa-backward"></i> Go Back</a>
-        <a href="{{ route('delete-campaign', $data->id) }}" class="btn btn-sm btn-danger shadow-sm text-white"><i class="fa fa-trash-o"></i> Delete</a>
+        <a href="{{ route('marketing-campaign') }}" class="btn btn-sm btn-secondary shadow-sm text-white"><i class="fa fa-backward"></i> Go Back</a>
+        {{-- <a href="{{ route('delete-campaign', $data->id) }}" class="btn btn-sm btn-danger shadow-sm text-white"><i class="fa fa-trash-o"></i> Delete</a> --}}
     </div>
 </div>
 <div class="overlay overlay-mid" style="display: none;"></div>
@@ -157,7 +157,6 @@ font-weight-bold
                                     <th>Tanggal Pelaksanaan</th>
                                     <td style="text-align: start; font-weight:500">: {{ $data->date }}</td>
                                 </tr>
-                              </tr>
                           </table>
                         </div>
                     </div>

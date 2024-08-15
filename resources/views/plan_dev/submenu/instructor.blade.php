@@ -20,7 +20,7 @@ font-weight-bold
         <p class="mb-4">Menu Instruktur.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
-        <a href="{{ route('upload-certificate') }}" class="btn btn-sm btn-primary shadow-sm text-white"><i class="fa fa-file-text fa-sm"></i> Import Cerficate</a>
+        {{-- <a href="{{ route('upload-certificate') }}" class="btn btn-sm btn-primary shadow-sm text-white"><i class="fa fa-file-text fa-sm"></i> Import Cerficate</a> --}}
     </div>
 </div>
 <div class="overlay overlay-mid" style="display: none;"></div>
@@ -76,74 +76,85 @@ font-weight-bold
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> List Data</h6>
                     <div class="text-right">
-                        <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Register Instructor</a>
+                        <a class="btn btn-primary btn-sm text-white" href="{{ route('register-instructor') }}"><i class="menu-Logo fa fa-plus"></i> Register Instructor</a>
                     </div>
                 </div>
                 <div class="card-body">
+                    <form method="GET" action="{{ route('instructor') }}">
+                        @csrf
+                        <div class="row d-flex justify-content-start mb-1 p-1">
+                            <div class="col-md-12">
+                                <div class="row align-items-center">
+                                    <div class="col-md-5">
+                                        <div class="form-group">
+                                            <label for="email">Nama Pelatihan :</label>
+                                            <select class="form-control form-control" name="penlat">
+                                                <option value="0" selected>Show All</option>
+                                                @foreach ($penlatList as $item)
+                                                <option value="{{ $item->id }}" @if ($item->id == $penlatId) selected @endif>{{ $item->description }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1 d-flex align-self-end justify-content-start">
+                                        <div class="form-group">
+                                            <div class="align-self-center">
+                                                <button type="submit" class="btn btn-primary" style="padding-left: 1.2em; padding-right: 1.2em;"><i class="ti-search"></i></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                     <div class="table-responsive p-2">
-                        <table id="dataTable" class="table table-borderless mt-2 zoom90">
+                        <table id="dataTable" class="table table-borderless zoom90">
                             <thead class="text-center" style="display: none;">
                                 <tr>
                                     <th>Instructors</th>
                                 </tr>
                             </thead>
                             <tbody class="mt-2">
+                                @foreach($data as $item)
                                 <tr>
                                     <td>
-                                        <div class="card custom-card mb-3 bg-white shadow">
+                                        <div class="card custom-card mb-3 bg-white shadow-none" style="border: 3px solid rgb(228, 228, 228);">
                                             <div class="row no-gutters">
-                                                <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding: 2em;">
-                                                    <img src="https://via.placeholder.com/150x150/5fa9f8/ffffff" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
+                                                <div class="col-md-2 d-flex align-items-center justify-content-center" style="padding: 1.2em;">
+                                                    <img src="{{ asset($item->imgFilepath) }}" style="height: 150px; width: 120px;" alt="" class="img-fluid d-none d-md-block rounded">
                                                 </div>
-                                                <div class="col-md-7 mt-2">
-                                                    <div class="card-body text-secondary">
-                                                        <div>
-                                                            <h4 class="card-title font-weight-bold">Haekal Sastradilaga</h4>
-                                                            <ul class="ml-3">
-                                                                <li class="card-text">Nilai Feedback</li>
-                                                                <li class="card-text">Umur</li>
-                                                            </ul>
+                                                <div class="col-md-8 mt-2">
+                                                    <div class="card-body text-secondary p-2">
+                                                        <h5 class="card-title font-weight-bold mb-1">{{ $item->instructor_name }}</h5>
+                                                        <div class="ml-2">
+                                                            <table class="table table-borderless table-sm mb-0">
+                                                                <tr>
+                                                                    <td style="width: 180px;"><i class="ti-minus mr-2"></i> Avg Nilai Feedback</td>
+                                                                    <td style="text-align: start;">:</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td style="width: 180px;"><i class="ti-minus mr-2"></i> Email</td>
+                                                                    <td style="text-align: start;">: {{ $item->instructor_email }}</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td><i class="ti-minus mr-2"></i> Umur</td>
+                                                                    <td style="text-align: start;">: {{ $item->instructor_dob }}</td>
+                                                                </tr>
+                                                            </table>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-2 d-flex align-items-center justify-content-center">
-                                                    <a class="btn btn-outline-secondary btn-sm" href="#" data-toggle="modal" data-target="#customModal"><i class="menu-Logo fa fa-eye"></i> View Details</a>
+                                                    <a class="btn btn-outline-secondary btn-sm" href="{{ route('preview-instructor', ['id' => $item->id, 'penlatId' => $penlatId]) }}"><i class="menu-Logo fa fa-eye"></i> Summary</a>
                                                 </div>
-                                                <div class="card-icons">
+                                                <div class="card-icons position-absolute" style="top: 10px; right: 10px;">
                                                     <a href="#"><i class="fa fa-download fa-2x text-secondary" style="font-size: 1.5em;"></i></a>
                                                 </div>
                                             </div>
                                         </div>
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td>
-                                        <div class="card custom-card mb-3 bg-white shadow">
-                                            <div class="row no-gutters">
-                                                <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding: 2em;">
-                                                    <img src="https://via.placeholder.com/150x150/5fa9f8/ffffff" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
-                                                </div>
-                                                <div class="col-md-7 mt-2">
-                                                    <div class="card-body text-secondary">
-                                                        <div>
-                                                            <h4 class="card-title font-weight-bold">Henry</h4>
-                                                            <ul class="ml-3">
-                                                                <li class="card-text">Nilai Feedback</li>
-                                                                <li class="card-text">Umur</li>
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-2 d-flex align-items-center justify-content-center">
-                                                    <a class="btn btn-outline-secondary btn-sm" href="#" data-toggle="modal" data-target="#customModal"><i class="menu-Logo fa fa-eye"></i> View Details</a>
-                                                </div>
-                                                <div class="card-icons">
-                                                    <a href="#"><i class="fa fa-download fa-2x text-secondary" style="font-size: 1.5em;"></i></a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>

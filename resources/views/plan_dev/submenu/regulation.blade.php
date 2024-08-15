@@ -83,7 +83,7 @@ font-weight-bold
                                 @foreach($data as $item)
                                 <tr>
                                     <td>
-                                        <div class="card mb-3">
+                                        <div class="card mb-3 shadow-none">
                                             <div class="card-body custom-card">
                                                 <div class="row no-gutters">
                                                     <div class="col-md-10 mt-2">

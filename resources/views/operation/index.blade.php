@@ -21,7 +21,7 @@ font-weight-bold
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
     </div>
 </div>
-<div class="animated fadeIn">
+<div class="animated fadeIn" id="mainContainer">
     <div class="row">
         <!-- Earnings (Monthly) Card Example -->
         <div class="col-xl-4 col-md-6 timesheet">
@@ -84,7 +84,7 @@ font-weight-bold
         </div>
     </div>
     <div class="row">
-        <div class="col-lg-6">
+        <div class="col-lg-12">
             <div class="card">
                 <div class="row">
                     <div class="col-lg-12">
@@ -109,6 +109,12 @@ font-weight-bold
             </div>
         </div><!-- /# column -->
     </div>
+    <div class="text-right mb-4">
+        {{-- button or else --}}
+        <small><i class="ti-fullscreen"></i>
+            <a href="#" onclick="toggleFullScreen('mainContainer')">&nbsp;<i>Fullscreen</i></a>
+        </small>
+    </div>
 </div>
 <script>
 window.onload = function () {
@@ -117,13 +123,22 @@ window.onload = function () {
         .then(data => {
             var chart = new CanvasJS.Chart("chartContainerSpline", {
                 animationEnabled: true,
+                zoomEnabled: true,
                 theme: "light2",
-                title: { text: "Data Peserta Training" },
+                title: { text: "Data Peserta Training MTC 2024" },
                 axisX: { valueFormatString: "DD MMM" },
                 axisY: {
-                    title: "Data Peserta Training MTC 2024",
+                    title: "Data Peserta Training",
                     includeZero: true,
-                    maximum: 270
+                    maximum: 270,
+                    stripLines: [{
+                        value: 190,
+                        label: "Target 190 Peserta",
+                        labelAlign: "center",
+                        labelFontColor: "#FF0000",
+                        color: "#FF0000",
+                        thickness: 2
+                    }]
                 },
                 data: [{
                     type: "splineArea",

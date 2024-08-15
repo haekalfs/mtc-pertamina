@@ -156,8 +156,7 @@ font-weight-bold
                                     <th>Tanggal Pelaksanaan</th>
                                     <td style="text-align: start; font-weight:500">: {{ $data->date }}</td>
                                 </tr>
-                              </tr>
-                          </table>
+                            </table>
                           <small class="font-weight-bold text-danger">
                             Editing batch is only available on the
                             <a href="{{ route('batch-penlat') }}" class="text-danger">
@@ -242,13 +241,10 @@ font-weight-bold
                                         </select> --}}
                                         {{ $tool->utility->utility_unit }}
                                     </td>
-                                    <td class="actions text-center" data-th="">
+                                    <td class="actions text-center">
                                         <div>
-                                            <button class="btn btn-white btn-sm border-secondary bg-white btn-md mb-2 mr-2">
-                                                <i class="fa fa-save"></i> Update
-                                            </button>
                                             <button class="btn btn-white btn-sm border-secondary bg-white btn-md mb-2">
-                                                <i class="fa fa-trash"></i> Delete
+                                                <i class="fa fa-save"></i> Update
                                             </button>
                                         </div>
                                     </td>

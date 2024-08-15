@@ -13,16 +13,16 @@ class InventoryToolController extends Controller
     {
         // Validate the form inputs
         $validatedData = $request->validate([
-            'asset_name' => 'required|string|max:255',
+            'asset_name' => 'required',
             'asset_number' => 'nullable|string|max:20',
-            'maker' => 'required|string|max:100',
-            'running_hour' => 'nullable|string|max:145',
-            'condition' => 'required|string|max:255',
-            'last_maintenance' => 'required|max:255',
-            'next_maintenance' => 'required|max:255',
-            'stock' => 'required|string|max:25',
-            'maintenance_guide' => 'required|file|mimes:pdf,doc,docx|max:2048', // Assuming the guide is a file
-            'tool_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'maker' => 'required',
+            'running_hour' => 'required',
+            'condition' => 'required',
+            'last_maintenance' => 'required',
+            'next_maintenance' => 'required',
+            'stock' => 'required',
+            'maintenance_guide' => 'required|file|mimes:pdf,doc,docx', // Assuming the guide is a file
+            'tool_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
         ]);
 
         // Store the main data in the inventory tool table

@@ -81,7 +81,7 @@ font-weight-bold
                         <div class="row d-flex justify-content-start mb-4">
                             <div class="col-md-12">
                                 <div class="row align-items-center">
-                                    <div class="col-md-3">
+                                    <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="email">Nama Penlat :</label>
                                             <select class="custom-select" id="namaPenlat" name="namaPenlat">
@@ -136,13 +136,13 @@ font-weight-bold
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-md-1 d-flex align-self-end justify-content-start">
+                                    {{-- <div class="col-md-1 d-flex align-self-end justify-content-start">
                                         <div class="form-group">
                                             <div class="align-self-center">
                                                 <button type="submit" class="btn btn-primary" style="padding-left: 1.2em; padding-right: 1.2em;"><i class="ti-search"></i></button>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                 </div>
                             </div>
                         </div>
@@ -152,7 +152,6 @@ font-weight-bold
                             <tr>
                                 <th>Nama Peserta</th>
                                 <th>Nama Program</th>
-                                <th>Batch</th>
                                 <th>Tgl Pelaksanaan</th>
                                 <th>Tempat Pelaksanaan</th>
                                 <th>Jenis Pelatihan</th>
@@ -250,7 +249,6 @@ $(document).ready(function() {
         columns: [
             { data: 'nama_peserta', name: 'nama_peserta' },
             { data: 'nama_program', name: 'nama_program' },
-            { data: 'batch', name: 'batch' },
             { data: 'tgl_pelaksanaan', name: 'tgl_pelaksanaan' },
             { data: 'tempat_pelaksanaan', name: 'tempat_pelaksanaan' },
             { data: 'jenis_pelatihan', name: 'jenis_pelatihan' },

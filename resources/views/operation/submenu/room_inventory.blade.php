@@ -64,7 +64,7 @@ font-weight-bold
                     <table id="dataTable" class="table table-bordered mt-2">
                         <thead>
                             <tr>
-                                <th>Tool</th>
+                                <th>Room Name</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -78,11 +78,16 @@ font-weight-bold
                                         </div>
                                         <div class="col-md-8 text-left mt-sm-2">
                                             <h5 class="card-title font-weight-bold">{{ $item->room_name }}</h5>
-                                            <ul class="ml-4">
-                                                @foreach($item->list as $list)
-                                                <li class="card-text">{{ $list->tools->asset_name }} : {{ $list->amount }}</li>
-                                                @endforeach
-                                            </ul>
+                                            <div class="ml-2">
+                                                <table class="table table-borderless table-sm">
+                                                    @foreach($item->list as $list)
+                                                    <tr>
+                                                        <td style="width: 200px;" class="mb-2"><i class="ti-minus mr-2"></i> {{ $list->tools->asset_name }}</td>
+                                                        <td style="text-align: start;">: &nbsp; {{ $list->amount }} Pcs</td>
+                                                    </tr>
+                                                    @endforeach
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
                                 </td>

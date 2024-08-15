@@ -84,7 +84,6 @@ font-weight-bold
                                     <th>Tanggal Pelaksanaan</th>
                                     <td style="text-align: start; font-weight:500">: {{ $data->date }}</td>
                                 </tr>
-                              </tr>
                           </table>
                         </div>
                     </div>
@@ -106,15 +105,19 @@ font-weight-bold
                 </div>
                 <div class="card-body">
                     <h5 class="card-title font-weight-bold">Peserta</h5>
-                    <ul class="ml-4">
-                        @if(!$data->certificate || !$data->certificate->participant || $data->certificate->participant->isEmpty())
-                            No Data Available
-                        @else
-                            @foreach ($data->certificate->participant as $item)
-                                <li class="card-text">{{ $item->peserta->nama_peserta }}</li>
-                            @endforeach
-                        @endif
-                    </ul>
+                    <div class="ml-2">
+                        <table class="table table-borderless table-sm mb-0">
+                            @if(!$data->certificate || !$data->certificate->participant || $data->certificate->participant->isEmpty())
+                                No Data Available
+                            @else
+                                @foreach ($data->certificate->participant as $item)
+                                <tr>
+                                    <td><i class="ti-minus mr-2"></i> {{ $item->peserta->nama_peserta }}</td>
+                                </tr>
+                                @endforeach
+                            @endif
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

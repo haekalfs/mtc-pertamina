@@ -64,7 +64,7 @@ font-weight-bold
                     <table id="dataTable" class="table table-bordered mt-4 zoom90">
                         <thead>
                             <tr>
-                                <th>Tool</th>
+                                <th>Penlat</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -78,11 +78,15 @@ font-weight-bold
                                         </div>
                                         <div class="col-md-9 text-left mt-sm-2">
                                             <h5 class="card-title font-weight-bold">{{ $item->description }}</h5>
-                                            <ul class="ml-4">
-                                                @foreach ($item->requirement as $requirement)
-                                                <li class="card-text">{{ $requirement->requirement }} </li>
-                                                @endforeach
-                                            </ul>
+                                            <div class="ml-2">
+                                                <table class="table table-borderless table-sm">
+                                                    @foreach ($item->requirement as $requirement)
+                                                    <tr>
+                                                        <td class="mb-2"><i class="ti-minus mr-2"></i> {{ $requirement->requirement }}</td>
+                                                    </tr>
+                                                    @endforeach
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
                                 </td>

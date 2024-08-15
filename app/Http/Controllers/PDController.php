@@ -2,15 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Certificates_catalog;
+use App\Models\Certificates_to_penlat;
+use App\Models\Department;
 use App\Models\Infografis_peserta;
+use App\Models\Instructor;
+use App\Models\Instructor_certificate;
 use App\Models\Penlat;
 use App\Models\Penlat_batch;
 use App\Models\Penlat_certificate;
+use App\Models\Position;
 use App\Models\Receivables_participant_certificate;
 use App\Models\Regulation;
+use App\Models\Role;
 use App\Models\Status;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class PDController extends Controller
 {
@@ -36,6 +44,18 @@ class PDController extends Controller
         return view('plan_dev.submenu.regulation', ['data' => $data ,'statuses' => $statuses]);
     }
 
+    public function main_certificate()
+    {
+        $penlatList = Penlat::all();
+        //filtering list
+        $listBatch = Penlat_batch::all();
+
+        $data = Penlat_certificate::all();
+        $instructorData = Certificates_catalog::all();
+
+        return view('plan_dev.certification-main', ['data' => $data, 'penlatList' => $penlatList, 'listBatch' => $listBatch, 'instructorData' => $instructorData]);
+    }
+
     public function certificate()
     {
         $penlatList = Penlat::all();
@@ -47,9 +67,38 @@ class PDController extends Controller
         return view('plan_dev.submenu.certificate', ['data' => $data, 'penlatList' => $penlatList, 'listBatch' => $listBatch]);
     }
 
-    public function instructor()
+    public function certificate_instructor()
     {
-        return view('plan_dev.submenu.instructor');
+        $penlatList = Penlat::all();
+        //filtering list
+        $listBatch = Penlat_batch::all();
+
+        $data = Certificates_catalog::all();
+
+        return view('plan_dev.submenu.instructor-certificate', ['data' => $data, 'penlatList' => $penlatList, 'listBatch' => $listBatch]);
+    }
+
+    public function instructor(Request $request, $penlatId = 0)
+    {
+        // Validate the request inputs
+        $validator = Validator::make($request->all(), [
+            'penlat' => 'sometimes'
+        ]);
+
+        $query = Instructor::query();
+
+        // Apply filters based on the request
+        if($request->penlat != 0){
+            $penlatId = $request->penlat;
+            //search data
+            $getData = Certificates_to_penlat::where('penlat_id', $penlatId)->pluck('certificates_catalog_id')->toArray();
+            $validateData = Instructor_certificate::whereIn('certificates_catalog_id', $getData)->pluck('instructor_id')->toArray();
+            $query->whereIn('id', $validateData);
+        }
+
+        $data = $query->get();
+        $penlatList = Penlat::all();
+        return view('plan_dev.submenu.instructor', ['data' => $data, 'penlatList' => $penlatList, 'penlatId' => $penlatId]);
     }
 
     public function training_reference()
@@ -166,5 +215,62 @@ class PDController extends Controller
     {
         $data = Penlat_certificate::find($id);
         return view('plan_dev.submenu.preview-certificate', ['data' => $data]);
+    }
+
+    public function register_instructor()
+    {
+        $certificate = Certificates_catalog::all();
+        return view('plan_dev.submenu.register-instructor', ['certificate' => $certificate]);
+    }
+
+    public function certificate_catalog_store(Request $request)
+    {
+        // Validate the incoming request data
+        $request->validate([
+            'judulSertifikat' => 'required',
+            'issued_by'       => 'required',
+            'penlats'         => 'array', // Assuming 'penlats' is optional and can have multiple values
+            'keterangan'      => 'nullable|string',
+        ]);
+
+        // Create a new Certificates_catalog entry
+        $certificate = new Certificates_catalog();
+        $certificate->certificate_name = $request->input('judulSertifikat');
+        $certificate->issuedBy = $request->input('issued_by');
+        $certificate->keterangan = $request->input('keterangan');
+
+        // Save the model instance to the database
+        $certificate->save();
+
+        $penlats = $request->input('penlats');
+        if ($penlats) {
+            foreach ($penlats as $penlatId) {
+                $certificateToPenlat = new Certificates_to_penlat();
+                $certificateToPenlat->certificates_catalog_id = $certificate->id; // Assuming there's a certificate_id foreign key in Certificates_to_penlat
+                $certificateToPenlat->penlat_id = $penlatId; // Assuming penlat_id is the foreign key related to penlats
+                $certificateToPenlat->save();
+            }
+        }
+
+        // Redirect back with a success message
+        return redirect()->back()->with('success', 'Certificate has been added successfully!');
+    }
+
+    public function preview_instructor($id, $penlatId)
+    {
+        $data = Instructor::find($id);
+
+        if($penlatId != 0){
+            $getData = Certificates_to_penlat::where('penlat_id', $penlatId)->pluck('certificates_catalog_id')->toArray();
+        } else {
+            $getData = Instructor_certificate::where('instructor_id', $id)->pluck('certificates_catalog_id')->toArray();
+        }
+
+        $certificateData = Instructor_certificate::where('instructor_id', $id)
+            ->whereIn('certificates_catalog_id', $getData)
+            ->with('catalog.relationOne.penlat')
+            ->get();
+
+        return view('plan_dev.submenu.preview-instructor', ['data' => $data, 'certificateData' => $certificateData]);
     }
 }

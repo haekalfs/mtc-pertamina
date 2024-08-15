@@ -25,6 +25,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/cs-skin-elastic.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/lib/chosen/chosen.min.css') }}">
+    <script src="{{ asset('js/tinymce/tinymce.min.js') }}" referrerpolicy="origin"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chartist@0.11.0/dist/chartist.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jqvmap@1.5.1/dist/jqvmap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/weathericons@2.1.0/css/weather-icons.css">
@@ -116,7 +117,7 @@
                             <li><i class="fa fa-tag"></i><a href="{{ route('training-reference') }}" class="@yield('training-reference')">Referensi Pelatihan</a></li>
                             {{-- <li><i class="fa fa-cog"></i><a href="#">Monitoring Approval</a></li> --}}
                             <li><i class="fa fa-male"></i><a href="{{ route('instructor') }}" class="@yield('instructor')">Instruktur</a></li>
-                            <li><i class="fa fa-certificate"></i><a href="{{ route('certificate') }}" class="@yield('certificate')">Certification</a></li>
+                            <li><i class="fa fa-certificate"></i><a href="{{ route('certificate-main') }}" class="@yield('certificate')">Certification</a></li>
                             <li><i class="fa fa-warning"></i><a href="{{ route('regulation') }}" class="@yield('regulation')">Regulasi</a></li>
                         </ul>
                     </li>
@@ -280,6 +281,8 @@
             </div>
         </footer>
     </div>
+    <script src="{{ asset('js/custom.js') }}"></script>
+
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <!-- jQuery -->

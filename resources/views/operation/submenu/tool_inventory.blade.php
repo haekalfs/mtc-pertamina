@@ -144,18 +144,38 @@ font-weight-bold
                                     <td data-th="Product">
                                         <div class="row">
                                             <div class="col-md-4 d-flex justify-content-center align-items-start mt-2">
-                                                <img src="{{ asset($item->img->filepath) }}" style="height: 150px; width: 160px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
+                                                <img src="{{ asset($item->img->filepath) }}" style="height: 150px; width: 160px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
                                             </div>
                                             <div class="col-md-8 text-left mt-sm-2">
                                                 <h5 class="card-title font-weight-bold">{{ $item->asset_name }}</h5>
-                                                <ul class="ml-4">
-                                                    <li class="card-text mb-1">Nomor Aset : {{ $item->asset_id }}</li>
-                                                    <li class="card-text mb-1">Maker : {{ $item->asset_maker }}</li>
-                                                    <li class="card-text mb-1">Running Hour : {{ $item->used_time }} Hours</li>
-                                                    <li class="card-text mb-1">Jadwal Maintenance Next : {{ $item->next_maintenance }}</li>
-                                                    <li class="card-text mb-1">Last Maintenance : {{ $item->last_maintenance }}</li>
-                                                    <li class="card-text mb-1">Panduan Maintenance : <a href="{{ asset($item->asset_guidance) }}" target="_blank" class="text-secondary">&nbsp;&nbsp;<i class="fa fa-external-link fa-sm"></i> <u>View</u></a></li>
-                                                </ul>
+                                                <div class="ml-2">
+                                                    <table class="table table-borderless table-sm">
+                                                        <tr>
+                                                            <td style="width: 200px;" class="mb-2"><i class="ti-minus mr-2"></i> Nomor Aset</td>
+                                                            <td style="text-align: start;">: {{ $item->asset_id }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 200px;" class="mb-2"><i class="ti-minus mr-2"></i> Maker</td>
+                                                            <td style="text-align: start;">: {{ $item->asset_maker }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 200px;" class="mb-2"><i class="ti-minus mr-2"></i> Running Hour</td>
+                                                            <td style="text-align: start;">: {{ $item->used_time }} Hours</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 200px;" class="mb-2"><i class="ti-minus mr-2"></i> Next Maintenance</td>
+                                                            <td style="text-align: start;">: {{ $item->next_maintenance }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 200px;" class="mb-2"><i class="ti-minus mr-2"></i> Last Maintenance</td>
+                                                            <td style="text-align: start;">: {{ $item->last_maintenance }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 200px;" class="mb-2"><i class="ti-minus mr-2"></i> Panduan Maintenance</td>
+                                                            <td style="text-align: start;">: &nbsp; <a href="{{ asset($item->asset_guidance) }}" target="_blank" class="text-secondary"><i class="fa fa-external-link fa-sm"></i> <u>View</u></a></td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
                                             </div>
                                         </div>
                                     </td>

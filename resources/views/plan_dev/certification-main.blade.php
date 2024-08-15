@@ -13,13 +13,52 @@ font-weight-bold
 @endsection
 
 @section('content')
-<div class="d-sm-flex align-items-center zoom90 justify-content-between">
-    <div>
-        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="menu-icon fa fa-certificate"></i> Certificate</h1>
-        <p class="mb-4">Sertifikat Trainee.</a></p>
-    </div>
-    <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
-        <a href="{{ route('certificate-main') }}" class="btn btn-sm btn-secondary shadow-sm text-white"><i class="fa fa-backward"></i> Go Back</a>
+
+<div class="animated fadeIn">
+    <div class="row">
+        <!-- Earnings (Monthly) Card Example -->
+        <div class="col-xl-4 col-md-6 timesheet">
+            <a href="{{ route('certificate') }}" class="clickable-card">
+                <div class="card border-left-primary shadow py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="stat-heading mb-1 font-weight-bold">Certificate Peserta</div>
+                                <div class="h6 mb-0 text-gray-800"><span style="font-size: 14px;">Status Sertifikasi Peserta</span></div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fa fa-trophy fa-2x text-primary"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="mb-4">
+            <div class="outer">
+                <div class="inner"></div>
+            </div>
+        </div>
+        <!-- Earnings (Monthly) Card Example -->
+        <div class="col-xl-4 col-md-6 medical">
+            <a href="{{ route('certificate-instructor') }}" class="clickable-card">
+                <div class="card border-left-success shadow py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="stat-heading mb-1 font-weight-bold">
+                                    Certificate Instruktur</div>
+                                    <div class="h6 mb-0 text-gray-800"><span style="font-size: 14px;">Sertifikasi Trainer/Instruktur</span></div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fa fa-male fa-2x text-success"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
     </div>
 </div>
 <div class="overlay overlay-mid" style="display: none;"></div>
@@ -70,79 +109,79 @@ font-weight-bold
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold" id="judul">List Data</h6>
-                    <div class="d-flex">
-                        <div class="text-right">
-                            <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Register Certificate</a>
-                        </div>
+                    <div class="text-right">
+                        <select class="form-control" id="year" name="year">
+                            <option>2024</option>
+                        </select>
                     </div>
                 </div>
+                <nav>
+                    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                        <a class="nav-item nav-link active" id="custom-nav-home-tab" data-toggle="tab" href="#custom-nav-home" role="tab" aria-controls="custom-nav-home" aria-selected="true"> Participant Certificate</a>
+                        <a class="nav-item nav-link" id="custom-nav-profile-tab" data-toggle="tab" href="#custom-nav-profile" role="tab" aria-controls="custom-nav-profile" aria-selected="false"> Instruktur Certificate</a>
+                    </div>
+                </nav>
                 <div class="card-body zoom90 p-4">
-                    <form method="GET" action="">
-                        @csrf
-                        <div class="row d-flex justify-content-start mb-4">
-                            <div class="col-md-12">
-                                <div class="row align-items-center">
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label for="email">Nama Pelatihan :</label>
-                                            <select class="form-control form-control" name="penlat">
-                                                <option value="1">Show All</option>
-                                                @foreach ($penlatList as $item)
-                                                <option value="{{ $item->id }}">{{ $item->description }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="form-group">
-                                            <label for="position_id">Batch :</label>
-                                            <select name="stcw" class="form-control" id="stcw">
-                                                <option value="1">Show All</option>
-                                                @foreach ($listBatch as $item)
-                                                <option value="{{ $item->batch }}">{{ $item->batch }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-1 d-flex align-self-end justify-content-start">
-                                        <div class="form-group">
-                                            <div class="align-self-center">
-                                                <button type="submit" class="btn btn-primary" style="padding-left: 1.2em; padding-right: 1.2em;"><i class="ti-search"></i></button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="tab-content" id="nav-tabContent">
+                        <div class="tab-pane fade show active" id="custom-nav-home" role="tabpanel" aria-labelledby="custom-nav-home-tab">
+                            <table id="docLetter" class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Nama Pelatihan</th>
+                                        <th>Alias</th>
+                                        <th>Batch</th>
+                                        <th>Status</th>
+                                        <th>Keterangan</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($data as $item)
+                                    <tr>
+                                        <td>{{ $item->batch->penlat->description}}</td>
+                                        <td>{{ $item->batch->penlat->alias }}</td>
+                                        <td>{{ $item->batch->batch }}</td>
+                                        <td>{{ $item->status }}</td>
+                                        <td>{{ $item->keterangan }}</td>
+                                        <td>{{ $item->total_issued }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
-                    </form>
-                    <table id="docLetter" class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Nama Pelatihan</th>
-                                <th>Alias</th>
-                                <th>Batch</th>
-                                <th>Status</th>
-                                <th>Keterangan</th>
-                                <th>Total</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($data as $item)
-                            <tr>
-                                <td>{{ $item->batch->penlat->description}}</td>
-                                <td>{{ $item->batch->penlat->alias }}</td>
-                                <td>{{ $item->batch->batch }}</td>
-                                <td>{{ $item->status }}</td>
-                                <td>{{ $item->keterangan }}</td>
-                                <td>{{ $item->total_issued }}</td>
-                                <td class="text-center">
-                                    <a class="btn btn-outline-secondary btn-sm" href="{{ route('preview-certificate', $item->id) }}"><i class="menu-Logo fa fa-eye"></i> Action</a>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                        <div class="tab-pane fade" id="custom-nav-profile" role="tabpanel" aria-labelledby="custom-nav-profile-tab">
+                            <table id="requestForm" class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Judul Sertifikat</th>
+                                        <th>Issuing Organization</th>
+                                        <th>Related To</th>
+                                        <th>Keterangan</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($instructorData as $item)
+                                    <tr>
+                                        <td>{{ $item->certificate_name }}</td>
+                                        <td>{{ $item->issuedBy }}</td>
+                                        <td>
+                                            @php
+                                                $badgeColors = ['bg-success', 'bg-danger', 'bg-warning', 'bg-info', 'bg-primary', 'bg-secondary'];
+                                            @endphp
+
+                                            @foreach($item->relationOne as $index => $relatedItem)
+                                                <span class="badge text-white {{ $badgeColors[$index % count($badgeColors)] }}">{{ $relatedItem->penlat->description }}</span>
+                                            @endforeach
+                                        </td>
+                                        <td>{{ $item->keterangan }}</td>
+                                        <td>{{ $item->total_issued }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

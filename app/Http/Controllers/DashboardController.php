@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Campaign;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -18,6 +19,8 @@ class DashboardController extends Controller
             // Do nothing
         }
 
-        return view('dashboard');
+        $headline = Campaign::orderBy('updated_at', 'desc')->take(min(Campaign::count(), 12))->get();
+
+        return view('dashboard', ['headline' => $headline]);
     }
 }

@@ -72,17 +72,41 @@ font-weight-bold
                     </div>
                 </div>
                 <div class="card-body">
-                    <div>
-                        <table id="dataTable" class="table table-borderless mt-4">
+                    <form method="GET" action="{{ route('instructor') }}">
+                        @csrf
+                        <div class="row d-flex justify-content-start mb-2 p-1">
+                            <div class="col-md-12">
+                                <div class="row align-items-center">
+                                    <div class="col-md-5">
+                                        <div class="form-group">
+                                            <label for="email">Nama Pelatihan :</label>
+                                            <select class="custom-select" id="namaPenlat" name="namaPenlat">
+                                                <option value="1" selected>Show All</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1 d-flex align-self-end justify-content-start">
+                                        <div class="form-group">
+                                            <div class="align-self-center">
+                                                <button type="submit" class="btn btn-primary" style="padding-left: 1.2em; padding-right: 1.2em;"><i class="ti-search"></i></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="table-responsive p-2">
+                        <table id="dataTable" class="table table-borderless">
                             <thead class="text-center" style="display: none;">
                                 <tr>
                                     <th>Training References</th>
                                 </tr>
                             </thead>
-                            <tbody class="mt-2">
+                            <tbody class="mt-2 zoom90">
                                 <tr>
                                     <td>
-                                        <div class="card custom-card mb-3 bg-white shadow">
+                                        <div class="card custom-card mb-3 bg-white shadow-none">
                                             <div class="row no-gutters">
                                                 <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding: 2em;">
                                                     <img src="https://via.placeholder.com/250x150/5fa9f8/ffffff" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
@@ -91,12 +115,19 @@ font-weight-bold
                                                     <div class="card-body text-secondary">
                                                         <div>
                                                             <h4 class="card-title font-weight-bold">Basic Sea Survival</h4>
-                                                            <ul class="ml-3">
-                                                                <li class="card-text">List Materi Ajar</li>
-                                                                <li class="card-text">List Materi Ajar</li>
-                                                                <li class="card-text">List Materi Ajar</li>
-                                                                <li class="card-text">List Materi Ajar</li>
-                                                            </ul>
+                                                            <div class="ml-2">
+                                                                <table class="table table-borderless table-sm">
+                                                                    <tr>
+                                                                        <td class="mb-2"><i class="ti-minus mr-2"></i> Referensi 1</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td class="mb-2"><i class="ti-minus mr-2"></i> Referensi 2</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td class="mb-2"><i class="ti-minus mr-2"></i> Referensi 3</td>
+                                                                    </tr>
+                                                                </table>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -109,10 +140,9 @@ font-weight-bold
                                             </div>
                                         </div>
                                     </td>
-                                </tr>
-                                <tr>
+                                </tr><tr>
                                     <td>
-                                        <div class="card custom-card mb-3 bg-white shadow">
+                                        <div class="card custom-card mb-3 bg-white shadow-none">
                                             <div class="row no-gutters">
                                                 <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding: 2em;">
                                                     <img src="https://via.placeholder.com/250x150/5fa9f8/ffffff" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
@@ -121,12 +151,19 @@ font-weight-bold
                                                     <div class="card-body text-secondary">
                                                         <div>
                                                             <h4 class="card-title font-weight-bold">Basic Sea Survival</h4>
-                                                            <ul class="ml-3">
-                                                                <li class="card-text">List Materi Ajar</li>
-                                                                <li class="card-text">List Materi Ajar</li>
-                                                                <li class="card-text">List Materi Ajar</li>
-                                                                <li class="card-text">List Materi Ajar</li>
-                                                            </ul>
+                                                            <div class="ml-2">
+                                                                <table class="table table-borderless table-sm">
+                                                                    <tr>
+                                                                        <td class="mb-2"><i class="ti-minus mr-2"></i> Referensi 1</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td class="mb-2"><i class="ti-minus mr-2"></i> Referensi 2</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td class="mb-2"><i class="ti-minus mr-2"></i> Referensi 3</td>
+                                                                    </tr>
+                                                                </table>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
