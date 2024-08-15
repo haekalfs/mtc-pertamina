@@ -131,16 +131,14 @@ font-weight-bold
                                     @endphp
 
                                     @foreach($certificateData as $index => $certificateItem)
-                                        @foreach($certificateItem->catalog->relationOne as $relatedItem)
-                                            <tr>
-                                                <td class="mb-2">
-                                                    <i class="ti-minus mr-2"></i>
-                                                    <span class="badge text-white p-2 {{ $badgeColors[$index % count($badgeColors)] }}">
-                                                        {{ $relatedItem->penlat->description }}
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        @endforeach
+                                        <tr>
+                                            <td class="mb-2">
+                                                <i class="ti-minus mr-2"></i>
+                                                <span class="badge text-white p-2 {{ $badgeColors[$index % count($badgeColors)] }}">
+                                                    {{ $certificateItem->catalog->certificate_name }}
+                                                </span>
+                                            </td>
+                                        </tr>
                                     @endforeach
                                 </table>
                             </div>
