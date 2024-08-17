@@ -7,12 +7,24 @@ use App\Models\Campaign;
 use App\Models\Status;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class MarketingController extends Controller
 {
     public function index()
     {
-        return view('marketing.index');
+        $queryAgreement = Agreement::query();
+        $countAgreement = $queryAgreement->count();
+        $getAgreements = $queryAgreement->limit(5)->get();
+
+        $queryCampaign = Agreement::query();
+        $countCampaign = $queryCampaign->count();
+        $campaignChart = Campaign::select(DB::raw('date, COUNT(*) as count'))
+        ->groupBy('date')
+        ->get();
+
+
+        return view('marketing.index', ['countAgreement' => $countAgreement, 'getAgreements' => $getAgreements, 'campaignChart' => $campaignChart, 'countCampaign' => $countCampaign]);
     }
 
     public function campaign(Request $request)

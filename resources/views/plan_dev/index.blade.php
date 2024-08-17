@@ -30,7 +30,7 @@ font-weight-bold
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="stat-heading mb-1">Feedback Report</div>
+                                <div class="stat-heading mb-1 font-weight-bold">Feedback Report</div>
                             </div>
                             <div class="col-auto">
                                 <i class="fa fa-trophy fa-2x text-primary"></i>
@@ -48,8 +48,9 @@ font-weight-bold
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="stat-heading mb-1">
+                                <div class="stat-heading mb-1 font-weight-bold">
                                     Instruktur</div>
+                                <div class="h6 mb-0 text-gray-800">{{ $instructorCount }} Orang</div>
                             </div>
                             <div class="col-auto">
                                 <i class="fa fa-male fa-2x text-success"></i>
@@ -67,8 +68,9 @@ font-weight-bold
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="stat-heading mb-1">
+                                <div class="stat-heading mb-1 font-weight-bold">
                                     Referensi Materi</div>
+                                <div class="h6 mb-0 text-gray-800">{{ $referencesCount }} Materi</div>
                             </div>
                             <div class="col-auto">
                                 <i class="fa fa-tag fa-2x text-info"></i>
@@ -91,19 +93,54 @@ font-weight-bold
                     </div>
                 </div> <!-- /.row -->
             </div>
-        </div><!-- /# column -->
-        <div class="col-lg-6">
+        </div>
+        <div class="col-md-6">
             <div class="card">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="card-body d-flex justify-content-center align-items-center">
-                            <!-- <canvas id="TrafficChart"></canvas>   -->
-                            <div id="chartContainerPie" style="height: 370px; width: 100%;"></div>
-                        </div>
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-star-o"></i> Top Rated Instructors</h6>
+                    <div class="text-right">
+                        {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Add Utilities</a> --}}
                     </div>
-                </div> <!-- /.row -->
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless zoom90">
+                        <thead>
+                            <tr class="text-center" style="display: none;">
+                                <th>Instructors</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($instructors as $instructor)
+                            <tr>
+                                <td data-th="Product">
+                                    <div class="row">
+                                        <div class="col-md-3 text-left">
+                                            <img src="{{ asset($instructor->imgFilepath) }}" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow ">
+                                        </div>
+                                        <div class="col-md-9 text-left mt-sm-2">
+                                            <h5 class="card-title font-weight-bold mb-1">{{ $instructor->instructor_name }}</h5>
+                                            <div class="ml-2">
+                                                <table class="table table-borderless table-sm mb-0">
+                                                    <tr>
+                                                        <td style="width: 100px;"><i class="ti-minus mr-2"></i> Email</td>
+                                                        <td style="text-align: start;">: {{ $instructor->instructor_email }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><i class="ti-minus mr-2"></i> Umur</td>
+                                                        <td style="text-align: start;">: {{ $instructor->instructor_dob }}</td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div><!-- /# column -->
+        </div>
     </div>
 </div>
 <?php
@@ -162,18 +199,6 @@ font-weight-bold
 	array("x"=> 1512066600000, "y" => 76.5950)
  );
 
- $dataPointsPie = array(
-	array("label"=>"Oxygen", "symbol" => "O","y"=>46.6),
-	array("label"=>"Silicon", "symbol" => "Si","y"=>27.7),
-	array("label"=>"Aluminium", "symbol" => "Al","y"=>13.9),
-	array("label"=>"Iron", "symbol" => "Fe","y"=>5),
-	array("label"=>"Calcium", "symbol" => "Ca","y"=>3.6),
-	array("label"=>"Sodium", "symbol" => "Na","y"=>2.6),
-	array("label"=>"Magnesium", "symbol" => "Mg","y"=>2.1),
-	array("label"=>"Others", "symbol" => "Others","y"=>1.5),
-
-)
-
 ?>
 <script>
     window.onload = function () {
@@ -229,24 +254,6 @@ font-weight-bold
         }
         chart.render();
     }
-
-    var chart = new CanvasJS.Chart("chartContainerPie", {
-        theme: "light2",
-        animationEnabled: true,
-        title: {
-            text: "Contoh Grafik"
-        },
-        data: [{
-            type: "doughnut",
-            indexLabel: "{symbol} - {y}",
-            yValueFormatString: "#,##0.0\"%\"",
-            showInLegend: true,
-            legendText: "{label} : {y}",
-            dataPoints: <?php echo json_encode($dataPointsPie, JSON_NUMERIC_CHECK); ?>
-        }]
-    });
-    chart.render();
-
 }
 </script>
 

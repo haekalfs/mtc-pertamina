@@ -16,4 +16,9 @@ class Penlat extends Model
     {
         return $this->hasMany('App\Models\Penlat_requirement');
     }
+
+    public function references()
+    {
+        return $this->hasMany('App\Models\Training_reference', 'penlat_id', 'id');
+    }
 }

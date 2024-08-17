@@ -75,31 +75,25 @@ font-weight-bold
                     </div>
                 </div>
                 <div class="card-body zoom90">
-                    <form method="GET" action="{{ route('participant-infographics') }}">
-                        @csrf
-                        <div class="row d-flex justify-content-start mb-4">
-                            <div class="col-md-12">
-                                <div class="row align-items-center">
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label for="email">Nama Pelatihan :</label>
-                                            <select class="custom-select" id="namaPenlat" name="namaPenlat">
-                                                <option value="1" selected>Show All</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-1 d-flex align-self-end justify-content-start">
-                                        <div class="form-group">
-                                            <div class="align-self-center">
-                                                <button type="submit" class="btn btn-primary" style="padding-left: 1.2em; padding-right: 1.2em;"><i class="ti-search"></i></button>
-                                            </div>
-                                        </div>
+                    <div class="row d-flex justify-content-start mb-4">
+                        <div class="col-md-12">
+                            <div class="row align-items-center">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="email">Nama Pelatihan :</label>
+                                        <select class="custom-select" id="namaPenlat" name="namaPenlat">
+                                            <option value="-1" selected>Show All</option>
+                                            @foreach($penlatList as $penlat)
+                                                <option value="{{ $penlat->id }}">{{ $penlat->description }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </form>
-                    <table id="docLetter" class="table table-bordered">
+                    </div>
+
+                    <table id="batchTables" class="table table-bordered">
                         <thead>
                             <tr>
                                 <th>Display</th>
@@ -110,29 +104,7 @@ font-weight-bold
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @foreach ($data as $item)
-                            <tr>
-                                <td class="text-center  d-flex flex-row align-items-center justify-content-center">
-                                    <a href="{{ route('preview-batch', $item->id) }}"><img src="{{ asset($item->filepath) }}" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow "></a>
-                                </td>
-                                <td>{{ $item->penlat->description }}</td>
-                                <td class="font-weight-bold">{{ $item->batch }}</td>
-                                <td>{{ $item->penlat->jenis_pelatihan }}</td>
-                                <td>{{ $item->date }}</td>
-                                <td class="actions text-center" data-th="">
-                                    <div>
-                                        <a data-id="{{ $item->id }}" href="#" class="btn btn-outline-secondary btn-md mb-2 mr-2 edit-tool" data-toggle="modal" data-target="#editDataModal">
-                                            <i class="fa fa-edit"></i>
-                                        </a>
-                                        <button class="btn btn-outline-danger btn-md mb-2">
-                                            <i class="fa fa-trash-o"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
+                        <tbody></tbody>
                     </table>
                 </div>
             </div>
@@ -228,12 +200,36 @@ font-weight-bold
             URL.revokeObjectURL(output.src) // Free up memory
         }
     }
-</script>
 
-<script>
     document.getElementById('penlatSelect').addEventListener('change', function() {
         var selectedOption = this.options[this.selectedIndex].text;
         document.getElementById('programInput').value = selectedOption;
     });
+</script>
+<script>
+$(document).ready(function() {
+    var table = $('#batchTables').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: "{{ route('batch-penlat') }}",
+            data: function (d) {
+                d.namaPenlat = $('#namaPenlat').val();
+            }
+        },
+        columns: [
+            { data: 'display', name: 'display', orderable: false, searchable: false },
+            { data: 'nama_pelatihan', name: 'penlat.description' },
+            { data: 'batch', name: 'batch' },
+            { data: 'jenis_pelatihan', name: 'penlat.jenis_pelatihan' },
+            { data: 'tgl_pelaksanaan', name: 'date' },
+            { data: 'action', name: 'action', orderable: false, searchable: false }
+        ]
+    });
+
+    $('#namaPenlat').on('click', function() {
+        table.draw();
+    });
+});
 </script>
 @endsection

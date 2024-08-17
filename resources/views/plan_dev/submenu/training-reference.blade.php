@@ -82,6 +82,9 @@ font-weight-bold
                                             <label for="email">Nama Pelatihan :</label>
                                             <select class="custom-select" id="namaPenlat" name="namaPenlat">
                                                 <option value="1" selected>Show All</option>
+                                                @foreach ($penlatList as $item)
+                                                <option value="{{ $item->id }}">{{ $item->description }}</option>
+                                                @endforeach
                                             </select>
                                         </div>
                                     </div>
@@ -104,64 +107,25 @@ font-weight-bold
                                 </tr>
                             </thead>
                             <tbody class="mt-2 zoom90">
+                                @foreach($data as $item)
                                 <tr>
                                     <td>
                                         <div class="card custom-card mb-3 bg-white shadow-none">
                                             <div class="row no-gutters">
                                                 <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding: 2em;">
-                                                    <img src="https://via.placeholder.com/250x150/5fa9f8/ffffff" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
+                                                    <img src="{{ asset($item->filepath) }}" style="height: 150px; width: 250px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
                                                 </div>
                                                 <div class="col-md-7 mt-2">
                                                     <div class="card-body text-secondary">
                                                         <div>
-                                                            <h4 class="card-title font-weight-bold">Basic Sea Survival</h4>
+                                                            <h4 class="card-title font-weight-bold">{{ $item->description }}</h4>
                                                             <div class="ml-2">
                                                                 <table class="table table-borderless table-sm">
+                                                                    @foreach ($item->references as $reference)
                                                                     <tr>
-                                                                        <td class="mb-2"><i class="ti-minus mr-2"></i> Referensi 1</td>
+                                                                        <td class="mb-2"><i class="ti-minus mr-2"></i> {{ $reference->references }}</td>
                                                                     </tr>
-                                                                    <tr>
-                                                                        <td class="mb-2"><i class="ti-minus mr-2"></i> Referensi 2</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td class="mb-2"><i class="ti-minus mr-2"></i> Referensi 3</td>
-                                                                    </tr>
-                                                                </table>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-2 d-flex align-items-center justify-content-center">
-                                                    <a class="btn btn-outline-secondary btn-sm" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-eye"></i> Review Pelatihan</a>
-                                                </div>
-                                                <div class="card-icons">
-                                                    <a href="#"><i class="fa fa-download fa-2x text-secondary" style="font-size: 1.5em;"></i></a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr><tr>
-                                    <td>
-                                        <div class="card custom-card mb-3 bg-white shadow-none">
-                                            <div class="row no-gutters">
-                                                <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding: 2em;">
-                                                    <img src="https://via.placeholder.com/250x150/5fa9f8/ffffff" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
-                                                </div>
-                                                <div class="col-md-7 mt-2">
-                                                    <div class="card-body text-secondary">
-                                                        <div>
-                                                            <h4 class="card-title font-weight-bold">Basic Sea Survival</h4>
-                                                            <div class="ml-2">
-                                                                <table class="table table-borderless table-sm">
-                                                                    <tr>
-                                                                        <td class="mb-2"><i class="ti-minus mr-2"></i> Referensi 1</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td class="mb-2"><i class="ti-minus mr-2"></i> Referensi 2</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td class="mb-2"><i class="ti-minus mr-2"></i> Referensi 3</td>
-                                                                    </tr>
+                                                                    @endforeach
                                                                 </table>
                                                             </div>
                                                         </div>
@@ -177,6 +141,7 @@ font-weight-bold
                                         </div>
                                     </td>
                                 </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -185,5 +150,96 @@ font-weight-bold
         </div>
     </div>
 </div>
+
+<div class="modal fade zoom90" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header d-flex flex-row align-items-center justify-content-between">
+                <h5 class="modal-title" id="inputDataModalLabel">Input Data</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" enctype="multipart/form-data" action="{{ route('references.store') }}">
+                @csrf
+                <div class="modal-body mr-2 ml-2">
+                    <div class="d-flex align-items-center mb-4">
+                        <div style="width: 140px;" class="mr-2">
+                            <p style="margin: 0;">Nama Pelatihan :</p>
+                        </div>
+                        <div class="flex-grow-1">
+                            <select id="penlatSelect" class="form-control" name="penlat">
+                                <option selected disabled>Select Pelatihan...</option>
+                                @foreach ($penlatList as $item)
+                                <option value="{{ $item->id }}">{{ $item->description }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="document-list-item mb-4">
+                            <div class="d-flex align-items-start">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">References :</p>
+                                </div>
+                                <div class="flex-grow-1 textarea-container" id="documents-list-container">
+                                    <div class="document-item">
+                                        <textarea type="text" class="form-control mb-2" rows="2" name="documents[]" required></textarea>
+                                        <input type="file" class="form-control-file mb-3" name="attachments[]" multiple>
+                                    </div>
+                                </div>
+                                <div class="ml-2">
+                                    <div class="col-md-12">
+                                        <button type="button" class="btn btn-success mb-2 shadow-sm btn-sm add-document-list"><i class="fa fa-plus"></i> Add More &nbsp;&nbsp;</button>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <a class="btn shadow-sm btn-sm btn-danger text-white delete-document-list" style="display: none;"><i class="fa fa-trash-alt"></i> Delete Item</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Submit Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        // Handle click event for the "Add More" button
+        $(".add-document-list").on("click", function () {
+            // Clone the entire document-item div
+            var clonedDocumentItem = $(".document-item:first").clone();
+
+            // Clear the content of the cloned textarea and file input
+            clonedDocumentItem.find("textarea").val("");
+            clonedDocumentItem.find("input[type=file]").val("");
+
+            // Create a new container for the cloned document-item div
+            var clonedContainer = $("<div class='document-item'></div>").append(clonedDocumentItem.html());
+
+            // Append the new container to the container
+            $("#documents-list-container").append(clonedContainer);
+
+            // Show the delete button when there are multiple items
+            $(".delete-document-list").show();
+        });
+
+        // Handle click event for the "Delete Item" button
+        $(".delete-document-list").on("click", function () {
+            // Remove the last cloned container when the delete button is clicked
+            $(".document-item:last").remove();
+
+            // Hide the delete button if there's only one item left
+            if ($(".document-item").length <= 1) {
+                $(".delete-document-list").hide();
+            }
+        });
+    });
+</script>
 @endsection
 

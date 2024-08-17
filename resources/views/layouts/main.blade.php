@@ -8,8 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Favicon and Apple Touch Icon -->
-    <link href="{{ asset('img/mtc-logo.png') }}" rel="icon">
-    <link href="{{ asset('img/mtc-logo.png') }}" rel="apple-touch-icon">
+    <link href="{{ asset('img/mtc-logo-1.jpg') }}" rel="icon">
+    <link href="{{ asset('img/mtc-logo-1.jpg') }}" rel="apple-touch-icon">
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.7.3/dist/Chart.bundle.min.js"></script>
@@ -53,7 +53,9 @@
     <!-- Bootstrap -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
-
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
+    <script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
 </head>
 
 <body>

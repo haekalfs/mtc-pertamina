@@ -60,29 +60,31 @@ font-weight-bold
                     <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Update Data</a>
                 </div>
             </div>
-            <div class="card-body">
+            <div class="card-body text-secondary">
                 <div class="col-md-12 mb-3">
                     <div class="row">
                         <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding-left: 1em;">
                             <img src="{{ asset($data->imgFilepath) }}" style="height: 200px; width: 170px; border-radius: 15px;" class="card-img" alt="...">
                         </div>
                         <div class="col-md-8">
+                            <h4 class="mb-2 font-weight-bold"><i class="fa fa-user"></i> Profile Instruktur</h4>
+                            <hr>
                             <table class="table table-borderless table-sm">
                                 <tr>
                                     <th style="width: 200px;">Nama Instruktur</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $data->instructor_name }}</td>
+                                    <td style="text-align: start; font-weight:500">: <span class="ml-2">{{ $data->instructor_name }}</span></td>
                                 </tr>
                                 <tr>
                                     <th>E-Mail Address</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $data->instructor_email }}</td>
+                                    <td style="text-align: start; font-weight:500">: <span class="ml-2">{{ $data->instructor_email }}</span></td>
                                 </tr>
                                 <tr>
                                     <th>Tanggal Lahir / Umur</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $data->instructor_dob }}</td>
+                                    <td style="text-align: start; font-weight:500">: <span class="ml-2">{{ $data->instructor_dob }}</span></td>
                                 </tr>
                                 <tr>
                                     <th>Address</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $data->instructor_address }}</td>
+                                    <td style="text-align: start; font-weight:500">: <span class="ml-2">{{ $data->instructor_address }}</span></td>
                                 </tr>
                           </table>
                         </div>
@@ -106,19 +108,19 @@ font-weight-bold
                 <div class="card-body mb-4">
                     <div class="row">
                         <div class="col-md-6">
-                            <h6 class="mb-3">Profil Diri</h6>
+                            <h4 class="mb-3 card-title font-weight-bold">Attachments</h4>
                             <div class="list-group mt-2">
                                 <div class="list-group-item d-flex justify-content-between align-items-center">
                                     Curriculum Vitae
-                                    <a href="path_to_curriculum_vitae.pdf" download class="btn btn-primary btn-sm"><i class="fa fa-download fa-2x" style="font-size: 1.5em;"></i></a>
+                                    <a href="{{ asset($data->cvFilepath) }}" target="_blank" class="btn btn-primary btn-sm"><i class="fa fa-download fa-2x" style="font-size: 1.5em;"></i></a>
                                 </div>
                                 <div class="list-group-item d-flex justify-content-between align-items-center">
                                     Ijazah
-                                    <a href="path_to_ijazah.pdf" download class="btn btn-primary btn-sm"><i class="fa fa-download fa-2x" style="font-size: 1.5em;"></i></a>
+                                    <a href="{{ asset($data->ijazahFilepath) }}" target="_blank" class="btn btn-primary btn-sm"><i class="fa fa-download fa-2x" style="font-size: 1.5em;"></i></a>
                                 </div>
                                 <div class="list-group-item d-flex justify-content-between align-items-center">
                                     Dokumen Pendukung
-                                    <a href="path_to_dokumen_pendukung.pdf" download class="btn btn-primary btn-sm"><i class="fa fa-download fa-2x" style="font-size: 1.5em;"></i></a>
+                                    <a href="{{ asset($data->cvFilepath) }}" target="_blank" class="btn btn-primary btn-sm"><i class="fa fa-download fa-2x" style="font-size: 1.5em;"></i></a>
                                 </div>
                             </div>
                         </div>
@@ -127,7 +129,7 @@ font-weight-bold
                             <div class="ml-2">
                                 <table class="table table-borderless table-sm">
                                     @php
-                                        $badgeColors = ['bg-success', 'bg-danger', 'bg-warning', 'bg-info', 'bg-primary', 'bg-secondary'];
+                                        $badgeColors = ['bg-success'];
                                     @endphp
 
                                     @foreach($certificateData as $index => $certificateItem)

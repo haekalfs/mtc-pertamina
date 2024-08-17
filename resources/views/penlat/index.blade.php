@@ -19,7 +19,7 @@ font-weight-bold
         <p class="mb-4">List Pelatihan at MTC.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
-        <a href="{{ route('participant-infographics-import-page') }}" class="btn btn-sm btn-primary shadow-sm text-white"><i class="fa fa-file-text fa-sm"></i> Import Data</a>
+        <a href="#" class="btn btn-sm btn-primary shadow-sm text-white"><i class="fa fa-file-text fa-sm"></i> Import Data</a>
     </div>
 </div>
 <div class="overlay overlay-mid" style="display: none;"></div>
@@ -75,55 +75,46 @@ font-weight-bold
                     </div>
                 </div>
                 <div class="card-body zoom90">
-                    <form method="GET" action="{{ route('penlat') }}">
-                        @csrf
-                        <div class="row d-flex justify-content-start mb-4">
-                            <div class="col-md-12">
-                                <div class="row align-items-center">
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label for="email">Nama Pelatihan :</label>
-                                            <select class="custom-select" id="namaPenlat" name="namaPenlat">
-                                                <option value="1" selected>Show All</option>
-                                            </select>
-                                        </div>
+                    <div class="row d-flex justify-content-start mb-4">
+                        <div class="col-md-12">
+                            <div class="row align-items-center">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="namaPenlat">Nama Pelatihan :</label>
+                                        <select class="custom-select" id="namaPenlat" name="namaPenlat">
+                                            <option value="-1" selected>Show All</option>
+                                            @foreach($data as $penlat)
+                                                <option value="{{ $penlat->id }}">{{ $penlat->description }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
-                                    <div class="col-md-2">
-                                        <div class="form-group">
-                                            <label for="position_id">STCW/Non :</label>
-                                            <select name="stcw" class="form-control" id="stcw">
-                                                <option value="1">Show All</option>
-                                            </select>
-                                        </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="jenisPenlat">Jenis Penlat :</label>
+                                        <select class="form-control" id="jenisPenlat" name="jenisPenlat">
+                                            <option value="-1" selected>Show All</option>
+                                            @foreach($data->unique('jenis_pelatihan') as $penlat)
+                                                <option value="{{ $penlat->jenis_pelatihan }}">{{ $penlat->jenis_pelatihan }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
-                                    <div class="col-md-2">
-                                        <div class="form-group">
-                                            <label for="status">Jenis Penlat :</label>
-                                            <select class="form-control" id="jenisPenlat" name="jenisPenlat" required>
-                                                <option value="1" selected>Show All</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="form-group">
-                                            <label for="position_id">TW :</label>
-                                            <select name="tw" class="form-control" id="tw">
-                                                <option value="1">Show All</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-1 d-flex align-self-end justify-content-start">
-                                        <div class="form-group">
-                                            <div class="align-self-center">
-                                                <button type="submit" class="btn btn-primary" style="padding-left: 1.2em; padding-right: 1.2em;"><i class="ti-search"></i></button>
-                                            </div>
-                                        </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="stcw">STCW/Non :</label>
+                                        <select name="stcw" class="form-control" id="stcw">
+                                            <option value="-1">Show All</option>
+                                            @foreach($data->unique('kategori_pelatihan') as $penlat)
+                                                <option value="{{ $penlat->kategori_pelatihan }}">{{ $penlat->kategori_pelatihan }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </form>
-                    <table id="docLetter" class="table table-bordered">
+                    </div>
+                    <table id="penlatTables" class="table table-bordered">
                         <thead>
                             <tr>
                                 <th>Display</th>
@@ -134,29 +125,7 @@ font-weight-bold
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @foreach ($data as $item)
-                            <tr>
-                                <td class="text-center  d-flex flex-row align-items-center justify-content-center">
-                                    <a href=""><img src="{{ asset($item->filepath) }}" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow "></a>
-                                </td>
-                                <td>{{ $item->description }}</td>
-                                <td>{{ $item->alias }}</td>
-                                <td>{{ $item->jenis_pelatihan }}</td>
-                                <td>{{ $item->kategori_pelatihan }}</td>
-                                <td class="actions text-center" data-th="">
-                                    <div>
-                                        <a data-id="{{ $item->id }}" href="#" class="btn btn-outline-secondary btn-md mb-2 mr-2 edit-tool" data-toggle="modal" data-target="#editDataModal">
-                                            <i class="fa fa-edit"></i>
-                                        </a>
-                                        <button class="btn btn-outline-danger btn-md mb-2">
-                                            <i class="fa fa-trash-o"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
+                        <tbody></tbody>
                     </table>
                 </div>
             </div>
@@ -342,6 +311,33 @@ $('.edit-tool').on('click', function () {
         $('#edit-image-preview').attr('src', data.image);
         $('#editForm').attr('action', '/penlat-update/' + id);
         $('#editDataModal').modal('show');
+    });
+});
+$(document).ready(function() {
+    var table = $('#penlatTables').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: "{{ route('penlat') }}",
+            data: function (d) {
+                d.namaPenlat = $('#namaPenlat').val();
+                d.jenisPenlat = $('#jenisPenlat').val();
+                d.stcw = $('#stcw').val();
+            }
+        },
+        columns: [
+            { data: 'display', name: 'display', orderable: false, searchable: false },
+            { data: 'description', name: 'description' },
+            { data: 'alias', name: 'alias' },
+            { data: 'jenis_pelatihan', name: 'jenis_pelatihan' },
+            { data: 'kategori_pelatihan', name: 'kategori_pelatihan' },
+            { data: 'action', name: 'action', orderable: false, searchable: false }
+        ]
+    });
+
+    // Redraw the table based on filter changes
+    $('#namaPenlat, #jenisPenlat, #stcw').change(function() {
+        table.draw();
     });
 });
 </script>

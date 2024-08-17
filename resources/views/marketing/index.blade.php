@@ -58,53 +58,61 @@ font-weight-bold
     <div class="row">
         <!-- Earnings (Monthly) Card Example -->
         <div class="col-xl-4 col-md-6 timesheet">
-            <div class="card border-left-primary shadow py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="stat-heading mb-1">
-                                Marketing Campaign</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fa fa-bullhorn fa-2x text-primary"></i>
+            <a href="{{ route('marketing-campaign') }}" class="clickable-card">
+                <div class="card border-left-primary shadow py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="stat-heading mb-1 font-weight-bold">
+                                    Marketing Campaign</div>
+                                <div class="h6 mb-0 text-gray-800">{{ $countCampaign }} Events</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fa fa-bullhorn fa-2x text-primary"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
 
         <!-- Earnings (Monthly) Card Example -->
         <div class="col-xl-4 col-md-6 medical">
-            <div class="card border-left-success shadow py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="stat-heading mb-1">
-                                Enggagement Social Media</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="ti-instagram fa-2x text-success"></i>
+            <a href="" class="clickable-card">
+                <div class="card border-left-success shadow py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="stat-heading mb-1 font-weight-bold">
+                                    Enggagement Social Media</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="ti-instagram fa-2x text-success"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
 
         <!-- Earnings (Monthly) Card Example -->
         <div class="col-xl-4 col-md-6 reimburse">
-            <div class="card border-left-info shadow py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="stat-heading mb-1">
-                                Company Agreement</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fa fa-sitemap fa-2x text-info"></i>
+            <a href="{{ route('company-agreement') }}" class="clickable-card">
+                <div class="card border-left-info shadow py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="stat-heading mb-1 font-weight-bold">
+                                    Company Agreement</div>
+                                <div class="h6 mb-0 text-gray-800">{{ $countAgreement }} Documents</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fa fa-sitemap fa-2x text-info"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
     </div>
     <div class="row">
@@ -119,163 +127,94 @@ font-weight-bold
                     </div>
                 </div> <!-- /.row -->
             </div>
-        </div><!-- /# column -->
-        <div class="col-lg-6">
+        </div>
+        <div class="col-md-6">
             <div class="card">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="card-body d-flex justify-content-center align-items-center">
-                            <!-- <canvas id="TrafficChart"></canvas>   -->
-                            <div id="chartContainerPie" style="height: 370px; width: 100%;"></div>
-                        </div>
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> Company Agreement</h6>
+                    <div class="text-right">
+                        {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Add Utilities</a> --}}
                     </div>
-                </div> <!-- /.row -->
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless zoom90">
+                        <thead>
+                            <tr class="text-center" style="display: none;">
+                                <th>Instructors</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($getAgreements as $agreement)
+                            <tr>
+                                <td data-th="Product">
+                                    <div class="row">
+                                        <div class="col-md-4 text-left">
+                                            <img src="{{ asset($agreement->img_filepath ? $agreement->img_filepath : 'https://via.placeholder.com/250x150/5fa9f8/ffffff') }}" style="height: 100px; width: 150px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow ">
+                                        </div>
+                                        <div class="col-md-8 text-left mt-sm-2">
+                                            <h5 class="card-title font-weight-bold mb-1">{{ $agreement->company_name }}</h5>
+                                            <div class="ml-2">
+                                                <table class="table table-borderless table-sm mb-0">
+                                                    <tr>
+                                                        <td style="width: 150px;"><i class="ti-minus mr-2"></i> Document SPK</td>
+                                                        <td style="text-align: start;">: &nbsp;<a href="{{ asset($agreement->spk_filepath) }}" target="_blank" class="text-secondary"><u>View</u> <i class="fa fa-external-link fa-sm"></i></a></td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div><!-- /# column -->
+        </div>
     </div>
-</div>
-<?php
-
- $dataPoints1 = array(
-	array("x" => 1451586600000, "y" => 96.709),
-	array("x" => 1454265000000, "y" => 94.918),
-	array("x" => 1456770600000, "y" => 95.152),
-	array("x" => 1459449000000, "y" => 97.070),
-	array("x" => 1462041000000, "y" => 97.305),
-	array("x" => 1464719400000, "y" => 89.854),
-	array("x" => 1467311400000, "y" => 88.158),
-	array("x" => 1469989800000, "y" => 87.989),
-	array("x" => 1472668200000, "y" => 86.366),
-	array("x" => 1475260200000, "y" => 81.650),
-	array("x" => 1477938600000, "y" => 85.789),
-	array("x" => 1480530600000, "y" => 83.846),
-	array("x" => 1483209000000, "y" => 84.927),
-	array("x" => 1485887400000, "y" => 82.609),
-	array("x" => 1488306600000, "y" => 81.428),
-	array("x" => 1490985000000, "y" => 83.259),
-	array("x" => 1493577000000, "y" => 83.153),
-	array("x" => 1496255400000, "y" => 84.180),
-	array("x" => 1498847400000, "y" => 84.840),
-	array("x" => 1501525800000, "y" => 82.671),
-	array("x" => 1504204200000, "y" => 87.496),
-	array("x" => 1506796200000, "y" => 86.007),
-	array("x" => 1509474600000, "y" => 87.233),
-	array("x" => 1512066600000, "y"=> 86.276)
- );
-
- $dataPoints2 = array(
-	array("x"=> 1451586600000, "y" => 73.5555),
-	array("x"=> 1454265000000, "y" => 74.1625),
-	array("x"=> 1456770600000, "y" => 75.3980),
-	array("x"=> 1459449000000, "y" => 76.0965),
-	array("x"=> 1462041000000, "y" => 74.8165),
-	array("x"=> 1464719400000, "y" => 74.9660),
-	array("x"=> 1467311400000, "y" => 74.4805),
-	array("x"=> 1469989800000, "y" => 74.7355),
-	array("x"=> 1472668200000, "y" => 74.8155),
-	array("x"=> 1475260200000, "y" => 73.2275),
-	array("x"=> 1477938600000, "y" => 72.6315),
-	array("x"=> 1480530600000, "y" => 71.4610),
-	array("x"=> 1483209000000, "y" => 72.9025),
-	array("x"=> 1485887400000, "y" => 70.5750),
-	array("x"=> 1488306600000, "y" => 69.0955),
-	array("x"=> 1490985000000, "y" => 70.0565),
-	array("x"=> 1493577000000, "y" => 72.5320),
-	array("x"=> 1496255400000, "y" => 73.8350),
-	array("x"=> 1498847400000, "y" => 76.0255),
-	array("x"=> 1501525800000, "y" => 76.1465),
-	array("x"=> 1504204200000, "y" => 77.1570),
-	array("x"=> 1506796200000, "y" => 75.4075),
-	array("x"=> 1509474600000, "y" => 76.7690),
-	array("x"=> 1512066600000, "y" => 76.5950)
- );
-
- $dataPointsPie = array(
-	array("label"=>"Oxygen", "symbol" => "O","y"=>46.6),
-	array("label"=>"Silicon", "symbol" => "Si","y"=>27.7),
-	array("label"=>"Aluminium", "symbol" => "Al","y"=>13.9),
-	array("label"=>"Iron", "symbol" => "Fe","y"=>5),
-	array("label"=>"Calcium", "symbol" => "Ca","y"=>3.6),
-	array("label"=>"Sodium", "symbol" => "Na","y"=>2.6),
-	array("label"=>"Magnesium", "symbol" => "Mg","y"=>2.1),
-	array("label"=>"Others", "symbol" => "Others","y"=>1.5),
-
-)
-
-?>
-<script>
+</div><script>
     window.onload = function () {
+        var chartData = @json($campaignChart);
 
-    var chart = new CanvasJS.Chart("chartContainer", {
-        animationEnabled: true,
-        title:{
-            text: "Contoh Grafik"
-        },
-        subtitles: [{
-            fontSize: 18
-        }],
-        axisY: {
-            prefix: "₹"
-        },
-        legend:{
-            cursor: "pointer",
-            itemclick: toggleDataSeries
-        },
-        toolTip: {
-            shared: true
-        },
-        data: [
-        {
-            type: "area",
-            name: "GBP",
-            showInLegend: "true",
-            xValueType: "dateTime",
-            xValueFormatString: "MMM YYYY",
-            yValueFormatString: "₹#,##0.##",
-            dataPoints: <?php echo json_encode($dataPoints1); ?>
-        },
-        {
-            type: "area",
-            name: "EUR",
-            showInLegend: "true",
-            xValueType: "dateTime",
-            xValueFormatString: "MMM YYYY",
-            yValueFormatString: "₹#,##0.##",
-            dataPoints: <?php echo json_encode($dataPoints2); ?>
-        }
-        ]
-    });
+        // Prepare data points for the chart
+        var dataPoints = chartData.map(function(row) {
+            return {
+                x: new Date(row.date), // Parse the date string into a Date object
+                y: row.count
+            };
+        });
 
-    chart.render();
+        var chart = new CanvasJS.Chart("chartContainer", {
+            animationEnabled: true,
+            title:{
+                text: "Marketing Campaign",
+                margin: 30,
+            },
+            axisX:{
+                valueFormatString: "DD MMM",
+                crosshair: {
+                    enabled: true,
+                    snapToDataPoint: true
+                }
+            },
+            axisY: {
+                valueFormatString: "##0",
+                crosshair: {
+                    enabled: true,
+                    snapToDataPoint: true
+                }
+            },
+            data: [{
+                type: "area",
+                xValueFormatString: "DD MMM",
+                yValueFormatString: "##0",
+                toolTipContent: "{x}: {y} events", // Add suffix here
+                dataPoints: dataPoints
+            }]
+        });
 
-    function toggleDataSeries(e){
-        if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
-            e.dataSeries.visible = false;
-        }
-        else{
-            e.dataSeries.visible = true;
-        }
         chart.render();
     }
-
-    var chart = new CanvasJS.Chart("chartContainerPie", {
-        theme: "light2",
-        animationEnabled: true,
-        title: {
-            text: "Contoh Grafik"
-        },
-        data: [{
-            type: "doughnut",
-            indexLabel: "{symbol} - {y}",
-            yValueFormatString: "#,##0.0\"%\"",
-            showInLegend: true,
-            legendText: "{label} : {y}",
-            dataPoints: <?php echo json_encode($dataPointsPie, JSON_NUMERIC_CHECK); ?>
-        }]
-    });
-    chart.render();
-
-}
 </script>
 
 <script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>

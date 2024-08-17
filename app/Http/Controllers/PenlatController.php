@@ -7,11 +7,49 @@ use App\Models\Penlat;
 use App\Models\Penlat_batch;
 use App\Models\Penlat_requirement;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Yajra\DataTables\Facades\DataTables;
 
 class PenlatController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        if ($request->ajax()) {
+            $query = Penlat::query();
+
+            // Apply filters based on the selected values from the dropdowns
+            if ($request->namaPenlat && $request->namaPenlat != '-1') {
+                $query->where('id', $request->namaPenlat);
+            }
+
+            if ($request->jenisPenlat && $request->jenisPenlat != '-1') {
+                $query->where('jenis_pelatihan', $request->jenisPenlat);
+            }
+
+            if ($request->stcw && $request->stcw != '-1') {
+                $query->where('kategori_pelatihan', $request->stcw);
+            }
+
+            $data = $query->get();
+
+            return DataTables::of($data)
+                ->addColumn('display', function($item) {
+                    return '<a href="#"><img src="' . asset($item->filepath) . '" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow"></a>';
+                })
+                ->addColumn('action', function($item) {
+                    return '<div>
+                                <a data-id="' . $item->id . '" href="#" class="btn btn-outline-secondary btn-md mb-2 mr-2 edit-tool" data-toggle="modal" data-target="#editDataModal">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <button class="btn btn-outline-danger btn-md mb-2">
+                                    <i class="fa fa-trash-o"></i>
+                                </button>
+                            </div>';
+                })
+                ->rawColumns(['display', 'action'])
+                ->make(true);
+        }
+
         $data = Penlat::all();
         return view('penlat.index', ['data' => $data]);
     }
@@ -128,11 +166,52 @@ class PenlatController extends Controller
         return redirect()->back()->with('success', 'Requirements submitted successfully!');
     }
 
-    public function batch()
+    public function batch(Request $request)
     {
-        $data = Penlat_batch::all();
+        if ($request->ajax()) {
+            $query = Penlat_batch::with('penlat');
+
+            // Apply filter based on selected values from dropdowns
+            if ($request->namaPenlat && $request->namaPenlat != '-1') {
+                $query->whereHas('penlat', function($q) use ($request) {
+                    $q->where('id', $request->namaPenlat);
+                });
+            }
+
+            $data = $query->get();
+
+            return DataTables::of($data)
+                ->addColumn('display', function($item) {
+                    return '<a href="' . route('preview-batch', $item->id) . '"><img src="' . asset($item->filepath) . '" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow "></a>';
+                })
+                ->addColumn('nama_pelatihan', function($item) {
+                    return $item->penlat->description;
+                })
+                ->addColumn('batch', function($item) {
+                    return $item->batch;
+                })
+                ->addColumn('jenis_pelatihan', function($item) {
+                    return $item->penlat->jenis_pelatihan;
+                })
+                ->addColumn('tgl_pelaksanaan', function($item) {
+                    return $item->date;
+                })
+                ->addColumn('action', function($item) {
+                    return '
+                        <a data-id="' . $item->id . '" href="#" class="btn btn-outline-secondary btn-md mb-2 mr-2 edit-tool" data-toggle="modal" data-target="#editDataModal">
+                            <i class="fa fa-edit"></i>
+                        </a>
+                        <button class="btn btn-outline-danger btn-md mb-2">
+                            <i class="fa fa-trash-o"></i>
+                        </button>
+                    ';
+                })
+                ->rawColumns(['display', 'action'])  // Enable raw HTML for the 'display' and 'action' columns
+                ->make(true);
+        }
+
         $penlatList = Penlat::all();
-        return view('penlat.batch', ['data' => $data, 'penlatList' => $penlatList]);
+        return view('penlat.batch', ['penlatList' => $penlatList]);
     }
 
     public function batch_store(Request $request)
@@ -146,31 +225,39 @@ class PenlatController extends Controller
             'program' => 'sometimes',
         ]);
 
-        // Handle the image upload
-        $imagePath = null;
-        if ($request->hasFile('image')) {
+        DB::beginTransaction(); // Start the transaction
 
-            $image = $request->file('image');
-            $filename = time() . '_' . $image->getClientOriginalName();
-            $image->move(public_path('uploads/penlat_utility'), $filename);
-            $imagePath = 'uploads/penlat_utility/' . $filename;
+        try {
+            // Handle the image upload
+            $imagePath = null;
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                $filename = time() . '_' . $image->getClientOriginalName();
+                $image->move(public_path('uploads/penlat_utility'), $filename);
+                $imagePath = 'uploads/penlat_utility/' . $filename;
+            }
+
+            // Create or update the entry
+            $penlatUtility = Penlat_batch::updateOrCreate(
+                [
+                    'batch' => $request->batch,
+                ],
+                [
+                    'penlat_id' => $request->penlat,
+                    'nama_program' => $request->program,
+                    'date' => $request->date,
+                    'filepath' => $imagePath,
+                ]
+            );
+
+            DB::commit(); // Commit the transaction
+
+            // Redirect back with a success message
+            return redirect()->back()->with('success', 'Penlat Batch data saved successfully!');
+        } catch (\Exception $e) {
+            DB::rollBack(); // Rollback the transaction for any other exceptions
+            return redirect()->back()->with('error', 'An unexpected error occurred: ' . $e->getMessage())->withInput();
         }
-
-        // Create a new entry
-        $penlatUtility = Penlat_batch::updateOrCreate(
-            [
-                'penlat_id' => $request->penlat,
-                'batch' => $request->batch,
-            ],
-            [
-                'nama_program' => $request->program,
-                'date' => $request->date,
-                'filepath' => $imagePath,
-            ]
-        );
-
-        // Redirect back with a success message
-        return redirect()->back()->with('success', 'Penlat Batch data saved successfully!');
     }
 
     public function preview_batch($id)

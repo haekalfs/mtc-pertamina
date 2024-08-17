@@ -16,15 +16,23 @@ use App\Models\Receivables_participant_certificate;
 use App\Models\Regulation;
 use App\Models\Role;
 use App\Models\Status;
+use App\Models\Training_reference;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class PDController extends Controller
 {
     public function index()
     {
-        return view('plan_dev.index');
+        $query = Instructor::query();
+        $instructorCount = $query->count();
+        $getData = Training_reference::groupBy('penlat_id')->pluck('penlat_id')->toArray();
+        $referencesCount = Penlat::whereIn('id', $getData)->count();
+        $instructors = $query->limit(5)->get();
+
+        return view('plan_dev.index', ['instructorCount' => $instructorCount, 'referencesCount' => $referencesCount, 'instructors' => $instructors]);
     }
 
     public function feedback_report()
@@ -103,7 +111,12 @@ class PDController extends Controller
 
     public function training_reference()
     {
-        return view('plan_dev.submenu.training-reference');
+        $penlatList = Penlat::all();
+        $getData = Training_reference::groupBy('penlat_id')->pluck('penlat_id')->toArray();
+
+        $data = Penlat::whereIn('id', $getData)->get();
+
+        return view('plan_dev.submenu.training-reference', ['penlatList' => $penlatList, 'data' => $data]);
     }
 
     public function upload_certificate()
@@ -169,10 +182,10 @@ class PDController extends Controller
         // Create or update the Penlat_batch entry
         $penlatBatch = Penlat_batch::updateOrCreate(
             [
-                'penlat_id' => $validated['penlat'],
                 'batch' => $validated['batch'],
             ],
             [
+                'penlat_id' => $validated['penlat'],
                 'nama_program' => $validated['program'],
                 'updated_at' => $currentTimestamp,
             ]
@@ -272,5 +285,66 @@ class PDController extends Controller
             ->get();
 
         return view('plan_dev.submenu.preview-instructor', ['data' => $data, 'certificateData' => $certificateData]);
+    }
+
+    public function references_store(Request $request)
+    {
+        // Validate the form data
+        $request->validate([
+            'penlat' => 'required',
+            'documents.*' => 'required',
+            'attachments.*' => 'sometimes|file', // Adjust the allowed file types and size
+        ]);
+
+        // Get the form data
+        $documents = $request->input('documents');
+        $penlatId = $request->input('penlat');
+
+        if ($request->hasFile('attachments')) {
+            $files = $request->file('attachments');
+
+            foreach ($files as $file) {
+                $fileExtension = $file->getClientOriginalExtension();
+                $fileName = time() . '_' . uniqid() . '.' . $fileExtension;
+                $upload_folder = public_path('uploads/references_attachment/');
+                $filePath = 'uploads/references_attachment/' . $fileName;
+
+                // Move the uploaded file to the storage folder
+                $file->move($upload_folder, $fileName);
+
+                $filePathArray[] = $filePath;
+            }
+        }
+
+        $uniqueId = hexdec(substr(uniqid(), 0, 8));
+
+        while (Training_reference::where('id', $uniqueId)->exists()) {
+            $uniqueId = hexdec(substr(uniqid(), 0, 8));
+        }
+
+        // Example: Assuming you have a Document model, you can store each document in the database
+        foreach ($documents as $key => $document) {
+
+            try {
+                DB::beginTransaction();
+
+                $newDocument = new Training_reference([
+                    'penlat_id' => $penlatId,
+                    'references' => $document,
+                    'filepath' => $filePathArray[$key] ?? NULL,
+                ]);
+
+                $newDocument->save();
+
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollback();
+                // Handle the exception or log the error
+                return redirect()->back()->with('error', 'Failed to store receivable note. Please try again.');
+            }
+        }
+
+        // Redirect back or to a specific route after processing
+        return redirect()->back()->with('success', 'Form submitted successfully!');
     }
 }

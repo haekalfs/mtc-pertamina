@@ -168,6 +168,4 @@ window.onload = function () {
         });
 }
 </script>
-
-<script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
 @endsection

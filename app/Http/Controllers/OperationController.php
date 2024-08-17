@@ -210,10 +210,10 @@ class OperationController extends Controller
         // Create a new entry
         $penlatUtility = Penlat_batch::updateOrCreate(
             [
-                'penlat_id' => $request->penlat,
                 'batch' => $request->batch,
             ],
             [
+                'penlat_id' => $request->penlat,
                 'nama_program' => $request->program,
                 'date' => $request->date,
                 'filepath' => $imagePath,

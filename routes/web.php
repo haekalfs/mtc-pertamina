@@ -40,9 +40,13 @@ Route::get('/', function () {
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
+Route::middleware(['suspicious'])->group(function () {
+
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/api/chart-data', [OperationController::class, 'getChartData']);
+    Route::get('/api/chart-data-profits/{year}', [FinanceController::class, 'getChartDataProfits']);
     //External User Registration
     Route::get('/user-registration', [RegistrationController::class, 'index'])->name('ext.register.user');
     //KPI
@@ -119,9 +123,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/store-agreement', [AgreementController::class, 'store'])->name('agreement.store');
 
     //finances
-    Route::get('/finances', [FinanceController::class, 'dashboard'])->name('finance');
+    Route::get('/financial-dashboard/{yearSelected?}', [FinanceController::class, 'dashboard'])->name('finance');
     Route::get('/finances/vendor-payment', [FinanceController::class, 'vendor_payment'])->name('vendor-payment');
     Route::get('/finances/costs', [FinanceController::class, 'costs'])->name('cost');
+    Route::get('/finances/costs/import-profits-loss', [FinanceController::class, 'profits_import'])->name('costs.import');
+    Route::post('/import-profits-loss', [ImportController::class, 'import_profits'])->name('profits.import');
+    Route::get('/finances/costs/preview-item/{id}', [FinanceController::class, 'preview_costs'])->name('preview-costs');
 
 
     //Plan & Dev
@@ -146,6 +153,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/planning-development/instructor-store', [InstructorController::class, 'store'])->name('instructor.store');
 
     Route::get('/planning-development/training-reference', [PDController::class, 'training_reference'])->name('training-reference');
+    Route::post('/store-penlat-references', [PDController::class, 'references_store'])->name('references.store');
 
 
     Route::get('/planning-development/instructor/upload-certificate', [PDController::class, 'upload_certificate'])->name('upload-certificate');

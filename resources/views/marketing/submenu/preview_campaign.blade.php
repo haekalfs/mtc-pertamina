@@ -177,7 +177,7 @@ font-weight-bold
                     </div>
                 </div>
                 <div class="card-body">
-                    {{ $data->campaign_result }}
+                    {!! $data->campaign_result !!}
                 </div>
             </div>
         </div>

@@ -134,7 +134,7 @@ font-weight-bold
                                         <div class="card custom-card mb-3 bg-white shadow">
                                             <div class="row no-gutters">
                                                 <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding: 2em;">
-                                                    <img src="{{ asset($item->img_filepath ? $item->img_filepath : 'https://via.placeholder.com/250x150/5fa9f8/ffffff') }}" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
+                                                    <img src="{{ asset($item->img_filepath ? $item->img_filepath : 'https://via.placeholder.com/250x150/5fa9f8/ffffff') }}" style="height: 150px; width: 250px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
                                                 </div>
                                                 <div class="col-md-7 mt-2">
                                                     <div class="card-body text-secondary">
@@ -146,7 +146,7 @@ font-weight-bold
                                                                 <li class="card-text"><span class="font-weight-bold">Tgl Pelaksanaan</span> : {{ $item->date }}</li>
                                                                 <li class="card-text">
                                                                     <span class="font-weight-bold">Hasil Kegiatan</span> : <br>
-                                                                    {{ Str::limit($item->campaign_result, 200, '...') }}
+                                                                    {!! Str::limit($item->campaign_result, 300, '...') !!}
                                                                 </li>
                                                             </ul>
                                                         </div>
@@ -170,7 +170,7 @@ font-weight-bold
 </div>
 
 <div class="modal fade zoom90" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 900px;" role="document">
         <div class="modal-content">
             <div class="modal-header d-flex flex-row align-items-center justify-content-between">
                 <h5 class="modal-title" id="inputDataModalLabel">Input Data</h5>
@@ -194,32 +194,24 @@ font-weight-bold
                             <div class="card-body text-secondary">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div style="width: 160px;" class="mr-2">
                                                 <p style="margin: 0;">Nama Kegiatan :</p>
                                             </div>
                                             <div class="flex-grow-1">
                                                 <input type="text" class="form-control" name="activity_name" required>
                                             </div>
                                         </div>
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div style="width: 160px;" class="mr-2">
                                                 <p style="margin: 0;">Informasi Kegiatan :</p>
                                             </div>
                                             <div class="flex-grow-1">
                                                 <input type="text" class="form-control" name="activity_info">
                                             </div>
                                         </div>
-                                        <div class="d-flex align-items-start mb-4">
-                                            <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Hasil Kegiatan :</p>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <textarea class="form-control" rows="3" name="activity_result"></textarea>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div style="width: 160px;" class="mr-2">
                                                 <p style="margin: 0;">PIC :</p>
                                             </div>
                                             <div class="flex-grow-1">
@@ -230,8 +222,8 @@ font-weight-bold
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 145px;" class="mr-1">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <div style="width: 160px;" class="mr-2">
                                                 <p style="margin: 0;">Tanggal :</p>
                                             </div>
                                             <div class="flex-grow-1">
@@ -239,6 +231,16 @@ font-weight-bold
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="d-flex align-items-start mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Hasil Kegiatan :</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <textarea id="summernote" name="activity_result"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -252,6 +254,22 @@ font-weight-bold
         </div>
     </div>
 </div>
+<script>
+  $('#summernote').summernote({
+    placeholder: 'Hasil Kegiatan...',
+    tabsize: 2,
+    height: 220,
+    toolbar: [
+      ['style', ['style']],
+      ['font', ['bold', 'underline', 'clear']],
+      ['color', ['color']],
+      ['para', ['ul', 'ol', 'paragraph']],
+      ['table', ['table']],
+      ['insert', ['link', 'picture', 'video']],
+      ['view', ['fullscreen', 'codeview', 'help']]
+    ]
+  });
+</script>
 <script>
     function previewImage(event) {
         const reader = new FileReader();
