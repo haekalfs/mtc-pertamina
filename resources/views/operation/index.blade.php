@@ -133,7 +133,7 @@ window.onload = function () {
                     maximum: 270,
                     stripLines: [{
                         value: 190,
-                        label: "Target 190 Peserta",
+                        label: "Target 190 Peserta/Bulan",
                         labelAlign: "center",
                         labelFontColor: "#FF0000",
                         color: "#FF0000",

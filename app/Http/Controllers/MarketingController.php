@@ -17,7 +17,7 @@ class MarketingController extends Controller
         $countAgreement = $queryAgreement->count();
         $getAgreements = $queryAgreement->limit(5)->get();
 
-        $queryCampaign = Agreement::query();
+        $queryCampaign = Campaign::query();
         $countCampaign = $queryCampaign->count();
         $campaignChart = Campaign::select(DB::raw('date, COUNT(*) as count'))
         ->groupBy('date')

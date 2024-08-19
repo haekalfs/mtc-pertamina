@@ -4,15 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\KPI;
 use App\Models\PencapaianKPI;
+use App\Models\Quarter;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
 
 class KpiController extends Controller
 {
-    public function index($yearSelected = null)
+    public function index($encryptedQuarter = null, $encryptedYear = null)
     {
+        $quarterSelected = $encryptedQuarter ? Crypt::decryptString($encryptedQuarter) : -1;
+        $yearSelected = $encryptedYear ? Crypt::decryptString($encryptedYear) : null;
         // Determine the current year and generate the range of years
         $nowYear = date('Y');
         $yearsBefore = range($nowYear - 4, $nowYear);
@@ -20,53 +24,105 @@ class KpiController extends Controller
         // Set the selected year
         $currentYear = $yearSelected ?? $nowYear;
 
-        $pencapaian = PencapaianKPI::whereYear('created_at', $currentYear)->get();
-
-        // Fetch all indicators
-        $indicators = Kpi::where('periode', $currentYear)->get();
-
-        //percentages
-        $percentage = 0;
+        $quarters = Quarter::all();
 
         // Define the closure to be used within the with method
-        $pencapaianQuery = function ($query) use ($currentYear) {
-            $query->where('periode', $currentYear)->orderBy('quarter_id', 'asc');
+        $pencapaianQuery = function ($query) use ($currentYear, $quarterSelected, $quarters) {
+            $query->whereYear('periode_start', $currentYear)
+                ->whereYear('periode_end', $currentYear)
+                ->when($quarterSelected != -1, function ($query) use ($quarters, $quarterSelected) {
+                    $getQuarter = $quarters->find($quarterSelected);
+                    $query->where(function($query) use ($getQuarter) {
+                        $query->whereMonth('periode_start', '>=', $getQuarter->month_start)
+                                ->whereMonth('periode_start', '<=', $getQuarter->month_end)
+                                ->orWhere(function($query) use ($getQuarter) {
+                                    $query->whereMonth('periode_end', '>=', $getQuarter->month_start)
+                                        ->whereMonth('periode_end', '<=', $getQuarter->month_end);
+                                });
+                    });
+                })
+                ->orderBy('periode_start', 'asc');
         };
 
         // Fetch KPIs with their related 'pencapaian' data ordered by 'quarter_id' and filtered by 'periode'
-        $kpis = Kpi::with(['pencapaian' => $pencapaianQuery])->where('periode', $currentYear)->get();
+        $kpis = Kpi::with(['pencapaian' => $pencapaianQuery])->get();
 
-        $scores = PencapaianKPI::where('periode', $currentYear)->pluck('score');
-        $totalScore = $scores->sum();
-        $numScores = $scores->count();
-        $averageScore = $numScores > 0 ? $totalScore / $numScores : 0;
-        $percentage = round($averageScore, 2);
+        // Calculate percentage and prepare data
+        $data = $kpis->map(function ($kpi) {
+            $kpiTarget = $kpi->target;
+            $tercapai = $kpi->pencapaian->sum('score');
+            return $kpiTarget > 0 ? min(($tercapai / $kpiTarget) * 100, 100) : 0;
+        })->toArray();
 
-       // Prepare chart data
-        $chartData = $kpis->map(function($kpi) {
-            $randomColor = 'rgba(' . rand(0, 255) . ', ' . rand(0, 255) . ', ' . rand(0, 255) . ', 0.2)';
-            $borderColor = Str::replaceLast('0.2', '1', $randomColor);
-
-            return [
-                'id' => $kpi->id,
-                'title' => $kpi->indicator,
-                'type' => 'bar', // or any other type you prefer
-                'labels' => $kpi->pencapaian->pluck('quarter.quarter_name')->toArray(),
-                'data' => $kpi->pencapaian->pluck('score')->toArray(),
-                'backgroundColor' => $randomColor,
-                'borderColor' => $borderColor,
-            ];
-        });
+        // Calculate the overall progress percentage
+        $overallProgress = count($data) > 0 ? array_sum($data) / count($data) : 0;
 
         // Return view with data
         return view('kpi-view.index', [
             'kpis' => $kpis,
-            'percentage' => $percentage,
-            'indicators' => $indicators,
-            'chartData' => $chartData,
             'yearsBefore' => $yearsBefore,
+            'selectedQuarter' => $quarterSelected,
             'yearSelected' => $currentYear,
-            'pencapaian' => $pencapaian
+            'overallProgress' => round($overallProgress, 2),
+            'quarters' => $quarters
+        ]);
+    }
+
+    public function pencapaian($kpi, $quarterSelected, $currentYear)
+    {
+        $nowYear = date('Y');
+        $yearsBefore = range($nowYear - 4, $nowYear);
+
+        $quarters = Quarter::all();
+
+        // Define the closure to be used within the with method
+        $pencapaianQuery = function ($query) use ($currentYear, $quarterSelected, $quarters) {
+            $query->whereYear('periode_start', $currentYear)
+                ->whereYear('periode_end', $currentYear)
+                ->when($quarterSelected != -1, function ($query) use ($quarters, $quarterSelected) {
+                    $getQuarter = $quarters->find($quarterSelected);
+                    $query->where(function($query) use ($getQuarter) {
+                        $query->whereMonth('periode_start', '>=', $getQuarter->month_start)
+                            ->whereMonth('periode_start', '<=', $getQuarter->month_end)
+                            ->orWhere(function($query) use ($getQuarter) {
+                                $query->whereMonth('periode_end', '>=', $getQuarter->month_start)
+                                        ->whereMonth('periode_end', '<=', $getQuarter->month_end);
+                            });
+                    });
+                })
+                ->orderBy('periode_start', 'asc');
+        };
+
+        // Fetch a single KPI item with its related 'pencapaian' data
+        $kpiItem = KPI::where('id', $kpi)
+            ->with(['pencapaian' => $pencapaianQuery])
+            ->first(); // Use first() instead of get() to fetch a single record
+
+        // Calculate the percentage
+        $kpiTarget = $kpiItem->target;
+        $tercapai = $kpiItem->pencapaian->sum('score');
+        $percentage = ($kpiTarget > 0) ? ($tercapai / $kpiTarget) * 100 : 0;
+
+        // Prepare data for the chart
+        $dataPoints = [];
+        foreach ($kpiItem->pencapaian as $pencapaian) {
+            $periodeStart = \Carbon\Carbon::parse($pencapaian->periode_start);
+            $periodeEnd = \Carbon\Carbon::parse($pencapaian->periode_end);
+
+            // Loop through each date from start to end
+            for ($date = $periodeStart; $date->lte($periodeEnd); $date->addDay()) {
+                $dataPoints[] = [
+                    'x' => $date->timestamp * 1000, // CanvasJS uses timestamp in milliseconds
+                    'y' => $pencapaian->score
+                ];
+            }
+        }
+
+        return view('kpi-view.pencapaian', [
+            'kpiItem' => $kpiItem,
+            'yearsBefore' => $yearsBefore,
+            'percentage' => $percentage, // Pass the percentage to the view
+            'dataPoints' => $dataPoints, // Pass the data points to the view
         ]);
     }
 
@@ -107,7 +163,7 @@ class KpiController extends Controller
         $pencapaianQuery = PencapaianKPI::query();
 
         if ($periode != 1) {
-            $pencapaianQuery->where('periode', $periode);
+            $pencapaianQuery->where('periode_start', $periode);
         }
 
         if ($kpi != 7) {
@@ -165,51 +221,6 @@ class KpiController extends Controller
 
         // Redirect back with a success message
         return redirect()->back()->with('success', 'Pencapaian KPI berhasil ditambahkan!');
-    }
-
-    public function pencapaian($kpi)
-    {
-        $nowYear = date('Y');
-        $yearsBefore = range($nowYear - 4, $nowYear);
-
-        $kpiItem = KPI::find($kpi);
-        $kpiCurrentPeriode = $kpiItem->periode;
-        $previousYear1 = $kpiCurrentPeriode - 1;
-        $previousYear2 = $kpiCurrentPeriode - 2;
-
-        // Get data for the current period and the two previous years
-        $kpiData = PencapaianKPI::whereIn('periode', [$kpiCurrentPeriode, $previousYear1, $previousYear2])->where('kpi_id', $kpi)->get();
-
-        $scores = $kpiData->pluck('score');
-
-        // Format the data as required
-        $tableData = [];
-        foreach ($kpiData as $data) {
-            $year = $data->periode;
-
-            $totalScore = $scores->sum();
-            $numScores = $scores->count();
-            $averageScore = $numScores > 0 ? $totalScore / $numScores : 0;
-            $percentage = round($averageScore, 2);
-
-            if (!isset($tableData[$year])) {
-                $tableData[$year] = [];
-            }
-            $tableData[$year][] = [
-                'no' => $data->id,
-                'pencapaian' => $data->pencapaian,
-                'score' => $data->score,
-                'percentage' => $percentage,
-                'periode' => $data->periode,
-                'quarter_id' => $data->quarter->quarter_name,
-            ];
-        }
-
-        return view('kpi-view.pencapaian', [
-            'kpiItem' => $kpiItem,
-            'yearsBefore' => $yearsBefore,
-            'tableData' => $tableData
-        ]);
     }
 
     // Other resource methods (index, show, etc.) can be here

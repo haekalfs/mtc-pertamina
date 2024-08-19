@@ -147,25 +147,27 @@ font-weight-bold
                             </div>
                         </div>
                     </form>
-                    <table id="listPeserta" class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Nama Peserta</th>
-                                <th>Nama Program</th>
-                                <th>Tgl Pelaksanaan</th>
-                                <th>Tempat Pelaksanaan</th>
-                                <th>Jenis Pelatihan</th>
-                                <th>Keterangan</th>
-                                <th>Subholding</th>
-                                <th>Perusahaan</th>
-                                <th>Kategori Program</th>
-                                <th>Realisasi</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table id="listPeserta" class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Nama Peserta</th>
+                                    <th>Nama Program</th>
+                                    <th>Tgl Pelaksanaan</th>
+                                    <th>Tempat Pelaksanaan</th>
+                                    <th>Jenis Pelatihan</th>
+                                    <th>Keterangan</th>
+                                    <th>Subholding</th>
+                                    <th>Perusahaan</th>
+                                    <th>Kategori Program</th>
+                                    <th>Realisasi</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

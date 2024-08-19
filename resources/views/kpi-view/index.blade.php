@@ -30,67 +30,21 @@ font-weight-bold
         margin-right: 50px;
     }
 </style>
-<style>
-    .drop-zone {
-    border: 2px dashed #ccc;
-    padding: 10px;
-    text-align: center;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.3s;
-    /* Smooth transition for animations */
-}
-
-.drop-zone.dragging {
-    background-color: #e0e0e0;
-    transform: scale(1.05);
-    animation: pulse 1s infinite;
-    /* Adds a subtle scale effect while dragging */
-}
-
-.drop-zone.clicked {
-    animation: clickEffect 0.5s ease-out;
-    /* Triggers a quick animation when clicked */
-}
-
-@keyframes pulse {
-    0% {
-        transform: scale(1);
-        border-color: #ccc;
-    }
-    50% {
-        transform: scale(1.05);
-        border-color: #007bff;
-    }
-    100% {
-        transform: scale(1);
-        border-color: #ccc;
-    }
-}
-
-@keyframes clickEffect {
-    0% {
-        transform: scale(1);
-        background-color: #e0e0e0;
-    }
-    50% {
-        transform: scale(1.1);
-        background-color: #d0d0d0;
-    }
-    100% {
-        transform: scale(1);
-        background-color: #e0e0e0;
-    }
-}
-</style>
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
         <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-users"></i> Dashboard KPI</h1>
-        <p class="mb-4">Managing Access based on roles.</a></p>
+        <p class="mb-4">Menampilkan berbagai grafik hasil pencapaian KPI MTC secara umum.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
-        <select class="form-control" id="yearSelected" name="yearSelected" required onchange="redirectToPage()">
+        <select class="form-control mr-3" id="quarterSelected" name="quarterSelected" onchange="redirectToPage()" required style="width: 200px;">
+            <option value="-1" {{ $selectedQuarter == -1 ? 'selected' : '' }}>Show All</option>
+            @foreach ($quarters as $quarter)
+                <option value="{{ $quarter->id }}" {{ $quarter->id == $selectedQuarter ? 'selected' : '' }}>{{ $quarter->months }}</option>
+            @endforeach
+        </select>
+        <select class="form-control" id="yearSelected" name="yearSelected" required onchange="redirectToPage()" style="width: 100px;">
             @foreach (array_reverse($yearsBefore) as $year)
-                <option value="{{ $year }}" @if ($year == $yearSelected) selected @endif>{{ $year }}</option>
+                <option value="{{ $year }}" {{ $year == $yearSelected ? 'selected' : '' }}>{{ $year }}</option>
             @endforeach
         </select>
     </div>
@@ -115,58 +69,31 @@ font-weight-bold
     <strong>{{ $message }}</strong>
 </div>
 @endif
-<style>
-    .badge-container {
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-
-    .badge-item {
-        text-align: center;
-        margin: 15px;
-        width: 140px;
-        transition: transform 0.3s, box-shadow 0.3s;
-    }
-
-    .badge-item img {
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        box-shadow: 0 10px 12px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease;
-    }
-
-    .badge-item:hover img {
-        transform: scale(1.1);
-    }
-
-    .badge-label {
-        margin-top: 10px;
-        font-size: 14px;
-        font-weight: bold;
-        color: #767676;
-    }
-
-    .progress-box-modified {
-        padding: 20px;
-        border-radius: 10px;
-    }
-
-    .progress {
-        height: 25px;
-        border-radius: 50px;
-        overflow: hidden;
-    }
-
-    .progress-bar {
-        background-size: 1rem 1rem;
-    }
-</style>
+<section>
+    <div class="indicators">
+        @foreach ($kpis as $kpi)
+        <a href="{{ route('pencapaian-kpi', [$kpi->id, $selectedQuarter, $yearSelected]) }}">
+            <div class="indicator">
+                <div class="indicator__name">{{ $kpi->indicator }}</div>
+                <div class="indicator__data">
+                    <div class="data__entry">
+                        <div class="mb-1 @if($kpi->target <= $kpi->pencapaian->sum('score')) text-success @else text-danger @endif">Target :</div>
+                        <div class="data__description">{{ $kpi->goal }}</div>
+                        <div class="data__amount">{{ number_format($kpi->target, 0, ',', '.') }}</div>
+                    </div>
+                    <div class="data__entry">
+                        <div class="data__description">Tercapai :</div>
+                        <div class="data__spend">{{ number_format($kpi->pencapaian->sum('score'), 0, ',', '.') }}</div>
+                    </div>
+                </div>
+            </div>
+        </a>
+        @endforeach
+    </div>
+</section>
 {{-- circle progress bar --}}
 {{-- <a class="progress-circle-wrapper">
-    <div class="progress-circle p99 over50">
+    <div class="progress-circle p58 over50">
         <span>99%</span>
         <div class="left-half-clipper">
             <div class="first50-bar"></div>
@@ -178,40 +105,27 @@ font-weight-bold
     <div class="row">
         <div class="col-md-12">
             <div class="card">
-                <div class="card-header py-3">
-                    <div class="text-center">
-                        <h6 class="font-weight-bold">List Indicators</h6>
-                    </div>
-                </div>
-                <div class="badge-container">
-                    @foreach ($kpis as $kpi)
-                    <div class="badge-item mt-4">
-                        <div class="mx-auto d-block">
-                            <a href="{{ route('pencapaian-kpi', $kpi->id) }}">
-                                <img class="align-self-center rounded-circle mb-2" alt="" src="{{ asset('img/kpi-default-logo.png') }}">
-                            </a>
-                        </div>
-                        <div class="mx-auto d-block">
-                            <small class="badge-label">{{ $kpi->indicator }}</small>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-                <div class="progress-box-modified">
-                    <h4 class="por-title mb-2">Realisasi KPI Overall</h4>
-                    <div class="progress mb-2">
-                        <div class="progress-bar" role="progressbar" style="width: {{ $percentage ?? 0 }}%; background-color: #53777A;" aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100">
-                            {{ $percentage ?? 0 }}%
+                <div class="card-body">
+                    <div class="progress-box-modified progress-1" style="font-size: 20px;">
+                        <h4 class="por-title mb-2">Realisasi KPI Overall</h4>
+                        {{-- <div class="por-txt" style="font-size: 15px;">Target : {{ $kpiItem->target }}</div> --}}
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar
+                            @if(round($overallProgress, 2) >= 75) bg-success
+                            @elseif(round($overallProgress, 2) >= 50) bg-warning
+                            @else bg-danger
+                            @endif" role="progressbar" style="width: {{ round($overallProgress, 2) }}%;" aria-valuenow="{{ round($overallProgress, 2) }}" aria-valuemin="0" aria-valuemax="100">
+                                {{ round($overallProgress, 2) }}%
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-
             <div class="card">
-                <div class="card-header d-flex flex-row align-items-center justify-content-between">
+                <div class="card-header d-flex flex-row p-3 align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold" id="judul">Data Pencapaian Overall</h6>
                     <div class="text-right">
-                        <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Create KPI</a>
+                        {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Create KPI</a> --}}
                     </div>
                 </div>
                 <nav>
@@ -220,43 +134,62 @@ font-weight-bold
                         <a class="nav-item nav-link" id="custom-nav-profile-tab" data-toggle="tab" href="#custom-nav-profile" role="tab" aria-controls="custom-nav-profile" aria-selected="false"> Grafik Pencapaian</a>
                     </div>
                 </nav>
-                <div class="card-body">
+                <div class="card-body" style="padding-top: 10px;">
                     <div class="tab-content" id="nav-tabContent">
                         <div class="tab-pane fade show active" id="custom-nav-home" role="tabpanel" aria-labelledby="custom-nav-home-tab">
+                            <div class="row d-flex justify-content-start mb-2">
+                                <div class="col-md-12">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="email">Indicator :</label>
+                                                <select class="custom-select" id="namaPenlat" name="namaPenlat">
+                                                    <option value="1" selected>Show All</option>
+                                                    @foreach ($kpis as $kpi)
+                                                        <option value="{{ $kpi->indicator }}">{{ $kpi->indicator }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <table  id="docLetter" class="table table-striped table-bordered">
                                 <thead>
                                     <tr>
                                         <th>No.</th>
                                         <th>Pencapaian</th>
-                                        <th>Target Tercapai</th>
-                                        <th>Quarter</th>
+                                        <th>Goal</th>
+                                        <th>Tercapai</th>
+                                        <th>KPI</th>
                                         <th>Periode</th>
-                                        <th>Indicator</th>
-                                        <th>Action</th>
+                                        {{-- <th>Action</th> --}}
                                     </tr>
                                 </thead>
-                                <tbody>@php $no = 1; @endphp
-                                    @foreach ($pencapaian as $item)
-                                    <tr>
-                                        <td>{{ $no++ }}</td>
-                                        <td>{{ $item->pencapaian }}</td>
-                                        <td>{{ $item->score }}</td>
-                                        <td>{{ $item->quarter->quarter_name }}</td>
-                                        <td>{{ $item->periode }}</td>
-                                        <td>{{ $item->indicator->indicator}} </td>
-                                        <td class="text-center">
-                                            <a href="{{ route('preview-kpi', ['id' => $item->kpi_id]) }}" class="btn btn-outline-secondary btn-sm mr-2"><i class="ti-eye"></i> Preview</a>
-                                            {{-- <a href="#" class="btn btn-outline-danger btn-sm btn-details" onclick="confirmDelete({{ $item->id }});"><i class="fa fa-ban"></i> Delete</a>
-                                            <form id="delete-kpi-{{ $item->id }}" action="{{ route('kpi.destroy', $item->id) }}" method="POST" style="display: none;">
-                                                @csrf
-                                                @method('DELETE')
-                                            </form> --}}
-                                        </td>
-                                    </tr>
+                                <tbody>
+                                    @php $no = 1; @endphp
+                                    @foreach ($kpis as $kpi) <!-- Loop through each KPI -->
+                                        @foreach ($kpi->pencapaian as $item) <!-- Loop through each 'pencapaian' related to the current KPI -->
+                                        <tr data-indicator="{{ $item->indicator->indicator }}">
+                                            <td>{{ $no++ }}</td>
+                                            <td>{{ $item->pencapaian }}</td>
+                                            <td>{{ $item->indicator->goal }}</td>
+                                            <td>{{ number_format($item->score, 0, ',', '.') }}</td>
+                                            <td>{{ $item->indicator->indicator }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($item->periode_start)->format('d/m/y') }} - {{ \Carbon\Carbon::parse($item->periode_end)->format('d/m/y') }}</td>
+                                            {{-- <td class="text-center">
+                                                <a href="{{ route('preview-kpi', ['id' => $item->kpi_id]) }}" class="btn btn-outline-secondary btn-sm mr-2"><i class="ti-eye"></i> Preview</a>
+                                                <a href="#" class="btn btn-outline-danger btn-sm btn-details" onclick="confirmDelete({{ $item->id }});"><i class="fa fa-ban"></i> Delete</a>
+                                                <form id="delete-kpi-{{ $item->id }}" action="{{ route('kpi.destroy', $item->id) }}" method="POST" style="display: none;">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                </form>
+                                            </td> --}}
+                                        </tr>
+                                        @endforeach
                                     @endforeach
                                 </tbody>
                             </table>
-
                         </div>
                         <div class="tab-pane fade" id="custom-nav-profile" role="tabpanel" aria-labelledby="custom-nav-profile-tab">
                             <div id="mainContainer">
@@ -294,8 +227,12 @@ font-weight-bold
                             <input type="text" class="form-control" id="kpi" name="kpi" placeholder="Yearly Revenue..." required>
                         </div>
                         <div class="form-group">
+                            <label for="target">Goal</label>
+                            <input type="text" class="form-control" id="target" name="target" placeholder="Gain new subscribers..." required>
+                        </div>
+                        <div class="form-group">
                             <label for="target">Target</label>
-                            <input type="text" class="form-control" id="target" name="target" required>
+                            <input type="text" class="form-control" id="target" name="target" placeholder="1000" required>
                         </div>
                         <div class="form-group">
                             <label for="periode">Periode</label>
@@ -304,21 +241,6 @@ font-weight-bold
                                     <option value="{{ $year }}">{{ $year }}</option>
                                 @endforeach
                             </select>
-                        </div>
-                        <label for="target">KPI Logo <small>Optional</small></label>
-                        <div class="form-group mb-0 drop-zone" id="drop_zone">
-                            <span id="drop_zone_text">Paste or drag image here</span>
-                            <input type="file" class="form-control-file underline-input d-none" name="picture" id="picture" accept="image/*">
-                            <div class="col-md-12">
-                                <div class="row">
-                                    <div class="col-md-4 d-flex align-items-start">
-                                        <img id="preview" style="max-width: 100px; max-height: 100px; display: none;">
-                                        <button type="button" class="btn btn-sm btn-danger" id="discard" style="display: none;">
-                                            <i class="fa fa-times"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -332,185 +254,6 @@ font-weight-bold
 </div>
 
 <script>
-    function addImagePreviewListener(fileInput, imgPreview, discardButton, dropZone, dropZoneText) {
-    // Function to display the image preview and hide the text
-    function displayImagePreview(src) {
-        imgPreview.src = src;
-        imgPreview.style.display = "block";
-        discardButton.style.display = "inline-block";
-        dropZoneText.style.display = "none";
-    }
-
-    // Handle file input change
-    fileInput.addEventListener("change", function() {
-        if (fileInput.files && fileInput.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                displayImagePreview(e.target.result);
-            };
-            reader.readAsDataURL(fileInput.files[0]);
-        }
-    });
-
-    // Handle drag and drop
-    dropZone.addEventListener("dragover", function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        dropZone.classList.add("dragging");
-    });
-
-    dropZone.addEventListener("dragleave", function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        dropZone.classList.remove("dragging");
-    });
-
-    dropZone.addEventListener("drop", function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        dropZone.classList.remove("dragging");
-
-        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-            fileInput.files = e.dataTransfer.files;
-            const event = new Event("change");
-            fileInput.dispatchEvent(event);
-        }
-    });
-
-    // Handle paste
-    dropZone.addEventListener("paste", function(e) {
-        const items = (e.clipboardData || e.originalEvent.clipboardData).items;
-        for (let i = 0; i < items.length; i++) {
-            if (items[i].type.indexOf("image") !== -1) {
-                const file = items[i].getAsFile();
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    displayImagePreview(e.target.result);
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-    });
-
-    // Handle discard button
-    discardButton.addEventListener("click", function() {
-        imgPreview.src = "";
-        imgPreview.style.display = "none";
-        discardButton.style.display = "none";
-        dropZoneText.style.display = "block";
-        fileInput.value = ""; // Reset file input
-    });
-}
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const dropZone = document.getElementById("drop_zone");
-    const fileInput = document.getElementById("picture");
-    const imgPreview = document.getElementById("preview");
-    const discardButton = document.getElementById("discard");
-    const dropZoneText = document.getElementById("drop_zone_text");
-
-    dropZone.addEventListener("click", function() {
-        dropZone.classList.add("clicked");
-        setTimeout(() => {
-            dropZone.classList.remove("clicked");
-        }, 500);
-    });
-
-    dropZone.addEventListener("dragover", function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        dropZone.classList.add("dragging");
-    });
-
-    dropZone.addEventListener("dragleave", function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        dropZone.classList.remove("dragging");
-    });
-
-    dropZone.addEventListener("drop", function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        dropZone.classList.remove("dragging");
-
-        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-            fileInput.files = e.dataTransfer.files;
-            const event = new Event("change");
-            fileInput.dispatchEvent(event);
-        }
-    });
-
-    addImagePreviewListener(fileInput, imgPreview, discardButton, dropZone, dropZoneText);
-
-        const kpiData = @json($chartData);
-
-        const chartsRow = document.getElementById('chartsRow');
-
-        kpiData.forEach((kpi, index) => {
-            // Create a new div for each KPI chart
-            const colDiv = document.createElement('div');
-            colDiv.className = 'col-lg-6 col-md-6 mb-2';
-
-            const cardDiv = document.createElement('div');
-            cardDiv.className = 'card';
-
-            const cardBodyDiv = document.createElement('div');
-            cardBodyDiv.className = 'card-body';
-
-            const title = document.createElement('h5');
-            title.className = 'card-title';
-            title.innerText = kpi.title + " {{ $yearSelected }}";
-
-            const canvas = document.createElement('canvas');
-            canvas.id = 'chart' + index;
-            canvas.onclick = function() {
-                redirectToKpi(kpi.id);
-            };
-
-            // Append elements
-            cardBodyDiv.appendChild(title);
-            cardBodyDiv.appendChild(canvas);
-            cardDiv.appendChild(cardBodyDiv);
-            colDiv.appendChild(cardDiv);
-            chartsRow.appendChild(colDiv);
-
-            // Create the chart
-            new Chart(canvas.getContext('2d'), {
-                type: kpi.type,
-                data: {
-                    labels: kpi.labels,
-                    datasets: [{
-                        label: kpi.title + " {{ $yearSelected }}",
-                        data: kpi.data,
-                        backgroundColor: kpi.backgroundColor,
-                        borderColor: kpi.borderColor,
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    animation: {
-                        duration: 1000,
-                        easing: 'easeInOutBounce'
-                    },
-                    scales: {
-                        yAxes: [{
-                            ticks: {
-                                beginAtZero: true,
-                                min: 0
-                            }
-                        }]
-                    }
-                }
-            });
-        });
-
-        window.redirectToKpi = function(kpiId) {
-            const url = `/key-performance-indicators/achievements/${kpiId}`;
-            window.location.href = url;
-        };
-    });
-
     function confirmDelete(itemId) {
         event.preventDefault();
         swal({
@@ -527,12 +270,29 @@ font-weight-bold
     }
 
     function redirectToPage() {
-        var selectedOption = document.getElementById("yearSelected").value;
-        var url = "{{ url('/key-performance-indicators/index') }}"; // Specify the base URL
+        var year = document.getElementById("yearSelected").value;
+        var quarter = document.getElementById("quarterSelected").value;
 
-        url += "/" + selectedOption;
-
-        window.location.href = url; // Redirect to the desired page
+        // Redirect to the encryption route
+        var url = "{{ url('/encrypt-params') }}?quarter=" + quarter + "&year=" + year;
+        window.location.href = url;
     }
+</script>
+<script>
+    $(document).ready(function() {
+        // Event listener for dropdown change
+        $('#namaPenlat').on('change', function() {
+            var selectedIndicator = $(this).val();
+            $('#docLetter tbody tr').each(function() {
+                var rowIndicator = $(this).data('indicator');
+
+                if (selectedIndicator === '1' || rowIndicator === selectedIndicator) {
+                    $(this).show(); // Show rows that match the selected indicator
+                } else {
+                    $(this).hide(); // Hide rows that do not match
+                }
+            });
+        });
+    });
 </script>
 @endsection

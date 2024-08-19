@@ -21,6 +21,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -50,10 +51,19 @@ Route::middleware('auth')->group(function () {
     //External User Registration
     Route::get('/user-registration', [RegistrationController::class, 'index'])->name('ext.register.user');
     //KPI
-    Route::get('/key-performance-indicators/index/{yearSelected?}', [KpiController::class, 'index'])->name('kpi');
+    Route::get('/key-performance-indicators/index/{quarterSelected?}/{yearSelected?}', [KpiController::class, 'index'])->name('kpi');
+    Route::get('/encrypt-params', function () {
+        $quarter = request('quarter');
+        $year = request('year');
+
+        $encryptedQuarter = Crypt::encryptString($quarter);
+        $encryptedYear = Crypt::encryptString($year);
+
+        return redirect()->to('/key-performance-indicators/index/' . $encryptedQuarter . '/' . $encryptedYear);
+    });
     Route::post('/kpi-store', [KpiController::class, 'store'])->name('kpis.store');
     Route::post('/pencapaian-kpi/store/{kpi}', [KpiController::class, 'store_pencapaian'])->name('pencapaian.kpi.store');
-    Route::get('/key-performance-indicators/achievements/{id}', [KpiController::class, 'pencapaian'])->name('pencapaian-kpi');
+    Route::get('/key-performance-indicators/achievements/{id}/{quarter}/{year}', [KpiController::class, 'pencapaian'])->name('pencapaian-kpi');
     Route::delete('/delete-kpi/{id}', [KpiController::class, 'destroy'])->name('kpi.destroy');
     Route::delete('/delete-pencapaian-kpi/{id}', [KpiController::class, 'destroy_pencapaian'])->name('pencapaian.kpi.destroy');
     //KPI Report

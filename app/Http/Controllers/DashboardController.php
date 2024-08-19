@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Campaign;
+use App\Models\Infografis_peserta;
+use App\Models\Profit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -20,7 +22,13 @@ class DashboardController extends Controller
         }
 
         $headline = Campaign::orderBy('updated_at', 'desc')->take(min(Campaign::count(), 12))->get();
+        $getPesertaCount = Infografis_peserta::count();
+        $queryCampaign = Campaign::query();
+        $countCampaign = $queryCampaign->count();
 
-        return view('dashboard', ['headline' => $headline]);
+        //sum profits
+        $rawProfits = Profit::sum('profit');
+
+        return view('dashboard', ['headline' => $headline, 'getPesertaCount' => $getPesertaCount, 'countCampaign' => $countCampaign, 'rawProfits' => $rawProfits]);
     }
 }

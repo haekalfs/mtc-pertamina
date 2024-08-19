@@ -2961,3 +2961,130 @@ zoom: 70%;
     top: 30%;
     box-shadow: 0px 0px 30px 20px rgb(186, 180, 180);
   }
+
+  .badge-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.badge-item {
+    text-align: center;
+    margin: 15px;
+    width: 140px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.badge-item img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    box-shadow: 0 10px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.indicator:hover {
+    transform: scale(1.1);
+}
+
+.badge-label {
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #767676;
+}
+
+.progress-box-modified {
+    padding: 3px;
+    border-radius: 10px;
+}
+
+.progress {
+    height: 25px;
+    border-radius: 50px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    background-size: 1rem 1rem;
+}
+.indicators {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    justify-content: space-between; /* Distribute space between indicators */
+}
+
+.indicator {
+    box-shadow: 0 10px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    flex: 1 1 calc(20% - 20px); /* Responsive width calculation */
+    flex-grow: 1; /* Allow the boxes to stretch */
+    min-width: 180px;
+    height: 200px;
+    background-color: #fff;
+}
+
+.indicator__name {
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 33px;
+    padding-left: 19px;
+    background-color: #e8e8e8;
+}
+
+.indicator__data {
+    height: 100%;
+    text-align: center;
+}
+
+.data__entry {
+    padding-top: 15px;
+}
+
+.data__amount {
+    font-size: 24px;
+}
+
+.data__description {
+    font-size: 12px;
+    color: #68a2cc;
+}
+
+.data__spend {
+    font-size: 18px;
+}
+
+/* Media queries for responsiveness */
+@media (max-width: 1200px) {
+    .indicator {
+        flex: 1 1 calc(33.33% - 20px); /* 3 items per row */
+    }
+}
+
+@media (max-width: 768px) {
+    .indicator {
+        flex: 1 1 calc(50% - 20px); /* 2 items per row */
+    }
+}
+
+@media (max-width: 480px) {
+    .indicator {
+        flex: 1 1 100%; /* 1 item per row */
+    }
+}
+
+.card-body-modified {
+    transition: background-color 0.3s;
+}
+
+.card-body-modified.inactive {
+    background-color: rgb(220, 220, 220);
+}
+
+.card-body-modified.active {
+    background-color: rgb(255, 255, 255);
+    border: 4px solid #57a0ff;
+    border-radius: 12px; /* Add border-radius to round the border */
+}

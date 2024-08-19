@@ -74,7 +74,7 @@ font-weight-bold
                                 <td data-th="Product">
                                     <div class="row">
                                         <div class="col-md-4 d-flex justify-content-center align-items-start mt-2">
-                                            <img src="{{ asset($item->filepath) }}" style="height: 150px; width: 200px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
+                                            <img src="{{ asset($item->filepath) }}" style="height: 150px; width: 200px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
                                         </div>
                                         <div class="col-md-8 text-left mt-sm-2">
                                             <h5 class="card-title font-weight-bold">{{ $item->room_name }}</h5>
