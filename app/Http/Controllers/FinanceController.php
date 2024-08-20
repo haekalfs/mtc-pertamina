@@ -68,7 +68,7 @@ class FinanceController extends Controller
         }
 
         return response()->json([
-            'splineDataPoints' => $dataPointsSpline
+            'profitDataPoints' => $dataPointsSpline
         ]);
     }
 

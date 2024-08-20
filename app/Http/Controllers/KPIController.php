@@ -6,6 +6,7 @@ use App\Models\KPI;
 use App\Models\PencapaianKPI;
 use App\Models\Quarter;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
@@ -57,6 +58,28 @@ class KpiController extends Controller
         // Calculate the overall progress percentage
         $overallProgress = count($data) > 0 ? array_sum($data) / count($data) : 0;
 
+        $kpiChartsData = [];
+        foreach ($kpis as $kpi) {
+            $dataPoints = [];
+            foreach ($kpi->pencapaian as $pencapaian) {
+                $periodeStart = \Carbon\Carbon::parse($pencapaian->periode_start);
+                $periodeEnd = \Carbon\Carbon::parse($pencapaian->periode_end);
+
+                // Loop through each date from start to end
+                for ($date = $periodeStart; $date->lte($periodeEnd); $date->addDay()) {
+                    $dataPoints[] = [
+                        'x' => $date->timestamp * 1000, // CanvasJS uses timestamp in milliseconds
+                        'y' => $pencapaian->score
+                    ];
+                }
+            }
+
+            $kpiChartsData[] = [
+                'kpiName' => $kpi->indicator, // assuming your KPI model has a 'name' attribute
+                'dataPoints' => $dataPoints
+            ];
+        }
+
         // Return view with data
         return view('kpi-view.index', [
             'kpis' => $kpis,
@@ -64,15 +87,13 @@ class KpiController extends Controller
             'selectedQuarter' => $quarterSelected,
             'yearSelected' => $currentYear,
             'overallProgress' => round($overallProgress, 2),
-            'quarters' => $quarters
+            'quarters' => $quarters,
+            'kpiChartsData' => $kpiChartsData
         ]);
     }
 
     public function pencapaian($kpi, $quarterSelected, $currentYear)
     {
-        $nowYear = date('Y');
-        $yearsBefore = range($nowYear - 4, $nowYear);
-
         $quarters = Quarter::all();
 
         // Define the closure to be used within the with method
@@ -118,11 +139,26 @@ class KpiController extends Controller
             }
         }
 
+        $quarterStart = 1;
+        $quarterEnd = 12;
+        if($quarterSelected != -1){
+            // Fetch the selected quarter from the database
+            $quarter = Quarter::find($quarterSelected);
+            $quarterStart = $quarter->month_start;
+            $quarterEnd = $quarter->month_end;
+        }
+
+        // Calculate the start and end dates for the selected quarter
+        $startDate = Carbon::create($currentYear, $quarterStart, 1);
+        $endDate = Carbon::create($currentYear, $quarterEnd, 1)->endOfMonth();
+
         return view('kpi-view.pencapaian', [
             'kpiItem' => $kpiItem,
-            'yearsBefore' => $yearsBefore,
             'percentage' => $percentage, // Pass the percentage to the view
             'dataPoints' => $dataPoints, // Pass the data points to the view
+            'startDate' => $startDate->format('Y-m-d'),
+            'endDate' => $endDate->format('Y-m-d'),
+            'selectedQuarter' => $quarterSelected
         ]);
     }
 

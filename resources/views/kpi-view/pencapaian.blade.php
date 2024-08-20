@@ -162,24 +162,16 @@ font-weight-bold
                 <div class="modal-body">
                     <div class="col-md-12 zoom90">
                         <div class="form-group">
+                            <label for="score">Periode</label>
+                            <input type="text" class="form-control" name="daterange" id="daterange"/>
+                        </div>
+                        <div class="form-group">
                             <label for="pencapaian">Pencapaian</label>
                             <input type="text" class="form-control" id="pencapaian" name="pencapaian" placeholder="Average Test Score..." required>
                         </div>
                         <div class="form-group">
                             <label for="score">Score Tercapai <small class="text-danger"><i>(in percentage)</i></small></label>
                             <input type="text" class="form-control" id="score" name="score" placeholder="85%" required>
-                        </div>
-                        <div class="form-group">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <label for="periode_start">Periode</label>
-                                    <input type="date" class="form-control" id="pencapaian" name="pencapaian" placeholder="Average Test Score..." required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="periode_end">Year</label>
-                                    <input type="date" class="form-control" id="pencapaian" name="pencapaian" placeholder="Average Test Score..." required>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -191,6 +183,22 @@ font-weight-bold
         </div>
     </div>
 </div>
+<script type="text/javascript">
+$(function() {
+    var startDate = moment('{{ $startDate }}'); // Using startDate from the controller
+    var endDate = moment('{{ $endDate }}');     // Using endDate from the controller
+
+    $('input[name="daterange"]').daterangepicker({
+        "startDate": startDate,
+        "endDate": endDate,
+        "opens": "right",
+        "minDate": startDate,
+        "maxDate": endDate
+    }, function(start, end, label) {
+        console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
+    });
+});
+</script>
 <script>
 window.onload = function () {
 

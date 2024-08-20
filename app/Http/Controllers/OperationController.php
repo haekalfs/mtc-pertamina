@@ -34,14 +34,44 @@ class OperationController extends Controller
 
     public function getChartData()
     {
+        $data = Penlat_batch::select('penlat_batch.id', 'penlat_batch.nama_program', 'penlat_batch.batch', DB::raw('SUM(penlat_utility_usage.amount) as total_usage'))
+            ->join('penlat_utility_usage', 'penlat_batch.id', '=', 'penlat_utility_usage.penlat_batch_id')
+            ->groupBy('penlat_batch.id', 'penlat_batch.nama_program', 'penlat_batch.batch')
+            ->orderBy('total_usage', 'DESC')
+            ->get();
+
+        $mostUsedUtility = [];
+        foreach ($data as $row) {
+            $mostUsedUtility[] = [
+                "label" => $row->batch,
+                "y" => $row->total_usage
+            ];
+        }
+
+        // Fetch and group the data by nama_program, counting the number of participants
         $data = Infografis_peserta::select('nama_program', DB::raw('count(*) as total'))
-                                ->groupBy('batch', 'nama_program')
-                                ->get();
+            ->groupBy('nama_program')
+            ->having('total', '>', 500) // Only include categories with more than 10 participants
+            ->get();
 
+        // Calculate the count of participants not included in the main categories
+        $otherCount = Infografis_peserta::whereNotIn('nama_program', $data->pluck('nama_program'))
+            ->count();
+
+        // If there are other categories, add them as "Others"
+        if ($otherCount > 0) {
+            $data->push((object)[
+                'nama_program' => 'Lain-lain',
+                'total' => $otherCount
+            ]);
+        }
+
+        // Fetch data by date for the spline chart
         $dataByDate = Infografis_peserta::select('tgl_pelaksanaan', DB::raw('count(*) as total'))
-                                ->groupBy('tgl_pelaksanaan')
-                                ->get();
+            ->groupBy('tgl_pelaksanaan')
+            ->get();
 
+        // Prepare data points for the pie chart
         $dataPointsPie = [];
         foreach ($data as $row) {
             $dataPointsPie[] = [
@@ -51,6 +81,7 @@ class OperationController extends Controller
             ];
         }
 
+        // Prepare data points for the spline chart
         $dataPointsSpline = [];
         foreach ($dataByDate as $row) {
             $dataPointsSpline[] = [
@@ -59,9 +90,11 @@ class OperationController extends Controller
             ];
         }
 
+        // Return the data points in a JSON response
         return response()->json([
             'splineDataPoints' => $dataPointsSpline,
-            'pieDataPoints' => $dataPointsPie
+            'pieDataPoints' => $dataPointsPie,
+            'mostUsedUtility' => $mostUsedUtility
         ]);
     }
 

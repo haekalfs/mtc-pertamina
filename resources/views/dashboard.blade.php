@@ -9,7 +9,6 @@ active font-weight-bold
     <h1 class="h4 mb-0 font-weight-bold text-gray-800 text-secondary"><i class="far fa-smile-beam"></i> Welcome onboard, {{ Auth::user()->name }}!</h1>
     {{-- <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-smile-beam fa-sm text-white-50"></i> Show Details</a> --}}
 </div>
-<script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
 <div class="animated fadeIn">
     <!-- Widgets  -->
     <div class="row">
@@ -77,7 +76,7 @@ active font-weight-bold
                         <div class="stat-content">
                             <div class="text-left dib">
                                 <div class="h6"><span>{{ number_format($rawProfits, 0, ',', '.') }}</span></div>
-                                <div class="stat-heading">Raw Profits</div>
+                                <div class="stat-heading">Raw Profits MTC</div>
                             </div>
                         </div>
                     </div>
@@ -94,6 +93,7 @@ active font-weight-bold
                     <div class="col-lg-12">
                         <div class="card-body d-flex justify-content-center align-items-center">
                             <div id="chartContainerSpline" style="height: 370px; width: 100%;"></div>
+                            <canvas id="lineChart"></canvas>
                         </div>
                     </div>
                 </div> <!-- /.row -->
@@ -161,55 +161,83 @@ active font-weight-bold
 </div>
 
 <script>
-window.onload = function () {
+window.onload = function() {
     loadChartData();
     fetch('/api/chart-data')
         .then(response => response.json())
         .then(data => {
-            var chart = new CanvasJS.Chart("chartContainerSpline", {
-                animationEnabled: true,
-                zoomEnabled: true,
-                theme: "light2",
-                title: { text: "Data Peserta Training MTC 2024" },
-                axisX: { valueFormatString: "DD MMM" },
-                axisY: {
-                    title: "Data Peserta Training",
-                    includeZero: true,
-                    maximum: 270,
-                    stripLines: [{
-                        value: 190,
-                        label: "Target 190 Peserta/Bulan",
-                        labelAlign: "center",
-                        labelFontColor: "#FF0000",
-                        color: "#FF0000",
-                        thickness: 2
-                    }]
-                },
-                data: [{
-                    type: "splineArea",
-                    color: "#6599FF",
-                    xValueType: "dateTime",
-                    xValueFormatString: "DD MMM",
-                    yValueFormatString: "#,##0 Peserta",
-                    dataPoints: data.splineDataPoints
-                }]
+            // Convert data for Chart.js
+            const labels = data.splineDataPoints.map(dp => {
+                const date = new Date(dp.x);
+                return `${date.getDate()} ${date.toLocaleString('default', { month: 'short' })}`;
             });
-            chart.render();
 
-            var pieChart = new CanvasJS.Chart("chartContainerPie", {
-                theme: "light2",
-                animationEnabled: true,
-                title: { text: "Data Based On Batch & Jumlah Peserta" },
-                data: [{
-                    type: "doughnut",
-                    indexLabel: "{symbol} - {y}",
-                    yValueFormatString: "#,##0.0\"%\"",
-                    showInLegend: true,
-                    legendText: "{label} : {y}",
-                    dataPoints: data.pieDataPoints
-                }]
+            const dataset = {
+                label: "Data Peserta Training MTC 2024",
+                borderColor: "rgba(101, 153, 255, 0.9)",
+                borderWidth: 2,
+                backgroundColor: "rgba(101, 153, 255, 0.5)",
+                pointBorderColor: "rgba(101, 153, 255, 0.9)",
+                pointBackgroundColor: "rgba(101, 153, 255, 0.9)",
+                data: data.splineDataPoints.map(dp => dp.y),
+                fill: true,
+                tension: 0.4, // smooth curve
+            };
+
+            const ctx = document.getElementById("lineChart").getContext("2d");
+            const myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [dataset]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Data Peserta Training'
+                            },
+                            suggestedMax: 270
+                        }
+                    },
+                    plugins: {
+                        annotation: {
+                            annotations: {
+                                targetLine: {
+                                    type: 'line',
+                                    scaleID: 'y',
+                                    value: 190,
+                                    borderColor: 'rgba(255, 0, 0, 0.75)',
+                                    borderWidth: 2,
+                                    label: {
+                                        content: 'Target 190 Peserta/Bulan',
+                                        enabled: true,
+                                        position: 'center',
+                                        backgroundColor: 'rgba(255, 0, 0, 0.75)',
+                                        color: '#fff'
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    hover: {
+                        mode: 'nearest',
+                        intersect: true
+                    }
+                }
             });
-            pieChart.render();
         });
 }
 
@@ -222,7 +250,7 @@ function loadChartData() {
                 animationEnabled: true,
                 zoomEnabled: true,
                 theme: "light2",
-                title: { text: "Data Profits" },
+                title: { text: "Data Profits MTC" },
                 axisX: { valueFormatString: "DD MMM" },
                 axisY: {
                     includeZero: true
@@ -233,7 +261,7 @@ function loadChartData() {
                     xValueType: "dateTime",
                     xValueFormatString: "DD MMM",
                     yValueFormatString: "#,##0 Rupiah",
-                    dataPoints: data.splineDataPoints
+                    dataPoints: data.profitDataPoints
                 }]
             });
             chart.render();

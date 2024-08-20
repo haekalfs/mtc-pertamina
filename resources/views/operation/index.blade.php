@@ -90,7 +90,7 @@ font-weight-bold
                     <div class="col-lg-12">
                         <div class="card-body d-flex justify-content-center align-items-center">
                             <!-- <canvas id="TrafficChart"></canvas>   -->
-                            <div id="chartContainerSpline" style="height: 370px; width: 100%;"></div>
+                            <canvas id="lineChart" height="150"></canvas>
                         </div>
                     </div>
                 </div> <!-- /.row -->
@@ -107,7 +107,19 @@ font-weight-bold
                     </div>
                 </div> <!-- /.row -->
             </div>
-        </div><!-- /# column -->
+        </div>
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card-body d-flex justify-content-center align-items-center">
+                            <!-- <canvas id="TrafficChart"></canvas>   -->
+                            <div id="mostUsedUtility" style="height: 370px; width: 100%;"></div>
+                        </div>
+                    </div>
+                </div> <!-- /.row -->
+            </div>
+        </div>
     </div>
     <div class="text-right mb-4">
         {{-- button or else --}}
@@ -117,54 +129,112 @@ font-weight-bold
     </div>
 </div>
 <script>
-window.onload = function () {
+window.onload = function() {
     fetch('/api/chart-data')
         .then(response => response.json())
         .then(data => {
-            var chart = new CanvasJS.Chart("chartContainerSpline", {
-                animationEnabled: true,
-                zoomEnabled: true,
-                theme: "light2",
-                title: { text: "Data Peserta Training MTC 2024" },
-                axisX: { valueFormatString: "DD MMM" },
-                axisY: {
-                    title: "Data Peserta Training",
-                    includeZero: true,
-                    maximum: 270,
-                    stripLines: [{
-                        value: 190,
-                        label: "Target 190 Peserta/Bulan",
-                        labelAlign: "center",
-                        labelFontColor: "#FF0000",
-                        color: "#FF0000",
-                        thickness: 2
-                    }]
-                },
-                data: [{
-                    type: "splineArea",
-                    color: "#6599FF",
-                    xValueType: "dateTime",
-                    xValueFormatString: "DD MMM",
-                    yValueFormatString: "#,##0 Peserta",
-                    dataPoints: data.splineDataPoints
-                }]
+            // Convert data for Chart.js
+            const labels = data.splineDataPoints.map(dp => {
+                const date = new Date(dp.x);
+                return `${date.getDate()} ${date.toLocaleString('default', { month: 'short' })}`;
             });
-            chart.render();
+
+            const dataset = {
+                label: "Data Peserta Training MTC 2024",
+                borderColor: "rgba(101, 153, 255, 0.9)",
+                borderWidth: 2,
+                backgroundColor: "rgba(101, 153, 255, 0.5)",
+                pointBorderColor: "rgba(101, 153, 255, 0.9)",
+                pointBackgroundColor: "rgba(101, 153, 255, 0.9)",
+                data: data.splineDataPoints.map(dp => dp.y),
+                fill: true,
+                tension: 0.4, // smooth curve
+            };
+
+            const ctx = document.getElementById("lineChart").getContext("2d");
+            const myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [dataset]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Data Peserta Training'
+                            },
+                            suggestedMax: 270
+                        }
+                    },
+                    plugins: {
+                        annotation: {
+                            annotations: {
+                                targetLine: {
+                                    type: 'line',
+                                    scaleID: 'y',
+                                    value: 190,
+                                    borderColor: 'rgba(255, 0, 0, 0.75)',
+                                    borderWidth: 2,
+                                    label: {
+                                        content: 'Target 190 Peserta/Bulan',
+                                        enabled: true,
+                                        position: 'center',
+                                        backgroundColor: 'rgba(255, 0, 0, 0.75)',
+                                        color: '#fff'
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    hover: {
+                        mode: 'nearest',
+                        intersect: true
+                    }
+                }
+            });
+
 
             var pieChart = new CanvasJS.Chart("chartContainerPie", {
                 theme: "light2",
                 animationEnabled: true,
-                title: { text: "Data Based On Batch & Jumlah Peserta" },
+                title: { text: "Top Penlat Based on Program & Jumlah Peserta" },
                 data: [{
                     type: "doughnut",
                     indexLabel: "{symbol} - {y}",
-                    yValueFormatString: "#,##0.0\"%\"",
+                    yValueFormatString: "#,##0\" Peserta\"",
                     showInLegend: true,
                     legendText: "{label} : {y}",
                     dataPoints: data.pieDataPoints
                 }]
             });
             pieChart.render();
+
+            var chart = new CanvasJS.Chart("mostUsedUtility", {
+                theme: "light2",
+                animationEnabled: true,
+                title: {
+                    text: "Batch with the Most Used Utility"
+                },
+                data: [{
+                    type: "column", // Use column chart for better comparison
+                    yValueFormatString: "#,##0\" Items\"",
+                    dataPoints: data.mostUsedUtility
+                }]
+            });
+            chart.render();
         });
 }
 </script>

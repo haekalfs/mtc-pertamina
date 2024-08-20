@@ -299,20 +299,6 @@ font-weight-bold
     }
 </script>
 <script>
-$('.edit-tool').on('click', function () {
-    let id = $(this).data('id');
-
-    $.get('/penlat/' + id + '/edit', function (data) {
-        $('#edit_id').val(data.id);
-        $('#edit_nama_program').val(data.description);
-        $('#edit_alias').val(data.alias);
-        $('#edit_jenis_pelatihan').val(data.jenis_pelatihan);
-        $('#edit_kategori_pelatihan').val(data.kategori_pelatihan);
-        $('#edit-image-preview').attr('src', data.image);
-        $('#editForm').attr('action', '/penlat-update/' + id);
-        $('#editDataModal').modal('show');
-    });
-});
 $(document).ready(function() {
     var table = $('#penlatTables').DataTable({
         processing: true,
@@ -335,10 +321,27 @@ $(document).ready(function() {
         ]
     });
 
+    // Delegate event to static parent element
+    $('#penlatTables').on('click', '.edit-tool', function () {
+        let id = $(this).data('id');
+
+        $.get('/penlat/' + id + '/edit', function (data) {
+            $('#edit_id').val(data.id);
+            $('#edit_nama_program').val(data.description);
+            $('#edit_alias').val(data.alias);
+            $('#edit_jenis_pelatihan').val(data.jenis_pelatihan);
+            $('#edit_kategori_pelatihan').val(data.kategori_pelatihan);
+            $('#edit-image-preview').attr('src', data.image);
+            $('#editForm').attr('action', '/penlat-update/' + id);
+            $('#editDataModal').modal('show');
+        });
+    });
+
     // Redraw the table based on filter changes
     $('#namaPenlat, #jenisPenlat, #stcw').change(function() {
         table.draw();
     });
 });
+
 </script>
 @endsection

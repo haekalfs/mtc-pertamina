@@ -193,7 +193,13 @@ font-weight-bold
                         </div>
                         <div class="tab-pane fade" id="custom-nav-profile" role="tabpanel" aria-labelledby="custom-nav-profile-tab">
                             <div id="mainContainer">
-                                <div class="row" id="chartsRow"></div>
+                                <div class="row">
+                                    @foreach($kpiChartsData as $index => $chartData)
+                                    <div class="col-md-4">
+                                        <div id="chartContainer{{$index}}" style="height: 300px; width: 100%; margin-bottom: 20px;"></div>
+                                    </div>
+                                    @endforeach
+                                </div>
                             </div>
                             <div class="text-right mb-4">
                                 {{-- button or else --}}
@@ -294,5 +300,39 @@ font-weight-bold
             });
         });
     });
+</script>
+<script type="text/javascript">
+    const kpiChartsData = {!! json_encode($kpiChartsData, JSON_NUMERIC_CHECK) !!};
+
+    window.onload = function() {
+        kpiChartsData.forEach((chartData, index) => {
+            const chart = new CanvasJS.Chart(`chartContainer${index}`, {
+                animationEnabled: true,
+                zoomEnabled: true,
+                title:{
+                    text: chartData.kpiName + " Statistic"
+                },
+                axisY: {
+                    valueFormatString: "#0,,.",
+                    suffix: "mn"
+                },
+                axisX: {
+                    labelFormatter: function (e) {
+                        return CanvasJS.formatDate(e.value, "DD-MMM-YYYY");
+                    },
+                    interval: 1,
+                    intervalType: "week" // Adjust interval to week
+                },
+                data: [{
+                    type: "spline",
+                    markerSize: 5,
+                    xValueType: "dateTime",
+                    dataPoints: chartData.dataPoints
+                }]
+            });
+
+            chart.render();
+        });
+    };
 </script>
 @endsection

@@ -383,7 +383,7 @@ function loadChartData() {
                     xValueType: "dateTime",
                     xValueFormatString: "DD MMM",
                     yValueFormatString: "#,##0 Rupiah",
-                    dataPoints: data.splineDataPoints
+                    dataPoints: data.profitDataPoints
                 }]
             });
             chart.render();

@@ -123,7 +123,7 @@ font-weight-bold
                                                                 <table class="table table-borderless table-sm">
                                                                     @foreach ($item->references as $reference)
                                                                     <tr>
-                                                                        <td class="mb-2"><i class="ti-minus mr-2"></i> {{ $reference->references }}</td>
+                                                                        <td class="mb-2"><i class="ti-minus mr-2"></i> {{ $reference->references }} &nbsp; <small><a href="{{ asset($reference->filepath) }}" target="_blank" class="text-secondary"><i class="fa fa-external-link fa-sm"></i> <u>View</u></a></small></td>
                                                                     </tr>
                                                                     @endforeach
                                                                 </table>
