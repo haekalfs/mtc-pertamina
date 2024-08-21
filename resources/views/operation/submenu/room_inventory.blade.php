@@ -64,7 +64,8 @@ font-weight-bold
                     <table id="dataTable" class="table table-bordered mt-2">
                         <thead>
                             <tr>
-                                <th>Room Name</th>
+                                <th>Nama Ruangan</th>
+                                <th>Lokasi</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -74,29 +75,43 @@ font-weight-bold
                                 <td data-th="Product">
                                     <div class="row">
                                         <div class="col-md-4 d-flex justify-content-center align-items-start mt-2">
-                                            <img src="{{ asset($item->filepath) }}" style="height: 150px; width: 200px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
+                                            <a href="{{ route('preview-room-user', $item->id) }}">
+                                                <img src="{{ asset($item->filepath) }}" style="height: 150px; width: 200px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
+                                            </a>
                                         </div>
                                         <div class="col-md-8 text-left mt-sm-2">
                                             <h5 class="card-title font-weight-bold">{{ $item->room_name }}</h5>
                                             <div class="ml-2">
                                                 <table class="table table-borderless table-sm">
-                                                    @foreach($item->list as $list)
-                                                    <tr>
-                                                        <td style="width: 200px;" class="mb-2"><i class="ti-minus mr-2"></i> {{ $list->tools->asset_name }}</td>
-                                                        <td style="text-align: start;">: &nbsp; {{ $list->amount }} Pcs</td>
-                                                    </tr>
+                                                    @foreach($item->list as $index => $list)
+                                                        @if($index < 4)
+                                                            <tr>
+                                                                <td style="width: 200px;" class="mb-2">
+                                                                    <i class="ti-minus mr-2"></i> <span>{{ $list->tools->asset_name }}&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;{{ $list->amount }} Pcs</span>
+                                                                </td>
+                                                            </tr>
+                                                        @endif
                                                     @endforeach
+
+                                                    @if($item->list->count() > 4)
+                                                        <tr>
+                                                            <td colspan="2" style="width: 300px;" class="mb-2">
+                                                                <i class="ti-minus mr-2"></i> <a href="{{ route('preview-room-user', $item->id) }}"><i>Show More</i></a>
+                                                            </td>
+                                                        </tr>
+                                                    @endif
                                                 </table>
                                             </div>
                                         </div>
                                     </div>
                                 </td>
+                                <td>{{ $item->location->description }}</td>
                                 <td class="actions text-center" data-th="">
                                     <div>
-                                        <button class="btn btn-outline-secondary btn-md mb-2 mr-2">
+                                        <a href="{{ route('preview-room', $item->id) }}" class="btn btn-outline-secondary btn-md mb-2 mr-2 edit-button">
                                             <i class="fa fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-outline-danger btn-md mb-2">
+                                        </a>
+                                        <button data-id="{{ $item->id }}" class="btn btn-outline-danger btn-md mb-2">
                                             <i class="fa fa-trash-o"></i>
                                         </button>
                                     </div>
@@ -107,89 +122,6 @@ font-weight-bold
                     </table>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade zoom90" id="editDataModal" tabindex="-1" role="dialog" aria-labelledby="editDataModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header d-flex flex-row align-items-center justify-content-between">
-                <h5 class="modal-title" id="editDataModalLabel">Edit Data</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form method="post" enctype="multipart/form-data" action="{{ route('kpis.store') }}">
-                @csrf
-                <div class="modal-body mr-2 ml-2">
-                    <div class="row no-gutters">
-                        <div class="col-md-3 d-flex align-items-top justify-content-center" style="padding-top: 1em;">
-                            <img src="https://via.placeholder.com/50x50/5fa9f8/ffffff" style="height: 150px; width: 150px; border-radius: 15px;" class="card-img" alt="...">
-                        </div>
-                        <div class="col-md-9">
-                            <div class="card-body text-secondary">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Nama Ruangan :</p>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <input type="text" class="form-control" name="number" required>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Jumlah Kursi :</p>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <input type="number" class="form-control" name="date_released">
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Jumlah Meja :</p>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <input type="number" class="form-control" name="date_released">
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Jumlah Kelas :</p>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <input type="number" class="form-control" name="date_released">
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Jumlah Ruangan :</p>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <input type="number" class="form-control" name="date_released">
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Jumlah Simulator :</p>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <input type="number" class="form-control" name="date_released">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Submit Request</button>
-                </div>
-            </form>
         </div>
     </div>
 </div>
@@ -209,7 +141,7 @@ font-weight-bold
                     <div class="row no-gutters">
                         <div class="col-md-3 d-flex align-items-top justify-content-center text-center">
                             <label for="file-upload" style="cursor: pointer;">
-                                <img id="image-preview" src="https://via.placeholder.com/50x50/5fa9f8/ffffff"
+                                <img id="image-preview" src="https://via.placeholder.com/150x150/5fa9f8/ffffff"
                                      style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
                                      <small style="font-size: 10px;"><i><u>Click above to upload image!</u></i></small>
                             </label>
@@ -226,12 +158,24 @@ font-weight-bold
                                             <input type="text" class="form-control" name="nama_ruangan" required></input>
                                         </div>
                                     </div>
-                                    <div class="d-flex align-items-start">
+                                    <div class="d-flex align-items-center mb-4">
                                         <div style="width: 140px;" class="mr-2">
+                                            <p style="margin: 0;">Lokasi :</p>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <select class="form-control" name="location">
+                                                @foreach ($locations as $item)
+                                                    <option value="{{ $item->id }}">{{ $item->description }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-start">
+                                        <div style="width: 180px;" class="mr-2">
                                             <p style="margin: 0;">List Alat :</p>
                                         </div>
                                         <div class="flex-grow-1 textarea-container" id="documents-list-container">
-                                            <div class="document-item">
+                                            <div class="document-item mb-2">
                                                 <div class="row">
                                                     <div class="col-md-10">
                                                         <select class="form-control mb-2" name="tool[]" required>
@@ -241,7 +185,7 @@ font-weight-bold
                                                         </select>
                                                     </div>
                                                     <div class="col-md-2 p-0">
-                                                        <input type="text" class="form-control" name="amount[]" placeholder="Pcs" required></input>
+                                                        <input type="number" class="form-control" name="amount[]" placeholder="Pcs" required></input>
                                                     </div>
                                                 </div>
                                             </div>
@@ -281,7 +225,7 @@ font-weight-bold
             clonedDocumentItem.find("input[type=file]").val("");
 
             // Create a new container for the cloned document-item div
-            var clonedContainer = $("<div class='document-item'></div>").append(clonedDocumentItem.html());
+            var clonedContainer = $("<div class='document-item mb-2'></div>").append(clonedDocumentItem.html());
 
             // Append the new container to the container
             $("#documents-list-container").append(clonedContainer);
@@ -298,6 +242,42 @@ font-weight-bold
             // Hide the delete button if there's only one item left
             if ($(".document-item").length <= 1) {
                 $(".delete-document-list").hide();
+            }
+        });
+    });
+
+    $(document).on('click', '.btn-outline-danger', function() {
+        let id = $(this).data('id');
+        let url = "{{ route('delete.room', ':id') }}";
+        url = url.replace(':id', id);
+
+        swal({
+            title: "Are you sure?",
+            text: "Once deleted, you will not be able to recover this file!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then((willDelete) => {
+            if (willDelete) {
+                $.ajax({
+                    url: url,
+                    type: 'DELETE',
+                    data: {
+                        "_token": "{{ csrf_token() }}",
+                    },
+                    success: function(response) {
+                        swal("Poof! Your file has been deleted!", {
+                            icon: "success",
+                        }).then(() => {
+                            location.reload(); // Reload the page to reflect the changes
+                        });
+                    },
+                    error: function(response) {
+                        swal("An error occurred while deleting the item.", {
+                            icon: "error",
+                        });
+                    }
+                });
             }
         });
     });

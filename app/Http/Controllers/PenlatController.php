@@ -5,9 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Location;
 use App\Models\Penlat;
 use App\Models\Penlat_batch;
+use App\Models\Penlat_certificate;
 use App\Models\Penlat_requirement;
+use App\Models\Penlat_utility_usage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 use Yajra\DataTables\Facades\DataTables;
 
 class PenlatController extends Controller
@@ -33,21 +37,28 @@ class PenlatController extends Controller
             $data = $query->get();
 
             return DataTables::of($data)
-                ->addColumn('display', function($item) {
-                    return '<a href="#"><img src="' . asset($item->filepath) . '" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow"></a>';
-                })
-                ->addColumn('action', function($item) {
-                    return '<div>
-                                <a data-id="' . $item->id . '" href="#" class="btn btn-outline-secondary btn-md mb-2 mr-2 edit-tool" data-toggle="modal" data-target="#editDataModal">
-                                    <i class="fa fa-edit"></i>
-                                </a>
-                                <button class="btn btn-outline-danger btn-md mb-2">
-                                    <i class="fa fa-trash-o"></i>
-                                </button>
-                            </div>';
-                })
-                ->rawColumns(['display', 'action'])
-                ->make(true);
+            ->addColumn('display', function($item) {
+                $filePath = $item->filepath;
+                if($filePath){
+                    $imageUrl = asset($item->filepath);
+                } else {
+                    $imageUrl = asset('img/default-img.png');
+                }
+
+                return '<a href="#"><img src="' . $imageUrl . '" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow"></a>';
+            })
+            ->addColumn('action', function($item) {
+                return '<div>
+                            <a data-id="' . $item->id . '" href="#" class="btn btn-outline-secondary btn-md mb-2 mr-2 edit-tool" data-toggle="modal" data-target="#editDataModal">
+                                <i class="fa fa-edit"></i>
+                            </a>
+                            <button data-id="' . $item->id . '" class="btn btn-outline-danger btn-md mb-2">
+                                <i class="fa fa-trash-o"></i>
+                            </button>
+                        </div>';
+            })
+            ->rawColumns(['display', 'action'])
+            ->make(true);
         }
 
         $data = Penlat::all();
@@ -61,6 +72,12 @@ class PenlatController extends Controller
         $penlat = Penlat::whereIn('id', $getData)->get();
         $locations = Location::all();
         return view('operation.submenu.requirement_penlat', ['locations' => $locations, 'penlat' => $penlat, 'penlatList' => $penlatList]);
+    }
+
+    public function preview_requirement_penlat($penlatId)
+    {
+        $data = Penlat::findOrFail($penlatId);
+        return view('operation.submenu.requirement_preview', ['data' => $data]);
     }
 
     public function store(Request $request)
@@ -92,6 +109,109 @@ class PenlatController extends Controller
         $penlat->save();
 
         return redirect()->back()->with('success', 'Program data and image uploaded successfully.');
+    }
+
+    public function edit_requirement($id)
+    {
+        // Fetch the penlat with its related documents
+        $penlat = Penlat::with('requirement')->find($id);
+
+        // Check if penlat exists
+        if (!$penlat) {
+            return response()->json(['error' => 'Data not found'], 404);
+        }
+
+        // Return the data as JSON
+        return response()->json([
+            'penlat_id' => $penlat->id,
+            'documents' => $penlat->requirement->pluck('requirement')
+        ]);
+    }
+
+    public function update_requirement(Request $request)
+    {
+        // Validate the request
+        $request->validate([
+            'edit_penlat' => 'required',
+            'edit_documents' => 'required',
+            'edit_documents.*' => 'required',
+        ]);
+        $penlatId = $request->input('edit_penlat');
+        try {
+            // Check if the Penlat is used in the Penlat_batch table
+            $isRequirementExist = Penlat_requirement::where('penlat_id', $penlatId)->exists();
+
+            if (!$isRequirementExist) {
+                return response()->json(['error' => 'Requirement cannot be deleted because it is not found!'], 400);
+            }
+
+            $item = Penlat_requirement::where('penlat_id', $penlatId);
+            $item->delete();
+
+            $documents = $request->input('edit_documents');
+
+            // Loop through the documents and create a new record for each
+            foreach ($documents as $key => $document) {
+                Penlat_requirement::create([
+                    'penlat_id' => $request->edit_penlat,
+                    'requirement' => $document,
+                ]);
+            }
+
+            // Redirect back with a success message
+            return redirect()->back()->with('success', 'Requirements submitted successfully!');
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['error' => 'Record not found.'], 404);
+        } catch (\Exception $e) {
+            // Log the exception for debugging
+            Log::error('Failed to delete Penlat: ' . $e->getMessage());
+        }
+    }
+
+    public function delete_requirement($id)
+    {
+        try {
+            // Check if the Penlat is used in the Penlat_batch table
+            $isRequirementExist = Penlat_requirement::where('penlat_id', $id)->exists();
+
+            if (!$isRequirementExist) {
+                return response()->json(['error' => 'Requirement cannot be deleted because it is not found!'], 400);
+            }
+
+            $item = Penlat_requirement::where('penlat_id', $id);
+            $item->delete();
+
+            return response()->json(['success' => 'Record deleted successfully.'], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['error' => 'Record not found.'], 404);
+        } catch (\Exception $e) {
+            // Log the exception for debugging
+            Log::error('Failed to delete Penlat: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to delete record due to an unexpected error.'], 500);
+        }
+    }
+
+    public function delete_item_requirement($id)
+    {
+        try {
+            // Check if the Penlat is used in the Penlat_batch table
+            $isRequirementExist = Penlat_requirement::where('id', $id)->exists();
+
+            if (!$isRequirementExist) {
+                return response()->json(['error' => 'Requirement cannot be deleted because it is not found!'], 400);
+            }
+
+            $item = Penlat_requirement::where('id', $id);
+            $item->delete();
+
+            return redirect()->back()->with('success', 'Deleted Successfully.');
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['error' => 'Record not found.'], 404);
+        } catch (\Exception $e) {
+            // Log the exception for debugging
+            Log::error('Failed to delete Penlat: ' . $e->getMessage());
+            return redirect()->back()->with('success', 'Failed to delete record due to an unexpected error.');
+        }
     }
 
     public function edit($id)
@@ -141,6 +261,29 @@ class PenlatController extends Controller
         $penlat->save();
 
         return redirect()->back()->with('success', 'Program data updated successfully.');
+    }
+
+    public function delete($id)
+    {
+        try {
+            // Check if the Penlat is used in the Penlat_batch table
+            $isPenlatAssigned = Penlat_batch::where('penlat_id', $id)->exists();
+
+            if ($isPenlatAssigned) {
+                return response()->json(['error' => 'Penlat cannot be deleted because it is assigned to a batch!'], 400);
+            }
+
+            $penlat = Penlat::findOrFail($id);
+            $penlat->delete();
+
+            return response()->json(['success' => 'Record deleted successfully.'], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['error' => 'Record not found.'], 404);
+        } catch (\Exception $e) {
+            // Log the exception for debugging
+            Log::error('Failed to delete Penlat: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to delete record due to an unexpected error.'], 500);
+        }
     }
 
     public function requirement_store(Request $request)
@@ -201,7 +344,7 @@ class PenlatController extends Controller
                         <a data-id="' . $item->id . '" href="#" class="btn btn-outline-secondary btn-md mb-2 mr-2 edit-tool" data-toggle="modal" data-target="#editDataModal">
                             <i class="fa fa-edit"></i>
                         </a>
-                        <button class="btn btn-outline-danger btn-md mb-2">
+                        <button data-id="' . $item->id . '" class="btn btn-outline-danger btn-md mb-2">
                             <i class="fa fa-trash-o"></i>
                         </button>
                     ';
@@ -260,9 +403,87 @@ class PenlatController extends Controller
         }
     }
 
+    public function fetch_batch($id)
+    {
+        $penlat = Penlat_batch::findOrFail($id);
+
+        $penlatData = [
+            'id' => $penlat->id,
+            'penlat_id' => $penlat->penlat_id,
+            'nama_program' => $penlat->nama_program,
+            'batch' => $penlat->batch,
+            'date' => $penlat->date,
+            'image' => $penlat->filepath ? asset($penlat->filepath) : null,
+        ];
+
+        return response()->json($penlatData);
+    }
+
+    public function update_batch(Request $request, $id)
+    {
+        $validatedData = $request->validate([
+            'edit_penlat_id' => 'required',
+            'edit_nama_program' => 'required|string|max:255',
+            'edit_batch' => 'required',
+            'edit_tgl_pelaksanaan' => 'required',
+            'edit_display' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+        $penlat = Penlat_batch::findOrFail($id);
+        $penlat->penlat_id = $request->input('edit_penlat_id');
+        $penlat->nama_program = $request->input('edit_nama_program');
+        $penlat->batch = $request->input('edit_batch');
+        $penlat->date = $request->input('edit_tgl_pelaksanaan');
+
+        if ($request->hasFile('edit_display')) {
+            // Delete the old image if exists
+            if ($penlat->filepath) {
+                unlink(public_path($penlat->filepath));
+            }
+
+            $image = $request->file('edit_display');
+            $filename = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('uploads/penlat_utility'), $filename);
+            $penlat->filepath = 'uploads/penlat_utility/' . $filename;
+        }
+
+        $penlat->save();
+
+        return redirect()->back()->with('success', 'Program data updated successfully.');
+    }
+
+    public function delete_batch($id)
+    {
+        try {
+            // Check if the Penlat is used in the Penlat_batch table
+            $isPenlatAssigned = Penlat_utility_usage::where('penlat_batch_id', $id)->exists();
+            $isCertificatesExist = Penlat_certificate::where('penlat_batch_id', $id)->exists();
+
+            if ($isPenlatAssigned || $isCertificatesExist) {
+                return response()->json(['error' => 'Batch cannot be deleted because it is assigned to a functions!'], 400);
+            }
+
+            $penlat = Penlat_batch::findOrFail($id);
+            $penlat->delete();
+
+            return response()->json(['success' => 'Record deleted successfully.'], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['error' => 'Record not found.'], 404);
+        } catch (\Exception $e) {
+            // Log the exception for debugging
+            Log::error('Failed to delete Penlat: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to delete record due to an unexpected error.'], 500);
+        }
+    }
+
     public function preview_batch($id)
     {
         $data = Penlat_batch::find($id);
         return view('penlat.preview-batch', ['data' => $data]);
+    }
+
+    public function penlat_import()
+    {
+        return view('penlat.import-page');
     }
 }

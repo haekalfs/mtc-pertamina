@@ -46,7 +46,7 @@ Route::middleware(['suspicious'])->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('/api/chart-data', [OperationController::class, 'getChartData']);
+    Route::get('/api/chart-data/{year}', [OperationController::class, 'getChartData']);
     Route::get('/api/chart-data-profits/{year}', [FinanceController::class, 'getChartDataProfits']);
     //External User Registration
     Route::get('/user-registration', [RegistrationController::class, 'index'])->name('ext.register.user');
@@ -79,13 +79,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/akhlak-print/{userSelected}/{akhlakSelected}/{periodeSelected}', [AkhlakController::class, 'print'])->name('akhlak.print');
 
     //Operation
-    Route::get('/operation', [OperationController::class, 'index'])->name('operation');
+    Route::get('/operation-dashboard/{yearSelected?}', [OperationController::class, 'index'])->name('operation');
 
     //penlat
     Route::get('/penlat/list-pelatihan', [PenlatController::class, 'index'])->name('penlat');
+    Route::get('/penlat/list-pelatihan/import-data', [PenlatController::class, 'penlat_import'])->name('penlat-import');
+    Route::post('/import-list-penlat', [ImportController::class, 'import_penlat'])->name('penlat.import');
     Route::post('/store-penlat', [PenlatController::class, 'store'])->name('penlat.store');
     Route::get('/penlat/{id}/edit', [PenlatController::class, 'edit'])->name('penlat.edit');
     Route::put('/penlat-update/{id}', [PenlatController::class, 'update'])->name('penlat.update');
+    Route::delete('/penlat-delete/{id}', [PenlatController::class, 'delete'])->name('delete.penlat');
+
 
     //participant-infographics
     Route::get('/operation/participant-infographics', [OperationController::class, 'participant_infographics'])->name('participant-infographics');
@@ -101,25 +105,42 @@ Route::middleware('auth')->group(function () {
     Route::post('/store-asset', [InventoryToolController::class, 'store'])->name('asset.store');
     Route::get('/inventory-tools/{id}/edit', [InventoryToolController::class, 'edit']);
     Route::put('/inventory-tools/{id}', [InventoryToolController::class, 'update']);
+    Route::delete('/asset-delete/{id}', [InventoryToolController::class, 'delete_asset'])->name('delete.asset');
 
 
     //inventaris ruangan
     Route::get('/operation/room-inventory', [OperationController::class, 'room_inventory'])->name('room-inventory');
     Route::post('/store-room-inventory', [OperationController::class, 'room_inventory_store'])->name('room.store');
+    Route::post('/insert-item-to-room-inventory/{roomId}', [OperationController::class, 'room_inventory_insert_item'])->name('room.insert.item');
+    Route::delete('/room-delete/{id}', [OperationController::class, 'delete_room'])->name('delete.room');
+    Route::get('/operation/room-inventory/preview-item/{id}', [OperationController::class, 'preview_room'])->name('preview-room');
+    Route::get('/operation/room-inventory/preview-room/{id}', [OperationController::class, 'preview_room_user'])->name('preview-room-user');
+    Route::get('/room-item-delete/{id}', [OperationController::class, 'delete_item_room'])->name('delete.item.room');
+    Route::post('/room-data-update/{roomId}', [OperationController::class, 'update_room_data'])->name('room.data.update');
+    Route::put('/room-item-update/{id}', [OperationController::class, 'update_room_item'])->name('room.item.update');
 
     //Penlat Requirement
     Route::get('/penlat/tool-requirement-penlat', [PenlatController::class, 'tool_requirement_penlat'])->name('tool-requirement-penlat');
     Route::post('/store-penlat-requirement', [PenlatController::class, 'requirement_store'])->name('requirement.store');
+    Route::get('/penlat-requirement/{id}/edit', [PenlatController::class, 'edit_requirement'])->name('requirement.data');
+    Route::post('/penlat-requirement-update', [PenlatController::class, 'update_requirement'])->name('requirement.update');
+    Route::delete('/penlat-requirement-delete/{id}', [PenlatController::class, 'delete_requirement'])->name('delete.requirement');
+    Route::get('/penlat-item-requirement-delete/{id}', [PenlatController::class, 'delete_item_requirement'])->name('delete.item.requirement');
 
     //batch penlat
     Route::get('/penlat/list-batch', [PenlatController::class, 'batch'])->name('batch-penlat');
     Route::get('/penlat/list-batch/preview-batch/{id}', [PenlatController::class, 'preview_batch'])->name('preview-batch');
     Route::post('/store-batch-penlat', [PenlatController::class, 'batch_store'])->name('batch.store');
+    Route::get('/penlat-batch/{id}/edit', [PenlatController::class, 'fetch_batch'])->name('batch.data');
+    Route::put('/penlat-batch-update/{id}', [PenlatController::class, 'update_batch'])->name('batch.update');
+    Route::delete('/penlat-batch-delete/{id}', [PenlatController::class, 'delete_batch'])->name('delete.batch');
 
     //Operation
     Route::get('/operation/utility', [OperationController::class, 'utility'])->name('utility');
     Route::get('/operation/utility/preview-item/{id}', [OperationController::class, 'preview_utility'])->name('preview-utility');
     Route::post('/store-penlat-utility', [OperationController::class, 'utility_store'])->name('utility.store');
+    Route::put('/penlat-utility-update/{id}', [OperationController::class, 'update_utility_usage'])->name('utility.update');
+    Route::delete('/penlat-utility-usage-delete/{id}', [OperationController::class, 'delete_batch_usage'])->name('delete.usage');
 
 
     //Marketing
@@ -156,10 +177,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/store-certificates', [PDController::class, 'certificate_store'])->name('certificate.store');
     Route::post('/store-certificate-catalog', [PDController::class, 'certificate_catalog_store'])->name('certificate-catalog.store');
     Route::get('/planning-development/certificate/preview-item/{id}', [PDController::class, 'preview_certificate'])->name('preview-certificate');
+    Route::get('/planning-development/certificate/catalog-item/{id}', [PDController::class, 'preview_certificate_catalog'])->name('preview-certificate-catalog');
 
     Route::get('/planning-development/instructor', [PDController::class, 'instructor'])->name('instructor');
     Route::get('/planning-development/instructor-preview/{id}/{penlatId}', [PDController::class, 'preview_instructor'])->name('preview-instructor');
-    Route::get('/planning-development/instructor-register', [PDController::class, 'register_instructor'])->name('register-instructor');
+    Route::get('/planning-development/instructor-registration', [PDController::class, 'register_instructor'])->name('register-instructor');
+    Route::get('/planning-development/instructor-update-data/{instructorId}', [InstructorController::class, 'edit_instructor'])->name('edit-instructor');
+    Route::put('/planning-development/instructor-update/{instructorId}', [InstructorController::class, 'update'])->name('instructor.update');
     Route::post('/planning-development/instructor-store', [InstructorController::class, 'store'])->name('instructor.store');
 
     Route::get('/planning-development/training-reference', [PDController::class, 'training_reference'])->name('training-reference');

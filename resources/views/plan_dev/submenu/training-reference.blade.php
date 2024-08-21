@@ -168,7 +168,7 @@ font-weight-bold
                             <p style="margin: 0;">Nama Pelatihan :</p>
                         </div>
                         <div class="flex-grow-1">
-                            <select id="penlatSelect" class="form-control" name="penlat">
+                            <select id="penlatSelect" class="form-control select2" name="penlat">
                                 <option selected disabled>Select Pelatihan...</option>
                                 @foreach ($penlatList as $item)
                                 <option value="{{ $item->id }}">{{ $item->description }}</option>
@@ -209,6 +209,16 @@ font-weight-bold
     </div>
 </div>
 <script>
+    $(document).ready(function() {
+        // Initialize Select2
+        $('#penlatSelect').select2({
+            dropdownParent: $('#inputDataModal'),
+            theme: "classic",
+            placeholder: "Select Pelatihan...",
+            width: '100%',
+            tags: true,
+        });
+    });
     $(document).ready(function () {
         // Handle click event for the "Add More" button
         $(".add-document-list").on("click", function () {

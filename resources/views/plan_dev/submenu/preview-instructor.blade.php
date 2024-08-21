@@ -57,14 +57,14 @@ font-weight-bold
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> List Data</h6>
                 <div class="text-right">
-                    <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Update Data</a>
+                    <a class="btn btn-primary btn-sm text-white" href="{{ route('edit-instructor', $data->id) }}"><i class="menu-Logo fa fa-edit"></i> Update Data</a>
                 </div>
             </div>
             <div class="card-body text-secondary">
                 <div class="col-md-12 mb-3">
                     <div class="row">
                         <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding-left: 1em;">
-                            <img src="{{ asset($data->imgFilepath) }}" style="height: 200px; width: 170px; border-radius: 15px;" class="card-img" alt="...">
+                            <img src="{{ asset($data->imgFilepath) }}" style="height: 200px; width: 170px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
                         </div>
                         <div class="col-md-8">
                             <h4 class="mb-2 font-weight-bold"><i class="fa fa-user"></i> Profile Instruktur</h4>
@@ -80,7 +80,7 @@ font-weight-bold
                                 </tr>
                                 <tr>
                                     <th>Tanggal Lahir / Umur</th>
-                                    <td style="text-align: start; font-weight:500">: <span class="ml-2">{{ $data->instructor_dob }}</span></td>
+                                    <td style="text-align: start; font-weight:500">: <span class="ml-2">{{ $data->instructor_dob }} / {{ \Carbon\Carbon::parse($data->instructor_dob)->age}} Tahun</span></td>
                                 </tr>
                                 <tr>
                                     <th>Address</th>
@@ -138,6 +138,25 @@ font-weight-bold
                                                 <i class="ti-minus mr-2"></i>
                                                 <span class="badge text-white p-2 {{ $badgeColors[$index % count($badgeColors)] }}">
                                                     {{ $certificateItem->catalog->certificate_name }}
+                                                </span>
+                                                {{-- <span class="text-success"><i class="fa fa-check"></i></span> --}}
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </table>
+                            </div>
+                            <div class="ml-2">
+                                <table class="table table-borderless table-sm">
+                                    @php
+                                        $otherBadges = ['bg-secondary'];
+                                    @endphp
+
+                                    @foreach($remainingCerts as $index => $certs)
+                                        <tr>
+                                            <td class="mb-2">
+                                                <i class="ti-minus mr-2"></i>
+                                                <span class="badge text-white p-2 {{ $otherBadges[$index % count($otherBadges)] }}">
+                                                    {{ $certs->catalog->certificate_name }}
                                                 </span>
                                             </td>
                                         </tr>

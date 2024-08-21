@@ -230,6 +230,15 @@ class PDController extends Controller
         return view('plan_dev.submenu.preview-certificate', ['data' => $data]);
     }
 
+    public function preview_certificate_catalog($id)
+    {
+        $data = Certificates_catalog::find($id);
+        $data->total_issued = $data->holder->count();
+        $data->save();
+
+        return view('plan_dev.submenu.preview-certificate-catalog', ['data' => $data]);
+    }
+
     public function register_instructor()
     {
         $certificate = Certificates_catalog::all();
@@ -284,7 +293,9 @@ class PDController extends Controller
             ->with('catalog.relationOne.penlat')
             ->get();
 
-        return view('plan_dev.submenu.preview-instructor', ['data' => $data, 'certificateData' => $certificateData]);
+        $allCerts = Instructor_certificate::where('instructor_id', $id)->whereNotIn('certificates_catalog_id', $getData)->get();
+
+        return view('plan_dev.submenu.preview-instructor', ['data' => $data, 'certificateData' => $certificateData, 'remainingCerts' => $allCerts]);
     }
 
     public function references_store(Request $request)

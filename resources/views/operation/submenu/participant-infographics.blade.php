@@ -173,8 +173,8 @@ font-weight-bold
         </div>
     </div>
 </div>
-<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+<div class="modal fade zoom90" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 1000px;" role="document">
         <div class="modal-content">
 			<div class="modal-header d-flex flex-row align-items-center justify-content-between border-bottom-1">
                 <h5 class="modal-title" id="editModalLabel">Edit Participant</h5>
@@ -182,53 +182,110 @@ font-weight-bold
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
-                <form id="editForm">
-                    @csrf
+            <form id="editForm">
+                @csrf
+                <div class="modal-body mr-2 ml-2">
                     <input type="hidden" id="editId" name="id">
-                    <div class="form-group">
-                        <label for="editNamaPeserta">Nama Peserta</label>
-                        <input type="text" class="form-control" id="editNamaPeserta" name="nama_peserta" required>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Nama Peserta:</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="text" class="form-control" id="editNamaPeserta" name="nama_peserta" required>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Nama Program:</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="text" class="form-control" id="editNamaProgram" name="nama_program" required>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Tgl Pelaksanaan:</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="date" class="form-control" id="editTglPelaksanaan" name="tgl_pelaksanaan" required>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Tempat Pelaksanaan:</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="text" class="form-control" id="editTempatPelaksanaan" name="tempat_pelaksanaan" required>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Jenis Pelatihan:</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="text" class="form-control" id="editJenisPelatihan" name="jenis_pelatihan" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Keterangan:</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="text" class="form-control" id="editKeterangan" name="keterangan" required>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Subholding:</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="text" class="form-control" id="editSubholding" name="subholding" required>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Perusahaan:</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="text" class="form-control" id="editPerusahaan" name="perusahaan" required>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Kategori Program:</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="text" class="form-control" id="editKategoriProgram" name="kategori_program" required>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Realisasi:</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="text" class="form-control" id="editRealisasi" name="realisasi" required>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="editNamaProgram">Nama Program</label>
-                        <input type="text" class="form-control" id="editNamaProgram" name="nama_program" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editTglPelaksanaan">Tgl Pelaksanaan</label>
-                        <input type="date" class="form-control" id="editTglPelaksanaan" name="tgl_pelaksanaan" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editTempatPelaksanaan">Tempat Pelaksanaan</label>
-                        <input type="text" class="form-control" id="editTempatPelaksanaan" name="tempat_pelaksanaan" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editJenisPelatihan">Jenis Pelatihan</label>
-                        <input type="text" class="form-control" id="editJenisPelatihan" name="jenis_pelatihan" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editKeterangan">Keterangan</label>
-                        <input type="text" class="form-control" id="editKeterangan" name="keterangan" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editSubholding">Subholding</label>
-                        <input type="text" class="form-control" id="editSubholding" name="subholding" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editPerusahaan">Perusahaan</label>
-                        <input type="text" class="form-control" id="editPerusahaan" name="perusahaan" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editKategoriProgram">Kategori Program</label>
-                        <input type="text" class="form-control" id="editKategoriProgram" name="kategori_program" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editRealise">Realisasi</label>
-                        <input type="text" class="form-control" id="editRealisasi" name="realisasi" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Save changes</button>
-                </form>
-            </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Submit Request</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -299,16 +356,7 @@ $(document).ready(function() {
             method: 'PUT',
             data: $(this).serialize(),
             success: function(response) {
-                $('#participant-' + id + ' td:nth-child(1)').text(response.nama_peserta);
-                $('#participant-' + id + ' td:nth-child(2)').text(response.nama_program);
-                $('#participant-' + id + ' td:nth-child(3)').text(response.tgl_pelaksanaan);
-                $('#participant-' + id + ' td:nth-child(4)').text(response.tempat_pelaksanaan);
-                $('#participant-' + id + ' td:nth-child(5)').text(response.jenis_pelatihan);
-                $('#participant-' + id + ' td:nth-child(6)').text(response.keterangan);
-                $('#participant-' + id + ' td:nth-child(7)').text(response.subholding);
-                $('#participant-' + id + ' td:nth-child(8)').text(response.perusahaan);
-                $('#participant-' + id + ' td:nth-child(9)').text(response.kategori_program);
-                $('#participant-' + id + ' td:nth-child(10)').text(response.realisasi);
+                table.draw(); // Redraw the table
                 $('#editModal').modal('hide');
                 $('.alert-success-saving-mid').show();
                 $('.overlay-mid').show();
@@ -316,7 +364,6 @@ $(document).ready(function() {
                 setTimeout(function() {
                     $('.alert-success-saving-mid').fadeOut('slow');
                     $('.overlay-mid').fadeOut('slow');
-                    window.location.reload();
                 }, 1000);
             }
         });

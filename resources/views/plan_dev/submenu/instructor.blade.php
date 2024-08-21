@@ -120,25 +120,31 @@ font-weight-bold
                                     <td>
                                         <div class="card custom-card mb-3 bg-white shadow-none" style="border: 3px solid rgb(228, 228, 228);">
                                             <div class="row no-gutters">
-                                                <div class="col-md-2 d-flex align-items-center justify-content-center" style="padding: 1.2em;">
-                                                    <img src="{{ asset($item->imgFilepath) }}" style="height: 150px; width: 120px;" alt="" class="img-fluid d-none d-md-block rounded">
+                                                <div class="col-md-2 d-flex align-items-center justify-content-center animateBox" style="padding: 1.2em;">
+                                                    <a href="{{ route('preview-instructor', ['id' => $item->id, 'penlatId' => $penlatId]) }}">
+                                                        <img src="{{ asset($item->imgFilepath) }}" style="height: 150px; width: 120px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
+                                                    </a>
                                                 </div>
                                                 <div class="col-md-8 mt-2">
                                                     <div class="card-body text-secondary p-2">
-                                                        <h5 class="card-title font-weight-bold mb-1">{{ $item->instructor_name }}</h5>
+                                                        <h5 class="card-title font-weight-bold mb-1 mt-2">{{ $item->instructor_name }}</h5>
                                                         <div class="ml-2">
-                                                            <table class="table table-borderless table-sm mb-0">
-                                                                <tr>
-                                                                    <td style="width: 180px;"><i class="ti-minus mr-2"></i> Avg Nilai Feedback</td>
-                                                                    <td style="text-align: start;">:</td>
-                                                                </tr>
+                                                            <table class="table table-borderless table-sm mb-0 mt-2">
                                                                 <tr>
                                                                     <td style="width: 180px;"><i class="ti-minus mr-2"></i> Email</td>
                                                                     <td style="text-align: start;">: {{ $item->instructor_email }}</td>
                                                                 </tr>
                                                                 <tr>
                                                                     <td><i class="ti-minus mr-2"></i> Umur</td>
-                                                                    <td style="text-align: start;">: {{ $item->instructor_dob }}</td>
+                                                                    <td style="text-align: start;">: {{ \Carbon\Carbon::parse($item->instructor_dob)->age}} Tahun</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td><i class="ti-minus mr-2"></i> Jam Mengajar</td>
+                                                                    <td style="text-align: start;">: {{ $item->working_hours }}</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td style="width: 180px;"><i class="ti-minus mr-2"></i> Avg Nilai Feedback</td>
+                                                                    <td style="text-align: start;">:</td>
                                                                 </tr>
                                                             </table>
                                                         </div>

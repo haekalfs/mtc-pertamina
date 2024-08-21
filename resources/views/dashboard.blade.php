@@ -12,76 +12,84 @@ active font-weight-bold
 <div class="animated fadeIn">
     <!-- Widgets  -->
     <div class="row">
-        <div class="col-lg-3 col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <div class="stat-widget-five">
-                        <div class="stat-icon dib flat-color-1">
-                            <i class="ti-cup"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="text-left dib">
-                                <div class="stat-text"><span class="count">{{ $getPesertaCount }}</span></div>
-                                <div class="stat-heading">Realisasi Peserta</div>
+        <div class="col-lg-3 col-md-6 animateBox">
+            <a href="{{ route('participant-infographics') }}" class="clickable-card">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon dib flat-color-1">
+                                <i class="ti-cup"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="text-left dib">
+                                    <div class="stat-text"><span class="count">{{ $getPesertaCount }}</span></div>
+                                    <div class="stat-heading">Realisasi Peserta</div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
 
-        <div class="col-lg-3 col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <div class="stat-widget-five">
-                        <div class="stat-icon dib flat-color-2">
-                            <i class="ti-camera"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="text-left dib">
-                                <div class="stat-text"><span class="count">{{ $countCampaign }}</span></div>
-                                <div class="stat-heading">Event Campaign</div>
+        <div class="col-lg-3 col-md-6 animateBox">
+            <a href="{{ route('marketing-campaign') }}" class="clickable-card">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon dib flat-color-2">
+                                <i class="ti-camera"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="text-left dib">
+                                    <div class="stat-text"><span class="count">{{ $countCampaign }}</span></div>
+                                    <div class="stat-heading">Event Campaign</div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
 
-        <div class="col-lg-3 col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <div class="stat-widget-five">
-                        <div class="stat-icon dib flat-color-3">
-                            <i class="pe-7s-browser"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="text-left dib">
-                                <div class="stat-text"><span class="count">0</span></div>
-                                <div class="stat-heading">Rekap Feedback</div>
+        <div class="col-lg-3 col-md-6 animateBox">
+            <a href="#" class="clickable-card">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon dib flat-color-3">
+                                <i class="pe-7s-browser"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="text-left dib">
+                                    <div class="stat-text"><span class="count">0</span></div>
+                                    <div class="stat-heading">Rekap Feedback</div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
 
-        <div class="col-lg-3 col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <div class="stat-widget-five">
-                        <div class="stat-icon dib flat-color-4">
-                            <i class="pe-7s-cash"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="text-left dib">
-                                <div class="h6"><span>{{ number_format($rawProfits, 0, ',', '.') }}</span></div>
-                                <div class="stat-heading">Raw Profits MTC</div>
+        <div class="col-lg-3 col-md-6 animateBox">
+            <a href="{{ route('cost') }}" class="clickable-card">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon dib flat-color-4">
+                                <i class="pe-7s-cash"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="text-left dib">
+                                    <div class="h6"><span>{{ number_format($rawProfits, 0, ',', '.') }}</span></div>
+                                    <div class="stat-heading">Raw Profits MTC</div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
     </div>
     <!-- /Widgets -->
@@ -163,7 +171,8 @@ active font-weight-bold
 <script>
 window.onload = function() {
     loadChartData();
-    fetch('/api/chart-data')
+    var selectedOption = "{{ date('Y') }}";
+    fetch('/api/chart-data/' + selectedOption) // Fixed concatenation
         .then(response => response.json())
         .then(data => {
             // Convert data for Chart.js

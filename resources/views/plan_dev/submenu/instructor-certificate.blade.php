@@ -132,7 +132,7 @@ font-weight-bold
                                 <td>{{ $item->keterangan }}</td>
                                 <td>{{ $item->total_issued }}</td>
                                 <td class="text-center">
-                                    <a class="btn btn-outline-secondary btn-sm" href="{{ route('preview-certificate', $item->id) }}"><i class="menu-Logo fa fa-eye"></i> Action</a>
+                                    <a class="btn btn-outline-secondary btn-sm" href="{{ route('preview-certificate-catalog', $item->id) }}"><i class="menu-Logo fa fa-eye"></i> View</a>
                                 </td>
                             </tr>
                             @endforeach

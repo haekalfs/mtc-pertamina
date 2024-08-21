@@ -75,72 +75,47 @@ font-weight-bold
                     </div>
                 </div>
                 <div class="card-body zoom90">
-                    <form method="GET" action="{{ route('utility') }}">
-                        @csrf
-                        <div class="row d-flex justify-content-start mb-4">
-                            <div class="col-md-12">
-                                <div class="row align-items-center">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="email">Nama Pelatihan :</label>
-                                            <select class="custom-select" id="namaPenlat" name="namaPenlat">
-                                                <option value="1" selected>Show All</option>
-                                                @foreach ($penlatList as $item)
-                                                <option value="{{ $item->id }}">{{ $item->description }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
+                    <div class="row d-flex justify-content-start mb-4">
+                        <div class="col-md-12">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="namaPenlat">Nama Pelatihan :</label>
+                                        <select class="custom-select" id="namaPenlat" name="namaPenlat">
+                                            <option value="-1">Show All</option>
+                                            @foreach ($penlatList as $item)
+                                            <option value="{{ $item->id }}">{{ $item->description }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
-                                    <div class="col-md-5">
-                                        <div class="form-group">
-                                            <label for="position_id">Batch :</label>
-                                            <select name="stcw" class="form-control" id="stcw">
-                                                <option value="1">Show All</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-1 d-flex align-self-end justify-content-start">
-                                        <div class="form-group">
-                                            <div class="align-self-center">
-                                                <button type="submit" class="btn btn-primary" style="padding-left: 1.2em; padding-right: 1.2em;"><i class="ti-search"></i></button>
-                                            </div>
-                                        </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="batch">Batch :</label>
+                                        <select name="batch" class="form-control" id="batch">
+                                            <option value="-1">Show All</option>
+                                            @foreach ($batchList as $item)
+                                            <option value="{{ $item->id }}">{{ $item->batch }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </form>
-                    <table id="docLetter" class="table table-bordered">
+                    </div>
+
+                    <table id="listUsages" class="table table-bordered">
                         <thead class="bg-secondary text-white">
                             <tr>
-                                <th>Display</th>
+                                <th style="width: 100px;">Display</th>
                                 <th>Pelatihan</th>
                                 @foreach($utilities as $tool)
-                                    <th>{{ $tool->utility_name }} ({{$tool->utility_unit}})</th>
+                                    <th>{{ $tool->utility_name }} ({{ $tool->utility_unit }})</th>
                                 @endforeach
                                 <th>Batch</th>
                                 <th>Date</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @foreach($data as $item)
-                            <tr>
-                                <td class="text-center  d-flex flex-row align-items-center justify-content-center">
-                                    <a href="{{ route('preview-utility', $item->id) }}"><img src="{{ $item->filepath ? asset($item->filepath) : 'https://via.placeholder.com/50x50/5fa9f8/ffffff' }}" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow "></a>
-                                </td>
-                                <td>{{ $item->penlat->description }}</td>
-                                @foreach($utilities as $tool)
-                                    @php
-                                        // Find the matching utility record for the current tool
-                                        $utility = $item->penlat_usage->firstWhere('utility_id', $tool->id);
-                                    @endphp
-                                    <td class="text-center">{{ $utility ? $utility->amount : '-' }}</td> <!-- Assuming 'value' column in penlat_utilities -->
-                                @endforeach
-                                <td class="text-center font-weight-bold">{{ $item->batch }}</td>
-                                <td>{{ $item->date }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
                     </table>
                 </div>
             </div>
@@ -175,10 +150,10 @@ font-weight-bold
                                     <p style="margin: 0;">Nama Pelatihan :</p>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <select id="penlatSelect" class="form-control" name="penlat">
+                                    <select id="penlatSelect" class="form-control select2" name="penlat">
                                         <option selected disabled>Select Pelatihan...</option>
                                         @foreach ($penlatList as $item)
-                                        <option value="{{ $item->id }}">{{ $item->description }}</option>
+                                            <option value="{{ $item->id }}">{{ $item->description }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -266,6 +241,50 @@ font-weight-bold
     });
 </script>
 <script>
+    $(document).ready(function() {
+    $('#listUsages').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: "{{ route('utility') }}",
+            data: function (d) {
+                d.namaPenlat = $('#namaPenlat').val();
+                d.stcw = $('#batch').val();
+            }
+        },
+        columns: [
+            { data: 'image', name: 'image', orderable: false, searchable: false },
+            { data: 'description', name: 'penlat.description' },
+            @foreach($utilities as $tool)
+                { data: 'utilities.utility_{{ $tool->id }}', name: '{{ $tool->id }}' },
+            @endforeach
+            { data: 'batch', name: 'batch' },
+            { data: 'date', name: 'date' }
+        ]
+    });
+
+    $('#namaPenlat, #batch').change(function() {
+        $('#listUsages').DataTable().draw();
+    });
+});
+
+$(document).ready(function() {
+    // Initialize Select2
+    $('#penlatSelect').select2({
+        dropdownParent: $('#inputDataModal'),
+        theme: "classic",
+        placeholder: "Select Pelatihan...",
+        width: '100%',
+        tags: true,
+    });
+
+    // Event listener for change event
+    $('#penlatSelect').on('change', function() {
+        var selectedOption = $(this).find('option:selected').text();
+        $('#programInput').val(selectedOption);
+    });
+});
+
 $(document).ready(function() {
     $('#mySelect2').select2({
         dropdownParent: $('#inputDataModal'),

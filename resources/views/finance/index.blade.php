@@ -29,7 +29,7 @@ font-weight-bold
 <div class="animated fadeIn">
     <div class="row">
         <!-- Earnings (Monthly) Card Example -->
-        <div class="col-xl-4 col-md-6 timesheet">
+        <div class="col-xl-4 col-md-6 animateBox">
             <a href="{{ route('cost') }}" class="clickable-card">
                 <div class="card border-left-primary shadow py-2">
                     <div class="card-body">
@@ -49,7 +49,7 @@ font-weight-bold
         </div>
 
         <!-- Earnings (Monthly) Card Example -->
-        <div class="col-xl-4 col-md-6 medical">
+        <div class="col-xl-4 col-md-6 animateBox">
             <a href="{{ route('cost') }}" class="clickable-card">
                 <div class="card border-left-danger shadow py-2">
                     <div class="card-body">
@@ -70,7 +70,7 @@ font-weight-bold
         </div>
 
         <!-- Earnings (Monthly) Card Example -->
-        <div class="col-xl-4 col-md-6 reimburse">
+        <div class="col-xl-4 col-md-6 animateBox">
             <a href="{{ route('cost') }}" class="clickable-card">
                 <div class="card border-left-success shadow py-2">
                     <div class="card-body">

@@ -2,8 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Models\Infografis_peserta;
-use Carbon\Carbon;
+use App\Models\Penlat;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -13,7 +12,7 @@ use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
 
-class ImportParticipantInfographics implements ShouldQueue
+class ImportPenlat implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -54,30 +53,19 @@ class ImportParticipantInfographics implements ShouldQueue
 
             // Skip the header row
             fgetcsv($handle);
+            fgetcsv($handle);
 
             // Loop through the rows and save the data to the database
             while (($row = fgetcsv($handle)) !== FALSE) {
-                if (empty($row[2]) || empty($row[11]) || empty($row[12]) || empty($row[13]) || empty($row[14])) {
+                if (empty($row[60])) {
                     continue; // Skip rows with empty required fields
                 }
 
-                // Additional validation if needed
-                if (strlen($row[2]) > 255 || !is_string($row[2])) {
-                    continue; // Skip invalid entries
-                }
-
-                Infografis_peserta::create([
-                    'nama_peserta' => $row[2],
-                    'nama_program' => $row[11],
-                    'batch' => $row[10],
-                    'tgl_pelaksanaan' => Carbon::createFromFormat('j-M-y', $row[12])->format('Y-m-d'),
-                    'tempat_pelaksanaan' => $row[13],
-                    'jenis_pelatihan' => $row[14],
-                    'keterangan' => $row[16],
-                    'subholding' => $row[17],
-                    'perusahaan' => $row[18],
-                    'kategori_program' => $row[19],
-                    'realisasi' => $row[20],
+                Penlat::create([
+                    'description' => $row[60],
+                    'alias' => $row[68],
+                    'jenis_pelatihan' => $row[69],
+                    'kategori_pelatihan' => $row[70],
                 ]);
             }
 

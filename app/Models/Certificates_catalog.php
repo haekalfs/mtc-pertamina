@@ -15,4 +15,9 @@ class Certificates_catalog extends Model
     {
         return $this->hasMany('App\Models\Certificates_to_penlat', 'certificates_catalog_id', 'id');
     }
+
+    public function holder()
+    {
+        return $this->hasMany('App\Models\Instructor_certificate', 'certificates_catalog_id', 'id');
+    }
 }

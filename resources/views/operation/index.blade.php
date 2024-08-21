@@ -19,12 +19,17 @@ font-weight-bold
         <p class="mb-4">Dashboard Operation.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
+        <select class="form-control" id="yearSelected" name="yearSelected" required onchange="redirectToPage()" style="width: 100px;">
+            @foreach (array_reverse($yearsBefore) as $year)
+                <option value="{{ $year }}" {{ $year == $yearSelected ? 'selected' : '' }}>{{ $year }}</option>
+            @endforeach
+        </select>
     </div>
 </div>
 <div class="animated fadeIn" id="mainContainer">
     <div class="row">
         <!-- Earnings (Monthly) Card Example -->
-        <div class="col-xl-4 col-md-6 timesheet">
+        <div class="col-xl-4 col-md-6 animateBox">
             <a href="{{ route('participant-infographics') }}" class="clickable-card">
                 <div class="card border-left-primary shadow py-2">
                     <div class="card-body">
@@ -44,7 +49,7 @@ font-weight-bold
         </div>
 
         <!-- Earnings (Monthly) Card Example -->
-        <div class="col-xl-4 col-md-6 medical">
+        <div class="col-xl-4 col-md-6 animateBox">
             <a href="{{ route('tool-inventory') }}" class="clickable-card">
                 <div class="card border-left-success shadow py-2">
                     <div class="card-body">
@@ -64,7 +69,7 @@ font-weight-bold
         </div>
 
         <!-- Earnings (Monthly) Card Example -->
-        <div class="col-xl-4 col-md-6 reimburse">
+        <div class="col-xl-4 col-md-6 animateBox">
             <a href="{{ route('tool-requirement-penlat') }}" class="clickable-card">
                 <div class="card border-left-info shadow py-2">
                     <div class="card-body">
@@ -130,7 +135,8 @@ font-weight-bold
 </div>
 <script>
 window.onload = function() {
-    fetch('/api/chart-data')
+    var selectedOption = document.getElementById("yearSelected").value;
+    fetch('/api/chart-data/' + selectedOption) // Fixed concatenation
         .then(response => response.json())
         .then(data => {
             // Convert data for Chart.js
@@ -236,6 +242,11 @@ window.onload = function() {
             });
             chart.render();
         });
+}
+function redirectToPage() {
+    var selectedOption = document.getElementById("yearSelected").value;
+    var url = "{{ url('/operation-dashboard') }}" + "/" + selectedOption;
+    window.location.href = url; // Redirect to the desired page
 }
 </script>
 @endsection

@@ -13,39 +13,6 @@ font-weight-bold
 @endsection
 
 @section('content')
-<style>
-    .border-left-primary {
-      border-left: 0.25rem solid #4e73df !important;
-    }
-
-    .border-bottom-primary {
-      border-bottom: 0.25rem solid #4e73df !important;
-    }
-
-    .border-left-secondary {
-      border-left: 0.25rem solid #858796 !important;
-    }
-
-    .border-bottom-secondary {
-      border-bottom: 0.25rem solid #858796 !important;
-    }
-
-    .border-left-success {
-      border-left: 0.25rem solid #1cc88a !important;
-    }
-
-    .border-bottom-success {
-      border-bottom: 0.25rem solid #1cc88a !important;
-    }
-
-    .border-left-info {
-      border-left: 0.25rem solid #36b9cc !important;
-    }
-
-    .border-bottom-info {
-      border-bottom: 0.25rem solid #36b9cc !important;
-    }
-</style>
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
         <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="menu-icon fa fa-suitcase"></i> Dashboard Marketing</h1>
@@ -57,7 +24,7 @@ font-weight-bold
 <div class="animated fadeIn">
     <div class="row">
         <!-- Earnings (Monthly) Card Example -->
-        <div class="col-xl-4 col-md-6 timesheet">
+        <div class="col-xl-4 col-md-6 animateBox">
             <a href="{{ route('marketing-campaign') }}" class="clickable-card">
                 <div class="card border-left-primary shadow py-2">
                     <div class="card-body">
@@ -77,7 +44,7 @@ font-weight-bold
         </div>
 
         <!-- Earnings (Monthly) Card Example -->
-        <div class="col-xl-4 col-md-6 medical">
+        <div class="col-xl-4 col-md-6 animateBox">
             <a href="" class="clickable-card">
                 <div class="card border-left-success shadow py-2">
                     <div class="card-body">
@@ -96,7 +63,7 @@ font-weight-bold
         </div>
 
         <!-- Earnings (Monthly) Card Example -->
-        <div class="col-xl-4 col-md-6 reimburse">
+        <div class="col-xl-4 col-md-6 animateBox">
             <a href="{{ route('company-agreement') }}" class="clickable-card">
                 <div class="card border-left-info shadow py-2">
                     <div class="card-body">

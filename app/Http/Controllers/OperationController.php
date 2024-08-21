@@ -17,31 +17,40 @@ use App\Models\Utility;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 
 class OperationController extends Controller
 {
-    public function index()
+    public function index($yearSelected = null)
     {
+        $nowYear = date('Y');
+        $yearsBefore = range($nowYear - 4, $nowYear);
+
+        // Set the selected year
+        $yearSelected = $yearSelected ?? $nowYear;
+
         $getPesertaCount = Infografis_peserta::count();
         $getKebutuhanCount = Penlat_requirement::count();
         $getAssetCount = Inventory_tools::count();
         $getAssetStock = Inventory_tools::sum('initial_stock');
 
-        return view('operation.index', compact('getPesertaCount', 'getKebutuhanCount', 'getAssetCount', 'getAssetStock'));
+        return view('operation.index', compact('getPesertaCount', 'getKebutuhanCount', 'getAssetCount', 'getAssetStock', 'yearsBefore', 'yearSelected'));
     }
 
-    public function getChartData()
+    public function getChartData($year)
     {
-        $data = Penlat_batch::select('penlat_batch.id', 'penlat_batch.nama_program', 'penlat_batch.batch', DB::raw('SUM(penlat_utility_usage.amount) as total_usage'))
+        // Filter data by the specified year in 'tgl_pelaksanaan' column
+        $dataBatch = Penlat_batch::select('penlat_batch.id', 'penlat_batch.nama_program', 'penlat_batch.batch', DB::raw('SUM(penlat_utility_usage.amount) as total_usage'))
             ->join('penlat_utility_usage', 'penlat_batch.id', '=', 'penlat_utility_usage.penlat_batch_id')
+            ->whereYear('penlat_batch.date', $year)
             ->groupBy('penlat_batch.id', 'penlat_batch.nama_program', 'penlat_batch.batch')
             ->orderBy('total_usage', 'DESC')
             ->get();
 
         $mostUsedUtility = [];
-        foreach ($data as $row) {
+        foreach ($dataBatch as $row) {
             $mostUsedUtility[] = [
                 "label" => $row->batch,
                 "y" => $row->total_usage
@@ -50,12 +59,14 @@ class OperationController extends Controller
 
         // Fetch and group the data by nama_program, counting the number of participants
         $data = Infografis_peserta::select('nama_program', DB::raw('count(*) as total'))
+            ->whereYear('tgl_pelaksanaan', $year)
             ->groupBy('nama_program')
-            ->having('total', '>', 500) // Only include categories with more than 10 participants
+            ->having('total', '>', 500) // Only include categories with more than 500 participants
             ->get();
 
         // Calculate the count of participants not included in the main categories
-        $otherCount = Infografis_peserta::whereNotIn('nama_program', $data->pluck('nama_program'))
+        $otherCount = Infografis_peserta::whereYear('tgl_pelaksanaan', $year)
+            ->whereNotIn('nama_program', $data->pluck('nama_program'))
             ->count();
 
         // If there are other categories, add them as "Others"
@@ -68,6 +79,7 @@ class OperationController extends Controller
 
         // Fetch data by date for the spline chart
         $dataByDate = Infografis_peserta::select('tgl_pelaksanaan', DB::raw('count(*) as total'))
+            ->whereYear('tgl_pelaksanaan', $year)
             ->groupBy('tgl_pelaksanaan')
             ->get();
 
@@ -276,12 +288,34 @@ class OperationController extends Controller
         return redirect()->back()->with('success', 'Penlat utility data saved successfully!');
     }
 
+    public function delete_batch_usage($id)
+    {
+        try {
+            // Check if the Penlat is used in the Penlat_batch table
+            $isExist = Penlat_utility_usage::where('penlat_batch_id', $id)->exists();
+
+            if (!$isExist) {
+                return response()->json(['status' => 'failed', 'message' => 'Cannot be deleted because it is not found!']);
+            }
+
+            $usages = Penlat_utility_usage::where('penlat_batch_id', $id);
+            $usages->delete();
+
+            return response()->json(['status' => 'success', 'message' => 'Penlat utility data deleted successfully!']);
+        } catch (\Exception $e) {
+            // Log the exception for debugging
+            Log::error('Failed to delete Penlat: ' . $e->getMessage());
+            return response()->json(['status' => 'failed', 'message' => 'Failed to delete record due to an unexpected error!']);
+        }
+    }
+
     public function room_inventory_store(Request $request)
     {
         // Validate the request
         $validated = $request->validate([
             'nama_ruangan' => 'required',
             'room_image' => 'nullable',
+            'location' => 'required',
             'tool.*' => 'required',
             'amount.*' => 'required',
         ]);
@@ -298,6 +332,7 @@ class OperationController extends Controller
         // Create the inventory room entry
         $inventoryRoom = Room::create([
             'room_name' => $validated['nama_ruangan'],
+            'location_id' => $validated['location'],
             'filepath' => $imagePath,
         ]);
 
@@ -311,6 +346,26 @@ class OperationController extends Controller
         }
 
         return redirect()->route('room-inventory')->with('success', 'Room inventory saved successfully!');
+    }
+
+    public function room_inventory_insert_item(Request $request, $roomId)
+    {
+        // Validate the request
+        $validated = $request->validate([
+            'tool.*' => 'required',
+            'amount.*' => 'required',
+        ]);
+
+         // Save the tools associated with this room
+        foreach ($validated['tool'] as $key => $toolId) {
+            Inventory_room::create([
+                'room_id' => $roomId,
+                'inventory_tool_id' => $toolId,
+                'amount' => $validated['amount'][$key],
+            ]);
+        }
+
+        return redirect()->route('preview-room', $roomId)->with('success', 'Room inventory saved successfully!');
     }
 
     public function tool_inventory()
@@ -335,22 +390,251 @@ class OperationController extends Controller
         return view('operation.submenu.room_inventory', ['assets' => $assets, 'locations' => $locations, 'rooms' => $rooms]);
     }
 
-    public function utility()
+    public function utility(Request $request)
     {
+        if ($request->ajax()) {
+
+            $validateData = Penlat_utility_usage::groupBy('penlat_batch_id')->pluck('penlat_batch_id')->toArray();
+
+            $data = Penlat_batch::whereIn('id', $validateData);
+
+            // Apply filters based on the selected values from the dropdowns
+            if ($request->namaPenlat && $request->namaPenlat != '-1') {
+                $data->where('penlat_id', $request->namaPenlat);
+            }
+
+            if ($request->batch && $request->batch != '-1') {
+                $data->where('batch', $request->stcw);
+            }
+
+            $query = $data->with(['penlat', 'penlat_usage'])
+            ->select('penlat_batch.*');
+
+            $utilities = Utility::all();
+
+            return DataTables::of($query)
+                ->addColumn('image', function($item) {
+                    $imageUrl = $item->filepath ? asset($item->filepath) : 'https://via.placeholder.com/50x50/5fa9f8/ffffff';
+                    return '<a href="'.route('preview-utility', $item->id).'"><img src="'.$imageUrl.'" style="height: 100px; width: 100px;" alt="" class="img-fluid rounded mb-2 shadow animateBox"></a>';
+                })
+                ->addColumn('description', function($item) {
+                    return $item->penlat->description;
+                })
+                ->addColumn('utilities', function($item) use ($utilities) {
+                    $utilityData = [];
+                    foreach ($utilities as $tool) {
+                        $utility = $item->penlat_usage->firstWhere('utility_id', $tool->id);
+                        $utilityData['utility_'.$tool->id] = $utility ? $utility->amount : '-';
+                    }
+                    return $utilityData;
+                })
+                ->addColumn('batch', function($item) {
+                    return '<span class="font-weight-bold text-center">' . $item->batch . '</span>';
+                })
+                ->addColumn('date', function($item) {
+                    return $item->date;
+                })
+                ->rawColumns(['image', 'batch'])
+                ->make(true);
+        }
+
         $penlatList = Penlat::all();
-
-        $validateData = Penlat_utility_usage::groupBy('penlat_batch_id')->pluck('penlat_batch_id')->toArray();
-        $data = Penlat_batch::whereIn('id', $validateData)->get();
-
         $batchList = Penlat_batch::all();
-
         $utility = Utility::all();
-        return view('operation.submenu.utility', ['data' => $data, 'utilities' => $utility, 'penlatList' => $penlatList, 'batchList' => $batchList]);
+
+        return view('operation.submenu.utility', [
+            'penlatList' => $penlatList,
+            'batchList' => $batchList,
+            'utilities' => $utility
+        ]);
     }
 
     public function preview_utility($id)
     {
         $utility = Penlat_batch::find($id);
         return view('operation.submenu.preview-utility', ['data' => $utility]);
+    }
+
+    public function update_utility_usage(Request $request, $id)
+    {
+        // Retrieve the penlat_usage record by ID
+        $penlatUsage = Penlat_utility_usage::findOrFail($id);
+
+        // Validate and update the amount
+        $request->validate([
+            'amount' => 'required|numeric|min:0'
+        ]);
+
+
+        if ($penlatUsage) {
+            $penlatUsage->amount = $request->input('amount');
+            $penlatUsage->save();
+
+            return response()->json(['message' => 'Utility usage updated successfully.'], 200);
+        } else {
+            return response()->json(['message' => 'Utility not found.'], 404);
+        }
+    }
+
+    public function fetch_room_data($id)
+    {
+        // Fetch the room with its related tools and amount
+        $inventoryRoom = Room::with('list.tools')->find($id);
+
+        // Check if room exists
+        if (!$inventoryRoom) {
+            return response()->json(['error' => 'Data not found'], 404);
+        }
+
+        // Prepare data to return
+        $tools = [];
+        $amounts = [];
+        foreach ($inventoryRoom->list as $listItem) {
+            foreach ($listItem->tools as $tool) {
+                $tools[] = $tool->inventory_tool_id;
+                $amounts[] = $tool->amount;
+            }
+        }
+
+        // Return the data as JSON
+        return response()->json([
+            'room_name' => $inventoryRoom->room_name,
+            'tools' => $tools,
+            'amount' => $amounts
+        ]);
+    }
+
+    public function delete_room($id)
+    {
+        try {
+            // Find the room by ID
+            $room = Room::with('list')->find($id);
+
+            // Check if the room exists
+            if (!$room) {
+                return response()->json(['error' => 'Requirement cannot be deleted because it is not found!'], 400);
+            }
+
+            // Delete the related list items
+            $room->list()->delete();
+
+            // Delete the room itself
+            $room->delete();
+
+            return response()->json(['success' => 'Record deleted successfully.'], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['error' => 'Record not found.'], 404);
+        } catch (\Exception $e) {
+            // Log the exception for debugging
+            Log::error('Failed to delete room: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to delete record due to an unexpected error.'], 500);
+        }
+    }
+
+    public function delete_item_room($id)
+    {
+        try {
+            // Check if the Penlat is used in the Penlat_batch table
+            $isItemExist = Inventory_room::where('id', $id)->exists();
+
+            if (!$isItemExist) {
+                return redirect()->back()->with('success', 'Failed to delete record due to unexist item.');
+            }
+
+            $item = Inventory_room::where('id', $id);
+            $item->delete();
+
+            return redirect()->back()->with('success', 'Deleted Successfully.');
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['error' => 'Record not found.'], 404);
+        } catch (\Exception $e) {
+            // Log the exception for debugging
+            Log::error('Failed to delete Penlat: ' . $e->getMessage());
+            return redirect()->back()->with('success', 'Failed to delete record due to an unexpected error.');
+        }
+    }
+
+    public function update_room_data(Request $request, $roomId)
+    {
+        // Validate the request
+        $validated = $request->validate([
+            'nama_ruangan' => 'required',
+            'room_image' => 'nullable',
+            'location' => 'required',
+        ]);
+
+        try {
+            // Find the existing room by ID
+            $room = Room::findOrFail($roomId);
+
+            // Handle the image upload
+            $imagePath = $room->filepath; // Keep the existing image path
+
+            if ($request->hasFile('room_image')) {
+                // Unlink the previous image if it exists
+                if ($room->filepath && file_exists(public_path($room->filepath))) {
+                    unlink(public_path($room->filepath));
+                }
+
+                // Upload the new image
+                $image = $request->file('room_image');
+                $filename = time() . '_' . $image->getClientOriginalName();
+                $image->move(public_path('uploads/room_images'), $filename);
+                $imagePath = 'uploads/room_images/' . $filename;
+            }
+
+            // Update the room entry
+            $room->update([
+                'room_name' => $validated['nama_ruangan'],
+                'location_id' => $validated['location'],
+                'filepath' => $imagePath,
+            ]);
+
+            // Redirect back with a success message
+            return redirect()->route('preview-room', $roomId)->with('success', 'Room updated successfully!');
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['error' => 'Record not found.'], 404);
+        } catch (\Exception $e) {
+            // Log the exception for debugging
+            Log::error('Failed to update room: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to update room. Please try again.');
+        }
+    }
+
+    public function update_room_item(Request $request, $id)
+    {
+        // Retrieve the penlat_usage record by ID
+        $inventoryItem = Inventory_room::findOrFail($id);
+
+        // Validate and update the amount
+        $request->validate([
+            'amount' => 'required|numeric|min:0'
+        ]);
+
+
+        if ($inventoryItem) {
+            $inventoryItem->amount = $request->input('amount');
+            $inventoryItem->save();
+
+            return response()->json(['message' => 'Utility usage updated successfully.'], 200);
+        } else {
+            return response()->json(['message' => 'Utility not found.'], 404);
+        }
+    }
+
+    public function preview_room($roomId)
+    {
+        $data = Room::find($roomId);
+        $assets = Inventory_tools::all();
+        $locations = Location::all();
+        return view('operation.submenu.preview-room-inventory', ['assets' => $assets, 'data' => $data, 'locations' => $locations]);
+    }
+
+    public function preview_room_user($roomId)
+    {
+        $data = Room::find($roomId);
+        $assets = Inventory_tools::all();
+        $locations = Location::all();
+        return view('operation.submenu.preview-room-inventory-user', ['assets' => $assets, 'data' => $data, 'locations' => $locations]);
     }
 }

@@ -139,7 +139,7 @@ font-weight-bold
                                     <p style="margin: 0;">Nama Pelatihan :</p>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <select id="penlatSelect" class="form-control" name="penlat">
+                                    <select id="penlatSelect" class="form-control select2" name="penlat">
                                         <option selected disabled>Select Pelatihan...</option>
                                         @foreach ($penlatList as $item)
                                         <option value="{{ $item->id }}">{{ $item->description }}</option>
@@ -182,6 +182,85 @@ font-weight-bold
         </div>
     </div>
 </div>
+<div class="modal fade zoom90" id="editDataModal" tabindex="-1" role="dialog" aria-labelledby="editDataModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header d-flex flex-row align-items-center justify-content-between">
+                <h5 class="modal-title" id="editDataModalLabel">Edit Data</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" enctype="multipart/form-data" action="" id="editForm">
+                @csrf
+                @method('PUT')
+                <div class="modal-body mr-2 ml-2">
+                    <input type="hidden" name="id" id="edit_id">
+                    <div class="row no-gutters">
+                        <div class="col-md-3 d-flex align-items-top justify-content-center text-center">
+                            <label for="edit-file-upload" style="cursor: pointer;">
+                                <img id="edit-image-preview" src="https://via.placeholder.com/50x50/5fa9f8/ffffff" style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
+                                <small style="font-size: 10px;"><i><u>Click above to upload image!</u></i></small>
+                            </label>
+                            <input id="edit-file-upload" type="file" name="edit_display" style="display: none;" accept="image/*" onchange="previewEditImage(event)">
+                        </div>
+                        <div class="col-md-9">
+                            <div class="card-body text-secondary">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Nama Pelatihan :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <select id="edit_penlat_id" name="edit_penlat_id" class="form-control select2" required>
+                                                    <option selected disabled>Select Pelatihan...</option>
+                                                    @foreach($penlatList as $penlat)
+                                                        <option value="{{ $penlat->id }}">{{ $penlat->description }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Nama Program :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="text" class="form-control" id="edit_nama_program" name="edit_nama_program" required>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Batch :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="text" class="form-control" id="edit_batch" name="edit_batch" required>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Tgl Pelaksanaan :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="date" class="form-control" id="edit_tgl_pelaksanaan" name="edit_tgl_pelaksanaan" required>
+                                            </div>
+                                        </div>
+                                        <!-- Continue for alias, jenis_pelatihan, kategori_program -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Update Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 
 <script>
     function previewImage(event) {
@@ -200,11 +279,6 @@ font-weight-bold
             URL.revokeObjectURL(output.src) // Free up memory
         }
     }
-
-    document.getElementById('penlatSelect').addEventListener('change', function() {
-        var selectedOption = this.options[this.selectedIndex].text;
-        document.getElementById('programInput').value = selectedOption;
-    });
 </script>
 <script>
 $(document).ready(function() {
@@ -227,8 +301,96 @@ $(document).ready(function() {
         ]
     });
 
+    // Edit functionality
+    $('#batchTables').on('click', '.edit-tool', function () {
+        let id = $(this).data('id');
+
+        $.get('/penlat-batch/' + id + '/edit', function (data) {
+            $('#edit_id').val(data.id);
+            $('#edit_penlat_id').val(data.penlat_id);
+            $('#edit_nama_program').val(data.nama_program);
+            $('#edit_batch').val(data.batch);
+            $('#edit_tgl_pelaksanaan').val(data.date);
+
+            var imageUrl = data.image ? data.image : '{{ asset('img/default-img.png') }}';
+            $('#edit-image-preview').attr('src', imageUrl);
+
+            $('#editForm').attr('action', '/penlat-batch-update/' + id);
+            $('#editDataModal').modal('show');
+        });
+    });
+
+    // Delete functionality
+    $('#batchTables').on('click', '.btn-outline-danger', function () {
+        let id = $(this).data('id');
+
+        swal({
+            title: "Are you sure?",
+            text: "Once deleted, you will not be able to recover this record!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+        .then((willDelete) => {
+            if (willDelete) {
+                $.ajax({
+                    url: '{{ route("delete.batch", ":id") }}'.replace(':id', id),
+                    type: 'DELETE',
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(result) {
+                        swal("Poof! Your record has been deleted!", {
+                            icon: "success",
+                        });
+                        table.draw(); // Redraw the table
+                    },
+                    error: function(xhr, status, error) {
+                        let errorMessage = xhr.responseJSON && xhr.responseJSON.error
+                            ? xhr.responseJSON.error
+                            : "Oops! Something went wrong!";
+
+                        swal("Error!", errorMessage, "error");
+                    }
+                });
+            } else {
+                swal("Your record is safe!");
+            }
+        });
+    });
+
     $('#namaPenlat').on('click', function() {
         table.draw();
+    });
+
+    // Initialize Select2
+    $('#penlatSelect').select2({
+        dropdownParent: $('#inputDataModal'),
+        theme: "classic",
+        placeholder: "Select Pelatihan...",
+        width: '100%',
+        tags: true,
+    });
+
+    // Event listener for change event
+    $('#penlatSelect').on('change', function() {
+        var selectedOption = $(this).find('option:selected').text();
+        $('#programInput').val(selectedOption);
+    });
+
+    // Initialize Select2
+    $('#edit_penlat_id').select2({
+        dropdownParent: $('#editDataModal'),
+        theme: "classic",
+        placeholder: "Select Pelatihan...",
+        width: '100%',
+        tags: true,
+    });
+
+    // Event listener for change event
+    $('#edit_penlat_id').on('change', function() {
+        var selectedOption = $(this).find('option:selected').text();
+        $('#edit_nama_program').val(selectedOption);
     });
 });
 </script>

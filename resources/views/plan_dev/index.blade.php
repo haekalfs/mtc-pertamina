@@ -24,7 +24,7 @@ font-weight-bold
 <div class="animated fadeIn">
     <div class="row">
         <!-- Earnings (Monthly) Card Example -->
-        <div class="col-xl-4 col-md-6 timesheet">
+        <div class="col-xl-4 col-md-6 animateBox">
             <a href="{{ route('feedback-report') }}" class="clickable-card">
                 <div class="card border-left-primary shadow py-2">
                     <div class="card-body">
@@ -42,7 +42,7 @@ font-weight-bold
         </div>
 
         <!-- Earnings (Monthly) Card Example -->
-        <div class="col-xl-4 col-md-6 medical">
+        <div class="col-xl-4 col-md-6 animateBox">
             <a href="{{ route('instructor') }}" class="clickable-card">
                 <div class="card border-left-success shadow py-2">
                     <div class="card-body">
@@ -62,7 +62,7 @@ font-weight-bold
         </div>
 
         <!-- Earnings (Monthly) Card Example -->
-        <div class="col-xl-4 col-md-6 reimburse">
+        <div class="col-xl-4 col-md-6 animateBox">
             <a href="{{ route('training-reference') }}" class="clickable-card">
                 <div class="card border-left-info shadow py-2">
                     <div class="card-body">
@@ -127,7 +127,7 @@ font-weight-bold
                                                     </tr>
                                                     <tr>
                                                         <td><i class="ti-minus mr-2"></i> Umur</td>
-                                                        <td style="text-align: start;">: {{ $instructor->instructor_dob }}</td>
+                                                        <td style="text-align: start;">: {{ \Carbon\Carbon::parse($instructor->instructor_dob)->age}} Tahun</td>
                                                     </tr>
                                                 </table>
                                             </div>

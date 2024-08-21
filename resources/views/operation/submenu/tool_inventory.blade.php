@@ -206,7 +206,7 @@ font-weight-bold
                                             <a data-id="{{ $item->id }}" href="#" class="btn btn-outline-secondary btn-md mb-2 mr-2 edit-tool">
                                                 <i class="fa fa-edit"></i>
                                             </a>
-                                            <button class="btn btn-outline-danger btn-md mb-2">
+                                            <button data-id="{{ $item->id }}" class="btn btn-outline-danger btn-md mb-2">
                                                 <i class="fa fa-trash-o"></i>
                                             </button>
                                         </div>
@@ -433,7 +433,7 @@ font-weight-bold
                                                         <p style="margin: 0;">Used :</p>
                                                     </div>
                                                     <div class="flex-grow-1">
-                                                        <input type="text" class="form-control" name="stock" id="edit_used_amount">
+                                                        <input type="text" class="form-control" name="used_amount" id="edit_used_amount">
                                                     </div>
                                                 </div>
                                             </div>
@@ -454,12 +454,12 @@ font-weight-bold
                                                 <input type="date" class="form-control" name="next_maintenance" id="edit_next_maintenance">
                                             </div>
                                         </div>
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 200px;" class="mr-2">
-                                                <p style="margin: 0;">Panduan Maintenance :</p>
+                                        <div class="d-flex align-items-center mb-2">
+                                            <div style="width: 250px;" class="mr-2">
+                                                <p style="margin: 0;">Update Panduan (Optional) :</p> <small id="existing-file"></small>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <input type="file" class="form-control" name="maintenance_guide" id="edit_maintenance_guide" required>
+                                                <input type="file" class="form-control" name="maintenance_guide" id="edit_maintenance_guide">
                                             </div>
                                         </div>
                                     </div>
@@ -518,6 +518,14 @@ font-weight-bold
                 $('#edit_last_maintenance').val(response.last_maintenance);
                 $('#edit_next_maintenance').val(response.next_maintenance);
                 $('#edit-image-preview').attr('src', response.tool_image ? response.tool_image : 'https://via.placeholder.com/150x150');
+
+                // Handle the existing file
+                if(response.asset_guidance) {
+                    $('#existing-file').html(`<a href="${response.asset_guidance}" target="_blank">Download Existing File</a>`);
+                } else {
+                    $('#existing-file').html('No existing file');
+                }
+
                 // Show the modal
                 $('#editToolModal').modal('show');
             }
@@ -545,6 +553,46 @@ font-weight-bold
             error: function(xhr) {
                 // Handle errors
                 alert('Failed to update the tool. Please check the input and try again.');
+            }
+        });
+    });
+
+    $(document).on('click', '.btn-outline-danger', function(e) {
+        e.preventDefault();
+        let id = $(this).data('id');
+
+        swal({
+            title: "Are you sure?",
+            text: "Once deleted, you will not be able to recover this record!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+        .then((willDelete) => {
+            if (willDelete) {
+                $.ajax({
+                    url: '{{ route("delete.asset", ":id") }}'.replace(':id', id),
+                    type: 'DELETE',
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(result) {
+                        swal("Poof! Your record has been deleted!", {
+                            icon: "success",
+                        }).then(() => {
+                            location.reload(); // Reload the page after success
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        let errorMessage = xhr.responseJSON && xhr.responseJSON.error
+                            ? xhr.responseJSON.error
+                            : "Oops! Something went wrong!";
+
+                        swal("Error!", errorMessage, "error");
+                    }
+                });
+            } else {
+                swal("Your record is safe!");
             }
         });
     });

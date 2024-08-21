@@ -22,7 +22,8 @@ font-weight-bold
         <a href="{{ route('instructor') }}" class="btn btn-sm btn-secondary shadow-sm text-white"><i class="fa fa-backward"></i> Go Back</a>
     </div>
 </div>
-<form action="{{ route ('instructor.store') }}" method="post" enctype="multipart/form-data" class="form-horizontal">
+<form action="{{ route ('instructor.update', $data->id) }}" method="post" enctype="multipart/form-data" class="form-horizontal">
+    @method('PUT') <!-- Add this to specify the form method as PUT -->
     @csrf
     <div class="animated fadeIn zoom90">
         <div class="row">
@@ -42,8 +43,7 @@ font-weight-bold
                                             <div class="col-md-12">
                                                 <div class="d-flex align-items-top justify-content-center text-center">
                                                     <label for="file-upload" style="cursor: pointer;">
-                                                        <img id="image-preview" src="https://via.placeholder.com/150x150/5fa9f8/ffffff"
-                                                             style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
+                                                        <img id="image-preview" src="{{ asset($data->imgFilepath) }}" style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
                                                              <small style="font-size: 10px;"><i><u>Click above to upload image!</u></i></small>
                                                     </label>
                                                     <input id="file-upload" type="file" name="profile_picture" style="display: none;" accept="image/*" onchange="previewImage(event)">
@@ -81,50 +81,62 @@ font-weight-bold
                     <div class="card-body card-block">
                         <div class="row form-group">
                             <div class="col col-md-3"><label for="full_name" class=" form-control-label">Instructor Fullname</label></div>
-                            <div class="col-12 col-md-9"><input type="text" id="full_name" name="full_name" placeholder="Full Name" class="form-control"></div>
+                            <div class="col-12 col-md-9"><input type="text" id="full_name" name="full_name" placeholder="Full Name" class="form-control" value="{{ $data->instructor_name }}"></div>
                         </div>
                         <div class="row form-group">
                             <div class="col col-md-3"><label for="email" class=" form-control-label">E-Mail Address</label></div>
-                            <div class="col-12 col-md-9"><input type="email" id="email" name="email" placeholder="Enter Email" class="form-control"></div>
+                            <div class="col-12 col-md-9"><input type="email" id="email" name="email" placeholder="Enter Email" class="form-control" value="{{ $data->instructor_email }}"></div>
                         </div>
                         <div class="row form-group">
                             <div class="col col-md-3"><label for="dob" class=" form-control-label">Date of Birth</label></div>
-                            <div class="col-12 col-md-9"><input type="date" id="dob" name="dob" class="form-control"></div>
+                            <div class="col-12 col-md-9"><input type="date" id="dob" name="dob" class="form-control" value="{{ $data->instructor_dob }}"></div>
                         </div>
                         <div class="row form-group">
                             <div class="col col-md-3"><label for="address" class=" form-control-label">Address</label></div>
-                            <div class="col-12 col-md-9"><textarea name="address" rows="3" class="form-control"></textarea></div>
+                            <div class="col-12 col-md-9"><textarea name="address" rows="3" class="form-control">{{ $data->instructor_address }}</textarea></div>
                         </div>
                         <div class="row form-group">
                             <div class="col col-md-3"><label for="working_hour" class=" form-control-label">Jam Mengajar</label></div>
-                            <div class="col-12 col-md-9"><input type="text" id="working_hour" name="working_hour" placeholder="Jam Mengajar" class="form-control"></div>
+                            <div class="col-12 col-md-9"><input type="text" id="working_hour" name="working_hour" placeholder="Jam Mengajar" class="form-control" value="{{ $data->working_hours }}"></div>
                         </div>
                         <div class="row form-group">
                             <div class="col col-md-3"><label for="user_status" class=" form-control-label">Instructor Status</label></div>
                             <div class="col-12 col-md-9">
-                                <select name="user_status" id="user_status" class="form-control form-control">
-                                    <option disabled selected>Please select</option>
-                                    <option value="1">Active</option>
-                                    <option value="0">Non Active</option>
+                                <select name="status" id="user_status" class="form-control">
+                                    <option disabled {{ is_null($data->status) ? 'selected' : '' }}>Please select</option>
+                                    <option value="1" {{ $data->status == '1' ? 'selected' : '' }}>Active</option>
+                                    <option value="0" {{ $data->status == '0' ? 'selected' : '' }}>Non Active</option>
                                 </select>
                             </div>
                         </div>
                         <h6 class="h6 m-0 font-weight-bold mt-4 mb-4"><i class="fa fa-user"></i> Additional Information</h6>
                         <hr class="sidebar-divider mb-4">
                         <div class="row form-group">
-                            <div class="col col-md-3"><label for="cv" class=" form-control-label">CV</label></div>
-                            <div class="col-12 col-md-9"><input type="file" id="cv" name="cv" class="form-control"></div>
+                            <div class="col col-md-3"><label for="cv" class="form-control-label">CV</label></div>
+                            <div class="col-12 col-md-9">
+                                <input type="file" id="cv" name="cvFilepath" class="form-control">
+                                @if($data->cvFilepath)
+                                    <a href="{{ asset($data->cvFilepath) }}" target="_blank">View CV</a>
+                                @endif
+                            </div>
                         </div>
                         <div class="row form-group">
-                            <div class="col col-md-3"><label for="ijazah" class=" form-control-label">Ijazah</label></div>
-                            <div class="col-12 col-md-9"><input type="file" id="ijazah" name="ijazah" class="form-control"></div>
+                            <div class="col col-md-3"><label for="ijazah" class="form-control-label">Ijazah</label></div>
+                            <div class="col-12 col-md-9">
+                                <input type="file" id="ijazah" name="ijazahFilepath" class="form-control">
+                                @if($data->ijazahFilepath)
+                                    <a href="{{ asset($data->ijazahFilepath) }}" target="_blank">View Ijazah</a>
+                                @endif
+                            </div>
                         </div>
                         <div class="row form-group">
-                            <div class="col col-md-3"><label for="roles" class="form-control-label">Certifications</label></div>
+                            <div class="col col-md-3"><label for="certificates" class="form-control-label">Certifications</label></div>
                             <div class="col-12 col-md-9">
                                 <select data-placeholder="Certificate..." multiple class="standardSelect form-control" id="certificates" name="certificates[]">
                                     @foreach ($certificate as $item)
-                                    <option value="{{ $item->id }}">{{ $item->certificate_name }}</option>
+                                    <option value="{{ $item->id }}" {{ in_array($item->id, $data->certificates->pluck('certificates_catalog_id')->toArray()) ? 'selected' : '' }}>
+                                        {{ $item->certificate_name }}
+                                    </option>
                                     @endforeach
                                 </select>
                             </div>

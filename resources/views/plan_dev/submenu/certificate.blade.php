@@ -15,7 +15,7 @@ font-weight-bold
 @section('content')
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
-        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="menu-icon fa fa-certificate"></i> Certificate</h1>
+        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="menu-icon fa fa-certificate"></i> Trainee Certificates</h1>
         <p class="mb-4">Sertifikat Trainee.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
@@ -148,75 +148,6 @@ font-weight-bold
         </div>
     </div>
 </div>
-<div class="modal fade zoom90" id="updateProcessModal" tabindex="-1" role="dialog" aria-labelledby="updateProcessModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header d-flex flex-row align-items-center justify-content-between border-bottom-1">
-          <h5 class="modal-title" id="updateProcessModalLabel">Update Process</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form>
-            <div class="d-flex align-items-center mb-4">
-                <div style="width: 140px;" class="mr-2">
-                    <p style="margin: 0;">Nama Penlat :</p>
-                </div>
-                <div class="flex-grow-1">
-                    <select class="form-control" name="penlat">
-                        @foreach ($penlatList as $item)
-                        <option value="{{ $item->id }}">{{ $item->description }}</option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-            <div class="d-flex align-items-center mb-4">
-                <div style="width: 140px;" class="mr-2">
-                    <p style="margin: 0;">Batch Penlat :</p>
-                </div>
-                <div class="flex-grow-1">
-                    <select name="stcw" class="form-control" id="stcw">
-                        @foreach ($listBatch as $item)
-                        <option value="{{ $item->batch }}">{{ $item->batch }}</option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-            <div class="d-flex align-items-center mb-4">
-                <div style="width: 140px;" class="mr-2">
-                    <p style="margin: 0;">Status :</p>
-                </div>
-                <div class="flex-grow-1">
-                    <select class="form-control" id="status">
-                      <option value="option1">Option 1</option>
-                      <option value="option2">Option 2</option>
-                      <option value="option3">Option 3</option>
-                    </select>
-                </div>
-            </div>
-          </form>
-          <!-- DataTable -->
-          <table id="dataTable" class="table table-striped table-bordered">
-            <thead>
-              <tr>
-                <th>Nama Peserta</th>
-                <th>Received</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- DataTable rows will be populated here -->
-            </tbody>
-          </table>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
-        </div>
-      </div>
-    </div>
-</div>
 
 <div class="modal fade zoom90" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -238,7 +169,7 @@ font-weight-bold
                             <select id="penlatSelect" class="form-control" name="penlat">
                                 <option selected disabled>Select Pelatihan...</option>
                                 @foreach ($penlatList as $item)
-                                <option value="{{ $item->id }}">{{ $item->description }}</option>
+                                    <option value="{{ $item->id }}">{{ $item->description }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -294,6 +225,7 @@ font-weight-bold
 
 <script>
 $(document).ready(function() {
+    // Initialize Select2 for Batch with custom tagging
     $('#mySelect2').select2({
         dropdownParent: $('#inputDataModal'),
         theme: "classic",
@@ -324,16 +256,31 @@ $(document).ready(function() {
         }
     });
 
+    // Handle the selection of new tags
     $('#mySelect2').on('select2:select', function(e) {
         if (e.params.data.newTag) {
-            // Show a notification that a new record is added
-
-            // After the new option is added, remove the "newTag" property
+            // Create and select the new option
             var newOption = new Option(e.params.data.text, e.params.data.id, true, true);
             $(this).append(newOption).trigger('change');
         }
     });
+
+    // Initialize Select2 for Pelatihan
+    $('#penlatSelect').select2({
+        dropdownParent: $('#inputDataModal'),
+        theme: "classic",
+        placeholder: "Select Pelatihan...",
+        width: '100%',
+        tags: true,
+    });
+
+    // Event listener to update the program input when Pelatihan is selected
+    $('#penlatSelect').on('change', function() {
+        var selectedOption = $(this).find('option:selected').text();
+        $('#programInput').val(selectedOption);
+    });
 });
+
 </script>
 <script>
     document.getElementById('addApproversBtn').addEventListener('click', function() {
@@ -359,12 +306,5 @@ $(document).ready(function() {
             label.textContent = file.name;
         }
     }
-</script>
-
-<script>
-    document.getElementById('penlatSelect').addEventListener('change', function() {
-        var selectedOption = this.options[this.selectedIndex].text;
-        document.getElementById('programInput').value = selectedOption;
-    });
 </script>
 @endsection

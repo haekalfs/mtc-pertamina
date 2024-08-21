@@ -90,12 +90,12 @@ font-weight-bold
                                         </div>
                                     </div>
                                 </td>
-                                <td class="actions text-center" data-th="">
+                                <td class="actions text-center">
                                     <div>
-                                        <button class="btn btn-outline-secondary btn-md mb-2 mr-2">
+                                        <button data-id="{{ $item->id }}" class="btn btn-outline-secondary btn-md mb-2 mr-2 edit-button">
                                             <i class="fa fa-edit"></i>
                                         </button>
-                                        <button class="btn btn-outline-danger btn-md mb-2">
+                                        <button data-id="{{ $item->id }}" class="btn btn-outline-danger btn-md mb-2">
                                             <i class="fa fa-trash-o"></i>
                                         </button>
                                     </div>
@@ -131,9 +131,10 @@ font-weight-bold
                                             <p style="margin: 0;">Nama Penlat :</p>
                                         </div>
                                         <div class="flex-grow-1">
-                                            <select class="form-control" id="penlat" name="penlat" required>
-                                                @foreach($penlatList as $item)
-                                                    <option value="{{ $item->id }}">{{ $item->description }}</option>
+                                            <select id="penlatSelect" class="form-control select2" name="penlat">
+                                                <option selected disabled>Select Pelatihan...</option>
+                                                @foreach ($penlatList as $item)
+                                                <option value="{{ $item->id }}">{{ $item->description }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -170,7 +171,85 @@ font-weight-bold
     </div>
 </div>
 
+<div class="modal fade zoom90" id="editDataModal" tabindex="-1" role="dialog" aria-labelledby="editDataModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 700px;" role="document">
+        <div class="modal-content">
+            <div class="modal-header d-flex flex-row align-items-center justify-content-between">
+                <h5 class="modal-title" id="editDataModalLabel">Edit Data</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" enctype="multipart/form-data" action="{{ route('requirement.update') }}">
+                @csrf
+                <div class="modal-body mr-2 ml-2">
+                    <div class="row no-gutters">
+                        <div class="col-md-12">
+                            <div>
+                                <div class="document-list-item mb-4 mt-3">
+                                    <div class="d-flex align-items-center mb-4">
+                                        <div style="width: 140px;" class="mr-2">
+                                            <p style="margin: 0;">Nama Penlat :</p>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <select id="editpenlatSelect" class="form-control select2" name="edit_penlat">
+                                                <option selected disabled>Select Pelatihan...</option>
+                                                @foreach ($penlatList as $item)
+                                                <option value="{{ $item->id }}">{{ $item->description }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-start">
+                                        <div style="width: 140px;" class="mr-2">
+                                            <p style="margin: 0;">Kebutuhan :</p>
+                                        </div>
+                                        <div class="flex-grow-1 edit-textarea-container" id="edit-documents-list-container">
+                                            <div class="edit-document-item">
+                                                <input type="text" class="form-control mb-2" rows="2" name="edit_documents[]" required></input>
+                                            </div>
+                                        </div>
+                                        <div class="ml-2 text-white">
+                                            <div class="col-md-12">
+                                                <button type="button" class="btn btn-success mb-2 shadow-sm btn-sm edit-add-document-list"><i class="fa fa-plus"></i> Add More &nbsp;&nbsp;</button>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <a class="btn shadow-sm btn-sm btn-danger edit-delete-document-list" style="display: none;"><i class="fa fa-trash-alt"></i> Delete Item</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Submit Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
+    $(document).ready(function() {
+        // Initialize Select2
+        $('#penlatSelect').select2({
+            dropdownParent: $('#inputDataModal'),
+            theme: "classic",
+            placeholder: "Select Pelatihan...",
+            width: '100%',
+            tags: true,
+        });
+        $('#editpenlatSelect').select2({
+            dropdownParent: $('#editDataModal'),
+            theme: "classic",
+            placeholder: "Select Pelatihan...",
+            width: '100%',
+            tags: true,
+        });
+    });
     $(document).ready(function () {
         // Handle click event for the "Add More" button
         $(".add-document-list").on("click", function () {
@@ -199,6 +278,97 @@ font-weight-bold
             // Hide the delete button if there's only one item left
             if ($(".document-item").length <= 1) {
                 $(".delete-document-list").hide();
+            }
+        });
+    });
+
+    $(document).on('click', '.btn-outline-danger', function() {
+        let id = $(this).data('id');
+        let url = "{{ route('delete.requirement', ':id') }}";
+        url = url.replace(':id', id);
+
+        swal({
+            title: "Are you sure?",
+            text: "Once deleted, you will not be able to recover this file!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then((willDelete) => {
+            if (willDelete) {
+                $.ajax({
+                    url: url,
+                    type: 'DELETE',
+                    data: {
+                        "_token": "{{ csrf_token() }}",
+                    },
+                    success: function(response) {
+                        swal("Poof! Your file has been deleted!", {
+                            icon: "success",
+                        }).then(() => {
+                            location.reload(); // Reload the page to reflect the changes
+                        });
+                    },
+                    error: function(response) {
+                        swal("An error occurred while deleting the item.", {
+                            icon: "error",
+                        });
+                    }
+                });
+            }
+        });
+    });
+
+    $(document).on('click', '.edit-button', function () {
+        var penlatId = $(this).data('id');
+
+        // Generate the URL using the route name
+        var fetchUrl = "{{ route('requirement.data', ':id') }}";
+        fetchUrl = fetchUrl.replace(':id', penlatId);
+
+        // Fetch data via AJAX
+        $.ajax({
+            url: fetchUrl,
+            method: 'GET',
+            success: function (data) {
+                // Prefill the penlat select
+                $('#editpenlatSelect').val(data.penlat_id).trigger('change');
+
+                // Clear the existing document items
+                $('#edit-documents-list-container').empty();
+
+                // Prefill document fields
+                data.documents.forEach(function (document) {
+                    var documentItem = '<div class="edit-document-item"><input type="text" class="form-control mb-2" name="edit_documents[]" value="' + document + '" required></div>';
+                    $('#edit-documents-list-container').append(documentItem);
+                });
+
+                // Show the delete button if there are multiple items
+                if (data.documents.length > 1) {
+                    $('.edit-delete-document-list').show();
+                } else {
+                    $('.edit-delete-document-list').hide();
+                }
+
+                // Show the modal
+                $('#editDataModal').modal('show');
+            }
+        });
+    });
+
+    $(document).ready(function () {
+        // Add document field
+        $(".edit-add-document-list").on("click", function () {
+            var clonedDocumentItem = $(".edit-document-item:first").clone();
+            clonedDocumentItem.find("input").val("");
+            $("#edit-documents-list-container").append(clonedDocumentItem);
+            $(".edit-delete-document-list").show();
+        });
+
+        // Delete document field
+        $(".edit-delete-document-list").on("click", function () {
+            $(".edit-document-item:last").remove();
+            if ($(".edit-document-item").length <= 1) {
+                $(".edit-delete-document-list").hide();
             }
         });
     });

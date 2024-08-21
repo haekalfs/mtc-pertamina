@@ -19,7 +19,7 @@ font-weight-bold
         <p class="mb-4">List Pelatihan at MTC.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
-        <a href="#" class="btn btn-sm btn-primary shadow-sm text-white"><i class="fa fa-file-text fa-sm"></i> Import Data</a>
+        <a href="{{ route('penlat-import') }}" class="btn btn-sm btn-primary shadow-sm text-white"><i class="fa fa-file-text fa-sm"></i> Import Data</a>
     </div>
 </div>
 <div class="overlay overlay-mid" style="display: none;"></div>
@@ -122,7 +122,7 @@ font-weight-bold
                                 <th>Alias</th>
                                 <th>Jenis Pelatihan</th>
                                 <th>Kategori Program</th>
-                                <th>Action</th>
+                                <th width="100px">Action</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -148,8 +148,7 @@ font-weight-bold
                     <div class="row no-gutters">
                         <div class="col-md-3 d-flex align-items-top justify-content-center text-center">
                             <label for="file-upload" style="cursor: pointer;">
-                                <img id="image-preview" src="https://via.placeholder.com/50x50/5fa9f8/ffffff"
-                                     style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
+                                <img id="image-preview" src="https://via.placeholder.com/50x50/5fa9f8/ffffff" style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
                                      <small style="font-size: 10px;"><i><u>Click above to upload image!</u></i></small>
                             </label>
                             <input id="file-upload" type="file" name="display" style="display: none;" accept="image/*" onchange="previewImage(event)">
@@ -221,8 +220,7 @@ font-weight-bold
                     <div class="row no-gutters">
                         <div class="col-md-3 d-flex align-items-top justify-content-center text-center">
                             <label for="edit-file-upload" style="cursor: pointer;">
-                                <img id="edit-image-preview" src="https://via.placeholder.com/50x50/5fa9f8/ffffff"
-                                     style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
+                                <img id="edit-image-preview" src="https://via.placeholder.com/50x50/5fa9f8/ffffff" style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
                                      <small style="font-size: 10px;"><i><u>Click above to upload image!</u></i></small>
                             </label>
                             <input id="edit-file-upload" type="file" name="display" style="display: none;" accept="image/*" onchange="previewEditImage(event)">
@@ -321,7 +319,7 @@ $(document).ready(function() {
         ]
     });
 
-    // Delegate event to static parent element
+    // Edit functionality
     $('#penlatTables').on('click', '.edit-tool', function () {
         let id = $(this).data('id');
 
@@ -331,9 +329,49 @@ $(document).ready(function() {
             $('#edit_alias').val(data.alias);
             $('#edit_jenis_pelatihan').val(data.jenis_pelatihan);
             $('#edit_kategori_pelatihan').val(data.kategori_pelatihan);
-            $('#edit-image-preview').attr('src', data.image);
+            var imageUrl = data.image ? data.image : '{{ asset('img/default-img.png') }}';
+            $('#edit-image-preview').attr('src', imageUrl);
             $('#editForm').attr('action', '/penlat-update/' + id);
             $('#editDataModal').modal('show');
+        });
+    });
+
+    // Delete functionality
+    $('#penlatTables').on('click', '.btn-outline-danger', function () {
+        let id = $(this).data('id');
+
+        swal({
+            title: "Are you sure?",
+            text: "Once deleted, you will not be able to recover this record!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+        .then((willDelete) => {
+            if (willDelete) {
+                $.ajax({
+                    url: '{{ route("delete.penlat", ":id") }}'.replace(':id', id),
+                    type: 'DELETE',
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(result) {
+                        swal("Poof! Your record has been deleted!", {
+                            icon: "success",
+                        });
+                        table.draw(); // Redraw the table
+                    },
+                    error: function(xhr, status, error) {
+                        let errorMessage = xhr.responseJSON && xhr.responseJSON.error
+                            ? xhr.responseJSON.error
+                            : "Oops! Something went wrong!";
+
+                        swal("Error!", errorMessage, "error");
+                    }
+                });
+            } else {
+                swal("Your record is safe!");
+            }
         });
     });
 
@@ -342,6 +380,5 @@ $(document).ready(function() {
         table.draw();
     });
 });
-
 </script>
 @endsection

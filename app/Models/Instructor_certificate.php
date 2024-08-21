@@ -14,4 +14,8 @@ class Instructor_certificate extends Model
     public function catalog(){
     	return $this->belongsTo('App\Models\Certificates_catalog', 'certificates_catalog_id', 'id');
     }
+
+    public function instructor(){
+    	return $this->belongsTo('App\Models\Instructor', 'instructor_id', 'id');
+    }
 }
