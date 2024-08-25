@@ -77,45 +77,42 @@ font-weight-bold
                     </div>
                 </div>
                 <div class="card-body zoom90 p-4">
-                    <form method="GET" action="">
-                        @csrf
-                        <div class="row d-flex justify-content-start mb-4">
-                            <div class="col-md-12">
-                                <div class="row align-items-center">
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label for="email">Nama Pelatihan :</label>
-                                            <select class="form-control form-control" name="penlat">
-                                                <option value="1">Show All</option>
-                                                @foreach ($penlatList as $item)
-                                                <option value="{{ $item->id }}">{{ $item->description }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
+                    <div class="row d-flex justify-content-start mb-4">
+                        <div class="col-md-12">
+                            <div class="row align-items-center">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="penlat">Nama Pelatihan :</label>
+                                        <select class="form-control" name="penlat" id="penlat">
+                                            <option value="">Show All</option>
+                                            @foreach ($penlatList as $item)
+                                            <option value="{{ $item->id }}">{{ $item->description }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
-                                    <div class="col-md-2">
-                                        <div class="form-group">
-                                            <label for="position_id">Batch :</label>
-                                            <select name="stcw" class="form-control" id="stcw">
-                                                <option value="1">Show All</option>
-                                                @foreach ($listBatch as $item)
-                                                <option value="{{ $item->batch }}">{{ $item->batch }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label for="batch">Batch :</label>
+                                        <select name="batch" class="form-control" id="batch">
+                                            <option value="">Show All</option>
+                                            @foreach ($listBatch as $item)
+                                            <option value="{{ $item->batch }}">{{ $item->batch }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
-                                    <div class="col-md-1 d-flex align-self-end justify-content-start">
-                                        <div class="form-group">
-                                            <div class="align-self-center">
-                                                <button type="submit" class="btn btn-primary" style="padding-left: 1.2em; padding-right: 1.2em;"><i class="ti-search"></i></button>
-                                            </div>
+                                </div>
+                                <div class="col-md-1 d-flex align-self-end justify-content-start">
+                                    <div class="form-group">
+                                        <div class="align-self-center">
+                                            <button id="filterButton" class="btn btn-primary" style="padding-left: 1.2em; padding-right: 1.2em;"><i class="ti-search"></i></button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </form>
-                    <table id="docLetter" class="table table-bordered">
+                    </div>
+                    <table id="listIssuedCertificates" class="table table-bordered">
                         <thead>
                             <tr>
                                 <th>Nama Pelatihan</th>
@@ -124,23 +121,11 @@ font-weight-bold
                                 <th>Status</th>
                                 <th>Keterangan</th>
                                 <th>Total</th>
-                                <th>Action</th>
+                                <th width="225px">Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($data as $item)
-                            <tr>
-                                <td>{{ $item->batch->penlat->description}}</td>
-                                <td>{{ $item->batch->penlat->alias }}</td>
-                                <td>{{ $item->batch->batch }}</td>
-                                <td>{{ $item->status }}</td>
-                                <td>{{ $item->keterangan }}</td>
-                                <td>{{ $item->total_issued }}</td>
-                                <td class="text-center">
-                                    <a class="btn btn-outline-secondary btn-sm" href="{{ route('preview-certificate', $item->id) }}"><i class="menu-Logo fa fa-eye"></i> Action</a>
-                                </td>
-                            </tr>
-                            @endforeach
+                            <!-- Data will be populated by DataTables -->
                         </tbody>
                     </table>
                 </div>
@@ -149,7 +134,7 @@ font-weight-bold
     </div>
 </div>
 
-<div class="modal fade zoom90" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
+<div class="modal fade" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header d-flex flex-row align-items-center justify-content-between">
@@ -213,6 +198,10 @@ font-weight-bold
                             <textarea class="form-control" rows="3" name="keterangan"></textarea>
                         </div>
                     </div>
+                    <div class="alert alert-warning alert-block">
+                        <button type="button" class="close" data-dismiss="alert">×</button>
+                        <strong>Sistem akan otomatis mencari data peserta dari infografis sesuai batch yang dipilih!</strong>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -225,6 +214,67 @@ font-weight-bold
 
 <script>
 $(document).ready(function() {
+    var table = $('#listIssuedCertificates').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: "{{ route('certificate') }}",
+            data: function(d) {
+                d.penlat = $('#penlat').val();
+                d.batch = $('#batch').val();
+            }
+        },
+        columns: [
+            { data: 'batch.penlat.description', name: 'batch.penlat.description' },
+            { data: 'batch.penlat.alias', name: 'batch.penlat.alias' },
+            { data: 'batch.batch', name: 'batch.batch' },
+            { data: 'status', name: 'status' },
+            { data: 'keterangan', name: 'keterangan' },
+            { data: 'total_issued', name: 'total_issued' },
+            { data: 'action', name: 'action', orderable: false, searchable: false, className: 'text-center' }
+        ]
+    });
+
+    // Filter button click event
+    $('#filterButton').click(function() {
+        table.draw();
+    });
+
+    $('#listIssuedCertificates').on('click', '.delete-certificate', function() {
+        var certificateId = $(this).data('id');
+
+        swal({
+            title: "Are you sure?",
+            text: "Once deleted, you will not be able to recover this certificate!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then((willDelete) => {
+            if (willDelete) {
+                $.ajax({
+                    url: '{{ route("certificate.delete") }}', // Define the delete route
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        id: certificateId
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            swal("Success!", "Certificate has been deleted.", "success")
+                                .then(() => {
+                                    table.draw(); // Redraw the DataTable to refresh the data
+                                });
+                        } else {
+                            swal("Error!", "Certificate not found or could not be deleted.", "error");
+                        }
+                    },
+                    error: function (xhr) {
+                        swal("Error!", "There was an error deleting the certificate.", "error");
+                    }
+                });
+            }
+        });
+    });
     // Initialize Select2 for Batch with custom tagging
     $('#mySelect2').select2({
         dropdownParent: $('#inputDataModal'),
@@ -281,30 +331,5 @@ $(document).ready(function() {
     });
 });
 
-</script>
-<script>
-    document.getElementById('addApproversBtn').addEventListener('click', function() {
-        // Hide the "Add Approvers" button
-        document.getElementById('addApproversBtn').style.display = 'none';
-        // Show the form
-        document.getElementById('addApproverForm').style.display = 'block';
-        document.getElementById('hideApproversBtn').style.display = 'block';
-    });
-    document.getElementById('hideApproversBtn').addEventListener('click', function() {
-        // Hide the "Add Approvers" button
-        document.getElementById('addApproversBtn').style.display = 'block';
-        // Show the form
-        document.getElementById('addApproverForm').style.display = 'none';
-        document.getElementById('hideApproversBtn').style.display = 'none';
-    });
-
-    function displayFileName() {
-        const input = document.getElementById('file');
-        const label = document.getElementById('file-label');
-        const file = input.files[0];
-        if (file) {
-            label.textContent = file.name;
-        }
-    }
 </script>
 @endsection

@@ -12,12 +12,9 @@
     <link href="{{ asset('img/mtc-logo-1.jpg') }}" rel="apple-touch-icon">
 
     <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.7.3/dist/Chart.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{{ asset('js/chartjs-plugin-annotation') }}"></script>
-    <?php
-    // Calculate a version based on the current date, which changes every 24 hours.
-    $version = date('Ymd');
-    ?>
+
     <!-- CSS Libraries -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.0/normalize.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css">
@@ -32,7 +29,6 @@
     <script type="text/javascript" src="{{ asset('js/daterangepicker.min.js') }}"></script>
     <!-- Date Range Picker CSS -->
     <link rel="stylesheet" type="text/css" href="{{ asset('css/daterangepicker.css') }}" />
-    <script src="{{ asset('js/tinymce/tinymce.min.js') }}" referrerpolicy="origin"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chartist@0.11.0/dist/chartist.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jqvmap@1.5.1/dist/jqvmap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/weathericons@2.1.0/css/weather-icons.css">
@@ -154,7 +150,7 @@
                         <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-finance')">
                             <li><i class="fa fa-tachometer"></i><a href="{{ route('finance') }}" class="@yield('finance')">Dashboard</a></li>
                             <li><i class="fa fa-list-alt"></i><a href="{{ route('vendor-payment') }}" class="@yield('vendor-payment')">Pembayaran Vendor</a></li>
-                            <li><i class="ti-stats-down"></i><a href="{{ route('cost') }}" class="@yield('cost')">Cost</a></li>
+                            <li><i class="ti-stats-down"></i><a href="{{ route('profits') }}" class="@yield('cost')">Profits & Loss</a></li>
                         </ul>
                     </li>
                     @endusr_acc

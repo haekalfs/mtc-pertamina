@@ -17,7 +17,7 @@ font-weight-bold
 <div class="animated fadeIn">
     <div class="row">
         <!-- Earnings (Monthly) Card Example -->
-        <div class="col-xl-4 col-md-6 timesheet">
+        <div class="col-xl-4 col-md-6 animateBox">
             <a href="{{ route('certificate') }}" class="clickable-card">
                 <div class="card border-left-primary shadow py-2">
                     <div class="card-body">
@@ -41,7 +41,7 @@ font-weight-bold
             </div>
         </div>
         <!-- Earnings (Monthly) Card Example -->
-        <div class="col-xl-4 col-md-6 medical">
+        <div class="col-xl-4 col-md-6 animateBox">
             <a href="{{ route('certificate-instructor') }}" class="clickable-card">
                 <div class="card border-left-success shadow py-2">
                     <div class="card-body">
@@ -108,12 +108,7 @@ font-weight-bold
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold" id="judul">List Data</h6>
-                    <div class="text-right">
-                        <select class="form-control" id="year" name="year">
-                            <option>2024</option>
-                        </select>
-                    </div>
+                    <h6 class="m-0 font-weight-bold" id="judul">Overview</h6>
                 </div>
                 <nav>
                     <div class="nav nav-tabs" id="nav-tab" role="tablist">
@@ -187,223 +182,5 @@ font-weight-bold
         </div>
     </div>
 </div>
-<div class="modal fade zoom90" id="updateProcessModal" tabindex="-1" role="dialog" aria-labelledby="updateProcessModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header d-flex flex-row align-items-center justify-content-between border-bottom-1">
-          <h5 class="modal-title" id="updateProcessModalLabel">Update Process</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form>
-            <div class="d-flex align-items-center mb-4">
-                <div style="width: 140px;" class="mr-2">
-                    <p style="margin: 0;">Nama Penlat :</p>
-                </div>
-                <div class="flex-grow-1">
-                    <select class="form-control" name="penlat">
-                        @foreach ($penlatList as $item)
-                        <option value="{{ $item->id }}">{{ $item->description }}</option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-            <div class="d-flex align-items-center mb-4">
-                <div style="width: 140px;" class="mr-2">
-                    <p style="margin: 0;">Batch Penlat :</p>
-                </div>
-                <div class="flex-grow-1">
-                    <select name="stcw" class="form-control" id="stcw">
-                        @foreach ($listBatch as $item)
-                        <option value="{{ $item->batch }}">{{ $item->batch }}</option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-            <div class="d-flex align-items-center mb-4">
-                <div style="width: 140px;" class="mr-2">
-                    <p style="margin: 0;">Status :</p>
-                </div>
-                <div class="flex-grow-1">
-                    <select class="form-control" id="status">
-                      <option value="option1">Option 1</option>
-                      <option value="option2">Option 2</option>
-                      <option value="option3">Option 3</option>
-                    </select>
-                </div>
-            </div>
-          </form>
-          <!-- DataTable -->
-          <table id="dataTable" class="table table-striped table-bordered">
-            <thead>
-              <tr>
-                <th>Nama Peserta</th>
-                <th>Received</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- DataTable rows will be populated here -->
-            </tbody>
-          </table>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
-        </div>
-      </div>
-    </div>
-</div>
 
-<div class="modal fade zoom90" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header d-flex flex-row align-items-center justify-content-between">
-                <h5 class="modal-title" id="inputDataModalLabel">Input Data</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form method="post" enctype="multipart/form-data" action="{{ route('certificate.store') }}">
-                @csrf
-                <div class="modal-body mr-2 ml-2">
-                    <div class="d-flex align-items-center mb-4">
-                        <div style="width: 140px;" class="mr-2">
-                            <p style="margin: 0;">Nama Pelatihan :</p>
-                        </div>
-                        <div class="flex-grow-1">
-                            <select id="penlatSelect" class="form-control" name="penlat">
-                                <option selected disabled>Select Pelatihan...</option>
-                                @foreach ($penlatList as $item)
-                                <option value="{{ $item->id }}">{{ $item->description }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center mb-4">
-                        <div style="width: 140px;" class="mr-2">
-                            <p style="margin: 0;">Nama Program :</p>
-                        </div>
-                        <div class="flex-grow-1">
-                            <input type="text" id="programInput" class="form-control" name="program">
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center mb-4">
-                        <div style="width: 140px;" class="mr-2">
-                            <p style="margin: 0;">Batch :</p>
-                        </div>
-                        <div class="flex-grow-1">
-                            <select id="mySelect2" class="form-control" name="batch">
-                                @foreach ($listBatch as $item)
-                                    <option value="{{ $item->batch }}">{{ $item->batch }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center mb-4">
-                        <div style="width: 140px;" class="mr-2">
-                            <p style="margin: 0;">Status :</p>
-                        </div>
-                        <div class="flex-grow-1">
-                            <select class="form-control" id="status" name="status">
-                                <option value="On Process" selected>On Process</option>
-                                <option value="Issued">Issued</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-start mb-4">
-                        <div style="width: 140px;" class="mr-2">
-                            <p style="margin: 0;">Keterangan :</p>
-                        </div>
-                        <div class="flex-grow-1">
-                            <textarea class="form-control" rows="3" name="keterangan"></textarea>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Submit Request</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<script>
-$(document).ready(function() {
-    $('#mySelect2').select2({
-        dropdownParent: $('#inputDataModal'),
-        theme: "classic",
-        placeholder: "Select or add a Batch Penlat",
-        width: '100%',
-        tags: true,
-        createTag: function(params) {
-            var term = $.trim(params.term);
-            if (term === '') {
-                return null;
-            }
-            return {
-                id: term,
-                text: term,
-                newTag: true // Mark this as a new tag
-            };
-        },
-        templateResult: function(data) {
-            // Only show the "Add new" label if it's a new tag
-            if (data.newTag) {
-                return $('<span><em>Add new: "' + data.text + '"</em></span>');
-            }
-            return data.text;
-        },
-        templateSelection: function(data) {
-            // Show only the text for the selected item
-            return data.text;
-        }
-    });
-
-    $('#mySelect2').on('select2:select', function(e) {
-        if (e.params.data.newTag) {
-            // Show a notification that a new record is added
-
-            // After the new option is added, remove the "newTag" property
-            var newOption = new Option(e.params.data.text, e.params.data.id, true, true);
-            $(this).append(newOption).trigger('change');
-        }
-    });
-});
-</script>
-<script>
-    document.getElementById('addApproversBtn').addEventListener('click', function() {
-        // Hide the "Add Approvers" button
-        document.getElementById('addApproversBtn').style.display = 'none';
-        // Show the form
-        document.getElementById('addApproverForm').style.display = 'block';
-        document.getElementById('hideApproversBtn').style.display = 'block';
-    });
-    document.getElementById('hideApproversBtn').addEventListener('click', function() {
-        // Hide the "Add Approvers" button
-        document.getElementById('addApproversBtn').style.display = 'block';
-        // Show the form
-        document.getElementById('addApproverForm').style.display = 'none';
-        document.getElementById('hideApproversBtn').style.display = 'none';
-    });
-
-    function displayFileName() {
-        const input = document.getElementById('file');
-        const label = document.getElementById('file-label');
-        const file = input.files[0];
-        if (file) {
-            label.textContent = file.name;
-        }
-    }
-</script>
-
-<script>
-    document.getElementById('penlatSelect').addEventListener('change', function() {
-        var selectedOption = this.options[this.selectedIndex].text;
-        document.getElementById('programInput').value = selectedOption;
-    });
-</script>
 @endsection

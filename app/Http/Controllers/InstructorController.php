@@ -8,6 +8,7 @@ use App\Models\Instructor;
 use App\Models\Instructor_certificate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\File;
 
 class InstructorController extends Controller
 {
@@ -22,6 +23,7 @@ class InstructorController extends Controller
             'user_status'       => 'required',
             'profile_picture'   => 'required|mimes:jpeg,png,jpg,gif,svg',
             'cv'                => 'required',
+            'pendukung'         => 'sometimes',
             'working_hour'      => 'required',
             'ijazah'            => 'required',
             'certificates'      => 'required',
@@ -65,6 +67,13 @@ class InstructorController extends Controller
             $instructor->ijazahFilepath = $instructorDir . '/' . $ijazahName;
         }
 
+        if ($request->hasFile('pendukung')) {
+            $pendukung = $request->file('pendukung');
+            $pendukungName = 'document_pendukung.' . $pendukung->getClientOriginalExtension();
+            $pendukung->move(public_path($instructorDir), $pendukungName);
+            $instructor->documentPendukungFilepath = $instructorDir . '/' . $pendukungName;
+        }
+
         // Save Certificates (Assuming a Many-to-Many relationship)
         if (isset($validatedData['certificates'])) {
             // Assign roles
@@ -102,6 +111,7 @@ class InstructorController extends Controller
             'profile_picture'   => 'nullable|mimes:jpeg,png,jpg,gif,svg',
             'cvFilepath'        => 'nullable|mimes:pdf,doc,docx', // Adjust according to allowed CV formats
             'ijazahFilepath'    => 'nullable|mimes:pdf,doc,docx', // Adjust according to allowed Ijazah formats
+            'documentPendukungFilepath' => 'sometimes',
             'working_hour'      => 'required',
             'certificates'      => 'required|array',
             'certificates.*'    => 'required|integer',
@@ -163,6 +173,19 @@ class InstructorController extends Controller
             $instructor->ijazahFilepath = $instructorDir . '/' . $ijazahName;
         }
 
+        if ($request->hasFile('documentPendukungFilepath')) {
+            // Unlink existing Ijazah if it exists
+            if ($instructor->documentPendukungFilepath && file_exists(public_path($instructor->documentPendukungFilepath))) {
+                unlink(public_path($instructor->documentPendukungFilepath));
+            }
+
+            // Upload new Ijazah
+            $documentPendukungFilepath = $request->file('documentPendukungFilepath');
+            $documentPendukungFilepathName = 'document_pendukung.' . $documentPendukungFilepath->getClientOriginalExtension();
+            $documentPendukungFilepath->move(public_path($instructorDir), $documentPendukungFilepathName);
+            $instructor->documentPendukungFilepath = $instructorDir . '/' . $documentPendukungFilepathName;
+        }
+
         // Update Certificates (Assuming a Many-to-Many relationship)
         if (isset($validatedData['certificates'])) {
             // Sync certificates: Remove old ones not in the request and add new ones
@@ -189,5 +212,29 @@ class InstructorController extends Controller
 
         // Redirect or return response
         return redirect()->route('instructor')->with('success', 'Instructor updated successfully.');
+    }
+
+    public function deleteInstructor($instructorId)
+    {
+        // Find the instructor
+        $instructor = Instructor::findOrFail($instructorId);
+
+        // Define the path to the instructor's directory in the public folder
+        $folder = 'uploads/instructor/';
+        $instructorDir = public_path($folder . 'instructor_' . $instructor->id);
+
+        // Check if the directory exists and delete it
+        if (File::exists($instructorDir)) {
+            File::deleteDirectory($instructorDir); // This deletes the directory and all its contents
+        }
+
+        // Delete related certificates
+        $instructor->certificates()->delete();
+
+        // Delete the instructor
+        $instructor->delete();
+
+        // Return a success response
+        return response()->json(['success' => 'Instructor, related certificates, and files deleted successfully.']);
     }
 }

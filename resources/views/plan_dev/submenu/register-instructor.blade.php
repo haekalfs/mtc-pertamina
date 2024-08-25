@@ -120,6 +120,10 @@ font-weight-bold
                             <div class="col-12 col-md-9"><input type="file" id="ijazah" name="ijazah" class="form-control"></div>
                         </div>
                         <div class="row form-group">
+                            <div class="col col-md-3" style="font-size: 13px;"><label for="ijazah" class=" form-control-label">Dokumen Pendukung Lainnya (Optional)</label></div>
+                            <div class="col-12 col-md-9"><input type="file" id="pendukung" name="pendukung" class="form-control"></div>
+                        </div>
+                        <div class="row form-group">
                             <div class="col col-md-3"><label for="roles" class="form-control-label">Certifications</label></div>
                             <div class="col-12 col-md-9">
                                 <select data-placeholder="Certificate..." multiple class="standardSelect form-control" id="certificates" name="certificates[]">

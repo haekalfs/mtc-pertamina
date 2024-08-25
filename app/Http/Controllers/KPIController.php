@@ -130,8 +130,8 @@ class KpiController extends Controller
             $periodeStart = \Carbon\Carbon::parse($pencapaian->periode_start);
             $periodeEnd = \Carbon\Carbon::parse($pencapaian->periode_end);
 
-            // Loop through each date from start to end
-            for ($date = $periodeStart; $date->lte($periodeEnd); $date->addDay()) {
+            // Loop through each week from start to end
+            for ($date = $periodeStart; $date->lte($periodeEnd); $date->addWeek()) {
                 $dataPoints[] = [
                     'x' => $date->timestamp * 1000, // CanvasJS uses timestamp in milliseconds
                     'y' => $pencapaian->score

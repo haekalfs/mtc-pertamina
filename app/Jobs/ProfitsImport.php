@@ -2,6 +2,8 @@
 
 namespace App\Jobs;
 
+use App\Models\Penlat;
+use App\Models\Penlat_batch;
 use App\Models\Profit;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -68,25 +70,47 @@ class ProfitsImport implements ShouldQueue
                 }
 
                 if (strpos($row[0], '/') !== false) {
-                    // Process the row as a batch value row
-                    Profit::create([
-                        'tgl_pelaksanaan' => $currentDate,
-                        'pelaksanaan' => $row[0],
-                        'jumlah_peserta' => $row[2],
-                        'biaya_instruktur' => preg_replace('/[^0-9]/', '', $row[4]),
-                        'total_pnbp' => preg_replace('/[^0-9]/', '', $row[5]),
-                        'biaya_transportasi_hari' => preg_replace('/[^0-9]/', '', $row[6]),
-                        'honor_pnbp' => preg_replace('/[^0-9]/', '', $row[7]),
-                        'biaya_pendaftaran_peserta' => preg_replace('/[^0-9]/', '', $row[8]),
-                        'total_biaya_pendaftaran_peserta' => preg_replace('/[^0-9]/', '', $row[9]),
-                        'penagihan_foto' => preg_replace('/[^0-9]/', '', $row[10]),
-                        'penagihan_atk' => preg_replace('/[^0-9]/', '', $row[11]),
-                        'penagihan_snack' => preg_replace('/[^0-9]/', '', $row[12]),
-                        'penagihan_makan_siang' => preg_replace('/[^0-9]/', '', $row[13]),
-                        'penagihan_laundry' => preg_replace('/[^0-9]/', '', $row[14]),
-                        'jumlah_biaya' => preg_replace('/[^0-9]/', '', str_replace(',00', '', $row[15])),
-                        'profit' => preg_replace('/[^0-9]/', '', $row[16]),
-                    ]);
+                    //get penlat
+                    $parts = explode('/', $row[0]);
+                    $firstWord = $parts[0];
+
+                    //make sure its not exists
+                    $checkBatch = Penlat_batch::where('batch', $row[0])->exists();
+                    if(!$checkBatch){
+                        $getPenlat = Penlat::where('alias', $firstWord)->first();
+                        Penlat_batch::updateOrCreate(
+                            [
+                                'batch' => $row[0],
+                            ],
+                            [
+                                'penlat_id' => $getPenlat->id,
+                                'nama_program' => $getPenlat->description,
+                                'date' => $currentDate
+                            ]
+                        );
+                    }
+
+                    Penlat_batch::updateOrCreate(
+                        [
+                            'tgl_pelaksanaan' => $currentDate,
+                            'pelaksanaan' => $row[0],
+                            'jumlah_peserta' => $row[2],
+                            'biaya_instruktur' => preg_replace('/[^0-9]/', '', $row[4]),
+                            'total_pnbp' => preg_replace('/[^0-9]/', '', $row[5]),
+                            'biaya_transportasi_hari' => preg_replace('/[^0-9]/', '', $row[6]),
+                            'honor_pnbp' => preg_replace('/[^0-9]/', '', $row[7]),
+                            'biaya_pendaftaran_peserta' => preg_replace('/[^0-9]/', '', $row[8]),
+                            'total_biaya_pendaftaran_peserta' => preg_replace('/[^0-9]/', '', $row[9]),
+                            'penagihan_foto' => preg_replace('/[^0-9]/', '', $row[10]),
+                            'penagihan_atk' => preg_replace('/[^0-9]/', '', $row[11]),
+                            'penagihan_snack' => preg_replace('/[^0-9]/', '', $row[12]),
+                            'penagihan_makan_siang' => preg_replace('/[^0-9]/', '', $row[13]),
+                            'penagihan_laundry' => preg_replace('/[^0-9]/', '', $row[14]),
+                            'jumlah_biaya' => preg_replace('/[^0-9]/', '', str_replace(',00', '', $row[15])),
+                            'profit' => preg_replace('/[^0-9]/', '', $row[16]),
+                        ],
+                        []
+                    );
                 } else {
                     Log::warning('Skipped row due to missing date: ' . implode(', ', $row));
                 }

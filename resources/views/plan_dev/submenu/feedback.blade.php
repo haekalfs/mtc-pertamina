@@ -76,72 +76,61 @@ font-weight-bold
                     </div>
                 </div>
                 <div class="card-body zoom80">
-                    <form method="GET" action="">
-                        @csrf
-                        <div class="row d-flex justify-content-start mb-4">
-                            <div class="col-md-12">
-                                <div class="row align-items-center">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="email">Nama Penlat :</label>
-                                            <select class="custom-select" id="namaPenlat" name="namaPenlat">
-                                                <option value="1" selected>Show All</option>
-                                            </select>
-                                        </div>
+                    <div class="row d-flex justify-content-start mb-4">
+                        <div class="col-md-12">
+                            <div class="row align-items-center">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="email">Nama Penlat :</label>
+                                        <select class="custom-select" id="nama_pelatihan" name="nama_pelatihan">
+                                            <option value="-1" selected>Show All</option>
+                                            @foreach ($filterPelatihan as $item)
+                                                <option value="{{ $item->judul_pelatihan }}">{{ $item->judul_pelatihan }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
-                                    <div class="col-md-2">
-                                        <div class="form-group">
-                                            <label for="position_id">Kelompok :</label>
-                                            <select name="stcw" class="form-control" id="stcw">
-                                                <option value="1">Show All</option>
-                                            </select>
-                                        </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label for="position_id">Kelompok :</label>
+                                        <select name="kelompok" class="form-control" id="kelompok">
+                                            <option value="-1">Show All</option>
+                                            @foreach ($filterKelompok as $item)
+                                                <option value="{{ $item->kelompok }}">{{ $item->kelompok }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
-                                    <div class="col-md-2">
-                                        <div class="form-group">
-                                            <label for="status">Tanggal :</label>
-                                            <select class="form-control" id="jenisPenlat" name="jenisPenlat" required>
-                                                <option value="1" selected>Show All</option>
-                                            </select>
-                                        </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="status">Tanggal :</label>
+                                        <input type="text" class="form-control" name="daterange" id="daterange"/>
                                     </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label for="position_id">Jenis Feedback :</label>
-                                            <select name="tw" class="form-control" id="tw">
-                                                <option value="1">Show All</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-1 d-flex align-self-end justify-content-start">
-                                        <div class="form-group">
-                                            <div class="align-self-center">
-                                                <button type="submit" class="btn btn-primary" style="padding-left: 1.2em; padding-right: 1.2em;"><i class="ti-search"></i></button>
-                                            </div>
+                                </div>
+                                <div class="col-md-1 d-flex align-self-end justify-content-start">
+                                    <div class="form-group">
+                                        <div class="align-self-center">
+                                            <button id="searchBtn" type="submit" class="btn btn-primary" style="padding-left: 1.2em; padding-right: 1.2em;"><i class="ti-search"></i></button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </form>
-                    <table id="docLetter" class="table table-bordered">
+                    </div>
+                    <table id="listFeedback" class="table table-bordered">
                         <thead>
                             <tr>
-                                <th>Nama Peserta</th>
-                                <th>Nama Program</th>
                                 <th>Tgl Pelaksanaan</th>
-                                <th>Tempat Pelaksanaan</th>
-                                <th>Jenis Pelatihan</th>
-                                <th>Keterangan</th>
-                                <th>Subholding</th>
-                                <th>Perusahaan</th>
-                                <th>Kategori Program</th>
-                                <th>Realisasi</th>
+                                <th>Judul Pelatihan</th>
+                                <th>Instruktur</th>
+                                @foreach($feedbackTemplates as $template)
+                                    <th>{{ $template->questioner }}</th>
+                                @endforeach
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-
+                            <!-- Data will be populated by Yajra DataTables -->
                         </tbody>
                     </table>
                 </div>
@@ -149,144 +138,59 @@ font-weight-bold
         </div>
     </div>
 </div>
-<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-			<div class="modal-header d-flex flex-row align-items-center justify-content-between border-bottom-1">
-                <h5 class="modal-title" id="editModalLabel">Edit Participant</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="editForm">
-                    @csrf
-                    <input type="hidden" id="editId" name="id">
-                    <div class="form-group">
-                        <label for="editNamaPeserta">Nama Peserta</label>
-                        <input type="text" class="form-control" id="editNamaPeserta" name="nama_peserta" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editNamaProgram">Nama Program</label>
-                        <input type="text" class="form-control" id="editNamaProgram" name="nama_program" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editTglPelaksanaan">Tgl Pelaksanaan</label>
-                        <input type="date" class="form-control" id="editTglPelaksanaan" name="tgl_pelaksanaan" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editTempatPelaksanaan">Tempat Pelaksanaan</label>
-                        <input type="text" class="form-control" id="editTempatPelaksanaan" name="tempat_pelaksanaan" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editJenisPelatihan">Jenis Pelatihan</label>
-                        <input type="text" class="form-control" id="editJenisPelatihan" name="jenis_pelatihan" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editKeterangan">Keterangan</label>
-                        <input type="text" class="form-control" id="editKeterangan" name="keterangan" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editSubholding">Subholding</label>
-                        <input type="text" class="form-control" id="editSubholding" name="subholding" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editPerusahaan">Perusahaan</label>
-                        <input type="text" class="form-control" id="editPerusahaan" name="perusahaan" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editKategoriProgram">Kategori Program</label>
-                        <input type="text" class="form-control" id="editKategoriProgram" name="kategori_program" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editRealise">Realisasi</label>
-                        <input type="text" class="form-control" id="editRealisasi" name="realisasi" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Save changes</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
 <script>
 $(document).ready(function() {
-    $('.edit-btn').click(function() {
-        var id = $(this).data('item-id');
-        $.ajax({
-            url: '/infografis-peserta/' + id + '/edit',
-            method: 'GET',
-            success: function(data) {
-                $('#editId').val(data.id);
-                $('#editNamaPeserta').val(data.nama_peserta);
-                $('#editNamaProgram').val(data.nama_program);
-                $('#editTglPelaksanaan').val(data.tgl_pelaksanaan);
-                $('#editTempatPelaksanaan').val(data.tempat_pelaksanaan);
-                $('#editJenisPelatihan').val(data.jenis_pelatihan);
-                $('#editKeterangan').val(data.keterangan);
-                $('#editSubholding').val(data.subholding);
-                $('#editPerusahaan').val(data.perusahaan);
-                $('#editKategoriProgram').val(data.kategori_program);
-                $('#editRealisasi').val(data.realisasi);
-                $('#editModal').modal('show');
+    $('#listFeedback').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: "{{ route('feedback-report') }}",
+            data: function(d) {
+                d.nama_pelatihan = $('#nama_pelatihan').val();
+                d.kelompok = $('#kelompok').val();
+
+                // Pass startDate and endDate separately
+                var dateRange = $('#daterange').val();
+                if (dateRange) {
+                    var dates = dateRange.split(' - ');
+                    d.startDate = dates[0];
+                    d.endDate = dates[1];
+                }
             }
-        });
+        },
+        columns: [
+            { data: 'tgl_pelaksanaan', name: 'tgl_pelaksanaan' },
+            { data: 'judul_pelatihan', name: 'judul_pelatihan' },
+            { data: 'instruktur', name: 'instruktur' },
+            @foreach($feedbackTemplates as $template)
+                { data: 'feedback_{{ $template->id }}', name: 'feedback_{{ $template->id }}' },
+            @endforeach
+            { data: 'action', name: 'action', orderable: false, searchable: false }
+        ]
     });
 
-    $('#editForm').submit(function(e) {
-        e.preventDefault();
-        var id = $('#editId').val();
-        $.ajax({
-            url: '/infografis-peserta/' + id,
-            method: 'PUT',
-            data: $(this).serialize(),
-            success: function(response) {
-                $('#participant-' + id + ' td:nth-child(1)').text(response.nama_peserta);
-                $('#participant-' + id + ' td:nth-child(2)').text(response.nama_program);
-                $('#participant-' + id + ' td:nth-child(3)').text(response.tgl_pelaksanaan);
-                $('#participant-' + id + ' td:nth-child(4)').text(response.tempat_pelaksanaan);
-                $('#participant-' + id + ' td:nth-child(5)').text(response.jenis_pelatihan);
-                $('#participant-' + id + ' td:nth-child(6)').text(response.keterangan);
-                $('#participant-' + id + ' td:nth-child(7)').text(response.subholding);
-                $('#participant-' + id + ' td:nth-child(8)').text(response.perusahaan);
-                $('#participant-' + id + ' td:nth-child(9)').text(response.kategori_program);
-                $('#participant-' + id + ' td:nth-child(10)').text(response.realisasi);
-                $('#editModal').modal('hide');
-                $('.alert-success-saving-mid').show();
-                $('.overlay-mid').show();
-                $('.alert-success-saving-mid').text(response.message);
-                setTimeout(function() {
-                    $('.alert-success-saving-mid').fadeOut('slow');
-                    $('.overlay-mid').fadeOut('slow');
-                    window.location.reload();
-                }, 1000);
-            }
-        });
+    // Redraw the DataTable when the search button is clicked
+    $('#searchBtn').click(function() {
+        $('#listFeedback').DataTable().draw();
     });
 });
-</script>
-<script>
-    document.getElementById('addApproversBtn').addEventListener('click', function() {
-        // Hide the "Add Approvers" button
-        document.getElementById('addApproversBtn').style.display = 'none';
-        // Show the form
-        document.getElementById('addApproverForm').style.display = 'block';
-        document.getElementById('hideApproversBtn').style.display = 'block';
-    });
-    document.getElementById('hideApproversBtn').addEventListener('click', function() {
-        // Hide the "Add Approvers" button
-        document.getElementById('addApproversBtn').style.display = 'block';
-        // Show the form
-        document.getElementById('addApproverForm').style.display = 'none';
-        document.getElementById('hideApproversBtn').style.display = 'none';
+
+$(function() {
+    $('input[name="daterange"]').daterangepicker({
+        // Setup options as needed
+        autoUpdateInput: false,
+        locale: {
+            cancelLabel: 'Clear'
+        }
     });
 
-    function displayFileName() {
-        const input = document.getElementById('file');
-        const label = document.getElementById('file-label');
-        const file = input.files[0];
-        if (file) {
-            label.textContent = file.name;
-        }
-    }
+    $('input[name="daterange"]').on('apply.daterangepicker', function(ev, picker) {
+        $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+    });
+
+    $('input[name="daterange"]').on('cancel.daterangepicker', function(ev, picker) {
+        $(this).val('');
+    });
+});
 </script>
 @endsection

@@ -15,6 +15,7 @@ use App\Models\Room;
 use App\Models\Tool_img;
 use App\Models\Utility;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -163,7 +164,7 @@ class OperationController extends Controller
             // Return the DataTables response
             return DataTables::of($query)
                 ->addColumn('action', function($row) {
-                    return '<a data-item-id="' . $row->id . '" class="btn btn-outline-secondary btn-sm mr-2 edit-btn"  href="#" data-toggle="modal" data-target="#editModal"><i class="ti-eye"></i> Edit</a>';
+                    return '<a data-item-id="' . $row->id . '" class="btn btn-outline-secondary btn-sm mr-2 edit-btn"  href="#" data-toggle="modal" data-target="#editModal"><i class="fa fa-edit"></i> Edit</a>';
                 })
                 ->make(true);
         }
@@ -231,6 +232,27 @@ class OperationController extends Controller
         }
     }
 
+    public function delete_data_peserta($id)
+    {
+        try {
+            // Check if the Penlat is used in the Penlat_batch table
+            $isExist = Infografis_peserta::where('id', $id)->exists();
+
+            if (!$isExist) {
+                return response()->json(['status' => 'failed', 'message' => 'Cannot be deleted because rows not found!']);
+            }
+
+            $usages = Infografis_peserta::where('id', $id);
+            $usages->delete();
+
+            return response()->json(['status' => 'success', 'message' => 'Peserta data deleted successfully!']);
+        } catch (\Exception $e) {
+            // Log the exception for debugging
+            Log::error('Failed to delete Penlat: ' . $e->getMessage());
+            return response()->json(['status' => 'failed', 'message' => 'Failed to delete record due to an unexpected error!']);
+        }
+    }
+
     public function utility_store(Request $request)
     {
         // Validate the request
@@ -238,54 +260,77 @@ class OperationController extends Controller
             'penlat' => 'required',
             'batch' => 'required',
             'date' => 'required',
-            'image' => 'required',
+            'image' => 'required|image',
             'program' => 'sometimes'
         ]);
 
-        // Handle the image upload
-        $imagePath = null;
-        if ($request->hasFile('image')) {
+        DB::beginTransaction();
 
-            $image = $request->file('image');
-            $filename = time() . '_' . $image->getClientOriginalName();
-            $image->move(public_path('uploads/penlat_utility'), $filename);
-            $imagePath = 'uploads/penlat_utility/' . $filename;
-        }
+        try {
+            // Handle the image upload
+            $imagePath = null;
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                $filename = time() . '_' . $image->getClientOriginalName();
+                $image->move(public_path('uploads/penlat_utility'), $filename);
+                $imagePath = 'uploads/penlat_utility/' . $filename;
+            }
 
-        // Create a new entry
-        $penlatUtility = Penlat_batch::updateOrCreate(
-            [
-                'batch' => $request->batch,
-            ],
-            [
-                'penlat_id' => $request->penlat,
-                'nama_program' => $request->program,
-                'date' => $request->date,
-                'filepath' => $imagePath,
-            ]
-        );
+            $checkData = Penlat_batch::where('batch', $request->batch)->exists();
 
-        // Loop through the tools and save the PenlatUtilityUsage entries
-        foreach ($request->all() as $key => $value) {
-            if (strpos($key, 'qty_') === 0) {
-                $id = substr($key, 4); // Extract the tool id from the key
-                $quantity = $value;
-                $unit = $request->input('unit_' . $id);
-
-                Penlat_utility_usage::updateOrCreate(
+            if (!$checkData) {
+                // Create a new Penlat_batch entry
+                $penlatUtility = Penlat_batch::updateOrCreate(
                     [
-                        'penlat_batch_id' => $penlatUtility->id,
-                        'utility_id' => $id, // Assuming you want to store the tool's id as utility_id
+                        'batch' => $request->batch,
+                        'penlat_id' => $request->penlat,
                     ],
                     [
-                        'amount' => $quantity,
+                        'nama_program' => $request->program,
+                        'date' => $request->date,
+                        'filepath' => $imagePath,
                     ]
                 );
+            } else {
+                // If the batch exists, fetch the existing Penlat_batch record
+                $penlatUtility = Penlat_batch::where('batch', $request->batch)->first();
             }
-        }
 
-        // Redirect back with a success message
-        return redirect()->back()->with('success', 'Penlat utility data saved successfully!');
+            // Loop through the tools and save the PenlatUtilityUsage entries
+            foreach ($request->all() as $key => $value) {
+                if (strpos($key, 'qty_') === 0) {
+                    $id = substr($key, 4); // Extract the tool id from the key
+                    $quantity = $value;
+                    $unit = $request->input('unit_' . $id);
+
+                    Penlat_utility_usage::updateOrCreate(
+                        [
+                            'penlat_batch_id' => $penlatUtility->id,
+                            'utility_id' => $id, // Assuming you want to store the tool's id as utility_id
+                        ],
+                        [
+                            'amount' => $quantity,
+                        ]
+                    );
+                }
+            }
+
+            // Commit the transaction
+            DB::commit();
+
+            // Redirect back with a success message
+            return redirect()->back()->with('success', 'Penlat utility data saved successfully!');
+
+        } catch (Exception $e) {
+            // Rollback the transaction in case of an error
+            DB::rollBack();
+
+            // Log the error (optional)
+            Log::error('Error storing penlat utility data: ' . $e->getMessage());
+
+            // Redirect or return a response with an error message
+            return redirect()->back()->with('error', 'Failed to save penlat utility data. Please try again.');
+        }
     }
 
     public function delete_batch_usage($id)
@@ -404,7 +449,7 @@ class OperationController extends Controller
             }
 
             if ($request->batch && $request->batch != '-1') {
-                $data->where('batch', $request->stcw);
+                $data->where('batch', $request->batch);
             }
 
             $query = $data->with(['penlat', 'penlat_usage'])

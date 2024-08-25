@@ -3,6 +3,8 @@
 namespace App\Jobs;
 
 use App\Models\Infografis_peserta;
+use App\Models\Penlat;
+use App\Models\Penlat_batch;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -79,6 +81,31 @@ class ImportParticipantInfographics implements ShouldQueue
                     'kategori_program' => $row[19],
                     'realisasi' => $row[20],
                 ]);
+
+                if (strpos($row[10], '/') !== false) {
+                    //make sure its not exists
+                    $checkBatch = Penlat_batch::where('batch', $row[10])->exists();
+                    if(!$checkBatch){
+                        //get penlat
+                        $parts = explode('/', $row[10]);
+                        $firstWord = $parts[0];
+
+                        $checkPenlat = Penlat::where('alias', $firstWord)->exists();
+                        if ($checkPenlat) {
+                            $getPenlat = Penlat::where('alias', $firstWord)->first();
+                            Penlat_batch::updateOrCreate(
+                                [
+                                    'batch' => $row[10],
+                                ],
+                                [
+                                    'penlat_id' => $getPenlat->id,
+                                    'nama_program' => $getPenlat->description,
+                                    'date' => Carbon::createFromFormat('j-M-y', $row[12])->format('Y-m-d')
+                                ]
+                            );
+                        }
+                    }
+                }
             }
 
             fclose($handle);

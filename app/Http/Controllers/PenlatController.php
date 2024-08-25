@@ -8,6 +8,7 @@ use App\Models\Penlat_batch;
 use App\Models\Penlat_certificate;
 use App\Models\Penlat_requirement;
 use App\Models\Penlat_utility_usage;
+use App\Models\Profit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -45,7 +46,7 @@ class PenlatController extends Controller
                     $imageUrl = asset('img/default-img.png');
                 }
 
-                return '<a href="#"><img src="' . $imageUrl . '" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow"></a>';
+                return '<a href="'. route('preview-penlat', $item->id) .'"><img src="' . $imageUrl . '" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow animateBox"></a>';
             })
             ->addColumn('action', function($item) {
                 return '<div>
@@ -63,6 +64,12 @@ class PenlatController extends Controller
 
         $data = Penlat::all();
         return view('penlat.index', ['data' => $data]);
+    }
+
+    public function preview_penlat($penlatId)
+    {
+        $data = Penlat::find($penlatId);
+        return view('penlat.preview-penlat', ['data' => $data]);
     }
 
     public function tool_requirement_penlat()
@@ -237,7 +244,7 @@ class PenlatController extends Controller
             'alias' => 'nullable|string|max:100',
             'jenis_pelatihan' => 'nullable|string|max:255',
             'kategori_program' => 'nullable|string|max:255',
-            'display' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'display' => 'sometimes',
         ]);
 
         $penlat = Penlat::findOrFail($id);
@@ -325,7 +332,8 @@ class PenlatController extends Controller
 
             return DataTables::of($data)
                 ->addColumn('display', function($item) {
-                    return '<a href="' . route('preview-batch', $item->id) . '"><img src="' . asset($item->filepath) . '" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow "></a>';
+                    $imageUrl = $item->filepath ? asset($item->filepath) : 'https://via.placeholder.com/50x50/5fa9f8/ffffff';
+                    return '<a href="' . route('preview-batch', $item->id) . '"><img src="' . $imageUrl . '" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow animateBox"></a>';
                 })
                 ->addColumn('nama_pelatihan', function($item) {
                     return $item->penlat->description;
@@ -368,6 +376,12 @@ class PenlatController extends Controller
             'program' => 'sometimes',
         ]);
 
+        $checkData = Penlat_batch::where('batch', $request->batch)->exists();
+
+        if($checkData) {
+            return redirect()->back()->with('failed', 'Batch is Already Exist!');
+        }
+
         DB::beginTransaction(); // Start the transaction
 
         try {
@@ -399,7 +413,7 @@ class PenlatController extends Controller
             return redirect()->back()->with('success', 'Penlat Batch data saved successfully!');
         } catch (\Exception $e) {
             DB::rollBack(); // Rollback the transaction for any other exceptions
-            return redirect()->back()->with('error', 'An unexpected error occurred: ' . $e->getMessage())->withInput();
+            return redirect()->back()->with('failed', 'An unexpected error occurred: ' . $e->getMessage())->withInput();
         }
     }
 
@@ -479,7 +493,10 @@ class PenlatController extends Controller
     public function preview_batch($id)
     {
         $data = Penlat_batch::find($id);
-        return view('penlat.preview-batch', ['data' => $data]);
+
+        $profits = Profit::where('pelaksanaan', $data->batch)->first();
+
+        return view('penlat.preview-batch', ['data' => $data, 'profits' => $profits]);
     }
 
     public function penlat_import()

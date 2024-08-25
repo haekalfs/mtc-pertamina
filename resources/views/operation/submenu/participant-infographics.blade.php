@@ -282,8 +282,8 @@ font-weight-bold
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Submit Request</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Delete Data</button>
+                    <button type="submit" class="btn btn-primary">Update Data</button>
                 </div>
             </form>
         </div>
@@ -365,6 +365,46 @@ $(document).ready(function() {
                     $('.alert-success-saving-mid').fadeOut('slow');
                     $('.overlay-mid').fadeOut('slow');
                 }, 1000);
+            }
+        });
+    });
+
+    // Event listener for the Delete Data button
+    $('#editModal').on('click', '.btn-danger', function() {
+        var id = $('#editId').val(); // Get the ID of the participant to delete from the hidden input field
+
+        // Use SweetAlert to confirm the deletion
+        swal({
+            title: "Are you sure?",
+            text: "Once deleted, you will not be able to recover this participant's data!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+        .then((willDelete) => {
+            if (willDelete) {
+                // If the user confirms, proceed with the deletion
+                $.ajax({
+                    url: '/infografis-peserta-delete-data/' + id,  // Use the ID from the hidden input field
+                    method: 'DELETE',
+                    data: {
+                        _token: '{{ csrf_token() }}', // Add CSRF token
+                    },
+                    success: function(response) {
+                        // Hide the modal
+                        $('#editModal').modal('hide');
+
+                        // Show success alert with SweetAlert
+                        swal("Success!", response.message, "success");
+
+                        // Optionally, refresh the table or perform other actions
+                        table.draw();
+                    },
+                    error: function(xhr) {
+                        // Handle errors (optional)
+                        swal("Error!", "Something went wrong. Please try again.", "error");
+                    }
+                });
             }
         });
     });

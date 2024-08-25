@@ -20,7 +20,7 @@ font-weight-bold
         <p class="mb-3">Utilities Details Information.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
-        <a href="{{ route('cost') }}" class="btn btn-sm btn-secondary shadow-sm text-white"><i class="fa fa-backward"></i> Go Back</a>
+        <a href="{{ url()->previous() }}" class="btn btn-sm btn-secondary shadow-sm text-white"><i class="fa fa-backward"></i> Go Back</a>
     </div>
 </div>
 <div class="overlay overlay-mid" style="display: none;"></div>
@@ -64,10 +64,10 @@ font-weight-bold
             <div class="card-body">
                 <div class="col-md-12 mb-3">
                     <div class="row">
-                        <div class="col-md-2 d-flex align-items-center justify-content-center" style="padding-left: 1em;">
-                            <img src="{{ $data->filepath ? asset($data->filepath) : 'https://via.placeholder.com/50x50/5fa9f8/ffffff' }}" style="height: 150px; width: 150px; border-radius: 15px;" class="card-img" alt="...">
+                        <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding-left: 1em;">
+                            <img src="{{ $data->filepath ? asset($data->filepath) : 'https://via.placeholder.com/50x50/5fa9f8/ffffff' }}" style="height: 150px; width: 200px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
                         </div>
-                        <div class="col-md-8">
+                        <div class="col-md-9">
                             <table class="table table-borderless table-sm">
                                 <tr>
                                     <th style="width: 250px;">Nama Pelatihan</th>
@@ -119,24 +119,30 @@ font-weight-bold
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($data->penlat_usage as $tool)
-                                <tr>
-                                    <td data-th="Product">
-                                        <div class="row">
-                                            <div class="col-md-4 text-left">
-                                                <img src="{{ asset($tool->utility->filepath) }}" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow ">
+                            @if($data->penlat_usage->isNotEmpty())
+                                @foreach($data->penlat_usage as $tool)
+                                    <tr>
+                                        <td data-th="Product">
+                                            <div class="row">
+                                                <div class="col-md-4 text-left">
+                                                    <img src="{{ asset($tool->utility->filepath) }}" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
+                                                </div>
+                                                <div class="col-md-8 text-left mt-sm-2">
+                                                    <h5>{{ $tool->utility->utility_name }}</h5>
+                                                    <p class="font-weight-light">Satuan Default ({{ $tool->utility->utility_unit }})</p>
+                                                </div>
                                             </div>
-                                            <div class="col-md-8 text-left mt-sm-2">
-                                                <h5>{{ $tool->utility->utility_name }}</h5>
-                                                <p class="font-weight-light">Satuan Default ({{$tool->utility->utility_unit}})</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="text-center" style="width:7%">
-                                        {{ $tool->amount }}
-                                    </td>
+                                        </td>
+                                        <td class="text-center" style="width:7%">
+                                            {{ $tool->amount }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @else
+                                <tr class="text-center">
+                                    <td colspan="2">No Data Available</td>
                                 </tr>
-                            @endforeach
+                            @endif
                         </tbody>
                     </table>
                 </div>
@@ -149,7 +155,7 @@ font-weight-bold
                         <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                             <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> List Costs</h6>
                             <div class="text-right">
-                                <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Edit Data</a>
+                                {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Edit Data</a> --}}
                             </div>
                         </div>
                         <div class="card-body">

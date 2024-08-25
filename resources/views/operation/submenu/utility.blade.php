@@ -95,7 +95,7 @@ font-weight-bold
                                         <select name="batch" class="form-control" id="batch">
                                             <option value="-1">Show All</option>
                                             @foreach ($batchList as $item)
-                                            <option value="{{ $item->id }}">{{ $item->batch }}</option>
+                                            <option value="{{ $item->batch }}">{{ $item->batch }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -123,7 +123,7 @@ font-weight-bold
     </div>
 </div>
 
-<div class="modal fade zoom90" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
+<div class="modal fade" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 900px;" role="document">
         <div class="modal-content">
             <div class="modal-header d-flex flex-row align-items-center justify-content-between">
@@ -241,7 +241,7 @@ font-weight-bold
     });
 </script>
 <script>
-    $(document).ready(function() {
+$(document).ready(function() {
     $('#listUsages').DataTable({
         processing: true,
         serverSide: true,
@@ -249,7 +249,7 @@ font-weight-bold
             url: "{{ route('utility') }}",
             data: function (d) {
                 d.namaPenlat = $('#namaPenlat').val();
-                d.stcw = $('#batch').val();
+                d.batch = $('#batch').val();
             }
         },
         columns: [

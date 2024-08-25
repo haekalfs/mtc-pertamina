@@ -217,10 +217,10 @@ var chart = new CanvasJS.Chart("chartContainer", {
            return CanvasJS.formatDate(e.value, "DD-MMM-YYYY");
        },
        interval: 1,
-       intervalType: "week" // Adjust interval to week
+       intervalType: "month" // Adjust interval to week
    },
    data: [{
-       type: "spline",
+       type: "splineArea",
        markerSize: 5,
        xValueType: "dateTime",
        dataPoints: {!! json_encode($dataPoints, JSON_NUMERIC_CHECK) !!}

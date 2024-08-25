@@ -13,7 +13,6 @@ font-weight-bold
 @endsection
 
 @section('content')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
         <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-male"></i> Instruktur</h1>
@@ -57,16 +56,24 @@ font-weight-bold
         padding: 0.5rem 1rem; /* Adjust the padding for height and width */
         border-radius: 0.5rem; /* Optional: Adjust the border radius */
     }
-</style>
-<style>
-    #dataTable tbody tr {
-        margin: 0;
-        padding: 0;
+    /* Custom CSS to align the Select2 container */
+    .select2-container--default .select2-selection--single {
+        height: calc(2.25rem + 2px); /* Adjust this value to match your input height */
+        padding: 0.375rem 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
     }
 
-    #dataTable tbody td {
-        padding: 0;
-        border: none; /* Optional: removes the borders */
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: calc(2.25rem + 2px); /* Adjust this to vertically align the text */
+    }
+
+    .select2-container .select2-selection--single {
+        height: 100% !important; /* Ensure the height is consistent */
+    }
+
+    .select2-container {
+        width: 100% !important; /* Ensure the width matches the form control */
     }
 </style>
 <div class="animated fadeIn zoom90">
@@ -88,18 +95,32 @@ font-weight-bold
                                     <div class="col-md-5">
                                         <div class="form-group">
                                             <label for="email">Nama Pelatihan :</label>
-                                            <select class="form-control form-control" name="penlat">
-                                                <option value="0" selected>Show All</option>
+                                            <select id="penlatSelect" class="form-control" name="penlat">
+                                                <option value="-1" {{ $penlatId == '-1' ? 'selected' : '' }}>Show All</option>
                                                 @foreach ($penlatList as $item)
-                                                <option value="{{ $item->id }}" @if ($item->id == $penlatId) selected @endif>{{ $item->description }}</option>
+                                                    <option value="{{ $item->id }}" {{ $item->id == $penlatId ? 'selected' : '' }}>
+                                                        {{ $item->description }}
+                                                    </option>
                                                 @endforeach
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-md-1 d-flex align-self-end justify-content-start">
+                                    <div class="col-md-5">
+                                        <div class="form-group">
+                                            <label for="email">Status :</label>
+                                            <select class="form-control" name="status">
+                                                <option value="-1" {{ $statusId == '-1' ? 'selected' : '' }}>Show All</option>
+                                                <option value="1" {{ $statusId == '1' ? 'selected' : '' }}>Active</option>
+                                                <option value="0" {{ $statusId == '0' ? 'selected' : '' }}>Non Active</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1 d-flex align-self-end justify-content-start mb-1">
                                         <div class="form-group">
                                             <div class="align-self-center">
-                                                <button type="submit" class="btn btn-primary" style="padding-left: 1.2em; padding-right: 1.2em;"><i class="ti-search"></i></button>
+                                                <button type="submit" class="btn btn-primary" style="padding-left: 1.2em; padding-right: 1.2em;">
+                                                    <i class="ti-search"></i>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -107,56 +128,69 @@ font-weight-bold
                             </div>
                         </div>
                     </form>
-                    <div class="table-responsive p-2">
-                        <table id="dataTable" class="table table-borderless zoom90">
-                            <thead class="text-center" style="display: none;">
+                    <div class="table-responsive">
+                        <table id="dataTable" class="table table-bordered mt-4 zoom90">
+                            <thead>
                                 <tr>
                                     <th>Instructors</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody class="mt-2">
+                            <tbody>
                                 @foreach($data as $item)
                                 <tr>
-                                    <td>
-                                        <div class="card custom-card mb-3 bg-white shadow-none" style="border: 3px solid rgb(228, 228, 228);">
-                                            <div class="row no-gutters">
-                                                <div class="col-md-2 d-flex align-items-center justify-content-center animateBox" style="padding: 1.2em;">
-                                                    <a href="{{ route('preview-instructor', ['id' => $item->id, 'penlatId' => $penlatId]) }}">
-                                                        <img src="{{ asset($item->imgFilepath) }}" style="height: 150px; width: 120px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
-                                                    </a>
-                                                </div>
-                                                <div class="col-md-8 mt-2">
-                                                    <div class="card-body text-secondary p-2">
-                                                        <h5 class="card-title font-weight-bold mb-1 mt-2">{{ $item->instructor_name }}</h5>
-                                                        <div class="ml-2">
-                                                            <table class="table table-borderless table-sm mb-0 mt-2">
-                                                                <tr>
-                                                                    <td style="width: 180px;"><i class="ti-minus mr-2"></i> Email</td>
-                                                                    <td style="text-align: start;">: {{ $item->instructor_email }}</td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td><i class="ti-minus mr-2"></i> Umur</td>
-                                                                    <td style="text-align: start;">: {{ \Carbon\Carbon::parse($item->instructor_dob)->age}} Tahun</td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td><i class="ti-minus mr-2"></i> Jam Mengajar</td>
-                                                                    <td style="text-align: start;">: {{ $item->working_hours }}</td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td style="width: 180px;"><i class="ti-minus mr-2"></i> Avg Nilai Feedback</td>
-                                                                    <td style="text-align: start;">:</td>
-                                                                </tr>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-2 d-flex align-items-center justify-content-center">
-                                                    <a class="btn btn-outline-secondary btn-sm" href="{{ route('preview-instructor', ['id' => $item->id, 'penlatId' => $penlatId]) }}"><i class="menu-Logo fa fa-eye"></i> Summary</a>
-                                                </div>
-                                                <div class="card-icons position-absolute" style="top: 10px; right: 10px;">
-                                                    <a href="#"><i class="fa fa-download fa-2x text-secondary" style="font-size: 1.5em;"></i></a>
+                                    <td data-th="Product">
+                                        <div class="row">
+                                            <div class="col-md-3 d-flex justify-content-center align-items-center text-center">
+                                                <a href="{{ route('preview-instructor', ['id' => $item->id, 'penlatId' => $penlatId]) }}">
+                                                    <img src="{{ $item->imgFilepath ? asset($item->imgFilepath) : 'https://via.placeholder.com/150x150/5fa9f8/ffffff' }}" style="height: 150px; width: 120px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
+                                                </a>
+                                            </div>
+                                            <div class="col-md-9 text-left mt-sm-2">
+                                                <h5 class="card-title font-weight-bold">{{ $item->instructor_name }}</h5>
+                                                <div class="ml-2">
+                                                    <table class="table table-borderless table-sm">
+                                                        <tr>
+                                                            <td style="width: 180px;"><i class="ti-minus mr-2"></i> Email</td>
+                                                            <td style="text-align: start;">: {{ $item->instructor_email }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><i class="ti-minus mr-2"></i> Umur</td>
+                                                            <td style="text-align: start;">: {{ \Carbon\Carbon::parse($item->instructor_dob)->age }} Tahun</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><i class="ti-minus mr-2"></i> Jam Mengajar</td>
+                                                            <td style="text-align: start;">: {{ $item->working_hours }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 180px;"><i class="ti-minus mr-2"></i> Avg Nilai Feedback</td>
+                                                            <td style="text-align: start;">:
+                                                                @php
+                                                                    $roundedScore = round($item->average_feedback_score, 1); // Round to one decimal place
+                                                                    $wholeStars = floor($roundedScore);
+                                                                    $halfStar = ($roundedScore - $wholeStars) >= 0.5;
+                                                                @endphp
+
+                                                                @for ($i = 0; $i < 5; $i++)
+                                                                    @if ($i < $wholeStars)
+                                                                        <i class="fa fa-star"></i>
+                                                                    @elseif ($halfStar && $i == $wholeStars)
+                                                                        <i class="fa fa-star-half-o"></i>
+                                                                    @else
+                                                                        <i class="fa fa-star-o"></i>
+                                                                    @endif
+                                                                @endfor
+                                                                {{ $roundedScore ?? '-' }}
+                                                            </td>
+                                                        </tr>
+                                                    </table>
                                                 </div>
                                             </div>
+                                        </div>
+                                    </td>
+                                    <td class="actions text-center">
+                                        <div>
+                                            <a class="btn btn-outline-secondary btn-sm mr-2" href="{{ route('preview-instructor', ['id' => $item->id, 'penlatId' => $penlatId]) }}"><i class="menu-Logo fa fa-eye"></i> Summary</a>
                                         </div>
                                     </td>
                                 </tr>
@@ -169,46 +203,15 @@ font-weight-bold
         </div>
     </div>
 </div>
-<div class="modal fade" id="customModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content custom-modal-content">
-        <div class="modal-header d-flex flex-row align-items-center justify-content-between border-bottom-1">
-          <h5 class="modal-title" id="exampleModalLabel">Instructor Detail</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <h6>Serfifikat</h6>
-          <div class="badge-container mt-2 mb-4">
-            <span class="badge badge-success badge-custom mb-2">Certificate 1 <i class="fa fa-check-square-o"></i></span>
-            <span class="badge badge-success badge-custom">Certificate 3 <i class="fa fa-check-square-o"></i></span>
-            <span class="badge badge-success badge-custom">Certificate 4 <i class="fa fa-check-square-o"></i></span>
-            <span class="badge badge-secondary badge-custom">Badge 2</span>
-            <span class="badge badge-secondary badge-custom">Badge 2</span>
-          </div>
-          <hr>
-          <h6>Profil Diri</h6>
-          <div class="list-group mt-2">
-                <div class="list-group-item d-flex justify-content-between align-items-center">
-                    Curriculum Vitae
-                    <a href="path_to_curriculum_vitae.pdf" download class="btn btn-primary btn-sm"><i class="fa fa-download fa-2x" style="font-size: 1.5em;"></i></a>
-                </div>
-                <div class="list-group-item d-flex justify-content-between align-items-center">
-                    Ijazah
-                    <a href="path_to_ijazah.pdf" download class="btn btn-primary btn-sm"><i class="fa fa-download fa-2x" style="font-size: 1.5em;"></i></a>
-                </div>
-                <div class="list-group-item d-flex justify-content-between align-items-center">
-                    Dokumen Pendukung
-                    <a href="path_to_dokumen_pendukung.pdf" download class="btn btn-primary btn-sm"><i class="fa fa-download fa-2x" style="font-size: 1.5em;"></i></a>
-                </div>
-            </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
+<script>
+$(document).ready(function() {
+    $('#penlatSelect').select2({
+        placeholder: "Select Pelatihan...",
+        width: '100%',
+        height: '100%',
+        allowClear: true,
+    });
+});
+</script>
 @endsection
 

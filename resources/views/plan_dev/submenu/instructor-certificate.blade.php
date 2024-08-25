@@ -50,20 +50,6 @@ font-weight-bold
     <strong>{{ $message }}</strong>
 </div>
 @endif
-<style>
-
-.alert-success-saving-mid {
-  display: none;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  padding: 20px;
-  border-radius: 5px;
-  text-align: center;
-  z-index: 10000;
-}
-</style>
 <div class="animated fadeIn zoom90">
     <div class="row">
         <div class="col-md-12">
@@ -112,7 +98,7 @@ font-weight-bold
                                 <th>Related To</th>
                                 <th>Keterangan</th>
                                 <th>Total</th>
-                                <th>Action</th>
+                                <th width="160px">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -131,8 +117,11 @@ font-weight-bold
                                 </td>
                                 <td>{{ $item->keterangan }}</td>
                                 <td>{{ $item->total_issued }}</td>
-                                <td class="text-center">
-                                    <a class="btn btn-outline-secondary btn-sm" href="{{ route('preview-certificate-catalog', $item->id) }}"><i class="menu-Logo fa fa-eye"></i> View</a>
+                                <td>
+                                    <a class="btn btn-outline-secondary btn-sm mr-2" href="{{ route('preview-certificate-catalog', $item->id) }}"><i class="menu-Logo fa fa-eye"></i> View</a>
+                                    <a class="btn btn-outline-danger text-danger btn-sm delete-instructor-certificate" data-id="{{ $item->id }}">
+                                        <i class="fa fa-trash-o"></i> Delete
+                                    </a>
                                 </td>
                             </tr>
                             @endforeach
@@ -144,7 +133,7 @@ font-weight-bold
     </div>
 </div>
 
-<div class="modal fade zoom90" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
+<div class="modal fade" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header d-flex flex-row align-items-center justify-content-between">
@@ -172,24 +161,24 @@ font-weight-bold
                             <input type="text" id="issued_by" class="form-control" name="issued_by">
                         </div>
                     </div>
-                    <div class="d-flex align-items-center mb-4">
-                        <div style="width: 200px;" class="mr-2">
-                            <p style="margin: 0;">Related To :</p>
-                        </div>
-                        <div class="flex-grow-1">
-                            <select class="js-example-basic-multiple form-control" name="penlats[]" multiple="multiple">
-                                @foreach ($penlatList as $item)
-                                <option value="{{ $item->id }}">{{ $item->description }}</option>
-                                @endforeach
-                              </select>
-                        </div>
-                    </div>
                     <div class="d-flex align-items-start mb-4">
                         <div style="width: 200px;" class="mr-2">
                             <p style="margin: 0;">Keterangan :</p>
                         </div>
                         <div class="flex-grow-1">
                             <textarea class="form-control" rows="3" name="keterangan"></textarea>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-4">
+                        <div style="width: 200px;" class="mr-2">
+                            <p style="margin: 0;">Related To :</p>
+                        </div>
+                        <div class="flex-grow-1" style="max-width: 530px;">
+                            <select data-placeholder="Penlat List..." multiple class="standardSelect form-control" name="penlats[]" multiple="multiple">
+                                @foreach ($penlatList as $item)
+                                <option value="{{ $item->id }}">{{ $item->description }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -204,13 +193,50 @@ font-weight-bold
 
 <script>
 $(document).ready(function() {
-    $('.js-example-basic-multiple').select2({
-        dropdownParent: $('#inputDataModal'),
-        placeholder: "Select Related Penlat",
-        width: '100%',
-        tags: true
+    $('.delete-instructor-certificate').click(function(e) {
+        e.preventDefault();
+
+        let certificateId = $(this).data('id'); // Assuming you pass the certificate ID via data attribute
+
+        swal({
+            title: "Are you sure?",
+            text: "Once deleted, you will not be able to recover this certificate!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+        .then((willDelete) => {
+            if (willDelete) {
+                // Make AJAX request to delete the certificate
+                $.ajax({
+                    url: '{{ route("certificates_catalog.delete", ":id") }}'.replace(':id', certificateId),
+                    method: 'DELETE',
+                    data: {
+                        _token: '{{ csrf_token() }}', // Include the CSRF token
+                    },
+                    success: function(response) {
+                        swal("Success! The certificate and its relations have been deleted!", {
+                            icon: "success",
+                        }).then(() => {
+                            location.reload(); // Reload the page after deletion
+                        });
+                    },
+                    error: function(xhr) {
+                        swal("Error! Something went wrong.", {
+                            icon: "error",
+                        });
+                    }
+                });
+            } else {
+                // Show a message if deletion is canceled
+                swal("Your certificate is safe!", {
+                    icon: "info",
+                });
+            }
+        });
     });
 });
+
 </script>
 <script>
 

@@ -14,7 +14,17 @@ class Penlat_batch extends Model
 
     public function penlat()
     {
-        return $this->belongsTo('App\Models\Penlat')->withDefault();
+        return $this->belongsTo('App\Models\Penlat', 'penlat_id', 'id')->withDefault();
+    }
+
+    public function infografis_peserta()
+    {
+        return $this->hasMany('App\Models\Infografis_peserta', 'batch', 'batch');
+    }
+
+    public function profits()
+    {
+        return $this->hasMany('App\Models\Profit', 'pelaksanaan', 'batch');
     }
 
     public function penlat_usage()

@@ -13,7 +13,6 @@ font-weight-bold
 @endsection
 
 @section('content')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <div class="d-sm-flex align-items-center zoom90 justify-content-between mb-2">
     <div>
         <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="ti-minus mr-2"></i> Preview Room Inventory</h1>
@@ -154,7 +153,7 @@ font-weight-bold
     </div>
 </div>
 
-<div class="modal fade zoom90" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
+<div class="modal fade" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header d-flex flex-row align-items-center justify-content-between">
@@ -213,7 +212,7 @@ font-weight-bold
     </div>
 </div>
 
-<div class="modal fade zoom90" id="editDataModal" tabindex="-1" role="dialog" aria-labelledby="editDataModalLabel" aria-hidden="true">
+<div class="modal fade" id="editDataModal" tabindex="-1" role="dialog" aria-labelledby="editDataModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 900px;" role="document">
         <div class="modal-content">
             <div class="modal-header d-flex flex-row align-items-center justify-content-between">

@@ -30,7 +30,7 @@ font-weight-bold
     <div class="row">
         <!-- Earnings (Monthly) Card Example -->
         <div class="col-xl-4 col-md-6 animateBox">
-            <a href="{{ route('cost') }}" class="clickable-card">
+            <a href="{{ route('profits') }}" class="clickable-card">
                 <div class="card border-left-primary shadow py-2">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
@@ -50,7 +50,7 @@ font-weight-bold
 
         <!-- Earnings (Monthly) Card Example -->
         <div class="col-xl-4 col-md-6 animateBox">
-            <a href="{{ route('cost') }}" class="clickable-card">
+            <a href="{{ route('profits') }}" class="clickable-card">
                 <div class="card border-left-danger shadow py-2">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
@@ -71,7 +71,7 @@ font-weight-bold
 
         <!-- Earnings (Monthly) Card Example -->
         <div class="col-xl-4 col-md-6 animateBox">
-            <a href="{{ route('cost') }}" class="clickable-card">
+            <a href="{{ route('profits') }}" class="clickable-card">
                 <div class="card border-left-success shadow py-2">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">

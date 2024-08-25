@@ -13,7 +13,6 @@ font-weight-bold
 @endsection
 
 @section('content')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <div class="d-sm-flex align-items-center zoom90 justify-content-between mb-2">
     <div>
         <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="ti-minus mr-2"></i> Preview Room Inventory</h1>

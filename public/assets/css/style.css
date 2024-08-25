@@ -2635,27 +2635,6 @@ footer.site-footer {
 }
 
 
-.zoom80{
-    zoom: 80%;
-}
-
-.zoom85{
-zoom: 85%;
-}
-
-.zoom90{
-zoom: 90%;
-}
-
-.zoom95{
-zoom: 95%;
-}
-
-.zoom70{
-zoom: 70%;
-}
-
-
 .row-toolbar {
     display: flex;
     justify-content: space-between;
@@ -3116,4 +3095,35 @@ zoom: 70%;
     width: 95%; /* Adjust the width as needed */
     max-width: 100%; /* Optional: set a maximum width */
     border-radius: 0; /* Remove border-radius to eliminate curvature */
+}
+.select2-selection__rendered {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 400px !important;
+}
+table.dataTable {
+    width: 100% !important; /* Ensure the table takes up the full width of the container */
+    table-layout: auto;      /* Allow columns to adjust based on their content */
+}
+
+
+.zoom80{
+    zoom: 80%;
+}
+
+.zoom85{
+zoom: 85%;
+}
+
+.zoom90{
+zoom: 90%;
+}
+
+.zoom95{
+zoom: 95%;
+}
+
+.zoom70{
+zoom: 70%;
 }

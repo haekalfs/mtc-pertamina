@@ -102,7 +102,7 @@ font-weight-bold
                         {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Add Utilities</a> --}}
                     </div>
                 </div>
-                <div class="card-body">
+                <div class="card-body zoom80">
                     <table class="table table-borderless zoom90">
                         <thead>
                             <tr class="text-center" style="display: none;">
@@ -117,17 +117,36 @@ font-weight-bold
                                         <div class="col-md-3 text-left">
                                             <img src="{{ asset($instructor->imgFilepath) }}" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow ">
                                         </div>
+                                        @php
+                                            $roundedScore = round($instructor->average_feedback_score, 1); // Round to one decimal place
+                                            $wholeStars = floor($roundedScore);
+                                            $halfStar = ($roundedScore - $wholeStars) >= 0.5;
+                                        @endphp
                                         <div class="col-md-9 text-left mt-sm-2">
                                             <h5 class="card-title font-weight-bold mb-1">{{ $instructor->instructor_name }}</h5>
                                             <div class="ml-2">
                                                 <table class="table table-borderless table-sm mb-0">
                                                     <tr>
-                                                        <td style="width: 100px;"><i class="ti-minus mr-2"></i> Email</td>
+                                                        <td style="width: 120px;"><i class="ti-minus mr-2"></i> Email</td>
                                                         <td style="text-align: start;">: {{ $instructor->instructor_email }}</td>
                                                     </tr>
                                                     <tr>
                                                         <td><i class="ti-minus mr-2"></i> Umur</td>
                                                         <td style="text-align: start;">: {{ \Carbon\Carbon::parse($instructor->instructor_dob)->age}} Tahun</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><i class="ti-minus mr-2"></i> Feedback</td>
+                                                        <td style="text-align: start;">:
+                                                            @for ($i = 0; $i < 5; $i++)
+                                                                @if ($i < $wholeStars)
+                                                                    <i class="fa fa-star"></i>
+                                                                @elseif ($halfStar && $i == $wholeStars)
+                                                                    <i class="fa fa-star-half-o"></i>
+                                                                @else
+                                                                    <i class="fa fa-star-o"></i>
+                                                                @endif
+                                                            @endfor {{ $roundedScore ?? '-' }}
+                                                        </td>
                                                     </tr>
                                                 </table>
                                             </div>
@@ -256,6 +275,4 @@ font-weight-bold
     }
 }
 </script>
-
-<script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
 @endsection

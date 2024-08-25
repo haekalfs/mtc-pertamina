@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Certificates_catalog;
 use App\Models\Certificates_to_penlat;
 use App\Models\Department;
+use App\Models\Feedback_report;
+use App\Models\Feedback_template;
 use App\Models\Infografis_peserta;
 use App\Models\Instructor;
 use App\Models\Instructor_certificate;
@@ -17,10 +19,13 @@ use App\Models\Regulation;
 use App\Models\Role;
 use App\Models\Status;
 use App\Models\Training_reference;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Yajra\DataTables\Facades\DataTables;
 
 class PDController extends Controller
 {
@@ -35,9 +40,70 @@ class PDController extends Controller
         return view('plan_dev.index', ['instructorCount' => $instructorCount, 'referencesCount' => $referencesCount, 'instructors' => $instructors]);
     }
 
-    public function feedback_report()
+    public function feedback_report(Request $request)
     {
-        return view('plan_dev.submenu.feedback');
+        if ($request->ajax()) {
+            $feedbackTemplates = Feedback_template::all();
+
+            // Start building the query for feedback reports
+            $query = Feedback_report::query();
+
+            // Apply filters based on the request parameters (if any)
+            if ($request->nama_pelatihan != '-1') {
+                $query->where('judul_pelatihan', $request->nama_pelatihan);
+            }
+
+            if ($request->kelompok != '-1') {
+                $query->where('kelompok', $request->kelompok);
+            }
+
+            // Apply date range filter if provided
+            if ($request->startDate && $request->endDate) {
+                $query->whereBetween('tgl_pelaksanaan', [$request->startDate, $request->endDate]);
+            }
+
+            // Select necessary fields and perform a group by
+            $query->select('nama', 'judul_pelatihan', 'instruktur', 'tgl_pelaksanaan')
+                ->groupBy('nama', 'judul_pelatihan', 'instruktur', 'tgl_pelaksanaan');
+
+            // Eager load feedback scores for all feedback templates in a single query
+            $feedbackData = Feedback_report::whereIn('feedback_template_id', $feedbackTemplates->pluck('id'))
+                ->get()
+                ->groupBy(function($item) {
+                    return $item->nama . '_' . $item->judul_pelatihan . '_' . $item->instruktur;
+                });
+
+            // Transform the reports with feedback data
+            $reports = $query->get()->map(function($item) use ($feedbackTemplates, $feedbackData) {
+                $key = $item->nama . '_' . $item->judul_pelatihan . '_' . $item->instruktur;
+                $feedbackScores = $feedbackData->get($key, collect())->keyBy('feedback_template_id');
+
+                $feedback = [];
+                foreach ($feedbackTemplates as $template) {
+                    $feedback['feedback_' . $template->id] = $feedbackScores->get($template->id)->score ?? '-';
+                }
+
+                return array_merge($item->toArray(), $feedback);
+            });
+
+            return DataTables::of($reports)
+                ->addColumn('action', function($item) {
+                    return '<a href="#" class="btn btn-sm btn-primary">Action</a>';
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        }
+
+        $feedbackTemplates = Feedback_template::orderBy('id', 'asc')->get();
+        $queryFilter = Feedback_report::query();
+        $filterPelatihan = $queryFilter->get()->unique('judul_pelatihan');
+        $filterKelompok = $queryFilter->get()->unique('kelompok');
+
+        return view('plan_dev.submenu.feedback', [
+            'feedbackTemplates' => $feedbackTemplates,
+            'filterPelatihan' => $filterPelatihan,
+            'filterKelompok' => $filterKelompok
+        ]);
     }
 
     public function feedback_report_import()
@@ -52,27 +118,72 @@ class PDController extends Controller
         return view('plan_dev.submenu.regulation', ['data' => $data ,'statuses' => $statuses]);
     }
 
-    public function main_certificate()
+    public function preview_regulation($itemId)
     {
-        $penlatList = Penlat::all();
-        //filtering list
-        $listBatch = Penlat_batch::all();
+        $data = Regulation::find($itemId);
+        $statuses = Status::all();
 
-        $data = Penlat_certificate::all();
-        $instructorData = Certificates_catalog::all();
+        // Check if the file exists and is a PDF
+        $fileExists = false;
+        $isPdf = false;
+        $filePath = null;
 
-        return view('plan_dev.certification-main', ['data' => $data, 'penlatList' => $penlatList, 'listBatch' => $listBatch, 'instructorData' => $instructorData]);
+        if ($data && file_exists(public_path($data->filepath))) {
+            $fileExists = true;
+            $filePath = public_path($data->filepath);
+            $isPdf = pathinfo($filePath, PATHINFO_EXTENSION) === 'pdf';
+        }
+
+        return view('plan_dev.submenu.preview-regulation', compact('data', 'fileExists', 'isPdf', 'filePath', 'statuses'));
     }
 
-    public function certificate()
+    public function main_certificate()
+    {
+        $data = Penlat_certificate::latest()->take(10)->get();
+        $instructorData = Certificates_catalog::latest()->take(10)->get();
+
+        return view('plan_dev.certification-main', ['data' => $data, 'instructorData' => $instructorData]);
+    }
+
+    public function certificate(Request $request)
     {
         $penlatList = Penlat::all();
-        //filtering list
         $listBatch = Penlat_batch::all();
 
-        $data = Penlat_certificate::all();
+        if ($request->ajax()) {
+            $query = Penlat_certificate::with(['batch.penlat']);
 
-        return view('plan_dev.submenu.certificate', ['data' => $data, 'penlatList' => $penlatList, 'listBatch' => $listBatch]);
+            if ($request->penlat) {
+                $query->whereHas('batch.penlat', function($q) use ($request) {
+                    $q->where('id', $request->penlat);
+                });
+            }
+
+            if ($request->batch) {
+                $query->whereHas('batch', function($q) use ($request) {
+                    $q->where('batch', $request->batch);
+                });
+            }
+
+            // Fetch the correct records
+            $certificates = $query->get();
+
+            // Manually build the DataTables response
+            return DataTables::of($certificates)
+                ->addColumn('action', function($item) {
+                    return '
+                        <a class="btn btn-outline-secondary mr-2 btn-sm" href="'.route('preview-certificate', $item->id).'"><i class="menu-Logo fa fa-eye"></i> Preview</a>
+                        <button class="btn btn-outline-danger btn-sm delete-certificate" data-id="'.$item->id.'"><i class="fa fa-trash"></i> Delete</button>
+                    ';
+                })
+                ->make(true);
+        }
+
+        // If it's not an AJAX request, return the view with necessary data
+        return view('plan_dev.submenu.certificate', [
+            'penlatList' => $penlatList,
+            'listBatch' => $listBatch
+        ]);
     }
 
     public function certificate_instructor()
@@ -86,27 +197,53 @@ class PDController extends Controller
         return view('plan_dev.submenu.instructor-certificate', ['data' => $data, 'penlatList' => $penlatList, 'listBatch' => $listBatch]);
     }
 
-    public function instructor(Request $request, $penlatId = 0)
+    public function instructor(Request $request, $penlatId = '-1', $status = '-1')
     {
         // Validate the request inputs
         $validator = Validator::make($request->all(), [
-            'penlat' => 'sometimes'
+            'penlat' => 'sometimes',
+            'status' => 'sometimes'
         ]);
 
-        $query = Instructor::query();
+        // Initialize the query with eager loading of the feedbacks relationship
+        $query = Instructor::with('feedbacks');
 
-        // Apply filters based on the request
-        if($request->penlat != 0){
+        if($request->penlat){
             $penlatId = $request->penlat;
-            //search data
-            $getData = Certificates_to_penlat::where('penlat_id', $penlatId)->pluck('certificates_catalog_id')->toArray();
-            $validateData = Instructor_certificate::whereIn('certificates_catalog_id', $getData)->pluck('instructor_id')->toArray();
-            $query->whereIn('id', $validateData);
+        }
+        // Apply filters based on the request
+        if ($penlatId != '-1' && !is_null($penlatId)) {
+            // Search for related certificates
+            $certificatesCatalogIds = Certificates_to_penlat::where('penlat_id', $penlatId)
+                ->pluck('certificates_catalog_id');
+
+            // Get instructor IDs related to the certificates
+            $instructorIds = Instructor_certificate::whereIn('certificates_catalog_id', $certificatesCatalogIds)
+                ->pluck('instructor_id');
+
+            // Filter instructors by these IDs
+            $query->whereIn('id', $instructorIds);
         }
 
+        $status = $request->status;
+        if ($status != '-1' && !is_null($status)) {
+            // Filter by status
+            $query->where('status', $status);
+        }
+
+        // Get the filtered data
         $data = $query->get();
+
+        // Get all Penlat data
         $penlatList = Penlat::all();
-        return view('plan_dev.submenu.instructor', ['data' => $data, 'penlatList' => $penlatList, 'penlatId' => $penlatId]);
+
+        // Pass the data to the view
+        return view('plan_dev.submenu.instructor', [
+            'data' => $data,
+            'penlatList' => $penlatList,
+            'penlatId' => $penlatId,
+            'statusId' => $status
+        ]);
     }
 
     public function training_reference()
@@ -144,12 +281,22 @@ class PDController extends Controller
             $file = $request->file('file');
             $filename = time() . '_' . $file->getClientOriginalName();
 
-            // Get the file size before moving the file
-            $fileSize = $file->getSize();
+            // Get the file size in bytes before moving the file
+            $fileSizeInBytes = $file->getSize();
 
+            // Convert the size to KB
+            $fileSizeInKb = $fileSizeInBytes / 1024;
+
+            // Convert the size to MB
+            $fileSizeInMb = $fileSizeInBytes / 1048576; // 1024 * 1024
+
+            // Move the file to the desired location
             $file->move(public_path('uploads/regulation'), $filename);
+
+            // Save the file path and size in KB or MB format with two decimal places
             $regulation->filepath = 'uploads/regulation/' . $filename;
-            $regulation->filesize = $fileSize;
+            $regulation->filesize = number_format($fileSizeInKb, 2); // Save in KB
+            // $regulation->filesize = number_format($fileSizeInMb, 2); // Save in MB
         }
 
         // Save to the database
@@ -157,6 +304,55 @@ class PDController extends Controller
 
         // Redirect with a success message
         return redirect()->back()->with('success', 'Regulation created successfully.');
+    }
+
+    public function update_regulation(Request $request)
+    {
+        $request->validate([
+            'regulation_name' => 'required',
+            'status' => 'required',
+            'file' => 'nullable|mimes:pdf,docx,doc'
+        ]);
+
+        $regulation = Regulation::find($request->input('regulation_id'));
+        $regulation->description = $request->input('regulation_name');
+        $regulation->status = $request->input('status');
+
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $filename = time() . '_' . $file->getClientOriginalName();
+
+            // Optionally delete the old file if you want
+            if ($regulation->filepath && file_exists(public_path($regulation->filepath))) {
+                unlink(public_path($regulation->filepath));
+            }
+
+            $file->move(public_path('uploads/regulation'), $filename);
+            $regulation->filepath = 'uploads/regulation/' . $filename;
+        }
+
+        $regulation->save();
+
+        return redirect()->back()->with('success', 'Regulation updated successfully.');
+    }
+
+    public function delete_regulation($id)
+    {
+        $regulation = Regulation::find($id);
+
+        if ($regulation) {
+            // Delete the file from storage if it exists
+            if (file_exists(public_path($regulation->filepath))) {
+                unlink(public_path($regulation->filepath));
+            }
+
+            // Delete the record from the database
+            $regulation->delete();
+
+            return response()->json(['success' => 'Regulation deleted successfully.']);
+        }
+
+        return response()->json(['error' => 'Regulation not found.'], 404);
     }
 
     /**
@@ -179,49 +375,74 @@ class PDController extends Controller
         // Store the current timestamp
         $currentTimestamp = now();
 
-        // Create or update the Penlat_batch entry
-        $penlatBatch = Penlat_batch::updateOrCreate(
-            [
-                'batch' => $validated['batch'],
-            ],
-            [
-                'penlat_id' => $validated['penlat'],
-                'nama_program' => $validated['program'],
-                'updated_at' => $currentTimestamp,
-            ]
-        );
+        DB::beginTransaction();
 
-        // Retrieve all participants for the specified batch
-        $participants = Infografis_peserta::where('batch', $validated['batch'])->get();
+        try {
+            // Check if the batch already exists
+            $checkData = Penlat_batch::where('batch', $request->batch)->exists();
 
-        // Create or update the Penlat_certificate entry
-        $penlatCertificate = Penlat_certificate::updateOrCreate(
-            [
-                'penlat_batch_id' => $penlatBatch->id,
-            ],
-            [
-                'status' => $validated['status'],
-                'keterangan' => $validated['keterangan'],
-                'total_issued' => $participants->count(),
-                'updated_at' => $currentTimestamp,
-            ]
-        );
+            if(!$checkData) {
+                // Create or update the Penlat_batch entry
+                $penlatBatch = Penlat_batch::updateOrCreate(
+                    [
+                        'batch' => $validated['batch'],
+                        'penlat_id' => $validated['penlat'],
+                    ],
+                    [
+                        'nama_program' => $validated['program'],
+                        'updated_at' => $currentTimestamp,
+                    ]
+                );
+            } else {
+                // If the batch exists, fetch the existing Penlat_batch record
+                $penlatBatch = Penlat_batch::where('batch', $validated['batch'])->first();
+            }
 
-        // Iterate over participants and update or create their certificates
-        foreach ($participants as $participant) {
-            Receivables_participant_certificate::updateOrCreate(
+            // Retrieve all participants for the specified batch
+            $participants = Infografis_peserta::where('batch', $validated['batch'])->get();
+
+            // Create or update the Penlat_certificate entry
+            $penlatCertificate = Penlat_certificate::updateOrCreate(
                 [
-                    'infografis_peserta_id' => $participant->id,
-                    'penlat_certificate_id' => $penlatCertificate->id,
+                    'penlat_batch_id' => $penlatBatch->id,
                 ],
                 [
+                    'status' => $validated['status'],
+                    'keterangan' => $validated['keterangan'],
+                    'total_issued' => $participants->count(),
                     'updated_at' => $currentTimestamp,
                 ]
             );
-        }
 
-        // Redirect or return a response with a success message
-        return redirect()->back()->with('success', 'Certificate data stored successfully.');
+            // Iterate over participants and update or create their certificates
+            foreach ($participants as $participant) {
+                Receivables_participant_certificate::updateOrCreate(
+                    [
+                        'infografis_peserta_id' => $participant->id,
+                        'penlat_certificate_id' => $penlatCertificate->id,
+                    ],
+                    [
+                        'updated_at' => $currentTimestamp,
+                    ]
+                );
+            }
+
+            // Commit the transaction
+            DB::commit();
+
+            // Redirect or return a response with a success message
+            return redirect()->back()->with('success', 'Certificate data stored successfully.');
+
+        } catch (Exception $e) {
+            // Rollback the transaction in case of an error
+            DB::rollBack();
+
+            // Log the error (optional)
+            Log::error('Error storing certificate data: ' . $e->getMessage());
+
+            // Redirect or return a response with an error message
+            return redirect()->back()->with('error', 'Failed to store certificate data. Please try again.');
+        }
     }
 
     public function preview_certificate($id)
@@ -282,7 +503,7 @@ class PDController extends Controller
     {
         $data = Instructor::find($id);
 
-        if($penlatId != 0){
+        if($penlatId != '-1'){
             $getData = Certificates_to_penlat::where('penlat_id', $penlatId)->pluck('certificates_catalog_id')->toArray();
         } else {
             $getData = Instructor_certificate::where('instructor_id', $id)->pluck('certificates_catalog_id')->toArray();
@@ -295,7 +516,7 @@ class PDController extends Controller
 
         $allCerts = Instructor_certificate::where('instructor_id', $id)->whereNotIn('certificates_catalog_id', $getData)->get();
 
-        return view('plan_dev.submenu.preview-instructor', ['data' => $data, 'certificateData' => $certificateData, 'remainingCerts' => $allCerts]);
+        return view('plan_dev.submenu.preview-instructor', ['penlatId' => $penlatId, 'data' => $data, 'certificateData' => $certificateData, 'remainingCerts' => $allCerts]);
     }
 
     public function references_store(Request $request)
@@ -357,5 +578,219 @@ class PDController extends Controller
 
         // Redirect back or to a specific route after processing
         return redirect()->back()->with('success', 'Form submitted successfully!');
+    }
+
+    public function preview_reference($penlatId)
+    {
+        $data = Penlat::find($penlatId);
+        $penlatList = Penlat::all();
+        return view('plan_dev.submenu.preview-training-reference', ['data' => $data, 'penlatList' => $penlatList]);
+    }
+
+    public function fetch_reference_data($id)
+    {
+        $reference = Training_reference::findOrFail($id);
+        return response()->json($reference);
+    }
+
+    public function update_references(Request $request)
+    {
+        $request->validate([
+            'document' => 'required',
+            'attachment' => 'sometimes|file',
+        ]);
+
+        $reference = Training_reference::findOrFail($request->id);
+        $reference->references = $request->document;
+
+        // Handle file replacement
+        if ($request->has('existing_file') && !$request->hasFile('attachment')) {
+            // Do nothing; keep the existing file
+        } elseif ($request->hasFile('attachment')) {
+            // Unlink the existing file if it exists
+            if ($reference->filepath && file_exists(public_path($reference->filepath))) {
+                unlink(public_path($reference->filepath));
+            }
+
+            // Upload the new file
+            $file = $request->file('attachment');
+            $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $upload_folder = public_path('uploads/references_attachment/');
+            $filePath = 'uploads/references_attachment/' . $fileName;
+
+            $file->move($upload_folder, $fileName);
+
+            $reference->filepath = $filePath;
+        } else {
+            // If no file is uploaded and no existing file, set filepath to null
+            $reference->filepath = null;
+        }
+
+        $reference->save();
+
+        return redirect()->back()->with('success', 'Reference updated successfully!');
+    }
+
+    public function references_insert(Request $request, $penlatId)
+    {
+        // Validate the form data
+        $request->validate([
+            'documents.*' => 'required',
+            'attachments.*' => 'sometimes|file', // Adjust the allowed file types and size
+        ]);
+
+        // Get the form data
+        $documents = $request->input('documents');
+        $penlatId = $penlatId;
+
+        if ($request->hasFile('attachments')) {
+            $files = $request->file('attachments');
+
+            foreach ($files as $file) {
+                $fileExtension = $file->getClientOriginalExtension();
+                $fileName = time() . '_' . uniqid() . '.' . $fileExtension;
+                $upload_folder = public_path('uploads/references_attachment/');
+                $filePath = 'uploads/references_attachment/' . $fileName;
+
+                // Move the uploaded file to the storage folder
+                $file->move($upload_folder, $fileName);
+
+                $filePathArray[] = $filePath;
+            }
+        }
+
+        $uniqueId = hexdec(substr(uniqid(), 0, 8));
+
+        while (Training_reference::where('id', $uniqueId)->exists()) {
+            $uniqueId = hexdec(substr(uniqid(), 0, 8));
+        }
+
+        // Example: Assuming you have a Document model, you can store each document in the database
+        foreach ($documents as $key => $document) {
+
+            try {
+                DB::beginTransaction();
+
+                $newDocument = new Training_reference([
+                    'penlat_id' => $penlatId,
+                    'references' => $document,
+                    'filepath' => $filePathArray[$key] ?? NULL,
+                ]);
+
+                $newDocument->save();
+
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollback();
+                // Handle the exception or log the error
+                return redirect()->back()->with('error', 'Failed to store receivable note. Please try again.');
+            }
+        }
+
+        // Redirect back or to a specific route after processing
+        return redirect()->back()->with('success', 'Form submitted successfully!');
+    }
+
+    public function deleteTrainingReference($penlat_id)
+    {
+        try {
+            // Delete all references associated with the given penlat_id
+            Training_reference::where('penlat_id', $penlat_id)->delete();
+
+            return response()->json(['message' => 'All references have been deleted successfully!']);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to delete references. Please try again.'], 500);
+        }
+    }
+
+    public function destroy_reference($id)
+    {
+        $trainingReference = Training_reference::findOrFail($id);
+        $trainingReference->delete();
+
+        return response()->json(['success' => 'Item deleted successfully']);
+    }
+
+    public function save_receivable(Request $request)
+    {
+        $participant = Receivables_participant_certificate::find($request->id);
+        $participant->date_received = $request->date_received;
+        $participant->status = $request->status;  // Save the checkbox status
+        $participant->save();
+
+        return response()->json(['status' => 'success']);
+    }
+
+    public function delete_receivable(Request $request)
+    {
+        $participant = Receivables_participant_certificate::find($request->id);
+        $participant->delete();
+
+        return response()->json(['status' => 'success']);
+    }
+
+    public function saveAllReceivables(Request $request)
+    {
+        $participants = $request->input('participants');
+
+        foreach ($participants as $participantData) {
+            $participant = Receivables_participant_certificate::find($participantData['id']);
+            $participant->date_received = $participantData['date_received'];
+            $participant->status = $participantData['status'];
+            $participant->save();
+        }
+
+        return response()->json(['status' => 'success']);
+    }
+
+    public function delete_certificate(Request $request)
+    {
+        try {
+            // Start a transaction
+            DB::beginTransaction();
+
+            // Find the certificate by ID
+            $certificate = Penlat_certificate::find($request->id);
+
+            if ($certificate) {
+                // Delete related participants first
+                $certificate->participant()->delete();
+
+                // Delete the certificate
+                $certificate->delete();
+
+                // Commit the transaction
+                DB::commit();
+
+                return response()->json(['success' => true]);
+            } else {
+                // Rollback if certificate not found
+                DB::rollBack();
+
+                return response()->json(['success' => false], 404);
+            }
+        } catch (\Exception $e) {
+            // Rollback in case of an error
+            DB::rollBack();
+
+            // Log the error for debugging
+            Log::error('Error deleting certificate: ' . $e->getMessage());
+
+            return response()->json(['success' => false, 'message' => 'Error deleting certificate'], 500);
+        }
+    }
+
+    public function deleteCertificate($id)
+    {
+        $certificate = Certificates_catalog::findOrFail($id);
+
+        // Delete related records in the relationOne and holder relationships
+        $certificate->relationOne()->delete();
+        $certificate->holder()->delete();
+
+        // Delete the certificate itself
+        $certificate->delete();
+
+        return response()->json(['success' => 'Certificate and related data deleted successfully.']);
     }
 }

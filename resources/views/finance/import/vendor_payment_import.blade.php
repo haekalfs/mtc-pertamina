@@ -1,25 +1,25 @@
 @extends('layouts.main')
 
-@section('active-operation')
+@section('active-finance')
 active font-weight-bold
 @endsection
 
-@section('show-operation')
+@section('show-finance')
 show
 @endsection
 
-@section('participant-infographics')
+@section('vendor-payment')
 font-weight-bold
 @endsection
 
 @section('content')
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
-        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="menu-icon fa fa-users"></i> Importer Participants Infographics</h1>
-        <p class="mb-4">Import Data From Excel.</a></p>
+        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="menu-icon ti-stats-down"></i> Vendor Payments Importer</h1>
+        <p class="mb-4">Import Feedback Report.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
-        <a href="{{ route('participant-infographics') }}" class="btn btn-sm btn-secondary shadow-sm text-white"><i class="fa fa-backward"></i> Go Back</a>
+        <a href="{{ route('vendor-payment') }}" class="btn btn-sm btn-secondary shadow-sm text-white"><i class="fa fa-backward"></i> Go Back</a>
     </div>
 </div>
 <div class="overlay overlay-mid" style="display: none;"></div>
@@ -71,11 +71,11 @@ font-weight-bold
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-secondary" id="judul">Search Report</h6>
                     <div class="text-right">
-                        {{-- <a class="btn btn-primary btn-sm text-white" href="{{ asset('participants_dummy_data_50.xlsx') }}"><i class="menu-icon fa fa-download"></i> Download Template</a> --}}
+                        {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-icon fa fa-download"></i> Download</a> --}}
                     </div>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('infografis_peserta.import') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('vendor_payment.import') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="row">
                             <div class="col-md-11">

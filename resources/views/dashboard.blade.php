@@ -53,7 +53,7 @@ active font-weight-bold
         </div>
 
         <div class="col-lg-3 col-md-6 animateBox">
-            <a href="#" class="clickable-card">
+            <a href="{{ route('feedback-report') }}" class="clickable-card">
                 <div class="card">
                     <div class="card-body">
                         <div class="stat-widget-five">
@@ -73,7 +73,7 @@ active font-weight-bold
         </div>
 
         <div class="col-lg-3 col-md-6 animateBox">
-            <a href="{{ route('cost') }}" class="clickable-card">
+            <a href="{{ route('profits') }}" class="clickable-card">
                 <div class="card">
                     <div class="card-body">
                         <div class="stat-widget-five">

@@ -13,7 +13,6 @@ font-weight-bold
 @endsection
 
 @section('content')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
         <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-building-o"></i> Room Inventory</h1>
@@ -75,7 +74,7 @@ font-weight-bold
                                 <td data-th="Product">
                                     <div class="row">
                                         <div class="col-md-4 d-flex justify-content-center align-items-start mt-2">
-                                            <a href="{{ route('preview-room-user', $item->id) }}">
+                                            <a href="{{ route('preview-room-user', $item->id) }}" class="animateBox">
                                                 <img src="{{ asset($item->filepath) }}" style="height: 150px; width: 200px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
                                             </a>
                                         </div>

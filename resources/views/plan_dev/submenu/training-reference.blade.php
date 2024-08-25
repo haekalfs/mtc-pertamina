@@ -13,7 +13,6 @@ font-weight-bold
 @endsection
 
 @section('content')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
         <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-tag"></i> Referensi Pelatihan</h1>
@@ -50,17 +49,6 @@ font-weight-bold
     <strong>{{ $message }}</strong>
 </div>
 @endif
-<style>
-    #dataTable tbody tr {
-        margin: 0;
-        padding: 0;
-    }
-
-    #dataTable tbody td {
-        padding: 0;
-        border: none; /* Optional: removes the borders */
-    }
-</style>
 <div class="animated fadeIn zoom90">
     <div class="row">
         <div class="col-md-12">
@@ -72,7 +60,7 @@ font-weight-bold
                     </div>
                 </div>
                 <div class="card-body">
-                    <form method="GET" action="{{ route('instructor') }}">
+                    <form method="GET" action="{{ route('training-reference') }}">
                         @csrf
                         <div class="row d-flex justify-content-start mb-2 p-1">
                             <div class="col-md-12">
@@ -99,59 +87,68 @@ font-weight-bold
                             </div>
                         </div>
                     </form>
-                    <div class="table-responsive p-2">
-                        <table id="dataTable" class="table table-borderless">
-                            <thead class="text-center" style="display: none;">
-                                <tr>
-                                    <th>Training References</th>
-                                </tr>
-                            </thead>
-                            <tbody class="mt-2 zoom90">
-                                @foreach($data as $item)
-                                <tr>
-                                    <td>
-                                        <div class="card custom-card mb-3 bg-white shadow-none">
-                                            <div class="row no-gutters">
-                                                <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding: 2em;">
-                                                    <img src="{{ asset($item->filepath) }}" style="height: 150px; width: 250px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
-                                                </div>
-                                                <div class="col-md-7 mt-2">
-                                                    <div class="card-body text-secondary">
-                                                        <div>
-                                                            <h4 class="card-title font-weight-bold">{{ $item->description }}</h4>
-                                                            <div class="ml-2">
-                                                                <table class="table table-borderless table-sm">
-                                                                    @foreach ($item->references as $reference)
-                                                                    <tr>
-                                                                        <td class="mb-2"><i class="ti-minus mr-2"></i> {{ $reference->references }} &nbsp; <small><a href="{{ asset($reference->filepath) }}" target="_blank" class="text-secondary"><i class="fa fa-external-link fa-sm"></i> <u>View</u></a></small></td>
-                                                                    </tr>
-                                                                    @endforeach
-                                                                </table>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-2 d-flex align-items-center justify-content-center">
-                                                    <a class="btn btn-outline-secondary btn-sm" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-eye"></i> Review Pelatihan</a>
-                                                </div>
-                                                <div class="card-icons">
-                                                    <a href="#"><i class="fa fa-download fa-2x text-secondary" style="font-size: 1.5em;"></i></a>
-                                                </div>
+                    <table id="dataTable" class="table table-bordered mt-4 zoom90">
+                        <thead>
+                            <tr>
+                                <th>Penlat</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($data as $item)
+                            <tr>
+                                <td data-th="Product">
+                                    <div class="row">
+                                        <div class="col-md-3 d-flex justify-content-center align-items-start text-center">
+                                            <a href="{{ route('preview-training-reference', $item->id) }}">
+                                                <img src="{{ $item->filepath ? asset($item->filepath) : 'https://via.placeholder.com/150x150/5fa9f8/ffffff' }}" style="height: 150px; width: 200px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow animateBox">
+                                            </a>
+                                        </div>
+                                        <div class="col-md-9 text-left mt-sm-2">
+                                            <h5 class="card-title font-weight-bold">{{ $item->description }}</h5>
+                                            <div class="ml-2">
+                                                <table class="table table-borderless table-sm">
+                                                    @foreach($item->references as $index => $list)
+                                                        @if($index < 3)
+                                                        <tr>
+                                                            <td class="mb-2"><i class="ti-minus mr-2"></i> {{ $list->references }} &nbsp; <small><a href="{{ asset($list->filepath) }}" target="_blank" class="text-secondary"><i class="fa fa-external-link fa-sm"></i> <u>View</u></a></small></td>
+                                                        </tr>
+                                                        @endif
+                                                    @endforeach
+
+                                                    @if($item->references->count() > 3)
+                                                        <tr>
+                                                            <td colspan="2" style="width: 300px;" class="mb-2">
+                                                                <i class="ti-minus mr-2"></i> <a href="{{ route('preview-training-reference', $item->id) }}"><i>Show More</i></a>
+                                                            </td>
+                                                        </tr>
+                                                    @endif
+                                                </table>
                                             </div>
                                         </div>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                                    </div>
+                                </td>
+                                <td class="actions text-center">
+                                    <div>
+                                        <a href="{{ route('preview-training-reference', $item->id) }}" class="btn btn-outline-secondary btn-md mb-2 mr-2">
+                                            <i class="fa fa-edit"></i>
+                                        </a>
+                                        <button data-id="{{ $item->id }}" class="btn btn-outline-danger btn-md mb-2">
+                                            <i class="fa fa-trash-o"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="modal fade zoom90" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
+<div class="modal fade" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header d-flex flex-row align-items-center justify-content-between">
@@ -209,47 +206,92 @@ font-weight-bold
     </div>
 </div>
 <script>
-    $(document).ready(function() {
-        // Initialize Select2
-        $('#penlatSelect').select2({
-            dropdownParent: $('#inputDataModal'),
-            theme: "classic",
-            placeholder: "Select Pelatihan...",
-            width: '100%',
-            tags: true,
-        });
+$(document).ready(function() {
+    // Initialize Select2
+    $('#penlatSelect').select2({
+        dropdownParent: $('#inputDataModal'),
+        theme: "classic",
+        placeholder: "Select Pelatihan...",
+        width: '100%',
+        tags: true,
     });
-    $(document).ready(function () {
-        // Handle click event for the "Add More" button
-        $(".add-document-list").on("click", function () {
-            // Clone the entire document-item div
-            var clonedDocumentItem = $(".document-item:first").clone();
+});
+$(document).ready(function () {
+    // Handle click event for the "Add More" button
+    $(".add-document-list").on("click", function () {
+        // Clone the entire document-item div
+        var clonedDocumentItem = $(".document-item:first").clone();
 
-            // Clear the content of the cloned textarea and file input
-            clonedDocumentItem.find("textarea").val("");
-            clonedDocumentItem.find("input[type=file]").val("");
+        // Clear the content of the cloned textarea and file input
+        clonedDocumentItem.find("textarea").val("");
+        clonedDocumentItem.find("input[type=file]").val("");
 
-            // Create a new container for the cloned document-item div
-            var clonedContainer = $("<div class='document-item'></div>").append(clonedDocumentItem.html());
+        // Create a new container for the cloned document-item div
+        var clonedContainer = $("<div class='document-item'></div>").append(clonedDocumentItem.html());
 
-            // Append the new container to the container
-            $("#documents-list-container").append(clonedContainer);
+        // Append the new container to the container
+        $("#documents-list-container").append(clonedContainer);
 
-            // Show the delete button when there are multiple items
-            $(".delete-document-list").show();
-        });
+        // Show the delete button when there are multiple items
+        $(".delete-document-list").show();
+    });
 
-        // Handle click event for the "Delete Item" button
-        $(".delete-document-list").on("click", function () {
-            // Remove the last cloned container when the delete button is clicked
-            $(".document-item:last").remove();
+    // Handle click event for the "Delete Item" button
+    $(".delete-document-list").on("click", function () {
+        // Remove the last cloned container when the delete button is clicked
+        $(".document-item:last").remove();
 
-            // Hide the delete button if there's only one item left
-            if ($(".document-item").length <= 1) {
-                $(".delete-document-list").hide();
+        // Hide the delete button if there's only one item left
+        if ($(".document-item").length <= 1) {
+            $(".delete-document-list").hide();
+        }
+    });
+});
+
+$(document).ready(function() {
+    $('.btn-outline-danger').on('click', function(event) {
+        event.preventDefault();
+        var id = $(this).data('id');
+
+        // Construct the URL using the route() helper in Blade
+        var url = "{{ route('training_reference.delete', ':id') }}";
+        url = url.replace(':id', id);
+
+        // SweetAlert confirmation
+        swal({
+            title: "Are you sure?",
+            text: "This action will delete all references for this Pelatihan!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then((willDelete) => {
+            if (willDelete) {
+                // AJAX request to delete the item
+                $.ajax({
+                    url: url,
+                    type: 'DELETE',
+                    data: {
+                        "_token": "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        swal("Poof! Your item has been deleted!", {
+                            icon: "success",
+                        }).then(() => {
+                            location.reload(); // Optionally reload the page
+                        });
+                    },
+                    error: function(response) {
+                        swal("Oops! Something went wrong.", {
+                            icon: "error",
+                        });
+                    }
+                });
+            } else {
+                swal("Your item is safe!");
             }
         });
     });
+});
 </script>
 @endsection
 

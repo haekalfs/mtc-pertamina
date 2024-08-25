@@ -21,4 +21,9 @@ class Penlat extends Model
     {
         return $this->hasMany('App\Models\Training_reference', 'penlat_id', 'id');
     }
+
+    public function batch()
+    {
+        return $this->hasMany('App\Models\Penlat_batch', 'penlat_id', 'id');
+    }
 }

@@ -83,6 +83,7 @@ Route::middleware('auth')->group(function () {
 
     //penlat
     Route::get('/penlat/list-pelatihan', [PenlatController::class, 'index'])->name('penlat');
+    Route::get('/penlat/pelatihan-preview/{penlatId}', [PenlatController::class, 'preview_penlat'])->name('preview-penlat');
     Route::get('/penlat/list-pelatihan/import-data', [PenlatController::class, 'penlat_import'])->name('penlat-import');
     Route::post('/import-list-penlat', [ImportController::class, 'import_penlat'])->name('penlat.import');
     Route::post('/store-penlat', [PenlatController::class, 'store'])->name('penlat.store');
@@ -97,6 +98,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/import-infografis-peserta', [ImportController::class, 'import'])->name('infografis_peserta.import');
     Route::get('/infografis-peserta/{id}/edit', [OperationController::class, 'edit']);
     Route::put('/infografis-peserta/{id}', [OperationController::class, 'update']);
+    Route::delete('/infografis-peserta-delete-data/{id}', [OperationController::class, 'delete_data_peserta']);
 
     //inventaris Alat
     Route::get('/operation/tool-inventory', [OperationController::class, 'tool_inventory'])->name('tool-inventory');
@@ -156,8 +158,12 @@ Route::middleware('auth')->group(function () {
     //finances
     Route::get('/financial-dashboard/{yearSelected?}', [FinanceController::class, 'dashboard'])->name('finance');
     Route::get('/finances/vendor-payment', [FinanceController::class, 'vendor_payment'])->name('vendor-payment');
-    Route::get('/finances/costs', [FinanceController::class, 'costs'])->name('cost');
-    Route::get('/finances/costs/import-profits-loss', [FinanceController::class, 'profits_import'])->name('costs.import');
+    Route::get('/finances/vendor-payment-import-page', [FinanceController::class, 'vendor_payment_import'])->name('vendor-payment-importer');
+    Route::post('/import-vendor-payments', [ImportController::class, 'import_vendor_payment'])->name('vendor_payment.import');
+
+    Route::get('/finances/profits-loss', [FinanceController::class, 'profits'])->name('profits');
+    Route::get('/finances/costs/{penlatId}', [FinanceController::class, 'costs'])->name('cost');
+    Route::get('/finances/import-profits-loss-page', [FinanceController::class, 'profits_import'])->name('costs.import');
     Route::post('/import-profits-loss', [ImportController::class, 'import_profits'])->name('profits.import');
     Route::get('/finances/costs/preview-item/{id}', [FinanceController::class, 'preview_costs'])->name('preview-costs');
 
@@ -166,8 +172,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/planning-development', [PDController::class, 'index'])->name('plan-dev');
     Route::get('/planning-development/feedback-report', [PDController::class, 'feedback_report'])->name('feedback-report');
     Route::get('/planning-development/feedback-report-import', [PDController::class, 'feedback_report_import'])->name('feedback-report-import-page');
+    Route::post('/import-feedback-report', [ImportController::class, 'import_feedback'])->name('feedback.import');
+
     Route::get('/planning-development/regulation', [PDController::class, 'regulation'])->name('regulation');
     Route::post('/store-regulation', [PDController::class, 'regulation_store'])->name('regulation.store');
+    Route::get('/planning-development/regulation-view/{itemId}', [PDController::class, 'preview_regulation'])->name('preview-regulation');
+    Route::delete('/delete-regulation/{id}', [PDController::class, 'delete_regulation'])->name('regulation.destroy');
+    Route::put('/update-regulation', [PDController::class, 'update_regulation'])->name('regulation.update');
+
 
 
     Route::get('/planning-development/certification', [PDController::class, 'main_certificate'])->name('certificate-main');
@@ -175,9 +187,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/planning-development/certification/instructors-certificate', [PDController::class, 'certificate_instructor'])->name('certificate-instructor');
 
     Route::post('/store-certificates', [PDController::class, 'certificate_store'])->name('certificate.store');
+    Route::post('/certificate/delete', [PDController::class, 'delete_certificate'])->name('certificate.delete');
     Route::post('/store-certificate-catalog', [PDController::class, 'certificate_catalog_store'])->name('certificate-catalog.store');
     Route::get('/planning-development/certificate/preview-item/{id}', [PDController::class, 'preview_certificate'])->name('preview-certificate');
+    Route::post('/participant/save', [PDController::class, 'save_receivable'])->name('receivable.participant.save');
+    Route::post('/participant/delete', [PDController::class, 'delete_receivable'])->name('receivable.participant.delete');
+    Route::post('/receivables/participants/saveAll', [PDController::class, 'saveAllReceivables'])->name('receivable.participants.saveAll');
     Route::get('/planning-development/certificate/catalog-item/{id}', [PDController::class, 'preview_certificate_catalog'])->name('preview-certificate-catalog');
+    Route::delete('/instructor-certificates-catalog/delete/{id}', [PDController::class, 'deleteCertificate'])->name('certificates_catalog.delete');
 
     Route::get('/planning-development/instructor', [PDController::class, 'instructor'])->name('instructor');
     Route::get('/planning-development/instructor-preview/{id}/{penlatId}', [PDController::class, 'preview_instructor'])->name('preview-instructor');
@@ -185,9 +202,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/planning-development/instructor-update-data/{instructorId}', [InstructorController::class, 'edit_instructor'])->name('edit-instructor');
     Route::put('/planning-development/instructor-update/{instructorId}', [InstructorController::class, 'update'])->name('instructor.update');
     Route::post('/planning-development/instructor-store', [InstructorController::class, 'store'])->name('instructor.store');
+    Route::delete('/planning-development/instructor-delete/{id}', [InstructorController::class, 'deleteInstructor'])->name('instructor.delete');
+
 
     Route::get('/planning-development/training-reference', [PDController::class, 'training_reference'])->name('training-reference');
     Route::post('/store-penlat-references', [PDController::class, 'references_store'])->name('references.store');
+    Route::delete('/delete-training-reference/{penlat_id}', [PDController::class, 'deleteTrainingReference'])->name('training_reference.delete');
+    Route::post('/insert-new-item-penlat-references/{penlatId}', [PDController::class, 'references_insert'])->name('references.new.item');
+    Route::get('/planning-development/preview/training-reference/{id}', [PDController::class, 'preview_reference'])->name('preview-training-reference');
+    Route::delete('/delete-item-training-reference/{id}', [PDController::class, 'destroy_reference'])->name('training-reference.destroy');
+    Route::get('/fetch-penlat-references/{penlatId}', [PDController::class, 'fetch_reference_data'])->name('references.data');
+    Route::post('/update-penlat-references', [PDController::class, 'update_references'])->name('references.update');
 
 
     Route::get('/planning-development/instructor/upload-certificate', [PDController::class, 'upload_certificate'])->name('upload-certificate');

@@ -57,16 +57,19 @@ class ImportPenlat implements ShouldQueue
 
             // Loop through the rows and save the data to the database
             while (($row = fgetcsv($handle)) !== FALSE) {
-                if (empty($row[60])) {
-                    continue; // Skip rows with empty required fields
+                if (empty($row[60]) || empty($row[68]) || empty($row[69])) {
+                    break; // Skip rows with empty required fields
                 }
 
-                Penlat::create([
-                    'description' => $row[60],
-                    'alias' => $row[68],
-                    'jenis_pelatihan' => $row[69],
-                    'kategori_pelatihan' => $row[70],
-                ]);
+                Penlat::updateOrCreate(
+                    [
+                        'description' => $row[60],
+                        'alias' => $row[68],
+                        'jenis_pelatihan' => $row[69],
+                        'kategori_pelatihan' => $row[70],
+                    ],
+                    []
+                );
             }
 
             fclose($handle);

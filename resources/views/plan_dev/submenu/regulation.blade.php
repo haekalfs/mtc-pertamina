@@ -13,7 +13,6 @@ font-weight-bold
 @endsection
 
 @section('content')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
         <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-warning"></i> Regulation</h1>
@@ -83,15 +82,16 @@ font-weight-bold
                                 @foreach($data as $item)
                                 <tr>
                                     <td>
-                                        <div class="card mb-3 shadow-none">
+                                        <div class="card mb-3 shadow">
                                             <div class="card-body custom-card">
                                                 <div class="row no-gutters">
                                                     <div class="col-md-10 mt-2">
                                                         <h5 class="card-title text-secondary font-weight-bold">{{ $item->description }}</h5>
-                                                        <a href="{{ asset($item->filepath) }}" class="card-text"><u>Lampiran Dokumen</u> <i class="fa fa-external-link fa-sm"></i></a>
+                                                        <p>Status : <span class="badge {{ $item->statuses->badge }}">{{ $item->statuses->description }}</span></p>
+                                                        <a href="{{ asset($item->filepath) }}" class="card-text"><u>Lampiran Dokumen</u> <i class="fa fa-external-link fa-sm"></i> <small>{{ $item->filesize }} Kb</small></a>
                                                     </div>
-                                                    <div class="col-md-2 d-flex align-items-center justify-content-center">
-                                                        <a class="btn btn-outline-secondary btn-sm" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-eye"></i> Review Regulation</a>
+                                                    <div class="col-md-2 d-flex align-items-center justify-content-end pr-3 zoom90">
+                                                        <a class="btn btn-outline-secondary btn-sm" href="{{ route('preview-regulation', $item->id) }}"><i class="menu-Logo fa fa-eye"></i> View Detail</a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -108,7 +108,7 @@ font-weight-bold
     </div>
 </div>
 
-<div class="modal fade zoom90" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
+<div class="modal fade" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header d-flex flex-row align-items-center justify-content-between">

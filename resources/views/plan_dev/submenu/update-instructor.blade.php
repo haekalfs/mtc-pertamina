@@ -15,7 +15,7 @@ font-weight-bold
 @section('content')
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
-        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-male"></i> Instructor Registration</h1>
+        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-male"></i> Update Instructor's Data</h1>
         <p class="mb-4">Managing Users Account</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
@@ -56,18 +56,17 @@ font-weight-bold
                         </div>
                     </div>
                     <div class="col-md-12">
-                        <div class="card mb-4">
+                        <div class="card mb-4 shadow">
                             <div class="card-header">
-                                <span class="text-danger font-weight-bold">User Data Verification</span>
+                                <span class="text-danger font-weight-bold">Delete Account</span>
                             </div>
-                            <div class="card-body" style="background-color: rgb(247, 247, 247);">
-                                <h6 class="h6 mb-2 font-weight-bold text-gray-800">General Guidelines</h6>
-                                <ul class="ml-4">
-                                    <li>Ensure all user data is accurately updated in accordance with company policies.</li>
-                                    <li>Verify and validate user information to maintain data integrity.</li>
-                                    <li>Unauthorized modifications to user records are strictly prohibited.</li>
-                                    <li>Double-check user details for completeness and correctness before saving changes.</li>
-                                </ul>
+                            <div class="card-body">
+                                <div class="mb-4">
+                                    <span>Deleting your account is a permanent action and cannot be undone. If you are sure you want to delete your account, select the button below.</span>
+                                </div>
+                                <div>
+                                    <a data-id="{{ $data->id }}" class="btn btn-outline-danger delete-instructor text-secondary">I Understand, delete the account</a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -129,6 +128,16 @@ font-weight-bold
                                 @endif
                             </div>
                         </div>
+
+                        <div class="row form-group">
+                            <div class="col col-md-3"><label for="documentPendukungFilepath" class="form-control-label">Dokument Pendukung</label></div>
+                            <div class="col-12 col-md-9">
+                                <input type="file" id="documentPendukungFilepath" name="documentPendukungFilepath" class="form-control">
+                                @if($data->documentPendukungFilepath)
+                                    <a href="{{ asset($data->documentPendukungFilepath) }}" target="_blank">View File</a>
+                                @endif
+                            </div>
+                        </div>
                         <div class="row form-group">
                             <div class="col col-md-3"><label for="certificates" class="form-control-label">Certifications</label></div>
                             <div class="col-12 col-md-9">
@@ -156,7 +165,6 @@ font-weight-bold
     </div>
 </form>
 <script>
-
     function previewImage(event) {
         const reader = new FileReader();
         reader.onload = function(){
@@ -165,5 +173,50 @@ font-weight-bold
         };
         reader.readAsDataURL(event.target.files[0]);
     }
+</script>
+<script>
+$(document).ready(function() {
+    $('.delete-instructor').click(function(e) {
+        e.preventDefault();
+        let id = $(this).data('id');
+
+        swal({
+            title: "Are you sure?",
+            text: "Once deleted, you will not be able to recover this account!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+        .then((willDelete) => {
+            if (willDelete) {
+                // Make AJAX request to delete the instructor
+                $.ajax({
+                    url: '{{ route("instructor.delete", ":id") }}'.replace(':id', id),
+                    method: 'DELETE',
+                    data: {
+                        _token: '{{ csrf_token() }}', // Include the CSRF token
+                    },
+                    success: function(response) {
+                        swal("Success! The account has been deleted!", {
+                            icon: "success",
+                        }).then(() => {
+                            window.location.href = '{{ route("instructor") }}'; // Redirect after deletion
+                        });
+                    },
+                    error: function(xhr) {
+                        swal("Error! Something went wrong.", {
+                            icon: "error",
+                        });
+                    }
+                });
+            } else {
+                // Show a message if deletion is canceled
+                swal("Your record is safe!", {
+                    icon: "info",
+                });
+            }
+        });
+    });
+});
 </script>
 @endsection

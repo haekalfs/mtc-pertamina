@@ -16,10 +16,10 @@ font-weight-bold
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
         <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="menu-icon ti-stats-down"></i> Profits & Loss</h1>
-        <p class="mb-4">Costs Report.</a></p>
+        <p class="mb-4">{{ $selectedPenlat->description }}</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
-        <a href="{{ route('costs.import') }}" class="btn btn-sm btn-primary shadow-sm text-white"><i class="fa fa-file-text fa-sm"></i> Import Data</a>
+        <a href="{{ route('profits') }}" class="btn btn-sm btn-secondary shadow-sm text-white"><i class="fa fa-backward"></i> Go Back</a>
     </div>
 </div>
 <div class="overlay overlay-mid" style="display: none;"></div>
@@ -37,6 +37,13 @@ font-weight-bold
 </div>
 @endif
 
+@if ($message = Session::get('batch-registration'))
+<div class="alert alert-danger alert-block">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>{!! $message !!}</strong>
+</div>
+@endif
+
 @if ($message = Session::get('failed'))
 <div class="alert alert-danger alert-block">
     <button type="button" class="close" data-dismiss="alert">×</button>
@@ -50,20 +57,6 @@ font-weight-bold
     <strong>{{ $message }}</strong>
 </div>
 @endif
-<style>
-
-.alert-success-saving-mid {
-  display: none;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  padding: 20px;
-  border-radius: 5px;
-  text-align: center;
-  z-index: 10000;
-}
-</style>
 <div class="animated fadeIn zoom90">
     <div class="row">
         <div class="col-md-12">
@@ -83,9 +76,11 @@ font-weight-bold
                                     <div class="form-group">
                                         <label for="email">Nama Penlat :</label>
                                         <select class="custom-select" id="namaPenlat" name="namaPenlat">
-                                            <option value="-1" selected>Show All</option>
+                                            <option value="-1">Show All</option>
                                             @foreach($penlatList as $penlat)
-                                                <option value="{{ $penlat->id }}">{{ $penlat->description }}</option>
+                                                <option value="{{ $penlat->id }}" {{ $penlat->id == $selectedPenlat->id ? 'selected' : '' }}>
+                                                    {{ $penlat->description }}
+                                                </option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -122,9 +117,9 @@ font-weight-bold
                                 <th>Nama Pelatihan</th>
                                 <th>Batch</th>
                                 <th>Jumlah Peserta</th>
-                                <th>Total Biaya Pendaftaran</th>
-                                <th>Jumlah Biaya</th>
-                                <th>Profit</th>
+                                <th>Revenue &nbsp;<i class="fa fa-plus text-success"></i></th>
+                                <th>Cost &nbsp;<i class="fa fa-minus text-danger"></i></th>
+                                <th>Nett Income</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -132,99 +127,9 @@ font-weight-bold
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold" id="judul">List Data</h6>
-                    <div class="d-flex">
-                        {{-- <a id="addApproversBtn" class="btn btn-sm btn-primary shadow-sm text-white"><i class="fa fa-file-text fa-sm"></i> Filter</a>
-                        <a id="hideApproversBtn" class="btn btn-sm btn-secondary shadow-sm text-white" style="display: none;"><i class="fa fa-backward fa-sm"></i> Cancel</a> --}}
-                    </div>
-                </div>
-                <div class="card-body zoom80">
-                    <div class="">
-                        <h5 class="card-title font-weight-bold">Revenue & Operating Expenses</h5>
-                        <div class="ml-2">
-                            <table class="table table-borderless table-sm">
-                                <tr>
-                                    <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Revenue</td>
-                                    <td style="text-align: start;" class="">: &nbsp; {{ $arrayData['revenue'] ? 'Rp ' . number_format($arrayData['revenue'], 0, ',', '.') : '-' }} </td>
-                                </tr>
-                                <tr>
-                                    <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Biaya Instruktur</td>
-                                    <td style="text-align: start;">: &nbsp; {{ $arrayData['total_biaya_instruktur'] ? 'Rp ' . number_format($arrayData['total_biaya_instruktur'], 0, ',', '.') : '-' }}</td>
-                                </tr>
-                                <tr>
-                                    <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Total PNBP</td>
-                                    <td style="text-align: start;">: &nbsp; {{ $arrayData['total_pnbp'] ? 'Rp ' . number_format($arrayData['total_pnbp'], 0, ',', '.') : '-' }}</td>
-                                </tr>
-                                <tr>
-                                    <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Biaya Transportasi</td>
-                                    <td style="text-align: start;">: &nbsp; {{ $arrayData['total_biaya_transportasi_hari'] ? 'Rp ' . number_format($arrayData['total_biaya_transportasi_hari'], 0, ',', '.') : '-' }}</td>
-                                </tr>
-                                <tr>
-                                    <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Penagihan Foto</td>
-                                    <td style="text-align: start;">: &nbsp; {{ $arrayData['total_penagihan_foto'] ? 'Rp ' . number_format($arrayData['total_penagihan_foto'], 0, ',', '.') : '-' }}</td>
-                                </tr>
-                                <tr>
-                                    <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Penagihan ATK</td>
-                                    <td style="text-align: start;">: &nbsp; {{ $arrayData['total_penagihan_atk'] ? 'Rp ' . number_format($arrayData['total_penagihan_atk'], 0, ',', '.') : '-' }}</td>
-                                </tr>
-                                <tr>
-                                    <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Penagihan Snacks</td>
-                                    <td style="text-align: start;">: &nbsp; {{ $arrayData['total_penagihan_snack'] ? 'Rp ' . number_format($arrayData['total_penagihan_snack'], 0, ',', '.') : '-' }}</td>
-                                </tr>
-                                <tr>
-                                    <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Penagihan Makan Siang</td>
-                                    <td style="text-align: start;">: &nbsp; {{ $arrayData['total_penagihan_makan_siang'] ? 'Rp ' . number_format($arrayData['total_penagihan_makan_siang'], 0, ',', '.') : '-' }}</td>
-                                </tr>
-                                <tr>
-                                    <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Penagihan Laundry</td>
-                                    <td style="text-align: start;">: &nbsp; {{ $arrayData['total_penagihan_laundry'] ? 'Rp ' . number_format($arrayData['total_penagihan_laundry'], 0, ',', '.') : '-' }}</td>
-                                </tr>
-                                <tr>
-                                    <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Total Peserta</td>
-                                    <td style="text-align: start;">: &nbsp; {{ $arrayData['total_peserta'] }} Peserta</td>
-                                </tr>
-                            </table>
-                        </div>
-                        <hr>
-                        <h5 class="card-title font-weight-bold">Nett Income</h5>
-                        <div class="ml-2">
-                            <table class="table table-borderless table-sm">
-                                <tr>
-                                    <td style="width: 270px;" class="mb-2 font-weight-bold text-success"><i class="ti-minus mr-2"></i> Revenue</td>
-                                    <td style="text-align: start;" class="font-weight-bold text-success">: &nbsp; {{ $arrayData['revenue'] ? 'Rp ' . number_format($arrayData['revenue'], 0, ',', '.') : '-' }} <i class="fa fa-plus"></i></td>
-                                </tr>
-                                <tr>
-                                    <td style="width: 270px;" class="mb-2 font-weight-bold text-danger"><i class="ti-minus mr-2"></i> Operating Expenses (COST) </td>
-                                    <td style="text-align: start;" class="font-weight-bold text-danger">: &nbsp; {{ $arrayData['total_costs'] ? 'Rp ' . number_format($arrayData['total_costs'], 0, ',', '.') : '-' }} <i class="fa fa-minus"></i></td>
-                                </tr>
-                                <tr>
-                                    <td style="width: 270px;" class="mb-2 font-weight-bold text-success"><i class="ti-minus mr-2"></i> Nett Income</td>
-                                    <td style="text-align: start;" class="font-weight-bold text-success">: &nbsp; {{ $arrayData['nett_income'] ? 'Rp ' . number_format($arrayData['nett_income'], 0, ',', '.') : '-' }} <i class="fa fa-plus"></i></td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold" id="judul">Grafik Overall</h6>
-                    <div class="d-flex">
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div id="chartContainerSpline" style="height: 370px; width: 100%;"></div>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
-<div class="modal fade zoom90" id="createBatchModal" tabindex="-1" role="dialog" aria-labelledby="createBatchModalLabel" aria-hidden="true">
+<div class="modal fade" id="createBatchModal" tabindex="-1" role="dialog" aria-labelledby="createBatchModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 900px;" role="document">
         <div class="modal-content">
             <div class="modal-header d-flex flex-row align-items-center justify-content-between">
@@ -251,7 +156,7 @@ font-weight-bold
                                     <p style="margin: 0;">Nama Pelatihan :</p>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <select id="penlatSelect" class="form-control" name="penlat">
+                                    <select id="penlatSelect" class="form-control select2" name="penlat">
                                         <option selected disabled>Select Pelatihan...</option>
                                         @foreach ($penlatList as $item)
                                         <option value="{{ $item->id }}">{{ $item->description }}</option>
@@ -294,103 +199,6 @@ font-weight-bold
         </div>
     </div>
 </div>
-<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-			<div class="modal-header d-flex flex-row align-items-center justify-content-between border-bottom-1">
-                <h5 class="modal-title" id="editModalLabel">Edit Participant</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="editForm">
-                    @csrf
-                    <input type="hidden" id="editId" name="id">
-                    <div class="form-group">
-                        <label for="editNamaPeserta">Nama Peserta</label>
-                        <input type="text" class="form-control" id="editNamaPeserta" name="nama_peserta" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editNamaProgram">Nama Program</label>
-                        <input type="text" class="form-control" id="editNamaProgram" name="nama_program" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editTglPelaksanaan">Tgl Pelaksanaan</label>
-                        <input type="date" class="form-control" id="editTglPelaksanaan" name="tgl_pelaksanaan" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editTempatPelaksanaan">Tempat Pelaksanaan</label>
-                        <input type="text" class="form-control" id="editTempatPelaksanaan" name="tempat_pelaksanaan" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editJenisPelatihan">Jenis Pelatihan</label>
-                        <input type="text" class="form-control" id="editJenisPelatihan" name="jenis_pelatihan" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editKeterangan">Keterangan</label>
-                        <input type="text" class="form-control" id="editKeterangan" name="keterangan" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editSubholding">Subholding</label>
-                        <input type="text" class="form-control" id="editSubholding" name="subholding" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editPerusahaan">Perusahaan</label>
-                        <input type="text" class="form-control" id="editPerusahaan" name="perusahaan" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editKategoriProgram">Kategori Program</label>
-                        <input type="text" class="form-control" id="editKategoriProgram" name="kategori_program" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editRealise">Realisasi</label>
-                        <input type="text" class="form-control" id="editRealisasi" name="realisasi" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Save changes</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-<script>
-window.onload = function () {
-    loadChartData();
-
-    // Add event listener to dropdown
-    document.getElementById("periode").addEventListener("change", function() {
-        loadChartData(); // Load chart data whenever the dropdown changes
-    });
-};
-
-function loadChartData() {
-    var selectedOption = document.getElementById("periode").value;
-    fetch('/api/chart-data-profits/' + selectedOption)
-        .then(response => response.json())
-        .then(data => {
-            var chart = new CanvasJS.Chart("chartContainerSpline", {
-                animationEnabled: true,
-                zoomEnabled: true,
-                theme: "light2",
-                title: { text: "Data Profits" },
-                axisX: { valueFormatString: "DD MMM" },
-                axisY: {
-                    includeZero: true
-                },
-                data: [{
-                    type: "splineArea",
-                    color: "#6599FF",
-                    xValueType: "dateTime",
-                    xValueFormatString: "DD MMM",
-                    yValueFormatString: "#,##0 Rupiah",
-                    dataPoints: data.profitDataPoints
-                }]
-            });
-            chart.render();
-        });
-}
-</script>
-
 <script>
 $('#createBatchModal').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget); // Button that triggered the modal
@@ -408,7 +216,7 @@ $(document).ready(function() {
         processing: true,
         serverSide: true,
         ajax: {
-            url: "{{ route('cost') }}", // Ensure this route points to the controller's costs method
+            url: "{{ route('cost', $selectedPenlat->id) }}", // Ensure this route points to the controller's costs method
             data: function(d) {
                 d.namaPenlat = $('#namaPenlat').val();
                 d.jenisPenlat = $('#jenisPenlat').val();
@@ -418,16 +226,31 @@ $(document).ready(function() {
         columns: [
             { data: 'tgl_pelaksanaan', name: 'tgl_pelaksanaan' },
             { data: 'description', name: 'batch.penlat.description', orderable: false, searchable: false },
-            { data: 'pelaksanaan', name: 'pelaksanaan', orderable: false, searchable: false },
+            { data: 'pelaksanaan', name: 'pelaksanaan' },
             { data: 'jumlah_peserta', name: 'jumlah_peserta' },
-            { data: 'total_biaya_pendaftaran_peserta', name: 'total_biaya_pendaftaran_peserta' },
-            { data: 'jumlah_biaya', name: 'jumlah_biaya' },
-            { data: 'profit', name: 'profit' }
+            { data: 'revenue', name: 'revenue' },
+            { data: 'cost', name: 'cost' },
+            { data: 'nett_income', name: 'nett_income' }
         ]
     });
 
     $('#namaPenlat, #jenisPenlat, #periode').change(function() {
         table.draw();
+    });
+
+    // Initialize Select2
+    $('#penlatSelect').select2({
+        dropdownParent: $('#createBatchModal'),
+        theme: "classic",
+        placeholder: "Select Pelatihan...",
+        width: '100%',
+        tags: true,
+    });
+
+    // Event listener for change event
+    $('#penlatSelect').on('change', function() {
+        var selectedOption = $(this).find('option:selected').text();
+        $('#programInput').val(selectedOption);
     });
 });
 </script>
@@ -440,11 +263,5 @@ $(document).ready(function() {
         };
         reader.readAsDataURL(event.target.files[0]);
     }
-    document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('penlatSelect').addEventListener('change', function() {
-            var selectedOption = this.options[this.selectedIndex].text;
-            document.getElementById('programInput').value = selectedOption;
-        });
-    });
 </script>
 @endsection

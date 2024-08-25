@@ -92,7 +92,6 @@ font-weight-bold
                             </div>
                         </div>
                     </div>
-
                     <table id="batchTables" class="table table-bordered">
                         <thead>
                             <tr>
@@ -101,7 +100,7 @@ font-weight-bold
                                 <th>Batch</th>
                                 <th>Jenis Pelatihan</th>
                                 <th>Tgl Pelaksanaan</th>
-                                <th>Action</th>
+                                <th width="100px">Action</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -112,7 +111,7 @@ font-weight-bold
     </div>
 </div>
 
-<div class="modal fade zoom90" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
+<div class="modal fade" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 900px;" role="document">
         <div class="modal-content">
             <div class="modal-header d-flex flex-row align-items-center justify-content-between">
@@ -182,8 +181,8 @@ font-weight-bold
         </div>
     </div>
 </div>
-<div class="modal fade zoom90" id="editDataModal" tabindex="-1" role="dialog" aria-labelledby="editDataModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+<div class="modal fade" id="editDataModal" tabindex="-1" role="dialog" aria-labelledby="editDataModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 900px;" role="document">
         <div class="modal-content">
             <div class="modal-header d-flex flex-row align-items-center justify-content-between">
                 <h5 class="modal-title" id="editDataModalLabel">Edit Data</h5>
@@ -307,7 +306,7 @@ $(document).ready(function() {
 
         $.get('/penlat-batch/' + id + '/edit', function (data) {
             $('#edit_id').val(data.id);
-            $('#edit_penlat_id').val(data.penlat_id);
+            $('#edit_penlat_id').val(data.penlat_id).trigger('change');
             $('#edit_nama_program').val(data.nama_program);
             $('#edit_batch').val(data.batch);
             $('#edit_tgl_pelaksanaan').val(data.date);
@@ -385,12 +384,6 @@ $(document).ready(function() {
         placeholder: "Select Pelatihan...",
         width: '100%',
         tags: true,
-    });
-
-    // Event listener for change event
-    $('#edit_penlat_id').on('change', function() {
-        var selectedOption = $(this).find('option:selected').text();
-        $('#edit_nama_program').val(selectedOption);
     });
 });
 </script>
