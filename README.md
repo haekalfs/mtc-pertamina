@@ -27,8 +27,7 @@ MTC - Pertamina DMS is a comprehensive data management system designed to stream
 
 **Technologies Used**
 
-* **[List of technologies used, e.g., Laravel, React, MySQL]**
-* **[Brief description of each technology and its role in the project]**
+* **Laravel 9, MySQL, Many Laravel Libraries**
 
 **Installation**
 
@@ -61,7 +60,7 @@ MTC - Pertamina DMS is a comprehensive data management system designed to stream
 
 **Contributing**
 
-We welcome contributions to MTC - Pertamina DMS. If you'd like to contribute, please follow these guidelines:
+THIS IS PROJECT CODE, UNAUTHORIZED ACCESS IS PROHIBITED, please follow these guidelines:
 
 1. Fork the repository.
 2. Create a new branch for your feature or bug fix.
@@ -71,15 +70,15 @@ We welcome contributions to MTC - Pertamina DMS. If you'd like to contribute, pl
 
 **License**
 
-[Specify the license under which the project is released, e.g., MIT, GPL]
+MIT 2.0
 
 **Acknowledgements**
 
-* **[List of individuals or organizations who contributed to the project]**
+* **HAEKAL SASTRADILAGA**
+* **NADA RAHMAWATI**
+* **DAUD REGEN**
+* **ANISA RAHMAWATI**
 
 **Additional Information**
 
-* **[Any additional information or resources that might be helpful]**
-
-**Remember to replace the placeholders with your actual project details.**
-This README provides a solid foundation for showcasing your MTC - Pertamina DMS project. You can customize it further to include more specific information and details about your project.
+**-**
