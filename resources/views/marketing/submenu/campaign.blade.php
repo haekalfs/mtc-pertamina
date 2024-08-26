@@ -255,20 +255,20 @@ font-weight-bold
     </div>
 </div>
 <script>
-  $('#summernote').summernote({
+$('#summernote').summernote({
     placeholder: 'Hasil Kegiatan...',
     tabsize: 2,
     height: 220,
     toolbar: [
-      ['style', ['style']],
-      ['font', ['bold', 'underline', 'clear']],
-      ['color', ['color']],
-      ['para', ['ul', 'ol', 'paragraph']],
-      ['table', ['table']],
-      ['insert', ['link', 'picture', 'video']],
-      ['view', ['fullscreen', 'codeview', 'help']]
+        ['style', ['style']],
+        ['font', ['bold', 'underline', 'clear']],
+        ['color', ['color']],
+        ['para', ['ul', 'ol', 'paragraph']],
+        ['table', ['table']],
+        ['insert', ['link', 'picture', 'video']],
+        ['view', ['fullscreen', 'codeview', 'help']]
     ]
-  });
+});
 </script>
 <script>
     function previewImage(event) {

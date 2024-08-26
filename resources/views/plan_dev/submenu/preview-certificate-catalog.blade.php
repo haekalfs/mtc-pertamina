@@ -103,11 +103,11 @@ font-weight-bold
 
                                                             @for ($i = 0; $i < 5; $i++)
                                                                 @if ($i < $wholeStars)
-                                                                    <i class="fa fa-star"></i>
+                                                                    <i class="fa fa-star text-warning"></i>
                                                                 @elseif ($halfStar && $i == $wholeStars)
-                                                                    <i class="fa fa-star-half-o"></i>
+                                                                    <i class="fa fa-star-half-o text-warning"></i>
                                                                 @else
-                                                                    <i class="fa fa-star-o"></i>
+                                                                    <i class="fa fa-star-o text-warning"></i>
                                                                 @endif
                                                             @endfor
                                                             {{ $roundedScore ?? '-' }}

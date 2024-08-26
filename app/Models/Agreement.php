@@ -9,7 +9,7 @@ class Agreement extends Model
 {
     use HasFactory;
     protected $table = "marketing_agreement";
-    protected $fillable = ["id", "company_name", 'company_details', 'status', 'spk_filepath', 'img_filepath', 'user_id',"created_at", "updated_at"];
+    protected $fillable = ["id", "company_name", 'company_details', 'date', 'non_spk', 'status', 'spk_filepath', 'img_filepath', 'user_id',"created_at", "updated_at"];
 
 
     public function statuses(){

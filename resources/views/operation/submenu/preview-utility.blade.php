@@ -166,7 +166,7 @@ font-weight-bold
                             <tbody>
                                 @foreach($data->penlat_usage as $tool)
                                     <tr>
-                                        <td data-th="Product">
+                                        <td>
                                             <div class="row">
                                                 <div class="col-md-3 text-left">
                                                     <img src="{{ asset($tool->utility->filepath) }}" style="height: 100px; width: 100px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
@@ -177,14 +177,10 @@ font-weight-bold
                                                 </div>
                                             </div>
                                         </td>
-                                        <td data-th="Quantity" style="width:10%">
-                                            <input type="number" class="form-control form-control-md text-center" name="qty_{{ $tool->utility->id }}" value="{{ $tool->amount }}">
+                                        <td style="width:10%">
+                                            <input type="number" class="form-control form-control-md text-center" name="qty_{{ $tool->id }}" value="{{ $tool->amount }}">
                                         </td>
-                                        <td data-th="Price" style="width:10%" class="text-center">
-                                            {{-- <select class="custom-select form-control form-control-sm" name="unit_{{ $tool->utility->id }}">
-                                                <option value="{{ $tool->utility->utility_unit }}" selected>{{ $tool->utility->utility_unit }}</option>
-                                                <!-- Add other options if necessary -->
-                                            </select> --}}
+                                        <td style="width:10%" class="text-center">
                                             {{ $tool->utility->utility_unit }}
                                         </td>
                                         <td class="actions text-center">

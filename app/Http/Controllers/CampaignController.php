@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Campaign;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class CampaignController extends Controller
 {
@@ -45,9 +47,45 @@ class CampaignController extends Controller
     public function preview_campaign($id)
     {
         $data = Campaign::find($id);
-        return view('marketing.submenu.preview_campaign', ['data' => $data]);
+        $users = User::all();
+        return view('marketing.submenu.preview_campaign', ['data' => $data, 'users' => $users]);
     }
 
+    public function show($id)
+    {
+        $campaign = Campaign::findOrFail($id);
+        return response()->json($campaign);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'activity_name' => 'required|string|max:255',
+            'activity_info' => 'nullable|string|max:255',
+            'activity_result' => 'nullable|string',
+            'person_in_charge' => 'nullable|string|max:255',
+            'activity_date' => 'nullable|date',
+            'img' => 'nullable',
+        ]);
+
+        $campaign = Campaign::findOrFail($id);
+        $campaign->campaign_name = $request->input('activity_name');
+        $campaign->campaign_details = $request->input('activity_info');
+        $campaign->campaign_result = $request->input('activity_result');
+        $campaign->user_id = auth()->user()->id;
+        $campaign->date = $request->input('activity_date');
+
+        if ($request->hasFile('img')) {
+            $image = $request->file('img');
+            $filename = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('uploads/campaign'), $filename);
+            $campaign->img_filepath = 'uploads/campaign/' . $filename;
+        }
+
+        $campaign->save();
+
+        return redirect()->back()->with('success', 'Campaign updated successfully.');
+    }
     /**
      * Delete a specific campaign by its ID.
      *
@@ -64,11 +102,10 @@ class CampaignController extends Controller
             // Delete the campaign
             $campaign->delete();
 
-            // Redirect back with a success message
-            return redirect()->route('marketing-campaign')->with('success', 'Campaign deleted successfully.');
+            return response()->json(['status' => 'success', 'message' => 'Campaign data deleted successfully!']);
         } else {
-            // Redirect back with an error message if not found
-            return redirect()->route('marketing-campaign')->with('error', 'Campaign not found.');
+            // Log the exception for debugging
+            return response()->json(['status' => 'failed', 'message' => 'Failed to delete record due to an unexpected error!']);
         }
     }
 }

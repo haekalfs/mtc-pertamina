@@ -13,7 +13,6 @@ font-weight-bold
 @endsection
 
 @section('content')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
         <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-sitemap"></i> Company Agreement</h1>
@@ -50,18 +49,6 @@ font-weight-bold
     <strong>{{ $message }}</strong>
 </div>
 @endif
-<style>
-    #dataTable tbody tr {
-        margin: 0;
-        padding: 0;
-    }
-
-    #dataTable tbody td {
-        padding: 0;
-        border: none; /* Optional: removes the borders */
-    }
-</style>
-
 <div class="animated fadeIn zoom90">
     <div class="row">
         <div class="col-md-12">
@@ -97,35 +84,52 @@ font-weight-bold
                             </div>
                         </div>
                     </form>
-                    <div>
-                        <table id="dataTable" class="table table-borderless mt-4 zoom90" style="padding: 10px;">
-                            <thead class="text-center" style="display: none;">
+                    <div class="table-responsive">
+                        <table id="dataTable" class="table table-bordered mt-4 zoom90">
+                            <thead>
                                 <tr>
                                     <th>Agreement</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody class="mt-2">
+                            <tbody>
                                 @foreach($data as $item)
                                 <tr>
-                                    <td>
-                                        <div class="card custom-card mb-3 bg-white shadow">
-                                            <div class="row no-gutters">
-                                                <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding: 2em;">
-                                                    <img src="{{ asset($item->img_filepath ? $item->img_filepath : 'https://via.placeholder.com/250x150/5fa9f8/ffffff') }}" style="height: 150px; width: 250px;" alt="" class="img-fluid d-none d-md-block rounded mb-2">
-                                                </div>
-                                                <div class="col-md-7 mt-2">
-                                                    <div class="card-body text-secondary">
-                                                        <div class="mt-1">
-                                                            <h4 class="font-weight-bold">{{ $item->company_name }}</h4>
-                                                            <p class="font-weight-light mt-2">Document SPK : <a href="{{ asset($item->spk_filepath) }}" target="_blank" class="text-secondary"><u>View</u> <i class="fa fa-external-link fa-sm"></i></a></p>
-                                                            <p>Status : <span class="badge {{ $item->statuses->badge }}">{{ $item->statuses->description }}</span></p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-2 d-flex align-items-center justify-content-start">
-                                                    <a class="btn btn-outline-secondary btn-sm" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-eye"></i> Preview Agreement</a>
+                                    <td data-th="Product">
+                                        <div class="row">
+                                            <div class="col-md-4 d-flex justify-content-center align-items-center text-center p-3">
+                                                <img src="{{ asset($item->img_filepath ? $item->img_filepath : 'https://via.placeholder.com/250x150/5fa9f8/ffffff') }}" style="height: 150px; width: 250px;" alt="" class="img-fluid d-none d-md-block rounded mb-2">
+                                            </div>
+                                            <div class="col-md-8 text-left mt-sm-2">
+                                                <h5 class="card-title font-weight-bold">{{ $item->company_name }}</h5>
+                                                <div class="ml-2">
+                                                    <table class="table table-borderless table-sm">
+                                                        <tr>
+                                                            <td style="width: 180px;"><i class="ti-minus mr-2"></i> Tipe Dokumen</td>
+                                                            <td style="text-align: start;">: @if($item->spk_filepath) SPK @else NON-SPK @endif</span></td>
+                                                        </tr>
+                                                        @if($item->spk_filepath)
+                                                        <tr>
+                                                            <td style="width: 180px;"><i class="ti-minus mr-2"></i> Dokumen SPK</td>
+                                                            <td style="text-align: start;">: Document SPK : <a href="{{ asset($item->spk_filepath) }}" target="_blank" class="text-secondary"><u>View</u> <i class="fa fa-external-link fa-sm"></i></a></td>
+                                                        </tr>
+                                                        @endif
+                                                        <tr>
+                                                            <td><i class="ti-minus mr-2"></i> Release Date</td>
+                                                            <td style="text-align: start;">: {{ \Carbon\Carbon::parse($item->date)->format('d-M-Y') }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><i class="ti-minus mr-2"></i> Status</td>
+                                                            <td style="text-align: start;">: <span class="badge {{ $item->statuses->badge }}">{{ $item->statuses->description }}</span></td>
+                                                        </tr>
+                                                    </table>
                                                 </div>
                                             </div>
+                                        </div>
+                                    </td>
+                                    <td class="actions text-center">
+                                        <div>
+                                            <a class="btn btn-outline-secondary btn-sm" href="{{ route('preview-company', $item->id) }}"><i class="menu-Logo fa fa-eye"></i> Preview Agreement</a>
                                         </div>
                                     </td>
                                 </tr>
@@ -140,7 +144,7 @@ font-weight-bold
 </div>
 
 <div class="modal fade zoom90" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 1000px;" role="document">
         <div class="modal-content">
             <div class="modal-header d-flex flex-row align-items-center justify-content-between">
                 <h5 class="modal-title" id="inputDataModalLabel">Input Data</h5>
@@ -192,12 +196,36 @@ font-weight-bold
                                                 <textarea class="form-control" rows="3" name="company_details"></textarea>
                                             </div>
                                         </div>
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 200px;" class="mr-2">
+                                        <div class="d-flex align-items-start mb-4">
+                                            <div style="width: 160px;" class="mr-2">
+                                                <p style="margin: 0;">Agreement Date :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="date" class="form-control" name="agreement_date" required>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-start mb-4">
+                                            <div style="width: 160px;" class="mr-2">
+                                                <p style="margin: 0;">SPK/NON-SPK :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <label class="col-md-4">
+                                                    <input class="form-radio-input" type="radio" name="type_reimburse" id="projectRadio" value="Project" checked>
+                                                    <span class="form-radio-sign">SPK</span>
+                                                </label>
+                                                <label class="col-md-4">
+                                                    <input class="form-radio-input" type="radio" name="type_reimburse" id="othersRadio" value="Others">
+                                                    <span class="form-radio-sign">NON-SPK</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-start mb-4">
+                                            <div style="width: 160px;" class="mr-2">
                                                 <p style="margin: 0;">Dokumen SPK :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <input type="file" class="form-control" name="spk_file" required>
+                                                <input type="file" class="form-control" name="spk_file" id="spkFileInput">
+                                                <textarea class="form-control" name="non_spk_details" id="nonSpkTextarea" style="display: none;"></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -215,14 +243,40 @@ font-weight-bold
     </div>
 </div>
 <script>
-    function previewImage(event) {
-        const reader = new FileReader();
-        reader.onload = function(){
-            const output = document.getElementById('image-preview');
-            output.src = reader.result;
-        };
-        reader.readAsDataURL(event.target.files[0]);
+document.addEventListener('DOMContentLoaded', function() {
+    const projectRadio = document.getElementById('projectRadio');
+    const othersRadio = document.getElementById('othersRadio');
+    const spkFileInput = document.getElementById('spkFileInput');
+    const nonSpkTextarea = document.getElementById('nonSpkTextarea');
+
+    function toggleInputFields() {
+        if (projectRadio.checked) {
+            spkFileInput.style.display = 'block';
+            spkFileInput.required = true;
+            nonSpkTextarea.style.display = 'none';
+            nonSpkTextarea.required = false;
+        } else {
+            spkFileInput.style.display = 'none';
+            spkFileInput.required = false;
+            nonSpkTextarea.style.display = 'block';
+            nonSpkTextarea.required = true;
+        }
     }
+
+    projectRadio.addEventListener('change', toggleInputFields);
+    othersRadio.addEventListener('change', toggleInputFields);
+
+    // Initial toggle based on the default checked option
+    toggleInputFields();
+});
+function previewImage(event) {
+    const reader = new FileReader();
+    reader.onload = function(){
+        const output = document.getElementById('image-preview');
+        output.src = reader.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+}
 </script>
 @endsection
 

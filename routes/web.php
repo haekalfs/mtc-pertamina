@@ -150,10 +150,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/marketing-campaign', [MarketingController::class, 'campaign'])->name('marketing-campaign');
     Route::get('/marketing-campaign/preview/{id}', [CampaignController::class, 'preview_campaign'])->name('preview-campaign');
     Route::post('/store-campaign', [CampaignController::class, 'store'])->name('campaign.store');
-    Route::get('/marketing-campaign/delete-item/{id}', [CampaignController::class, 'delete_campaign'])->name('delete-campaign');
+    Route::get('/fetch-campaign-data/{itemId}', [CampaignController::class, 'show'])->name('campaign.show');
+    Route::put('/update-campaign/{itemId}', [CampaignController::class, 'update'])->name('campaign.update');
+    Route::delete('/marketing-campaign/delete-item/{id}', [CampaignController::class, 'delete_campaign'])->name('delete-campaign');
+
     //Company Agreement
     Route::get('/marketing/company-agreement', [MarketingController::class, 'company_agreement'])->name('company-agreement');
     Route::post('/store-agreement', [AgreementController::class, 'store'])->name('agreement.store');
+    Route::get('/marketing/company-agreement-preview/{id}', [AgreementController::class, 'preview_agreement'])->name('preview-company');
+    Route::get('/fetch-agreement-data/{itemId}', [AgreementController::class, 'show'])->name('agreement.show');
+    Route::put('/update-agreement/{itemId}', [AgreementController::class, 'update'])->name('agreement.update');
+    Route::delete('/marketing-agreement/delete-item/{id}', [AgreementController::class, 'delete_agreement'])->name('delete-agreement');
 
     //finances
     Route::get('/financial-dashboard/{yearSelected?}', [FinanceController::class, 'dashboard'])->name('finance');

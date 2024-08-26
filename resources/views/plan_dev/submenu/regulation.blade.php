@@ -63,7 +63,7 @@ font-weight-bold
 <div class="animated fadeIn zoom90">
     <div class="row">
         <div class="col-md-12">
-            <div class="card">
+            <div class="card shadow">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> List Data</h6>
                     <div class="text-right">
