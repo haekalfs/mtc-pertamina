@@ -100,7 +100,7 @@ font-weight-bold
                                 <th>Batch</th>
                                 <th>Jenis Pelatihan</th>
                                 <th>Tgl Pelaksanaan</th>
-                                <th width="100px">Action</th>
+                                <th width="120px">Action</th>
                             </tr>
                         </thead>
                         <tbody></tbody>

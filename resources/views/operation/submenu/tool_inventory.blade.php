@@ -50,6 +50,19 @@ font-weight-bold
     <strong>{{ $message }}</strong>
 </div>
 @endif
+@if ($message = Session::get('out-of-stock'))
+<div class="alert alert-danger alert-block">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>{{ $message }}</strong>
+</div>
+@endif
+
+@if ($message = Session::get('maintenance'))
+<div class="alert alert-warning alert-block">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>{{ $message }}</strong>
+</div>
+@endif
 <style>
     .drop-zone {
     border: 2px dashed #ccc;
@@ -112,20 +125,34 @@ font-weight-bold
                         <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Register Tool</a>
                     </div>
                 </div>
-                {{-- <div class="row-toolbar mt-4 ml-2">
-                    <div class="col">
-                        <select style="max-width: 18%;" class="form-control" id="rowsPerPage">
-                            <option value="-1">Show All</option>
-                            @foreach($locations as $item)
-                            <option value="{{ $item->id }}">{{ $item->description }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-auto text-right mr-2">
-                        <input class="form-control" type="text" id="searchInput" placeholder="Search...">
-                    </div>
-                </div> --}}
                 <div class="card-body zoom90">
+                    <form method="GET" action="{{ route('tool-inventory') }}">
+                        @csrf
+                        <div class="row d-flex justify-content-right mb-4">
+                            <div class="col-md-12">
+                                <div class="row align-items-center">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="year">Filter :</label>
+                                            <select class="form-control" name="locationFilter">
+                                                <option value="-1" selected>Show All</option>
+                                                @foreach ($locations as $item)
+                                                    <option value="{{ $item->id }}" @if($item->id == $selectedLocation) selected @endif>{{ $item->description }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1 d-flex align-self-end justify-content-start">
+                                        <div class="form-group">
+                                            <div class="align-self-center">
+                                                <button type="submit" class="btn btn-primary" style="padding-left: 1.2em; padding-right: 1.2em;"><i class="ti-search"></i></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                     <div class="table-responsive">
                         <table id="dataTable" class="table table-bordered mt-4">
                             <thead>
@@ -280,6 +307,18 @@ font-weight-bold
                                         </div>
                                         <div class="d-flex align-items-center mb-4">
                                             <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Lokasi :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <select class="form-control" name="location">
+                                                    @foreach ($locations as $item)
+                                                        <option value="{{ $item->id }}">{{ $item->description }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
                                                 <p style="margin: 0;">Running Hour :</p>
                                             </div>
                                             <div class="flex-grow-1">
@@ -409,6 +448,18 @@ font-weight-bold
                                                 <input type="text" class="form-control" name="running_hour" id="edit_running_hour">
                                             </div>
                                         </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Lokasi :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <select class="form-control" id="edit_location" name="location">
+                                                    @foreach ($locations as $item)
+                                                        <option value="{{ $item->id }}">{{ $item->description }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="d-flex align-items-center mb-4">
@@ -522,6 +573,7 @@ font-weight-bold
                 $('#edit_condition').val(response.asset_condition_id);
                 $('#edit_initial_stock').val(response.initial_stock);
                 $('#edit_used_amount').val(response.used_amount);
+                $('#edit_location').val(response.location_id);
                 $('#edit_last_maintenance').val(response.last_maintenance);
                 $('#edit_next_maintenance').val(response.next_maintenance);
                 $('#edit-image-preview').attr('src', response.tool_image ? response.tool_image : 'https://via.placeholder.com/150x150');

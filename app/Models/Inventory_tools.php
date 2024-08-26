@@ -26,6 +26,7 @@ class Inventory_tools extends Model
         'next_maintenance',
         'last_maintenance',
         'initial_stock',
+        'location_id',
         'used_time',
         'used_amount'
     ];
@@ -41,5 +42,10 @@ class Inventory_tools extends Model
     public function penlat_usage()
     {
         return $this->hasMany('App\Models\Penlat_utility_usage', 'inventory_tool_id', 'id');
+    }
+
+    public function location()
+    {
+        return $this->belongsTo('App\Models\Location')->withDefault();
     }
 }

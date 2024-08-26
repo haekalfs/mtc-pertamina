@@ -21,6 +21,7 @@ class InventoryToolController extends Controller
             'maker' => 'required',
             'running_hour' => 'required',
             'condition' => 'required',
+            'location' => 'required',
             'last_maintenance' => 'required',
             'next_maintenance' => 'required',
             'stock' => 'required',
@@ -36,6 +37,7 @@ class InventoryToolController extends Controller
         $tool->asset_condition_id = $request->input('condition');
         $tool->asset_stock = $request->input('stock');
         $tool->initial_stock = $request->input('stock');
+        $tool->location_id = $request->input('location');
         $tool->used_time = $request->input('running_hour');
         $tool->last_maintenance = $request->input('last_maintenance');
         $tool->next_maintenance = $request->input('next_maintenance');
@@ -79,6 +81,7 @@ class InventoryToolController extends Controller
             'used_time' => $tool->used_time,
             'asset_condition_id' => $tool->asset_condition_id,
             'initial_stock' => $tool->initial_stock,
+            'location_id' => $tool->location_id,
             'used_amount' => $tool->used_amount,
             'last_maintenance' => $tool->last_maintenance,
             'next_maintenance' => $tool->next_maintenance,
@@ -113,6 +116,7 @@ class InventoryToolController extends Controller
         $tool->asset_maker = $request->input('maker');
         $tool->used_time = $request->input('running_hour');
         $tool->asset_condition_id = $request->input('condition');
+        $tool->location_id = $request->input('location');
         $tool->initial_stock = $initialStocks;
         $tool->used_amount = $existingUsedAmount;
         $tool->asset_stock = $stocks;

@@ -19,6 +19,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -32,12 +33,31 @@ class OperationController extends Controller
         // Set the selected year
         $yearSelected = $yearSelected ?? $nowYear;
 
+        // Get counts for various items
         $getPesertaCount = Infografis_peserta::count();
         $getKebutuhanCount = Penlat_requirement::count();
         $getAssetCount = Inventory_tools::count();
         $getAssetStock = Inventory_tools::sum('initial_stock');
 
-        return view('operation.index', compact('getPesertaCount', 'getKebutuhanCount', 'getAssetCount', 'getAssetStock', 'yearsBefore', 'yearSelected'));
+        // Get count of assets that are out of stock
+        $OutOfStockCount = Inventory_tools::where('asset_stock', '=', 0)->count();
+
+        // Get count of assets that are reaching their next maintenance date
+        $requiredMaintenanceCount = Inventory_tools::where('next_maintenance', '<=', now())->count();
+
+        $totalAttention = $OutOfStockCount + $requiredMaintenanceCount;
+
+        return view('operation.index', compact(
+            'getPesertaCount',
+            'totalAttention',
+            'getKebutuhanCount',
+            'getAssetCount',
+            'getAssetStock',
+            'yearsBefore',
+            'yearSelected',
+            'OutOfStockCount',
+            'requiredMaintenanceCount'
+        ));
     }
 
     public function getChartData($year)
@@ -420,13 +440,45 @@ class OperationController extends Controller
         return redirect()->route('preview-room', $roomId)->with('success', 'Room inventory saved successfully!');
     }
 
-    public function tool_inventory()
+    public function tool_inventory(Request $request)
     {
-        $assets = Inventory_tools::all();
         $locations = Location::all();
-        $assetCondition = Asset_condition::all();
 
-        return view('operation.submenu.tool_inventory', ['assets' => $assets, 'locations' => $locations, 'assetCondition' => $assetCondition]);
+        $assetCondition = Asset_condition::all();
+        $selectedLocation = '-1';
+
+        if($request->locationFilter){
+            $selectedLocation = $request->locationFilter;
+        }
+
+        if($selectedLocation != '-1'){
+            $assets = Inventory_tools::where('location_id', $selectedLocation)->get();
+        } else {
+            $assets = Inventory_tools::all();
+        }
+
+        // Get count of assets that are out of stock
+        $OutOfStockCount = Inventory_tools::where('asset_stock', '=', 0)->count();
+
+        // Get count of assets that are reaching their next maintenance date
+        $requiredMaintenanceCount = Inventory_tools::where('next_maintenance', '<=', now())->count();
+
+        if($OutOfStockCount){
+            Session::flash('out-of-stock', "$OutOfStockCount Assets is out of Stock!");
+        }
+
+        if($requiredMaintenanceCount){
+            Session::flash('maintenance', "$requiredMaintenanceCount Assets is require Maintenances!");
+        }
+
+        return view('operation.submenu.tool_inventory', [
+            'assets' => $assets,
+            'selectedLocation' => $selectedLocation,
+            'locations' => $locations,
+            'assetCondition' => $assetCondition,
+            'OutOfStockCount',
+            'requiredMaintenanceCount'
+        ]);
     }
 
     public function tool_usage()

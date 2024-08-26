@@ -92,7 +92,7 @@ font-weight-bold
                         <div class="row d-flex justify-content-start mb-1 p-1">
                             <div class="col-md-12">
                                 <div class="row align-items-center">
-                                    <div class="col-md-5">
+                                    <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="email">Nama Pelatihan :</label>
                                             <select id="penlatSelect" class="form-control" name="penlat">
@@ -105,13 +105,24 @@ font-weight-bold
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-md-5">
+                                    <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="email">Status :</label>
                                             <select class="form-control" name="status">
                                                 <option value="-1" {{ $statusId == '-1' ? 'selected' : '' }}>Show All</option>
                                                 <option value="1" {{ $statusId == '1' ? 'selected' : '' }}>Active</option>
                                                 <option value="0" {{ $statusId == '0' ? 'selected' : '' }}>Non Active</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="email">Umur :</label>
+                                            <select class="form-control" name="age">
+                                                <option value="-1" {{ $umur == '-1' ? 'selected' : '' }}>Show All</option>
+                                                <option value="1" {{ $umur == '1' ? 'selected' : '' }}>20 - 30 Tahun</option>
+                                                <option value="2" {{ $umur == '2' ? 'selected' : '' }}>30 - 40 Tahun</option>
+                                                <option value="3" {{ $umur == '3' ? 'selected' : '' }}>>= 40</option>
                                             </select>
                                         </div>
                                     </div>

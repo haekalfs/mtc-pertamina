@@ -39,7 +39,7 @@ class PDController extends Controller
             }
         ])
         ->orderByDesc('average_feedback_score')
-        ->take(5)
+        ->take(3)
         ->get();
 
         // Count total instructors
@@ -73,11 +73,40 @@ class PDController extends Controller
         '))
         ->value('average_score');
 
+        // List of columns to calculate averages for
+        $columns = [
+            'relevansi_materi',
+            'manfaat_training',
+            'durasi_training',
+            'sistematika_penyajian',
+            'tujuan_tercapai',
+            'kedisiplinan_steward',
+            'fasilitasi_steward',
+            'layanan_pelaksana',
+            'proses_administrasi',
+            'kemudahan_registrasi',
+            'kondisi_peralatan',
+            'kualitas_boga',
+            'media_online',
+            'rekomendasi'
+        ];
+
+        // Fetch the average for each column
+        $averages = [];
+        foreach ($columns as $column) {
+            $average = Feedback_mtc::avg(DB::raw("CAST($column AS DECIMAL(10,2))"));
+            $averages[$column] = $average;
+        }
+
+        $regulations = Regulation::latest()->take(3)->get();
+
         return view('plan_dev.index', [
             'instructorCount' => $instructorCount,
             'referencesCount' => $referencesCount,
             'instructors' => $instructors,
-            'averageFeedbackScore' => $averageFeedbackScore
+            'averageFeedbackScore' => $averageFeedbackScore,
+            'averages' => $averages,
+            'regulations' => $regulations
         ]);
     }
 
@@ -243,22 +272,22 @@ class PDController extends Controller
         return view('plan_dev.submenu.instructor-certificate', ['data' => $data, 'penlatList' => $penlatList, 'listBatch' => $listBatch]);
     }
 
-    public function instructor(Request $request, $penlatId = '-1', $status = '-1')
+    public function instructor(Request $request, $penlatId = '-1', $statusId = '-1')
     {
         // Validate the request inputs
         $validator = Validator::make($request->all(), [
             'penlat' => 'sometimes',
-            'status' => 'sometimes'
+            'status' => 'sometimes',
+            'age' => 'sometimes'
         ]);
 
         // Initialize the query with eager loading of the feedbacks relationship
         $query = Instructor::with('feedbacks');
 
-        if($request->penlat){
+        // Apply the Pelatihan (Training) filter
+        if ($request->filled('penlat') && $request->penlat != '-1') {
             $penlatId = $request->penlat;
-        }
-        // Apply filters based on the request
-        if ($penlatId != '-1' && !is_null($penlatId)) {
+
             // Search for related certificates
             $certificatesCatalogIds = Certificates_to_penlat::where('penlat_id', $penlatId)
                 ->pluck('certificates_catalog_id');
@@ -271,10 +300,28 @@ class PDController extends Controller
             $query->whereIn('id', $instructorIds);
         }
 
-        $status = $request->status;
-        if ($status != '-1' && !is_null($status)) {
-            // Filter by status
-            $query->where('status', $status);
+        // Apply the Status filter
+        if ($request->filled('status') && $request->status != '-1') {
+            $statusId = $request->status;
+            $query->where('status', $statusId);
+        }
+
+        // Apply the Age filter
+        if ($request->filled('age') && $request->age != '-1') {
+            $ageRange = $request->age;
+            $query->where(function ($q) use ($ageRange) {
+                switch ($ageRange) {
+                    case '1': // 20 - 30 Years
+                        $q->whereBetween(DB::raw('TIMESTAMPDIFF(YEAR, instructor_dob, CURDATE())'), [20, 30]);
+                        break;
+                    case '2': // 30 - 40 Years
+                        $q->whereBetween(DB::raw('TIMESTAMPDIFF(YEAR, instructor_dob, CURDATE())'), [30, 40]);
+                        break;
+                    case '3': // >= 40 Years
+                        $q->where(DB::raw('TIMESTAMPDIFF(YEAR, instructor_dob, CURDATE())'), '>=', 40);
+                        break;
+                }
+            });
         }
 
         // Get the filtered data
@@ -288,7 +335,8 @@ class PDController extends Controller
             'data' => $data,
             'penlatList' => $penlatList,
             'penlatId' => $penlatId,
-            'statusId' => $status
+            'statusId' => $statusId,
+            'umur' => $request->age
         ]);
     }
 

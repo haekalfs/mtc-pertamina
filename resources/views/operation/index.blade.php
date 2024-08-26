@@ -57,7 +57,17 @@ font-weight-bold
                             <div class="col mr-2">
                                 <div class="stat-heading mb-1 font-weight-bold">
                                     Inventaris Alat</div>
-                                <div class="h6 mb-0 text-gray-800"><span style="font-size: 14px;">{{ $getAssetCount }} Assets with Total {{ $getAssetStock }} Stocks</span></div>
+                                <div class="h6 mb-0 text-gray-800">
+                                    @if($totalAttention != 0)
+                                    <span style="font-size: 14px;">
+                                        <span class="badge bg-warning text-white">{{ $totalAttention }} Assets Need Attention</span>
+                                        {{-- <span class="badge out-of-stock">{{ $OutOfStockCount }} Assets is Out of Stock</span><br>
+                                        <span class="badge out-of-stock">{{ $requiredMaintenanceCount }} Assets Require Maintenance</span> --}}
+                                    </span>
+                                    @else
+                                    <div class="h6 mb-0 text-gray-800"><span style="font-size: 14px;">{{ $getAssetCount }} Assets with Total {{ $getAssetStock }} Stocks</span></div>
+                                    @endif
+                                </div>
                             </div>
                             <div class="col-auto">
                                 <i class="fa fa-fire-extinguisher fa-2x text-success"></i>
@@ -119,7 +129,7 @@ font-weight-bold
                     <div class="col-lg-12">
                         <div class="card-body d-flex justify-content-center align-items-center">
                             <!-- <canvas id="TrafficChart"></canvas>   -->
-                            <div id="mostUsedUtility" style="height: 370px; width: 100%;"></div>
+                            <canvas id="mostUsedUtility"></canvas>
                         </div>
                     </div>
                 </div> <!-- /.row -->
@@ -238,26 +248,50 @@ window.onload = function() {
             });
             pieChart.render();
 
-            var chart = new CanvasJS.Chart("mostUsedUtility", {
-                theme: "light2",
-                animationEnabled: true,
-                title: {
-                    text: "Batch with the Most Used Utility"
+            // Column chart for Batch with the Most Used Utility
+            const barCtx = document.getElementById("mostUsedUtility").getContext("2d");
+            new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: data.mostUsedUtility.map(dp => dp.label),
+                    datasets: [{
+                        label: "Items",
+                        data: data.mostUsedUtility.map(dp => dp.y),
+                        backgroundColor: data.mostUsedUtility.map((dp, index) => {
+                            const colors = ["#4F81BD", "#C0504D", "#9BBB59", "#8064A2", "#4BACC6", "#F79646"];
+                            return colors[index % colors.length];
+                        })
+                    }]
                 },
-                data: [{
-                    type: "column",
-                    yValueFormatString: "#,##0\" Items\"",
-                    dataPoints: data.mostUsedUtility.map((dp, index) => {
-                        const colors = ["#4F81BD", "#C0504D", "#9BBB59", "#8064A2", "#4BACC6", "#F79646"];
-                        return {
-                            label: dp.label,
-                            y: dp.y,
-                            color: colors[index % colors.length] // Cycle through colors
-                        };
-                    })
-                }]
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Batch'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Items'
+                            },
+                            suggestedMax: 50,
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: "Batch Pelatihan dengan penggunaan utilitas terbanyak"
+                        }
+                    }
+                }
             });
-            chart.render();
         });
 }
 function redirectToPage() {
