@@ -179,10 +179,18 @@ font-weight-bold
                                         </div>
                                     </td>
                                     <td data-th="Price">
-                                        {{ $item->asset_stock }} @if($item->asset_stock > 1) Units @else Unit @endif
+                                        @if($item->asset_stock)
+                                            {{ $item->asset_stock }} @if($item->asset_stock > 1) Units @else Unit @endif
+                                        @else
+                                            0 Unit
+                                        @endif
                                     </td>
-                                    <td data-th="Price">
-                                        {{ $item->used_amount }} @if($item->used_amount > 1) Units @else Unit @endif
+                                    <td>
+                                        @if($item->used_amount)
+                                            {{ $item->used_amount }} @if($item->used_amount > 1) Units @else Unit @endif
+                                        @else
+                                            0 Unit
+                                        @endif
                                     </td>
                                     <td data-th="Quantity">
                                         {!! $item->condition->badge !!}<br>

@@ -124,7 +124,7 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-chain"></i>Plan & Development</a>
                         <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-pd')">
                             <li><i class="fa fa-tachometer"></i><a href="{{ route('plan-dev') }}" class="@yield('plan-dev')">Dashboard</a></li>
-                            <li><i class="fa fa-trophy"></i><a href="{{ route('feedback-report') }}" class="@yield('feedback-report')">Feedback Report</a></li>
+                            <li><i class="fa fa-trophy"></i><a href="{{ route('feedback-report-main') }}" class="@yield('feedback-report')">Feedback Report</a></li>
                             <li><i class="fa fa-tag"></i><a href="{{ route('training-reference') }}" class="@yield('training-reference')">Referensi Pelatihan</a></li>
                             {{-- <li><i class="fa fa-cog"></i><a href="#">Monitoring Approval</a></li> --}}
                             <li><i class="fa fa-male"></i><a href="{{ route('instructor') }}" class="@yield('instructor')">Instruktur</a></li>

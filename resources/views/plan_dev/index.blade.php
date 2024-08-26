@@ -25,12 +25,13 @@ font-weight-bold
     <div class="row">
         <!-- Earnings (Monthly) Card Example -->
         <div class="col-xl-4 col-md-6 animateBox">
-            <a href="{{ route('feedback-report') }}" class="clickable-card">
+            <a href="{{ route('feedback-report-main') }}" class="clickable-card">
                 <div class="card border-left-primary shadow py-2">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="stat-heading mb-1 font-weight-bold">Feedback Report</div>
+                                <div class="stat-heading mb-1 font-weight-bold">Rating Feedback MTC</div>
+                                <div class="h6 mb-0 text-gray-800"><i class="fa fa-star text-warning"></i> {{ round($averageFeedbackScore, 2) ?? '-' }}</div>
                             </div>
                             <div class="col-auto">
                                 <i class="fa fa-trophy fa-2x text-primary"></i>
@@ -82,6 +83,62 @@ font-weight-bold
         </div>
     </div>
     <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-star text-warning"></i> Top Rated Instructors</h6>
+                    <div class="text-right">
+                        {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Add Utilities</a> --}}
+                    </div>
+                </div>
+                <div class="card-body zoom90">
+                    <table class="table table-borderless">
+                        <thead>
+                            <tr>
+                                <th>Instructor</th>
+                                <th>Email</th>
+                                <th class="text-center">Age</th>
+                                <th class="text-center">Feedback Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($instructors as $instructor)
+                            <tr class="text-secondary">
+                                <td>
+                                    <a href="{{ route('preview-instructor', ['id' => $instructor->id, 'penlatId' => '-1']) }}">
+                                        <div class="d-flex align-items-center animateBox">
+                                            <img src="{{ asset($instructor->imgFilepath) }}" alt="" class="rounded-circle mr-2 shadow" style="width:50px; height:50px;">
+                                            <span style=" padding-left: 10px;">{{ $instructor->instructor_name }}</span>
+                                        </div>
+                                    </a>
+                                </td>
+                                <td>{{ $instructor->instructor_email }}</td>
+                                <td class="text-center text-secondary">{{ \Carbon\Carbon::parse($instructor->instructor_dob)->age }} Years</td>
+                                <td class="text-center text-secondary">
+                                    @php
+                                        $roundedScore = round($instructor->average_feedback_score, 1);
+                                        $wholeStars = floor($roundedScore);
+                                        $halfStar = ($roundedScore - $wholeStars) >= 0.5;
+                                    @endphp
+
+                                    @for ($i = 0; $i < 5; $i++)
+                                        @if ($i < $wholeStars)
+                                            <i class="fa fa-star text-warning"></i>
+                                        @elseif ($halfStar && $i == $wholeStars)
+                                            <i class="fa fa-star-half-o text-warning"></i>
+                                        @else
+                                            <i class="fa fa-star-o"></i>
+                                        @endif
+                                    @endfor
+                                    <span class="ml-2">{{ $roundedScore }}</span>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
         <div class="col-lg-6">
             <div class="card">
                 <div class="row">
@@ -92,72 +149,6 @@ font-weight-bold
                         </div>
                     </div>
                 </div> <!-- /.row -->
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-star-o"></i> Top Rated Instructors</h6>
-                    <div class="text-right">
-                        {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Add Utilities</a> --}}
-                    </div>
-                </div>
-                <div class="card-body zoom80">
-                    <table class="table table-borderless zoom90">
-                        <thead>
-                            <tr class="text-center" style="display: none;">
-                                <th>Instructors</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($instructors as $instructor)
-                            <tr>
-                                <td data-th="Product">
-                                    <div class="row">
-                                        <div class="col-md-3 text-left">
-                                            <img src="{{ asset($instructor->imgFilepath) }}" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow ">
-                                        </div>
-                                        @php
-                                            $roundedScore = round($instructor->average_feedback_score, 1); // Round to one decimal place
-                                            $wholeStars = floor($roundedScore);
-                                            $halfStar = ($roundedScore - $wholeStars) >= 0.5;
-                                        @endphp
-                                        <div class="col-md-9 text-left mt-sm-2">
-                                            <h5 class="card-title font-weight-bold mb-1">{{ $instructor->instructor_name }}</h5>
-                                            <div class="ml-2">
-                                                <table class="table table-borderless table-sm mb-0">
-                                                    <tr>
-                                                        <td style="width: 120px;"><i class="ti-minus mr-2"></i> Email</td>
-                                                        <td style="text-align: start;">: {{ $instructor->instructor_email }}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><i class="ti-minus mr-2"></i> Umur</td>
-                                                        <td style="text-align: start;">: {{ \Carbon\Carbon::parse($instructor->instructor_dob)->age}} Tahun</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><i class="ti-minus mr-2"></i> Feedback</td>
-                                                        <td style="text-align: start;">:
-                                                            @for ($i = 0; $i < 5; $i++)
-                                                                @if ($i < $wholeStars)
-                                                                    <i class="fa fa-star text-warning"></i>
-                                                                @elseif ($halfStar && $i == $wholeStars)
-                                                                    <i class="fa fa-star-half-o text-warning"></i>
-                                                                @else
-                                                                    <i class="fa fa-star-o text-warning"></i>
-                                                                @endif
-                                                            @endfor {{ $roundedScore ?? '-' }}
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
             </div>
         </div>
     </div>

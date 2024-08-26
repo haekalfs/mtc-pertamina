@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Certificates_catalog;
 use App\Models\Certificates_to_penlat;
 use App\Models\Department;
+use App\Models\Feedback_mtc;
 use App\Models\Feedback_report;
 use App\Models\Feedback_template;
 use App\Models\Infografis_peserta;
@@ -31,13 +32,58 @@ class PDController extends Controller
 {
     public function index()
     {
-        $query = Instructor::query();
-        $instructorCount = $query->count();
+        // Calculate average feedback score and order instructors by it
+        $instructors = Instructor::withCount([
+            'feedbacks as average_feedback_score' => function ($query) {
+                $query->select(DB::raw('coalesce(avg(score), 0)'));
+            }
+        ])
+        ->orderByDesc('average_feedback_score')
+        ->take(5)
+        ->get();
+
+        // Count total instructors
+        $instructorCount = Instructor::count();
+
+        // Get reference data
         $getData = Training_reference::groupBy('penlat_id')->pluck('penlat_id')->toArray();
         $referencesCount = Penlat::whereIn('id', $getData)->count();
-        $instructors = $query->limit(5)->get();
 
-        return view('plan_dev.index', ['instructorCount' => $instructorCount, 'referencesCount' => $referencesCount, 'instructors' => $instructors]);
+        // Calculate the average feedback score
+        $averageFeedbackScore = DB::table('feedback_mtc')
+        ->select(DB::raw('
+            avg(
+                (
+                    COALESCE(relevansi_materi, 0) +
+                    COALESCE(manfaat_training, 0) +
+                    COALESCE(durasi_training, 0) +
+                    COALESCE(sistematika_penyajian, 0) +
+                    COALESCE(tujuan_tercapai, 0) +
+                    COALESCE(kedisiplinan_steward, 0) +
+                    COALESCE(fasilitasi_steward, 0) +
+                    COALESCE(layanan_pelaksana, 0) +
+                    COALESCE(proses_administrasi, 0) +
+                    COALESCE(kemudahan_registrasi, 0) +
+                    COALESCE(kondisi_peralatan, 0) +
+                    COALESCE(kualitas_boga, 0) +
+                    COALESCE(media_online, 0) +
+                    COALESCE(rekomendasi, 0)
+                ) / 14
+            ) as average_score
+        '))
+        ->value('average_score');
+
+        return view('plan_dev.index', [
+            'instructorCount' => $instructorCount,
+            'referencesCount' => $referencesCount,
+            'instructors' => $instructors,
+            'averageFeedbackScore' => $averageFeedbackScore
+        ]);
+    }
+
+    public function feedback_report_main()
+    {
+        return view('plan_dev.feedback-main');
     }
 
     public function feedback_report(Request $request)

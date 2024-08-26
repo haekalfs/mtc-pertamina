@@ -95,7 +95,7 @@ font-weight-bold
                     <div class="col-lg-12">
                         <div class="card-body d-flex justify-content-center align-items-center">
                             <!-- <canvas id="TrafficChart"></canvas>   -->
-                            <canvas id="lineChart" height="150"></canvas>
+                            <canvas id="lineChart"></canvas>
                         </div>
                     </div>
                 </div> <!-- /.row -->
@@ -136,25 +136,36 @@ font-weight-bold
 <script>
 window.onload = function() {
     var selectedOption = document.getElementById("yearSelected").value;
-    fetch('/api/chart-data/' + selectedOption) // Fixed concatenation
+    fetch('/api/chart-data/' + selectedOption)
         .then(response => response.json())
         .then(data => {
-            // Convert data for Chart.js
-            const labels = data.splineDataPoints.map(dp => {
+            const labels = data.dataPointsSpline1.map(dp => {
                 const date = new Date(dp.x);
                 return `${date.getDate()} ${date.toLocaleString('default', { month: 'short' })}`;
             });
 
-            const dataset = {
-                label: "Data Peserta Training MTC 2024",
+            const dataset1 = {
+                label: "STCW Participants",
                 borderColor: "rgba(101, 153, 255, 0.9)",
                 borderWidth: 2,
                 backgroundColor: "rgba(101, 153, 255, 0.5)",
                 pointBorderColor: "rgba(101, 153, 255, 0.9)",
                 pointBackgroundColor: "rgba(101, 153, 255, 0.9)",
-                data: data.splineDataPoints.map(dp => dp.y),
+                data: data.dataPointsSpline1.map(dp => dp.y),
                 fill: true,
-                tension: 0.4, // smooth curve
+                tension: 0.4,
+            };
+
+            const dataset2 = {
+                label: "NON STCW Participants",
+                borderColor: "rgba(255, 99, 132, 0.9)",
+                borderWidth: 2,
+                backgroundColor: "rgba(255, 99, 132, 0.5)",
+                pointBorderColor: "rgba(255, 99, 132, 0.9)",
+                pointBackgroundColor: "rgba(255, 99, 132, 0.9)",
+                data: data.dataPointsSpline2.map(dp => dp.y),
+                fill: true,
+                tension: 0.4,
             };
 
             const ctx = document.getElementById("lineChart").getContext("2d");
@@ -162,7 +173,7 @@ window.onload = function() {
                 type: 'line',
                 data: {
                     labels: labels,
-                    datasets: [dataset]
+                    datasets: [dataset1, dataset2]  // Multiple datasets
                 },
                 options: {
                     responsive: true,
@@ -178,7 +189,7 @@ window.onload = function() {
                                 display: true,
                                 text: 'Data Peserta Training'
                             },
-                            suggestedMax: 270
+                            suggestedMax: 200
                         }
                     },
                     plugins: {
@@ -212,7 +223,6 @@ window.onload = function() {
                 }
             });
 
-
             var pieChart = new CanvasJS.Chart("chartContainerPie", {
                 theme: "light2",
                 animationEnabled: true,
@@ -235,9 +245,16 @@ window.onload = function() {
                     text: "Batch with the Most Used Utility"
                 },
                 data: [{
-                    type: "column", // Use column chart for better comparison
+                    type: "column",
                     yValueFormatString: "#,##0\" Items\"",
-                    dataPoints: data.mostUsedUtility
+                    dataPoints: data.mostUsedUtility.map((dp, index) => {
+                        const colors = ["#4F81BD", "#C0504D", "#9BBB59", "#8064A2", "#4BACC6", "#F79646"];
+                        return {
+                            label: dp.label,
+                            y: dp.y,
+                            color: colors[index % colors.length] // Cycle through colors
+                        };
+                    })
                 }]
             });
             chart.render();

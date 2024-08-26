@@ -79,10 +79,34 @@ class OperationController extends Controller
         }
 
         // Fetch data by date for the spline chart
-        $dataByDate = Infografis_peserta::select('tgl_pelaksanaan', DB::raw('count(*) as total'))
+        $dataByDate1 = Infografis_peserta::select('tgl_pelaksanaan', DB::raw('count(*) as total'))
             ->whereYear('tgl_pelaksanaan', $year)
+            ->where('kategori_program', 'STCW')
             ->groupBy('tgl_pelaksanaan')
             ->get();
+
+        $dataByDate2 = Infografis_peserta::select('tgl_pelaksanaan', DB::raw('count(*) as total'))
+            ->whereYear('tgl_pelaksanaan', $year)
+            ->where('kategori_program', 'NON STCW')
+            ->groupBy('tgl_pelaksanaan')
+            ->get();
+
+        // Prepare data points for the spline chart
+        $dataPointsSpline1 = [];
+        $dataPointsSpline2 = [];
+        foreach ($dataByDate1 as $row) {
+            $dataPointsSpline1[] = [
+                "x" => Carbon::parse($row->tgl_pelaksanaan)->timestamp * 1000,
+                "y" => $row->total
+            ];
+        }
+
+        foreach ($dataByDate2 as $row) {
+            $dataPointsSpline2[] = [
+                "x" => Carbon::parse($row->tgl_pelaksanaan)->timestamp * 1000,
+                "y" => $row->total
+            ];
+        }
 
         // Prepare data points for the pie chart
         $dataPointsPie = [];
@@ -94,18 +118,10 @@ class OperationController extends Controller
             ];
         }
 
-        // Prepare data points for the spline chart
-        $dataPointsSpline = [];
-        foreach ($dataByDate as $row) {
-            $dataPointsSpline[] = [
-                "x" => Carbon::parse($row->tgl_pelaksanaan)->timestamp * 1000,
-                "y" => $row->total
-            ];
-        }
-
         // Return the data points in a JSON response
         return response()->json([
-            'splineDataPoints' => $dataPointsSpline,
+            'dataPointsSpline1' => $dataPointsSpline1,
+            'dataPointsSpline2' => $dataPointsSpline2,
             'pieDataPoints' => $dataPointsPie,
             'mostUsedUtility' => $mostUsedUtility
         ]);
@@ -119,15 +135,6 @@ class OperationController extends Controller
 
         // Set the selected year
         $currentYear = $periodeSelected ?? $nowYear;
-
-        // Validate the request inputs
-        $validator = Validator::make($request->all(), [
-            'namaPenlat' => 'required',
-            'stcw' => 'required',
-            'jenisPenlat' => 'required',
-            'tw' => 'required',
-            'periode' => 'required|digits:4' // Assuming 'periode' is a year
-        ]);
 
         $selectedArray = [
             'namaPenlat' => $request->input('namaPenlat'),

@@ -5,6 +5,7 @@ use App\Http\Controllers\AkhlakController;
 use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentPositionController;
+use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\InstagramController;
@@ -177,9 +178,16 @@ Route::middleware('auth')->group(function () {
 
     //Plan & Dev
     Route::get('/planning-development', [PDController::class, 'index'])->name('plan-dev');
+
+    Route::get('/planning-development/feedback-report-mainpage', [PDController::class, 'feedback_report_main'])->name('feedback-report-main');
+    Route::get('/planning-development/feedback-mtc', [FeedbackController::class, 'feedback_mtc'])->name('feedback-mtc');
     Route::get('/planning-development/feedback-report', [PDController::class, 'feedback_report'])->name('feedback-report');
+
     Route::get('/planning-development/feedback-report-import', [PDController::class, 'feedback_report_import'])->name('feedback-report-import-page');
     Route::post('/import-feedback-report', [ImportController::class, 'import_feedback'])->name('feedback.import');
+
+    Route::get('/planning-development/feedback-mtc-import', [FeedbackController::class, 'feedback_mtc_import'])->name('feedback-mtc-import-page');
+    Route::post('/import-feedback-mtc-report', [ImportController::class, 'import_feedback_mtc'])->name('feedback.mtc.import');
 
     Route::get('/planning-development/regulation', [PDController::class, 'regulation'])->name('regulation');
     Route::post('/store-regulation', [PDController::class, 'regulation_store'])->name('regulation.store');

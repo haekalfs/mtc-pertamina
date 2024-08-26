@@ -53,7 +53,7 @@ active font-weight-bold
         </div>
 
         <div class="col-lg-3 col-md-6 animateBox">
-            <a href="{{ route('feedback-report') }}" class="clickable-card">
+            <a href="{{ route('feedback-report-main') }}" class="clickable-card">
                 <div class="card">
                     <div class="card-body">
                         <div class="stat-widget-five">
@@ -62,7 +62,7 @@ active font-weight-bold
                             </div>
                             <div class="stat-content">
                                 <div class="text-left dib">
-                                    <div class="stat-text"><span class="count">0</span></div>
+                                    <div class="stat-text"><span><i class="fa fa-star text-warning"></i> {{ round($averageFeedbackScore, 2) ?? '-' }}</span></div>
                                     <div class="stat-heading">Rekap Feedback</div>
                                 </div>
                             </div>
@@ -175,22 +175,33 @@ window.onload = function() {
     fetch('/api/chart-data/' + selectedOption) // Fixed concatenation
         .then(response => response.json())
         .then(data => {
-            // Convert data for Chart.js
-            const labels = data.splineDataPoints.map(dp => {
+            const labels = data.dataPointsSpline1.map(dp => {
                 const date = new Date(dp.x);
                 return `${date.getDate()} ${date.toLocaleString('default', { month: 'short' })}`;
             });
 
-            const dataset = {
-                label: "Data Peserta Training MTC 2024",
+            const dataset1 = {
+                label: "STCW Participants",
                 borderColor: "rgba(101, 153, 255, 0.9)",
                 borderWidth: 2,
                 backgroundColor: "rgba(101, 153, 255, 0.5)",
                 pointBorderColor: "rgba(101, 153, 255, 0.9)",
                 pointBackgroundColor: "rgba(101, 153, 255, 0.9)",
-                data: data.splineDataPoints.map(dp => dp.y),
+                data: data.dataPointsSpline1.map(dp => dp.y),
                 fill: true,
-                tension: 0.4, // smooth curve
+                tension: 0.4,
+            };
+
+            const dataset2 = {
+                label: "NON STCW Participants",
+                borderColor: "rgba(255, 99, 132, 0.9)",
+                borderWidth: 2,
+                backgroundColor: "rgba(255, 99, 132, 0.5)",
+                pointBorderColor: "rgba(255, 99, 132, 0.9)",
+                pointBackgroundColor: "rgba(255, 99, 132, 0.9)",
+                data: data.dataPointsSpline2.map(dp => dp.y),
+                fill: true,
+                tension: 0.4,
             };
 
             const ctx = document.getElementById("lineChart").getContext("2d");
@@ -198,7 +209,7 @@ window.onload = function() {
                 type: 'line',
                 data: {
                     labels: labels,
-                    datasets: [dataset]
+                    datasets: [dataset1, dataset2]  // Multiple datasets
                 },
                 options: {
                     responsive: true,
@@ -214,7 +225,7 @@ window.onload = function() {
                                 display: true,
                                 text: 'Data Peserta Training'
                             },
-                            suggestedMax: 270
+                            suggestedMax: 200
                         }
                     },
                     plugins: {

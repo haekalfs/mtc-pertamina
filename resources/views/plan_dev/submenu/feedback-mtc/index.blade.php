@@ -15,12 +15,11 @@ font-weight-bold
 @section('content')
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
-        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="menu-icon fa fa-trophy"></i> Feedback Report</h1>
+        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="menu-icon fa fa-trophy"></i> Feedback Report to MTC</h1>
         <p class="mb-4">Feedback Report.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
-        {{-- <a href="{{ route('feedback-report-main') }}" class="btn btn-sm btn-secondary shadow-sm text-white mr-3"><i class="fa fa-backward"></i> Go Back</a> --}}
-        <a href="{{ route('feedback-report-import-page') }}" class="btn btn-sm btn-primary shadow-sm text-white"><i class="fa fa-file-text fa-sm"></i> Import Data</a>
+        <a href="{{ route('feedback-mtc-import-page') }}" class="btn btn-sm btn-primary shadow-sm text-white"><i class="fa fa-file-text fa-sm"></i> Import Data</a>
     </div>
 </div>
 <div class="overlay overlay-mid" style="display: none;"></div>
@@ -54,10 +53,16 @@ font-weight-bold
 <div class="animated fadeIn zoom90">
     <div class="row">
         <div class="col-md-12">
+            <div class="alert alert-warning alert-block">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                <strong>Not all columns are showed due to big data...</strong>
+            </div>
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold" id="judul">List Data</h6>
                     <div class="d-flex">
+                        {{-- <a id="addApproversBtn" class="btn btn-sm btn-primary shadow-sm text-white"><i class="fa fa-file-text fa-sm"></i> Filter</a>
+                        <a id="hideApproversBtn" class="btn btn-sm btn-secondary shadow-sm text-white" style="display: none;"><i class="fa fa-backward fa-sm"></i> Cancel</a> --}}
                     </div>
                 </div>
                 <div class="card-body zoom80">
@@ -69,9 +74,6 @@ font-weight-bold
                                         <label for="email">Nama Penlat :</label>
                                         <select class="custom-select" id="nama_pelatihan" name="nama_pelatihan">
                                             <option value="-1" selected>Show All</option>
-                                            @foreach ($filterPelatihan as $item)
-                                                <option value="{{ $item->judul_pelatihan }}">{{ $item->judul_pelatihan }}</option>
-                                            @endforeach
                                         </select>
                                     </div>
                                 </div>
@@ -80,9 +82,6 @@ font-weight-bold
                                         <label for="position_id">Kelompok :</label>
                                         <select name="kelompok" class="form-control" id="kelompok">
                                             <option value="-1">Show All</option>
-                                            @foreach ($filterKelompok as $item)
-                                                <option value="{{ $item->kelompok }}">{{ $item->kelompok }}</option>
-                                            @endforeach
                                         </select>
                                     </div>
                                 </div>
@@ -102,22 +101,26 @@ font-weight-bold
                             </div>
                         </div>
                     </div>
-                    <table id="listFeedback" class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Tgl Pelaksanaan</th>
+                    <div class="table-responsive">
+                        <table id="listFeedbackMTC" class="table table-bordered">
+                            <thead>
+                              <tr>
+                                <th>Nama Peserta</th>
                                 <th>Judul Pelatihan</th>
-                                <th>Instruktur</th>
-                                @foreach($feedbackTemplates as $template)
-                                    <th>{{ $template->questioner }}</th>
-                                @endforeach
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Data will be populated by Yajra DataTables -->
-                        </tbody>
-                    </table>
+                                <th>Tanggal Pelaksanaan</th>
+                                <th>Relevansi Materi</th>
+                                <th>Manfaat Training</th>
+                                <th>Durasi Training</th>
+                                <th>Sistematika Penyajian</th>
+                                <th>Tujuan Tercapai</th>
+                                <th>Kedisiplinan Steward</th>
+                                <th>Saran</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                          </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -125,41 +128,35 @@ font-weight-bold
 </div>
 <script>
 $(document).ready(function() {
-    $('#listFeedback').DataTable({
+    var table = $('#listFeedbackMTC').DataTable({
         processing: true,
         serverSide: true,
         ajax: {
-            url: "{{ route('feedback-report') }}",
-            data: function(d) {
-                d.nama_pelatihan = $('#nama_pelatihan').val();
-                d.kelompok = $('#kelompok').val();
-
-                // Pass startDate and endDate separately
-                var dateRange = $('#daterange').val();
-                if (dateRange) {
-                    var dates = dateRange.split(' - ');
-                    d.startDate = dates[0];
-                    d.endDate = dates[1];
-                }
-            }
+        url: "{{ route('feedback-mtc') }}",
+        data: function (d) {
+            d.nama_pelatihan = $('#nama_pelatihan').val();
+            d.periode = $('#periode').val();
+        }
         },
         columns: [
-            { data: 'tgl_pelaksanaan', name: 'tgl_pelaksanaan' },
+            { data: 'nama_peserta', name: 'nama_peserta' },
             { data: 'judul_pelatihan', name: 'judul_pelatihan' },
-            { data: 'instruktur', name: 'instruktur' },
-            @foreach($feedbackTemplates as $template)
-                { data: 'feedback_{{ $template->id }}', name: 'feedback_{{ $template->id }}' },
-            @endforeach
-            { data: 'action', name: 'action', orderable: false, searchable: false }
-        ]
+            { data: 'tgl_pelaksanaan', name: 'tgl_pelaksanaan' },
+            { data: 'relevansi_materi', name: 'relevansi_materi' },
+            { data: 'manfaat_training', name: 'manfaat_training' },
+            { data: 'durasi_training', name: 'durasi_training' },
+            { data: 'sistematika_penyajian', name: 'sistematika_penyajian' },
+            { data: 'tujuan_tercapai', name: 'tujuan_tercapai' },
+            { data: 'kedisiplinan_steward', name: 'kedisiplinan_steward' },
+            { data: 'saran', name: 'saran' },
+        ],
     });
 
-    // Redraw the DataTable when the search button is clicked
-    $('#searchBtn').click(function() {
-        $('#listFeedback').DataTable().draw();
+    // Re-draw the table when filters are changed
+    $('#nama_pelatihan, #periode').change(function(){
+        table.draw();
     });
 });
-
 $(function() {
     $('input[name="daterange"]').daterangepicker({
         // Setup options as needed
