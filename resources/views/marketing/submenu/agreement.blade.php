@@ -86,7 +86,7 @@ font-weight-bold
                     </form>
                     <div class="table-responsive">
                         <table id="dataTable" class="table table-bordered mt-4 zoom90">
-                            <thead>
+                            <thead class="thead-light">
                                 <tr>
                                     <th>Agreement</th>
                                     <th>Action</th>
@@ -98,7 +98,7 @@ font-weight-bold
                                     <td data-th="Product">
                                         <div class="row">
                                             <div class="col-md-4 d-flex justify-content-center align-items-center text-center p-3">
-                                                <img src="{{ asset($item->img_filepath ? $item->img_filepath : 'https://via.placeholder.com/250x150/5fa9f8/ffffff') }}" style="height: 150px; width: 250px;" alt="" class="img-fluid d-none d-md-block rounded mb-2">
+                                                <img src="{{ asset($item->img_filepath ? $item->img_filepath : 'https://via.placeholder.com/250x150/5fa9f8/ffffff') }}" style="height: 100px; width: 250px;" alt="" class="img-fluid d-none d-md-block rounded mb-2">
                                             </div>
                                             <div class="col-md-8 text-left mt-sm-2">
                                                 <h5 class="card-title font-weight-bold">{{ $item->company_name }}</h5>
@@ -111,7 +111,7 @@ font-weight-bold
                                                         @if($item->spk_filepath)
                                                         <tr>
                                                             <td style="width: 180px;"><i class="ti-minus mr-2"></i> Dokumen SPK</td>
-                                                            <td style="text-align: start;">: Document SPK : <a href="{{ asset($item->spk_filepath) }}" target="_blank" class="text-secondary"><u>View</u> <i class="fa fa-external-link fa-sm"></i></a></td>
+                                                            <td style="text-align: start;">: <a href="{{ asset($item->spk_filepath) }}" target="_blank" class="text-secondary"><u>View</u> <i class="fa fa-external-link fa-sm"></i></a></td>
                                                         </tr>
                                                         @endif
                                                         <tr>

@@ -29,4 +29,8 @@ class Infografis_peserta extends Model
         'kategori_program',
         'realisasi'
     ];
+
+    public function certificate(){
+    	return $this->hasMany('App\Models\Receivables_participant_certificate', 'infografis_peserta_id', 'id');
+    }
 }

@@ -47,6 +47,9 @@ Route::middleware(['suspicious'])->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
+    Route::middleware(['checkForErrors'])->group(function () {
+    });
+
     Route::get('/api/chart-data/{year}', [OperationController::class, 'getChartData']);
     Route::get('/api/chart-data-profits/{year}', [FinanceController::class, 'getChartDataProfits']);
     //External User Registration
@@ -97,6 +100,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/operation/participant-infographics', [OperationController::class, 'participant_infographics'])->name('participant-infographics');
     Route::get('/operation/participant-infographics/import-page', [OperationController::class, 'participant_infographics_import_page'])->name('participant-infographics-import-page');
     Route::post('/import-infografis-peserta', [ImportController::class, 'import'])->name('infografis_peserta.import');
+    Route::post('/infografis-peserta-store', [OperationController::class, 'infografis_store'])->name('infografis.store');
     Route::get('/infografis-peserta/{id}/edit', [OperationController::class, 'edit']);
     Route::put('/infografis-peserta/{id}', [OperationController::class, 'update']);
     Route::delete('/infografis-peserta-delete-data/{id}', [OperationController::class, 'delete_data_peserta']);
@@ -186,8 +190,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/planning-development/feedback-report-import', [PDController::class, 'feedback_report_import'])->name('feedback-report-import-page');
     Route::post('/import-feedback-report', [ImportController::class, 'import_feedback'])->name('feedback.import');
 
+    Route::get('/feedback-report/{id}/edit', [FeedbackController::class, 'edit_feedback'])->name('fetch.feedback.data');
+    Route::put('/feedback-report/{id}', [FeedbackController::class, 'update_feedback'])->name('feedback.update');
+    Route::delete('/feedback-instructor-delete-data/{id}', [FeedbackController::class, 'delete_feedback_instructor']);
+
     Route::get('/planning-development/feedback-mtc-import', [FeedbackController::class, 'feedback_mtc_import'])->name('feedback-mtc-import-page');
     Route::post('/import-feedback-mtc-report', [ImportController::class, 'import_feedback_mtc'])->name('feedback.mtc.import');
+    Route::get('/feedback-mtc-edit/{id}', [FeedbackController::class, 'edit_feeedback_mtc'])->name('feedback-mtc.edit');
+    Route::put('/feedback-mtc-update/{id}', [FeedbackController::class, 'update_feeedback_mtc'])->name('feedback-mtc.update');
+    Route::delete('/feedback-mtc-delete-data/{id}', [FeedbackController::class, 'delete_feedback_mtc']);
 
     Route::get('/planning-development/regulation', [PDController::class, 'regulation'])->name('regulation');
     Route::post('/store-regulation', [PDController::class, 'regulation_store'])->name('regulation.store');
@@ -202,6 +213,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/planning-development/certification/instructors-certificate', [PDController::class, 'certificate_instructor'])->name('certificate-instructor');
 
     Route::post('/store-certificates', [PDController::class, 'certificate_store'])->name('certificate.store');
+    Route::post('/planning-development/certificate-update/{certId}', [PDController::class, 'certificate_update'])->name('certificate.update');
     Route::post('/certificate/delete', [PDController::class, 'delete_certificate'])->name('certificate.delete');
     Route::post('/store-certificate-catalog', [PDController::class, 'certificate_catalog_store'])->name('certificate-catalog.store');
     Route::get('/planning-development/certificate/preview-item/{id}', [PDController::class, 'preview_certificate'])->name('preview-certificate');

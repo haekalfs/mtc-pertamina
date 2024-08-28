@@ -20,6 +20,7 @@ class Feedback_report extends Model
         'judul_pelatihan',
         'instruktur',
         'feedback_template_id',
+        'feedback_id',
         'score',
         'updated_at',
         'created_at'

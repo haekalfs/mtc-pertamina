@@ -15,7 +15,7 @@ class AgreementController extends Controller
         // Validate the input
         $request->validate([
             'company_name' => 'required|string|max:255',
-            'company_details' => 'nullable|string|max:255',
+            'company_details' => 'required',
             'status' => 'nullable|string',
             'agreement_date' => 'required',
             'spk_file' => 'sometimes',
@@ -60,7 +60,18 @@ class AgreementController extends Controller
     {
         $data = Agreement::find($id);
         $statuses = Status::all();
-        return view('marketing.submenu.preview-agreement', ['data' => $data, 'statuses' => $statuses]);
+
+        $fileExists = false;
+        $isPdf = false;
+        $filePath = null;
+
+        if ($data && file_exists(public_path($data->spk_filepath))) {
+            $fileExists = true;
+            $filePath = public_path($data->spk_filepath);
+            $isPdf = pathinfo($filePath, PATHINFO_EXTENSION) === 'pdf';
+        }
+
+        return view('marketing.submenu.preview-agreement', ['data' => $data, 'statuses' => $statuses, 'fileExists' => $fileExists, 'isPdf' => $isPdf, 'filePath' => $filePath]);
     }
 
 
@@ -75,7 +86,7 @@ class AgreementController extends Controller
         // Validate the input
         $request->validate([
             'company_name' => 'required|string|max:255',
-            'company_details' => 'nullable|string|max:255',
+            'company_details' => 'required',
             'status' => 'nullable|string',
             'agreement_date' => 'required',
             'spk_file' => 'sometimes',

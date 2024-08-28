@@ -61,7 +61,7 @@ font-weight-bold
                 </div>
                 <div class="card-body">
                     <table id="dataTable" class="table table-bordered mt-2">
-                        <thead>
+                        <thead class="thead-light">
                             <tr>
                                 <th>Nama Ruangan</th>
                                 <th>Lokasi</th>

@@ -99,19 +99,19 @@ font-weight-bold
                     <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-tag"></i> Referensi Pelatihan</h6>
                 </div>
                 <div class="card-body">
-                    <table id="dataTable" class="table table-bordered mt-4 zoom90">
+                    <table id="listReferensi" class="table table-bordered mt-4 zoom90">
                         <thead>
                             <tr>
                                 <th>Referensi</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody>@php $no = 1; @endphp
                             @foreach ($data->references as $item)
                             <tr>
-                                <td data-th="Product">
+                                <td>
                                     <div class="row">
                                         <div class="col-md-12 text-left mt-sm-2">
-                                            <h5 class="card-title font-weight-bold">{{ $item->references }}</h5>
+                                            <h5 class="card-title font-weight-bold">{{ $no++ }}. {{ $item->references }}</h5>
                                             <div class="ml-2">
                                                 <i class="ti-minus mr-2"></i> <a href="{{ asset($item->filepath) }}" target="_blank">{{ $item->filepath }}</a>
                                             </div>

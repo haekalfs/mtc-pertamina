@@ -64,8 +64,8 @@ font-weight-bold
             <div class="card-body">
                 <div class="col-md-12 mb-3">
                     <div class="row">
-                        <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding-left: 1em;">
-                            <img src="{{ asset($data->img_filepath) }}" style="height: 150px; width: 250px; border-radius: 15px;" class="card-img" alt="...">
+                        <div class="col-md-3 d-flex align-items-start justify-content-center">
+                            <img src="{{ asset($data->img_filepath) }}" style="height: 100px; width: 250px; border-radius: 15px;" class="card-img" alt="...">
                         </div>
                         <div class="col-md-8">
                             <table class="table table-borderless table-sm">
@@ -88,7 +88,8 @@ font-weight-bold
                           </table>
                         </div>
                     </div>
-
+                    <h6 class="font-weight-bold text-secondary" id="judul">Informasi Perusahaan : </h6>
+                    <p class="mt-3">{{ $data->company_details }}</p>
                 </div>
             </div>
         </div>
@@ -99,24 +100,30 @@ font-weight-bold
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> List Data</h6>
+                    <h6 class="m-0 font-weight-bold text-secondary" id="judul">Agreement</h6>
                     <div class="text-right">
-                        {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Add Utilities</a> --}}
+                        @if($fileExists)
+                            <a class="btn btn-primary btn-sm text-white mr-2" href="{{ asset($data->spk_filepath) }}" download><i class="menu-Logo fa fa-download"></i> Download</a>
+                        @endif
                     </div>
                 </div>
                 <div class="card-body">
                     @if($data->spk_filepath)
-                    <tr>
-                        <td style="width: 180px;"><i class="ti-minus mr-2"></i> Dokumen SPK</td>
-                        <td style="text-align: start;">: <a href="{{ asset($data->spk_filepath) }}" target="_blank" class="text-secondary"><u>View</u> <i class="fa fa-external-link fa-sm"></i></a></td>
-                    </tr>
+                        @if(!$fileExists)
+                            <div class="alert alert-danger" role="alert">
+                                File does not exist.
+                            </div>
+                        @elseif(!$isPdf)
+                            <div class="alert alert-warning" role="alert">
+                                The file is not in PDF format. Proceed to download the file by clicking download button.
+                            </div>
+                        @else
+                            <iframe src="{{ asset($data->spk_filepath) }}" width="100%" style="height:900px; border:none;"></iframe>
+                        @endif
                     @elseif($data->non_spk)
-                    <tr>
-                        <td style="width: 180px;"><i class="ti-minus mr-2"></i> NON-SPK</td>
-                        <td style="text-align: start;">: {{ $data->non_spk }}</td>
-                    </tr>
+                        <p class="mt-1">{{ $data->non_spk }}</p>
                     @else
-                    No File or Agreement Exist!
+                        No File or Agreement Exist!
                     @endif
                 </div>
             </div>

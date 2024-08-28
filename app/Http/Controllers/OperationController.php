@@ -9,8 +9,10 @@ use App\Models\Inventory_tools;
 use App\Models\Location;
 use App\Models\Penlat;
 use App\Models\Penlat_batch;
+use App\Models\Penlat_certificate;
 use App\Models\Penlat_requirement;
 use App\Models\Penlat_utility_usage;
+use App\Models\Receivables_participant_certificate;
 use App\Models\Room;
 use App\Models\Tool_img;
 use App\Models\Utility;
@@ -73,7 +75,7 @@ class OperationController extends Controller
         $mostUsedUtility = [];
         foreach ($dataBatch as $row) {
             $mostUsedUtility[] = [
-                "label" => $row->batch,
+                "label" => $row->nama_program,
                 "y" => $row->total_usage
             ];
         }
@@ -218,6 +220,65 @@ class OperationController extends Controller
         return view('operation.submenu.participant_infographics_import_page');
     }
 
+    public function infografis_store(Request $request)
+    {
+        // Validate the incoming request data
+        $validatedData = $request->validate([
+            'nama_peserta' => 'required|string|max:255',
+            'nama_program' => 'required|string|max:255',
+            'batch' => 'required|string|max:145',
+            'tgl_pelaksanaan' => 'required|date',
+            'tempat_pelaksanaan' => 'required|string|max:255',
+            'jenis_pelatihan' => 'required|string|max:255',
+            'keterangan' => 'required|string|max:255',
+            'subholding' => 'required|string|max:255',
+            'perusahaan' => 'required|string|max:255',
+            'kategori_program' => 'required|string|max:255',
+            'realisasi' => 'required|string|max:255',
+        ]);
+
+        // Create a new infografis_peserta record
+        $infografisPeserta = new Infografis_peserta();
+        $infografisPeserta->nama_peserta = $request->input('nama_peserta');
+        $infografisPeserta->nama_program = $request->input('nama_program');
+        $infografisPeserta->batch = $request->input('batch');
+        $infografisPeserta->tgl_pelaksanaan = $request->input('tgl_pelaksanaan');
+        $infografisPeserta->tempat_pelaksanaan = $request->input('tempat_pelaksanaan');
+        $infografisPeserta->jenis_pelatihan = $request->input('jenis_pelatihan');
+        $infografisPeserta->keterangan = $request->input('keterangan');
+        $infografisPeserta->subholding = $request->input('subholding');
+        $infografisPeserta->perusahaan = $request->input('perusahaan');
+        $infografisPeserta->kategori_program = $request->input('kategori_program');
+        $infografisPeserta->realisasi = $request->input('realisasi');
+
+        // Save the record to the database
+        $infografisPeserta->save();
+
+        $findBatch = Penlat_batch::where('batch', $validatedData['batch'])->first();
+
+        if($findBatch){
+            // Find the corresponding Penlat_certificate record
+            $penlatCert = Penlat_certificate::where('penlat_batch_id', $findBatch->id)->first();
+
+            if ($penlatCert) {
+                // Update or create the Receivables_participant_certificate record
+                Receivables_participant_certificate::updateOrCreate(
+                    [
+                        'infografis_peserta_id' => $infografisPeserta->id,
+                        'penlat_certificate_id' => $penlatCert->id,
+                    ],
+                    [
+                        'updated_at' => now(),
+                    ]
+                );
+            }
+        }
+
+        $message = 'Participant Data & Certificates has been successfully saved!';
+        // Redirect back with a success message
+        return redirect()->back()->with('success', $message);
+    }
+
     public function edit($id)
     {
         $participant = Infografis_peserta::find($id);
@@ -262,20 +323,24 @@ class OperationController extends Controller
     public function delete_data_peserta($id)
     {
         try {
-            // Check if the Penlat is used in the Penlat_batch table
-            $isExist = Infografis_peserta::where('id', $id)->exists();
+            // Check if the Infografis_peserta exists
+            $infografisPeserta = Infografis_peserta::find($id);
 
-            if (!$isExist) {
-                return response()->json(['status' => 'failed', 'message' => 'Cannot be deleted because rows not found!']);
+            if (!$infografisPeserta) {
+                return response()->json(['status' => 'failed', 'message' => 'Record not found!']);
             }
 
-            $usages = Infografis_peserta::where('id', $id);
-            $usages->delete();
+            // Delete related certificates
+            $infografisPeserta->certificate()->delete();
+
+            // Delete the Infografis_peserta record
+            $infografisPeserta->delete();
 
             return response()->json(['status' => 'success', 'message' => 'Peserta data deleted successfully!']);
         } catch (\Exception $e) {
             // Log the exception for debugging
-            Log::error('Failed to delete Penlat: ' . $e->getMessage());
+            Log::error('Failed to delete Peserta: ' . $e->getMessage());
+
             return response()->json(['status' => 'failed', 'message' => 'Failed to delete record due to an unexpected error!']);
         }
     }

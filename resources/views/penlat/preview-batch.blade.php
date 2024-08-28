@@ -134,6 +134,9 @@ font-weight-bold
                             <h5 class="card-title font-weight-bold">Profits</h5>
                             <div class="ml-2">
                                 <table class="table table-borderless table-sm">
+                                    @if(!$profits || $profits->isEmpty())
+                                        No Data Available
+                                    @else
                                     <tr>
                                         <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Jumlah Peserta</td>
                                         <td style="text-align: start;">: &nbsp; {{ $profits->jumlah_peserta ? $profits->jumlah_peserta : '-' }} Peserta</td>
@@ -146,11 +149,16 @@ font-weight-bold
                                         <td style="width: 250px;" class="mb-2 font-weight-bold text-success"><i class="ti-minus mr-2"></i> Total Biaya Pendaftaran</td>
                                         <td style="text-align: start;" class="font-weight-bold text-success">: &nbsp; {{ $profits->total_biaya_pendaftaran_peserta ? 'Rp ' . number_format($profits->total_biaya_pendaftaran_peserta, 0, ',', '.') : '-' }}</td>
                                     </tr>
+                                    @endif
                                 </table>
                             </div>
                             <h5 class="card-title font-weight-bold">Loss</h5>
                             <div class="ml-2">
                                 <table class="table table-borderless table-sm">
+
+                                    @if(!$profits || $profits->isEmpty())
+                                        No Data Available
+                                    @else
                                     <tr>
                                         <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Biaya Instruktur</td>
                                         <td style="text-align: start;">: &nbsp; {{ $profits->biaya_instruktur ? 'Rp ' . number_format($profits->biaya_instruktur, 0, ',', '.') : '-' }}</td>
@@ -187,12 +195,16 @@ font-weight-bold
                                         <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Penagihan Laundry</td>
                                         <td style="text-align: start;">: &nbsp; {{ $profits->penagihan_laundry ? 'Rp ' . number_format($profits->penagihan_laundry, 0, ',', '.') : '-' }}</td>
                                     </tr>
+                                    @endif
                                 </table>
                             </div>
                             <hr>
                             <h5 class="card-title font-weight-bold">Total Profits</h5>
                             <div class="ml-2">
                                 <table class="table table-borderless table-sm">
+                                    @if(!$profits || $profits->isEmpty())
+                                        No Data Available
+                                    @else
                                     <tr>
                                         <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Total Biaya Pendaftaran</td>
                                         <td style="text-align: start;" class="">: &nbsp; {{ $profits->total_biaya_pendaftaran_peserta ? 'Rp ' . number_format($profits->total_biaya_pendaftaran_peserta, 0, ',', '.') : '-' }} </td>
@@ -205,6 +217,7 @@ font-weight-bold
                                         <td style="width: 250px;" class="mb-2 font-weight-bold text-success"><i class="ti-minus mr-2"></i> Total Profits</td>
                                         <td style="text-align: start;" class="font-weight-bold text-success">: &nbsp; {{ $profits->profit ? 'Rp ' . number_format($profits->profit, 0, ',', '.') : '-' }} <i class="fa fa-plus"></i></td>
                                     </tr>
+                                    @endif
                                 </table>
                             </div>
                         </div>

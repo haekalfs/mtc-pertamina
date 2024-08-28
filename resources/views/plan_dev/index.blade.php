@@ -84,27 +84,27 @@ font-weight-bold
     </div>
     <div class="row">
 
-        <div class="col-lg-6 mb-3">
+        <div class="col-lg-6 mb-2">
             <div class="card-leaderboard">
                 <div class="card-header-leaderboard bg-secondary">
                     <i class="trophy-icon"></i>
                     <span class="title">Top Rated Instructors</span>
                     <span class="subtitle">LEADERBOARD</span>
                 </div>
-                <div class="card-body-leaderboard">
-                    <table class="table table-borderless">
-                        <tbody>
+                <div class="card-body-leaderboard bg-white">
+                    <table id="leaderboard" class="table table-borderless">
+                        <tbody>@php $no = 1; @endphp
                             @foreach($instructors as $instructor)
                             <tr class="text-secondary">
                                 <td>
                                     <a href="{{ route('preview-instructor', ['id' => $instructor->id, 'penlatId' => '-1']) }}">
                                         <div class="d-flex align-items-center animateBox">
-                                            <img src="{{ asset($instructor->imgFilepath) }}" alt="" class="rounded-circle mr-2 shadow" style="width:50px; height:50px;">
-                                            <span class="instructor-name">{{ $instructor->instructor_name }}</span>
+                                            {{ $no++ }}. &nbsp;&nbsp;<img src="{{ asset($instructor->imgFilepath) }}" alt="" class="rounded mr-2 shadow" style="width:50px; height:60px; border: 0.5px solid rgb(211, 211, 211);">
+                                            <span class="instructor-name zoom90 mt-2">{{ $instructor->instructor_name }}<br>{{ \Carbon\Carbon::parse($instructor->instructor_dob)->age }} Tahun</span>
                                         </div>
                                     </a>
                                 </td>
-                                <td class="text-center">
+                                <td class="text-center zoom90 pt-4">
                                     @php
                                         $roundedScore = round($instructor->average_feedback_score, 1);
                                         $wholeStars = floor($roundedScore);
@@ -117,10 +117,11 @@ font-weight-bold
                                         @elseif ($halfStar && $i == $wholeStars)
                                             <i class="fa fa-star-half-o text-warning"></i>
                                         @else
-                                            <i class="fa fa-star-o"></i>
+                                            <i class="fa fa-star-o text-secondary"></i>
                                         @endif
                                     @endfor
-                                    <span class="ml-2">{{ $roundedScore }}</span>
+                                    <span class="ml-2">{{ $roundedScore }}</span><br>
+                                    <small class="ml-4">({{ $instructor->feedbacks_count / 5 }} feedbacks)</small>
                                 </td>
                             </tr>
                             @endforeach
@@ -129,7 +130,7 @@ font-weight-bold
                 </div>
             </div>
         </div>
-        <div class="col-lg-6 mb-3">
+        <div class="col-lg-6 mb-2">
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-secondary" id="judul">Newest Regulations</h6>
@@ -139,10 +140,10 @@ font-weight-bold
                         <tbody>
                             @foreach($regulations as $item)
                                 <tr class="text-secondary">
-                                    <td>
+                                    <td class="d-flex align-items-center animateBox">
                                         <a href="{{ route('preview-regulation', $item->id) }}">
-                                            <div class="d-flex align-items-center">
-                                                <i class="ti-minus mr-2"></i> <span>{{ $item->description }}</span>
+                                            <div>
+                                                <i class="fa fa-info-circle mr-2"></i> <span>{{ $item->description }}</span>
                                             </div>
                                         </a>
                                     </td>
@@ -183,7 +184,6 @@ font-weight-bold
     overflow: hidden;
     font-family: Arial, sans-serif;
 }
-
 /* Header Section */
 .card-header-leaderboard {
     background-color: #4589b4;
@@ -216,7 +216,10 @@ font-weight-bold
 /* Body Section */
 .card-body-leaderboard {
     background-color: #f9f9f9;
-    padding: 16px;
+    padding-top: 4px;
+    padding-right: 16px;
+    padding-bottom: 16px;
+    padding-left: 16px;
 }
 
 .table-borderless {

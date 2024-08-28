@@ -18,16 +18,12 @@ class KpiController extends Controller
     {
         $quarterSelected = $encryptedQuarter ? Crypt::decryptString($encryptedQuarter) : -1;
         $yearSelected = $encryptedYear ? Crypt::decryptString($encryptedYear) : null;
-        // Determine the current year and generate the range of years
         $nowYear = date('Y');
         $yearsBefore = range($nowYear - 4, $nowYear);
-
-        // Set the selected year
         $currentYear = $yearSelected ?? $nowYear;
 
         $quarters = Quarter::all();
 
-        // Define the closure to be used within the with method
         $pencapaianQuery = function ($query) use ($currentYear, $quarterSelected, $quarters) {
             $query->whereYear('periode_start', $currentYear)
                 ->whereYear('periode_end', $currentYear)
@@ -35,52 +31,59 @@ class KpiController extends Controller
                     $getQuarter = $quarters->find($quarterSelected);
                     $query->where(function($query) use ($getQuarter) {
                         $query->whereMonth('periode_start', '>=', $getQuarter->month_start)
-                                ->whereMonth('periode_start', '<=', $getQuarter->month_end)
-                                ->orWhere(function($query) use ($getQuarter) {
-                                    $query->whereMonth('periode_end', '>=', $getQuarter->month_start)
-                                        ->whereMonth('periode_end', '<=', $getQuarter->month_end);
-                                });
+                            ->whereMonth('periode_start', '<=', $getQuarter->month_end)
+                            ->orWhere(function($query) use ($getQuarter) {
+                                $query->whereMonth('periode_end', '>=', $getQuarter->month_start)
+                                    ->whereMonth('periode_end', '<=', $getQuarter->month_end);
+                            });
                     });
                 })
                 ->orderBy('periode_start', 'asc');
         };
 
-        // Fetch KPIs with their related 'pencapaian' data ordered by 'quarter_id' and filtered by 'periode'
         $kpis = Kpi::with(['pencapaian' => $pencapaianQuery])->get();
 
-        // Calculate percentage and prepare data
-        $data = $kpis->map(function ($kpi) {
-            $kpiTarget = $kpi->target;
+        $data = $kpis->map(function ($kpi) use ($quarterSelected) {
+            $target = $quarterSelected == '-1' ? $kpi->target : $kpi->target / 4;
+            $kpiTarget = $target;
             $tercapai = $kpi->pencapaian->sum('score');
             return $kpiTarget > 0 ? min(($tercapai / $kpiTarget) * 100, 100) : 0;
         })->toArray();
 
-        // Calculate the overall progress percentage
         $overallProgress = count($data) > 0 ? array_sum($data) / count($data) : 0;
 
         $kpiChartsData = [];
         foreach ($kpis as $kpi) {
-            $dataPoints = [];
+            $weeklyScores = [];
+
             foreach ($kpi->pencapaian as $pencapaian) {
-                $periodeStart = \Carbon\Carbon::parse($pencapaian->periode_start);
+                $periodeStart = \Carbon\Carbon::parse($pencapaian->periode_start)->startOfWeek();
                 $periodeEnd = \Carbon\Carbon::parse($pencapaian->periode_end);
 
-                // Loop through each date from start to end
-                for ($date = $periodeStart; $date->lte($periodeEnd); $date->addDay()) {
-                    $dataPoints[] = [
-                        'x' => $date->timestamp * 1000, // CanvasJS uses timestamp in milliseconds
-                        'y' => $pencapaian->score
-                    ];
+                for ($date = $periodeStart; $date->lte($periodeEnd); $date->addWeek()) {
+                    $weekStart = $date->timestamp * 1000; // CanvasJS uses timestamp in milliseconds
+                    if (!isset($weeklyScores[$weekStart])) {
+                        $weeklyScores[$weekStart] = 0;
+                    }
+                    $weeklyScores[$weekStart] += $pencapaian->score;
                 }
             }
 
+            $dataPoints = [];
+            foreach ($weeklyScores as $weekStart => $score) {
+                $dataPoints[] = ['x' => $weekStart, 'y' => $score];
+            }
+
+            $target = $quarterSelected == '-1' ? $kpi->target : $kpi->target / 4;
+
             $kpiChartsData[] = [
-                'kpiName' => $kpi->indicator, // assuming your KPI model has a 'name' attribute
+                'kpi_id' => $kpi->id,
+                'kpiName' => $kpi->indicator,
+                'kpiTarget' => $target,
                 'dataPoints' => $dataPoints
             ];
         }
 
-        // Return view with data
         return view('kpi-view.index', [
             'kpis' => $kpis,
             'yearsBefore' => $yearsBefore,
@@ -96,7 +99,6 @@ class KpiController extends Controller
     {
         $quarters = Quarter::all();
 
-        // Define the closure to be used within the with method
         $pencapaianQuery = function ($query) use ($currentYear, $quarterSelected, $quarters) {
             $query->whereYear('periode_start', $currentYear)
                 ->whereYear('periode_end', $currentYear)
@@ -114,48 +116,55 @@ class KpiController extends Controller
                 ->orderBy('periode_start', 'asc');
         };
 
-        // Fetch a single KPI item with its related 'pencapaian' data
         $kpiItem = KPI::where('id', $kpi)
             ->with(['pencapaian' => $pencapaianQuery])
-            ->first(); // Use first() instead of get() to fetch a single record
+            ->first();
 
-        // Calculate the percentage
-        $kpiTarget = $kpiItem->target;
+        $kpiTarget = $kpiItem->target / 4;
         $tercapai = $kpiItem->pencapaian->sum('score');
-        $percentage = ($kpiTarget > 0) ? ($tercapai / $kpiTarget) * 100 : 0;
+        $percentage = ($kpiTarget > 0) ? min(($tercapai / $kpiTarget) * 100, 100) : 0;
 
-        // Prepare data for the chart
-        $dataPoints = [];
+        $weeklyScores = [];
+
         foreach ($kpiItem->pencapaian as $pencapaian) {
-            $periodeStart = \Carbon\Carbon::parse($pencapaian->periode_start);
-            $periodeEnd = \Carbon\Carbon::parse($pencapaian->periode_end);
+            $start = Carbon::parse($pencapaian->periode_start);
+            $end = Carbon::parse($pencapaian->periode_end);
+            $score = $pencapaian->score;
 
-            // Loop through each week from start to end
-            for ($date = $periodeStart; $date->lte($periodeEnd); $date->addWeek()) {
-                $dataPoints[] = [
-                    'x' => $date->timestamp * 1000, // CanvasJS uses timestamp in milliseconds
-                    'y' => $pencapaian->score
-                ];
+            // Move $start to the start of the week if it's not already
+            $start = $start->startOfWeek();
+
+            // Loop through each week in the period
+            for ($date = $start; $date->lte($end); $date->addWeek()) {
+                $weekStart = $date->timestamp * 1000; // CanvasJS uses timestamp in milliseconds
+                if (!isset($weeklyScores[$weekStart])) {
+                    $weeklyScores[$weekStart] = 0;
+                }
+                // Accumulate score for the week
+                $weeklyScores[$weekStart] += $score;
             }
+        }
+
+        $dataPoints = [];
+        foreach ($weeklyScores as $weekStart => $score) {
+            $dataPoints[] = ['x' => $weekStart, 'y' => $score];
         }
 
         $quarterStart = 1;
         $quarterEnd = 12;
         if($quarterSelected != -1){
-            // Fetch the selected quarter from the database
             $quarter = Quarter::find($quarterSelected);
             $quarterStart = $quarter->month_start;
             $quarterEnd = $quarter->month_end;
         }
 
-        // Calculate the start and end dates for the selected quarter
         $startDate = Carbon::create($currentYear, $quarterStart, 1);
         $endDate = Carbon::create($currentYear, $quarterEnd, 1)->endOfMonth();
 
         return view('kpi-view.pencapaian', [
             'kpiItem' => $kpiItem,
-            'percentage' => $percentage, // Pass the percentage to the view
-            'dataPoints' => $dataPoints, // Pass the data points to the view
+            'percentage' => $percentage,
+            'dataPoints' => $dataPoints,
             'startDate' => $startDate->format('Y-m-d'),
             'endDate' => $endDate->format('Y-m-d'),
             'selectedQuarter' => $quarterSelected
@@ -241,16 +250,20 @@ class KpiController extends Controller
         $request->validate([
             'pencapaian' => 'required|string|max:255',
             'score' => 'required|integer',
-            'quarter' => 'required',
-            'year' => 'required',
+            'daterange' => 'required|string',
         ]);
+
+        // Split the daterange into start and end dates
+        $daterange = explode(' - ', $request->daterange);
+        $periode_start = Carbon::createFromFormat('m/d/Y', trim($daterange[0]))->format('Y-m-d');
+        $periode_end = Carbon::createFromFormat('m/d/Y', trim($daterange[1]))->format('Y-m-d');
 
         // Create a new record in the kpi_pencapaian table
         PencapaianKPI::create([
             'pencapaian' => $request->pencapaian,
             'score' => $request->score,
-            'quarter_id' => $request->quarter,
-            'periode' => $request->year,
+            'periode_start' => $periode_start,
+            'periode_end' => $periode_end,
             'kpi_id' => $kpi_id,
             'user_id' => auth()->id(), // assuming the user is authenticated
         ]);

@@ -50,20 +50,6 @@ font-weight-bold
     <strong>{{ $message }}</strong>
 </div>
 @endif
-<style>
-
-.alert-success-saving-mid {
-  display: none;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  padding: 20px;
-  border-radius: 5px;
-  text-align: center;
-  z-index: 10000;
-}
-</style>
 <div class="animated fadeIn zoom90">
     <div class="row">
         <div class="col-md-12">
@@ -113,7 +99,7 @@ font-weight-bold
                         </div>
                     </div>
                     <table id="listIssuedCertificates" class="table table-bordered">
-                        <thead>
+                        <thead class="thead-light">
                             <tr>
                                 <th>Nama Pelatihan</th>
                                 <th>Alias</th>

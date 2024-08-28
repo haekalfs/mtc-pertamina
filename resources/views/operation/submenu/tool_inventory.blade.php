@@ -155,7 +155,7 @@ font-weight-bold
                     </form>
                     <div class="table-responsive">
                         <table id="dataTable" class="table table-bordered mt-4">
-                            <thead>
+                            <thead class="thead-light">
                                 <tr>
                                     <th>Tool</th>
                                     <th>Stock</th>
@@ -177,27 +177,27 @@ font-weight-bold
                                                 <div class="ml-2">
                                                     <table class="table table-borderless table-sm">
                                                         <tr>
-                                                            <td style="width: 200px;" class="mb-2"><i class="ti-minus mr-2"></i> Nomor Aset</td>
+                                                            <td style="width: 200px;" class="mb-2"><i class="fa fa-chevron-right mr-2"></i> Nomor Aset</td>
                                                             <td style="text-align: start;">: {{ $item->asset_id }}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td style="width: 200px;" class="mb-2"><i class="ti-minus mr-2"></i> Maker</td>
+                                                            <td style="width: 200px;" class="mb-2"><i class="fa fa-chevron-right mr-2"></i> Maker</td>
                                                             <td style="text-align: start;">: {{ $item->asset_maker }}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td style="width: 200px;" class="mb-2"><i class="ti-minus mr-2"></i> Running Hour</td>
+                                                            <td style="width: 200px;" class="mb-2"><i class="fa fa-chevron-right mr-2"></i> Running Hour</td>
                                                             <td style="text-align: start;">: {{ $item->used_time }} Hours</td>
                                                         </tr>
                                                         <tr>
-                                                            <td style="width: 200px;" class="mb-2"><i class="ti-minus mr-2"></i> Next Maintenance</td>
-                                                            <td style="text-align: start;">: {{ $item->next_maintenance }}</td>
+                                                            <td style="width: 200px;" class="mb-2"><i class="fa fa-chevron-right mr-2"></i> Next Maintenance</td>
+                                                            <td style="text-align: start;">: {{ \Carbon\Carbon::parse($item->next_maintenance)->format('d-M-Y') }}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td style="width: 200px;" class="mb-2"><i class="ti-minus mr-2"></i> Last Maintenance</td>
-                                                            <td style="text-align: start;">: {{ $item->last_maintenance }}</td>
+                                                            <td style="width: 200px;" class="mb-2"><i class="fa fa-chevron-right mr-2"></i> Last Maintenance</td>
+                                                            <td style="text-align: start;">: {{ \Carbon\Carbon::parse($item->last_maintenance)->format('d-M-Y') }}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td style="width: 200px;" class="mb-2"><i class="ti-minus mr-2"></i> Panduan Maintenance</td>
+                                                            <td style="width: 200px;" class="mb-2"><i class="fa fa-chevron-right mr-2"></i> Panduan Maintenance</td>
                                                             <td style="text-align: start;">: &nbsp; <a href="{{ asset($item->asset_guidance) }}" target="_blank" class="text-secondary"><i class="fa fa-external-link fa-sm"></i> <u>View</u></a></td>
                                                         </tr>
                                                     </table>

@@ -91,7 +91,7 @@ font-weight-bold
                         </div>
                     </form>
                     <table id="docLetter" class="table table-bordered">
-                        <thead>
+                        <thead class="thead-light">
                             <tr>
                                 <th>Judul Sertifikat</th>
                                 <th>Issuing Organization</th>

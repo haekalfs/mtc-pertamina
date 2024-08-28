@@ -52,7 +52,7 @@ font-weight-bold
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
                                 <div class="stat-heading mb-1 font-weight-bold">Feedback MTC</div>
-                                <div class="h6 mb-0 text-gray-800"><span style="font-size: 14px;">Feedback Report</span></div>
+                                <div class="h6 mb-0 text-gray-800"><span style="font-size: 14px;">Feedback Pelatihan</span></div>
                             </div>
                             <div class="col-auto">
                                 <i class="fa fa-trophy fa-2x text-primary"></i>
@@ -92,16 +92,16 @@ font-weight-bold
 
             <div class="card mb-4">
                 <div class="card-header">
-                    <span class="text-danger font-weight-bold">Data Import Guidelines</span>
+                    <span class="text-primary font-weight-bold">Feedback Pelatihan and Instruktur</span>
                 </div>
                 <div class="card-body" style="background-color: rgb(247, 247, 247);">
-                    <h6 class="h6 mb-2 font-weight-bold text-gray-800">Import Rules</h6>
+                    <h6 class="h6 mb-2 font-weight-bold text-gray-800">Feedback Guidelines</h6>
                     <ul class="ml-4">
-                        <li>Ensure all import files are in the correct format (e.g., CSV, XLSX) as specified in the guidelines.</li>
-                        <li>Verify the data in the files for accuracy and completeness before importing.</li>
-                        <li>Check for and resolve any data inconsistencies or errors in the file to prevent import issues.</li>
-                        <li>Unauthorized changes to import files or procedures are strictly prohibited.</li>
-                        <li>Double-check the mapping of data fields to ensure they align with the database schema.</li>
+                        <li><strong>Feedback MTC:</strong> This feedback section focuses on collecting ratings and opinions about the <span class="font-weight-bold">Pelatihan (Training)</span> programs. Participants can provide feedback on the content, delivery, and overall experience of the training sessions. The goal is to gather insights to help improve future training programs.</li>
+                        <li><strong>Feedback Instruktur:</strong> This section gathers ratings and feedback about the <span class="font-weight-bold">Instructors</span> who conducted the training. Participants can rate the instructors on their teaching methods, interaction, and overall effectiveness. This feedback helps in understanding the instructors' performance and identifying areas for improvement.</li>
+                        <li>Ensure that all feedback is constructive, specific, and actionable to help improve both the training programs and the instructors' performance.</li>
+                        <li>Unauthorized changes to feedback procedures are strictly prohibited.</li>
+                        <li>Double-check feedback submissions to ensure they align with the session objectives and are clearly communicated.</li>
                     </ul>
                 </div>
             </div>

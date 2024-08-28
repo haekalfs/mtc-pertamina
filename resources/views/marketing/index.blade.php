@@ -83,7 +83,7 @@ font-weight-bold
         </div>
     </div>
     <div class="row">
-        <div class="col-lg-6">
+        <div class="col-lg-8">
             <div class="card">
                 <div class="row">
                     <div class="col-lg-12">
@@ -95,51 +95,46 @@ font-weight-bold
                 </div> <!-- /.row -->
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> Company Agreement</h6>
+                    <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-sitemap"></i> Company Agreement</h6>
                     <div class="text-right">
                         {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Add Utilities</a> --}}
                     </div>
                 </div>
                 <div class="card-body">
-                    <table class="table table-borderless zoom90">
-                        <thead>
-                            <tr class="text-center" style="display: none;">
-                                <th>Instructors</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($getAgreements as $agreement)
-                            <tr>
-                                <td data-th="Product">
-                                    <div class="row">
-                                        <div class="col-md-4 text-left">
-                                            <img src="{{ asset($agreement->img_filepath ? $agreement->img_filepath : 'https://via.placeholder.com/250x150/5fa9f8/ffffff') }}" style="height: 100px; width: 150px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow ">
-                                        </div>
-                                        <div class="col-md-8 text-left mt-sm-2">
-                                            <h5 class="card-title font-weight-bold mb-1">{{ $agreement->company_name }}</h5>
-                                            <div class="ml-2">
-                                                <table class="table table-borderless table-sm mb-0">
-                                                    <tr>
-                                                        <td style="width: 150px;"><i class="ti-minus mr-2"></i> Document SPK</td>
-                                                        <td style="text-align: start;">: &nbsp;<a href="{{ asset($agreement->spk_filepath) }}" target="_blank" class="text-secondary"><u>View</u> <i class="fa fa-external-link fa-sm"></i></a></td>
-                                                    </tr>
-                                                </table>
-                                            </div>
-                                        </div>
+                    <div class="row">
+                        @foreach($getAgreements as $agreement)
+                        <div class="col-md-12">
+                            <div class="container-video">
+                                <div class="file-man-box">
+                                    <div class="file-img-box">
+                                        <img src="{{ asset($agreement->img_filepath ? $agreement->img_filepath : 'https://via.placeholder.com/250x150/5fa9f8/ffffff') }}" alt="icon">
                                     </div>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                                    <a href="{{ route('preview-company', $agreement->id) }}" target="_blank" class="file-download">
+                                        <small><i class="fa fa-external-link"></i></small>
+                                    </a>
+                                    <div class="file-man-title">
+                                        <h5 class="mb-0 text-overflow">{{ $agreement->company_name }}</h5>
+                                        <p class="mb-0"><small>Status : @if($agreement->spk_filepath) SPK @elseif($agreement->non_spk) NON-SPK @else No File or Agreement Exist! @endif </small> </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                        <div class="col-md-12 text-right">
+                            <a href="{{ route('company-agreement') }}">
+                                <small>Show More...</small>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div><script>
+</div>
+<script>
     window.onload = function () {
         var chartData = @json($campaignChart);
 
@@ -183,6 +178,64 @@ font-weight-bold
         chart.render();
     }
 </script>
+<style>
 
-<script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
+.file-man-box {
+    padding: 20px;
+    border: 1px solid #e3eaef;
+    border-radius: 5px;
+    position: relative;
+    margin-bottom: 20px
+}
+
+.file-man-box .file-close {
+    color: #f1556c;
+    position: absolute;
+    line-height: 24px;
+    font-size: 24px;
+    right: 10px;
+    top: 10px;
+    visibility: hidden
+}
+
+.file-man-box .file-img-box {
+    line-height: 120px;
+    text-align: center
+}
+
+.file-man-box .file-img-box img {
+    height: 64px
+}
+
+.file-man-box .file-download {
+    font-size: 32px;
+    color: #98a6ad;
+    position: absolute;
+    right: 10px
+}
+
+.file-man-box .file-download:hover {
+    color: #313a46
+}
+
+.file-man-box .file-man-title {
+    padding-right: 25px
+}
+
+.file-man-box:hover {
+    -webkit-box-shadow: 0 0 24px 0 rgba(0, 0, 0, .06), 0 1px 0 0 rgba(0, 0, 0, .02);
+    box-shadow: 0 0 24px 0 rgba(0, 0, 0, .06), 0 1px 0 0 rgba(0, 0, 0, .02)
+}
+
+.file-man-box:hover .file-close {
+    visibility: visible
+}
+.text-overflow {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+    width: 100%;
+    overflow: hidden;
+}
+</style>
 @endsection

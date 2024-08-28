@@ -88,7 +88,7 @@ font-weight-bold
                         </div>
                     </form>
                     <table id="dataTable" class="table table-bordered mt-4 zoom90">
-                        <thead>
+                        <thead class="thead-light">
                             <tr>
                                 <th>Penlat</th>
                                 <th>Action</th>

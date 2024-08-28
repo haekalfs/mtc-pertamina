@@ -141,7 +141,7 @@ font-weight-bold
                     </form>
                     <div class="table-responsive">
                         <table id="dataTable" class="table table-bordered mt-4 zoom90">
-                            <thead>
+                            <thead class="thead-light">
                                 <tr>
                                     <th>Instructors</th>
                                     <th>Action</th>
@@ -154,7 +154,7 @@ font-weight-bold
                                         <div class="row">
                                             <div class="col-md-3 d-flex justify-content-center align-items-center text-center">
                                                 <a href="{{ route('preview-instructor', ['id' => $item->id, 'penlatId' => $penlatId]) }}">
-                                                    <img src="{{ $item->imgFilepath ? asset($item->imgFilepath) : 'https://via.placeholder.com/150x150/5fa9f8/ffffff' }}" style="height: 150px; width: 120px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
+                                                    <img src="{{ $item->imgFilepath ? asset($item->imgFilepath) : 'https://via.placeholder.com/150x150/5fa9f8/ffffff' }}" style="height: 150px; width: 120px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow animateBox">
                                                 </a>
                                             </div>
                                             <div class="col-md-9 text-left mt-sm-2">
@@ -192,6 +192,7 @@ font-weight-bold
                                                                     @endif
                                                                 @endfor
                                                                 {{ $roundedScore ?? '-' }}
+                                                                <small>({{ $item->feedbacks_count / 5 }} feedbacks)</small>
                                                             </td>
                                                         </tr>
                                                     </table>

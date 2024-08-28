@@ -120,7 +120,7 @@ font-weight-bold
                         </div>
                     </div>
                     <table id="penlatTables" class="table table-bordered">
-                        <thead>
+                        <thead class="thead-light">
                             <tr>
                                 <th>Display</th>
                                 <th>Nama Pelatihan</th>

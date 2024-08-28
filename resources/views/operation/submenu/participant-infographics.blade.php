@@ -70,9 +70,8 @@ font-weight-bold
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold" id="judul">List Data</h6>
-                    <div class="d-flex">
-                        {{-- <a id="addApproversBtn" class="btn btn-sm btn-primary shadow-sm text-white"><i class="fa fa-file-text fa-sm"></i> Filter</a>
-                        <a id="hideApproversBtn" class="btn btn-sm btn-secondary shadow-sm text-white" style="display: none;"><i class="fa fa-backward fa-sm"></i> Cancel</a> --}}
+                    <div class="text-right">
+                        <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Register Participant</a>
                     </div>
                 </div>
                 <div class="card-body zoom80">
@@ -149,7 +148,7 @@ font-weight-bold
                     </form>
                     <div class="table-responsive">
                         <table id="listPeserta" class="table table-bordered">
-                            <thead>
+                            <thead class="thead-light">
                                 <tr>
                                     <th>Nama Peserta</th>
                                     <th>Nama Program</th>
@@ -170,6 +169,138 @@ font-weight-bold
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade zoom90" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 1000px;" role="document">
+        <div class="modal-content">
+			<div class="modal-header d-flex flex-row align-items-center justify-content-between border-bottom-1">
+                <h5 class="modal-title" id="inputDataModalLabel">Register Participant</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" action="{{ route('infografis.store') }}">
+                @csrf
+                <div class="modal-body mr-2 ml-2">
+                    <input type="hidden" id="editId" name="id">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Nama Peserta:</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="text" class="form-control" name="nama_peserta" required>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Nama Program:</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="text" class="form-control" name="nama_program" required>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Batch:</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="text" class="form-control" name="batch" required>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Tgl Pelaksanaan:</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="date" class="form-control" name="tgl_pelaksanaan" required>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Tempat Pelaksanaan:</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="text" class="form-control" name="tempat_pelaksanaan" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Jenis Pelatihan:</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="text" class="form-control" name="jenis_pelatihan" required>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Keterangan:</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="text" class="form-control" name="keterangan" required>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Subholding:</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="text" class="form-control" name="subholding" required>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Perusahaan:</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="text" class="form-control" name="perusahaan" required>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center mb-4">
+                                        <div style="width: 140px;" class="mr-2">
+                                            <p style="margin: 0;">Kategori Program:</p>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <input type="text" class="form-control" name="kategori_program" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center mb-4">
+                                        <div style="width: 140px;" class="mr-2">
+                                            <p style="margin: 0;">Realisasi:</p>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <input type="text" class="form-control" name="realisasi" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Insert Data</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -282,7 +413,7 @@ font-weight-bold
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Delete Data</button>
+                    <button type="button" class="btn btn-danger">Delete Data</button>
                     <button type="submit" class="btn btn-primary">Update Data</button>
                 </div>
             </form>
@@ -376,7 +507,7 @@ $(document).ready(function() {
         // Use SweetAlert to confirm the deletion
         swal({
             title: "Are you sure?",
-            text: "Once deleted, you will not be able to recover this participant's data!",
+            text: "This action will delete participant data & certificate, once deleted, you will not be able to recover this participant's data!",
             icon: "warning",
             buttons: true,
             dangerMode: true,
@@ -409,30 +540,5 @@ $(document).ready(function() {
         });
     });
 });
-</script>
-<script>
-    document.getElementById('addApproversBtn').addEventListener('click', function() {
-        // Hide the "Add Approvers" button
-        document.getElementById('addApproversBtn').style.display = 'none';
-        // Show the form
-        document.getElementById('addApproverForm').style.display = 'block';
-        document.getElementById('hideApproversBtn').style.display = 'block';
-    });
-    document.getElementById('hideApproversBtn').addEventListener('click', function() {
-        // Hide the "Add Approvers" button
-        document.getElementById('addApproversBtn').style.display = 'block';
-        // Show the form
-        document.getElementById('addApproverForm').style.display = 'none';
-        document.getElementById('hideApproversBtn').style.display = 'none';
-    });
-
-    function displayFileName() {
-        const input = document.getElementById('file');
-        const label = document.getElementById('file-label');
-        const file = input.files[0];
-        if (file) {
-            label.textContent = file.name;
-        }
-    }
 </script>
 @endsection

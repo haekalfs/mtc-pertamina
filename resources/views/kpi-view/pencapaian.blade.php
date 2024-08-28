@@ -54,9 +54,9 @@ font-weight-bold
                                 <div class="indicator__name">{{ $kpiItem->indicator }}</div>
                                 <div class="indicator__data">
                                     <div class="data__entry">
-                                        <div class="mb-1 @if($kpiItem->target <= $kpiItem->pencapaian->sum('score')) text-success @else text-danger @endif">Target :</div>
+                                        <div class="mb-1 @if($kpiItem->target / 4 <= $kpiItem->pencapaian->sum('score')) text-success @else text-danger @endif">Target :</div>
                                         <div class="data__description">{{ $kpiItem->goal }}</div>
-                                        <div class="data__amount">{{ number_format($kpiItem->target, 0, ',', '.') }}</div>
+                                        <div class="data__amount">{{ number_format($kpiItem->target / 4, 0, ',', '.') }}</div>
                                     </div>
                                     <div class="data__entry">
                                         <div class="data__description">Tercapai :</div>
@@ -84,9 +84,9 @@ font-weight-bold
                                     </div>
                                 </div>
                             </div>
-                            <div class="alert @if($kpiItem->target <= $kpiItem->pencapaian->sum('score')) alert-success @else alert-danger @endif alert-block mt-3">
+                            <div class="alert @if($kpiItem->target / 4 <= $kpiItem->pencapaian->sum('score')) alert-success @else alert-danger @endif alert-block mt-3">
                                 <button type="button" class="close" data-dismiss="alert">×</button>
-                                <strong>@if($kpiItem->target <= $kpiItem->pencapaian->sum('score')) Target is Reached! @else Target is not Reached yet! @endif</strong>
+                                <strong>@if($kpiItem->target / 4 <= $kpiItem->pencapaian->sum('score')) Target is Reached! @else Target is not Reached yet! @endif</strong>
                             </div>
                         </div>
                     </div>
@@ -111,7 +111,7 @@ font-weight-bold
                 </div>
                 <div class="card-body">
                     <table id="docLetter" class="table table-bordered">
-                        <thead>
+                        <thead class="thead-light">
                             <tr>
                                 <th>No.</th>
                                 <th>Pencapaian</th>
@@ -121,9 +121,8 @@ font-weight-bold
                                 <th>Periode</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @php $no = 1; @endphp
-                            @foreach ($kpiItem->pencapaian as $item) <!-- Loop through each 'pencapaian' related to the current KPI -->
+                        <tbody> @php $no = 1; @endphp
+                        @foreach ($kpiItem->pencapaian as $item)
                             <tr data-indicator="{{ $item->indicator->indicator }}">
                                 <td>{{ $no++ }}</td>
                                 <td>{{ $item->pencapaian }}</td>
@@ -131,16 +130,8 @@ font-weight-bold
                                 <td>{{ number_format($item->score, 0, ',', '.') }}</td>
                                 <td>{{ $item->indicator->indicator }}</td>
                                 <td>{{ \Carbon\Carbon::parse($item->periode_start)->format('d/m/y') }} - {{ \Carbon\Carbon::parse($item->periode_end)->format('d/m/y') }}</td>
-                                {{-- <td class="text-center">
-                                    <a href="{{ route('preview-kpi', ['id' => $item->kpi_id]) }}" class="btn btn-outline-secondary btn-sm mr-2"><i class="ti-eye"></i> Preview</a>
-                                    <a href="#" class="btn btn-outline-danger btn-sm btn-details" onclick="confirmDelete({{ $item->id }});"><i class="fa fa-ban"></i> Delete</a>
-                                    <form id="delete-kpi-{{ $item->id }}" action="{{ route('kpi.destroy', $item->id) }}" method="POST" style="display: none;">
-                                        @csrf
-                                        @method('DELETE')
-                                    </form>
-                                </td> --}}
                             </tr>
-                            @endforeach
+                        @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -201,34 +192,32 @@ $(function() {
 </script>
 <script>
 window.onload = function () {
-
-var chart = new CanvasJS.Chart("chartContainer", {
-   animationEnabled: true,
-   zoomEnabled: true,
-   title:{
-       text: "KPI Statistic"
-   },
-   axisY: {
-       valueFormatString: "#0,,.",
-       suffix: "mn"
-   },
-   axisX: {
-       labelFormatter: function (e) {
-           return CanvasJS.formatDate(e.value, "DD-MMM-YYYY");
-       },
-       interval: 1,
-       intervalType: "month" // Adjust interval to week
-   },
-   data: [{
-       type: "splineArea",
-       markerSize: 5,
-       xValueType: "dateTime",
-       dataPoints: {!! json_encode($dataPoints, JSON_NUMERIC_CHECK) !!}
-   }]
-});
-
-chart.render();
-
+    var chart = new CanvasJS.Chart("chartContainer", {
+        animationEnabled: true,
+        theme: "light2",
+        zoomEnabled: true,
+        title:{
+            text: "KPI Statistic"
+        },
+        axisY: {
+            valueFormatString: "#0,,.",
+            suffix: "mn"
+        },
+        axisX: {
+            labelFormatter: function (e) {
+                return CanvasJS.formatDate(e.value, "DD-MMM-YYYY");
+            },
+            interval: 1,
+            intervalType: "month" // Ensure this is set to 'week'
+        },
+        data: [{
+            type: "splineArea",
+            markerSize: 5,
+            xValueType: "dateTime",
+            dataPoints: {!! json_encode($dataPoints, JSON_NUMERIC_CHECK) !!}
+        }]
+    });
+    chart.render();
 }
 </script>
 <script>

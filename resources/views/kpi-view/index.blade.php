@@ -37,7 +37,7 @@ font-weight-bold
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
         <select class="form-control mr-3" id="quarterSelected" name="quarterSelected" onchange="redirectToPage()" required style="width: 200px;">
-            <option value="-1" {{ $selectedQuarter == -1 ? 'selected' : '' }}>Show All</option>
+            <option value="-1" {{ $selectedQuarter == -1 ? 'selected' : '' }}>Show All Periode</option>
             @foreach ($quarters as $quarter)
                 <option value="{{ $quarter->id }}" {{ $quarter->id == $selectedQuarter ? 'selected' : '' }}>{{ $quarter->months }}</option>
             @endforeach
@@ -72,14 +72,21 @@ font-weight-bold
 <section>
     <div class="indicators">
         @foreach ($kpis as $kpi)
+        @php
+        if($selectedQuarter == '-1'){
+            $target = $kpi->target;
+        } else {
+            $target = $kpi->target / 4;
+        }
+        @endphp
         <a href="{{ route('pencapaian-kpi', [$kpi->id, $selectedQuarter, $yearSelected]) }}">
             <div class="indicator">
-                <div class="indicator__name">{{ $kpi->indicator }}</div>
+                <div class="indicator__name bg-primary text-white">{{ $kpi->indicator }}</div>
                 <div class="indicator__data">
                     <div class="data__entry">
-                        <div class="mb-1 @if($kpi->target <= $kpi->pencapaian->sum('score')) text-success @else text-danger @endif">Target :</div>
+                        <div class="mb-1 @if($target <= $kpi->pencapaian->sum('score')) text-success @else text-danger @endif">Target :</div>
                         <div class="data__description">{{ $kpi->goal }}</div>
-                        <div class="data__amount">{{ number_format($kpi->target, 0, ',', '.') }}</div>
+                        <div class="data__amount">{{ number_format($target, 0, ',', '.') }}</div>
                     </div>
                     <div class="data__entry">
                         <div class="data__description">Tercapai :</div>
@@ -91,123 +98,121 @@ font-weight-bold
         @endforeach
     </div>
 </section>
-{{-- circle progress bar --}}
-{{-- <a class="progress-circle-wrapper">
-    <div class="progress-circle p58 over50">
-        <span>99%</span>
-        <div class="left-half-clipper">
-            <div class="first50-bar"></div>
-            <div class="value-bar"></div>
-        </div>
-    </div>
-</a> --}}
-<div class="animated fadeIn zoom90">
+<div class="animated fadeIn">
     <div class="row">
         <div class="col-md-12">
-            <div class="card">
-                <div class="card-body">
-                    <div class="progress-box-modified progress-1" style="font-size: 20px;">
-                        <h4 class="por-title mb-2">Realisasi KPI Overall</h4>
-                        {{-- <div class="por-txt" style="font-size: 15px;">Target : {{ $kpiItem->target }}</div> --}}
-                        <div class="progress" style="height: 20px;">
-                            <div class="progress-bar
-                            @if(round($overallProgress, 2) >= 75) bg-success
-                            @elseif(round($overallProgress, 2) >= 50) bg-warning
-                            @else bg-danger
-                            @endif" role="progressbar" style="width: {{ round($overallProgress, 2) }}%;" aria-valuenow="{{ round($overallProgress, 2) }}" aria-valuemin="0" aria-valuemax="100">
-                                {{ round($overallProgress, 2) }}%
+            <div class="card mb-4 mt-2">
+                <div class="card-header">
+                    <span class="text-secondary font-weight-bold">Infographics KPI</span>
+                </div>
+                <div class="card-body" style="background-color: rgb(247, 247, 247);">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="card-body d-flex align-items-center justify-content-center">
+                                {{-- circle progress bar --}}
+                                <h4 class="mb-2">Realisasi KPI Overall</h4>
+                                <a class="progress-circle-wrapper animateBox">
+                                    <div class="progress-circle p{{ round($overallProgress, 0) }} @if(round($overallProgress, 2) >= 50) over50 @endif">
+                                        <span>{{ round($overallProgress, 2) }}%</span>
+                                        <div class="left-half-clipper">
+                                            <div class="first50-bar"></div>
+                                            <div class="value-bar"></div>
+                                        </div>
+                                    </div>
+                                </a>
                             </div>
+                        </div>
+                        <div class="col-md-7">
+                            <h6 class="h6 mb-2 font-weight-bold text-gray-800">Guidelines for KPI Realization</h6>
+                            <ul class="ml-4">
+                                <li><strong>KPI Realization Overview:</strong> This section provides an overview of the Key Performance Indicators (KPIs) realization for Pertamina MTC. It focuses on evaluating the performance and achievements of various KPIs, highlighting areas of success and identifying opportunities for improvement. The goal is to assess how well the targets have been met and to provide insights for strategic planning and decision-making within the organization.</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+        @foreach($kpiChartsData as $index => $chartData)
+        <div class="@if($index == 0) col-lg-8 @elseif($index == 1) col-lg-4 @elseif($index == 4) col-lg-12 @else col-lg-6 @endif">
             <div class="card">
-                <div class="card-header d-flex flex-row p-3 align-items-center justify-content-between">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card-body d-flex justify-content-center align-items-center">
+                            <!-- <canvas id="TrafficChart"></canvas>   -->
+                            <div id="chartContainer{{$index}}" style="height: 370px; width: 100%;"></div>
+                        </div>
+                    </div>
+                </div> <!-- /.row -->
+            </div>
+        </div>
+        @endforeach
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header d-flex flex-row p-3 align-items-center justify-content-between zoom90">
                     <h6 class="m-0 font-weight-bold" id="judul">Data Pencapaian Overall</h6>
                     <div class="text-right">
                         {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Create KPI</a> --}}
                     </div>
                 </div>
-                <nav>
-                    <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                        <a class="nav-item nav-link active" id="custom-nav-home-tab" data-toggle="tab" href="#custom-nav-home" role="tab" aria-controls="custom-nav-home" aria-selected="true"> List Pencapaian</a>
-                        <a class="nav-item nav-link" id="custom-nav-profile-tab" data-toggle="tab" href="#custom-nav-profile" role="tab" aria-controls="custom-nav-profile" aria-selected="false"> Grafik Pencapaian</a>
-                    </div>
-                </nav>
                 <div class="card-body" style="padding-top: 10px;">
-                    <div class="tab-content" id="nav-tabContent">
-                        <div class="tab-pane fade show active" id="custom-nav-home" role="tabpanel" aria-labelledby="custom-nav-home-tab">
-                            <div class="row d-flex justify-content-start mb-2">
-                                <div class="col-md-12">
-                                    <div class="row align-items-center">
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="email">Indicator :</label>
-                                                <select class="custom-select" id="namaPenlat" name="namaPenlat">
-                                                    <option value="1" selected>Show All</option>
-                                                    @foreach ($kpis as $kpi)
-                                                        <option value="{{ $kpi->indicator }}">{{ $kpi->indicator }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </div>
+                    <div class="row d-flex justify-content-start mb-2">
+                        <div class="col-md-12">
+                            <div class="row align-items-center">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="email">Indicator :</label>
+                                        <select class="custom-select" id="namaPenlat" name="namaPenlat">
+                                            <option value="1" selected>Show All</option>
+                                            @foreach ($kpis as $kpi)
+                                                <option value="{{ $kpi->indicator }}">{{ $kpi->indicator }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                 </div>
                             </div>
-                            <table  id="docLetter" class="table table-striped table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>No.</th>
-                                        <th>Pencapaian</th>
-                                        <th>Goal</th>
-                                        <th>Tercapai</th>
-                                        <th>KPI</th>
-                                        <th>Periode</th>
-                                        {{-- <th>Action</th> --}}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @php $no = 1; @endphp
-                                    @foreach ($kpis as $kpi) <!-- Loop through each KPI -->
-                                        @foreach ($kpi->pencapaian as $item) <!-- Loop through each 'pencapaian' related to the current KPI -->
-                                        <tr data-indicator="{{ $item->indicator->indicator }}">
-                                            <td>{{ $no++ }}</td>
-                                            <td>{{ $item->pencapaian }}</td>
-                                            <td>{{ $item->indicator->goal }}</td>
-                                            <td>{{ number_format($item->score, 0, ',', '.') }}</td>
-                                            <td>{{ $item->indicator->indicator }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($item->periode_start)->format('d/m/y') }} - {{ \Carbon\Carbon::parse($item->periode_end)->format('d/m/y') }}</td>
-                                            {{-- <td class="text-center">
-                                                <a href="{{ route('preview-kpi', ['id' => $item->kpi_id]) }}" class="btn btn-outline-secondary btn-sm mr-2"><i class="ti-eye"></i> Preview</a>
-                                                <a href="#" class="btn btn-outline-danger btn-sm btn-details" onclick="confirmDelete({{ $item->id }});"><i class="fa fa-ban"></i> Delete</a>
-                                                <form id="delete-kpi-{{ $item->id }}" action="{{ route('kpi.destroy', $item->id) }}" method="POST" style="display: none;">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                </form>
-                                            </td> --}}
-                                        </tr>
-                                        @endforeach
-                                    @endforeach
-                                </tbody>
-                            </table>
                         </div>
-                        <div class="tab-pane fade" id="custom-nav-profile" role="tabpanel" aria-labelledby="custom-nav-profile-tab">
-                            <div id="mainContainer">
-                                <div class="row">
-                                    @foreach($kpiChartsData as $index => $chartData)
-                                    <div class="col-md-4">
-                                        <div id="chartContainer{{$index}}" style="height: 300px; width: 100%; margin-bottom: 20px;"></div>
-                                    </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                            <div class="text-right mb-4">
-                                {{-- button or else --}}
-                                <small><i class="ti-fullscreen"></i>
-                                    <a href="#" onclick="toggleFullScreen('mainContainer')">&nbsp;<i>Fullscreen</i></a>
-                                </small>
-                            </div>
-                        </div>
+                    </div>
+                    <table id="docLetter" class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>No.</th>
+                                <th>Pencapaian</th>
+                                <th>Goal</th>
+                                <th>Tercapai</th>
+                                <th>KPI</th>
+                                <th>Periode</th>
+                                {{-- <th>Action</th> --}}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @php $no = 1; @endphp
+                            @foreach ($kpis as $kpi) <!-- Loop through each KPI -->
+                                @foreach ($kpi->pencapaian as $item) <!-- Loop through each 'pencapaian' related to the current KPI -->
+                                <tr data-indicator="{{ $item->indicator->indicator }}">
+                                    <td>{{ $no++ }}</td>
+                                    <td>{{ $item->pencapaian }}</td>
+                                    <td>{{ $item->indicator->goal }}</td>
+                                    <td>{{ number_format($item->score, 0, ',', '.') }}</td>
+                                    <td>{{ $item->indicator->indicator }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($item->periode_start)->format('d/m/y') }} - {{ \Carbon\Carbon::parse($item->periode_end)->format('d/m/y') }}</td>
+                                    {{-- <td class="text-center">
+                                        <a href="{{ route('preview-kpi', ['id' => $item->kpi_id]) }}" class="btn btn-outline-secondary btn-sm mr-2"><i class="ti-eye"></i> Preview</a>
+                                        <a href="#" class="btn btn-outline-danger btn-sm btn-details" onclick="confirmDelete({{ $item->id }});"><i class="fa fa-ban"></i> Delete</a>
+                                        <form id="delete-kpi-{{ $item->id }}" action="{{ route('kpi.destroy', $item->id) }}" method="POST" style="display: none;">
+                                            @csrf
+                                            @method('DELETE')
+                                        </form>
+                                    </td> --}}
+                                </tr>
+                                @endforeach
+                            @endforeach
+                        </tbody>
+                    </table>
+                    <div class="text-right mb-4">
+                        {{-- button or else --}}
+                        <small><i class="ti-fullscreen"></i>
+                            <a href="#" onclick="toggleFullScreen('mainContainer')">&nbsp;<i>Fullscreen</i></a>
+                        </small>
                     </div>
                 </div>
             </div>
@@ -302,37 +307,50 @@ font-weight-bold
     });
 </script>
 <script type="text/javascript">
-    const kpiChartsData = {!! json_encode($kpiChartsData, JSON_NUMERIC_CHECK) !!};
+const kpiChartsData = {!! json_encode($kpiChartsData, JSON_NUMERIC_CHECK) !!};
 
-    window.onload = function() {
-        kpiChartsData.forEach((chartData, index) => {
-            const chart = new CanvasJS.Chart(`chartContainer${index}`, {
-                animationEnabled: true,
-                zoomEnabled: true,
-                title:{
-                    text: chartData.kpiName + " Statistic"
+window.onload = function() {
+    kpiChartsData.forEach((chartData, index) => {
+        const chart = new CanvasJS.Chart(`chartContainer${index}`, {
+            animationEnabled: true,
+            theme: "light2",
+            zoomEnabled: true,
+            title:{
+                text: chartData.kpiName + " Statistic"
+            },
+            axisY: {
+                valueFormatString: "#0,,.",
+                suffix: "mn",
+                stripLines: [
+                    {
+                        value: chartData.kpiTarget,
+                        label: "Target Minimum: " + chartData.kpiTarget,
+                        color: "#FF0000", // Color of the line
+                        thickness: 2, // Thickness of the line
+                        labelPlacement: "inside",
+                        labelAlign: "center",
+                        zIndex: 10 // Ensure line is in front of bars
+                    }
+                ]
+            },
+            axisX: {
+                labelFormatter: function (e) {
+                    return CanvasJS.formatDate(e.value, "DD-MMM");
                 },
-                axisY: {
-                    valueFormatString: "#0,,.",
-                    suffix: "mn"
-                },
-                axisX: {
-                    labelFormatter: function (e) {
-                        return CanvasJS.formatDate(e.value, "DD-MMM-YYYY");
-                    },
-                    interval: 1,
-                    intervalType: "week" // Adjust interval to week
-                },
-                data: [{
-                    type: "spline",
-                    markerSize: 5,
-                    xValueType: "dateTime",
-                    dataPoints: chartData.dataPoints
-                }]
-            });
-
-            chart.render();
+                interval: 1,
+                intervalType: "month"
+            },
+            data: [{
+                type: "splineArea",
+		        color: "#6599FF",
+                markerSize: 5,
+                xValueType: "dateTime",
+                dataPoints: chartData.dataPoints
+            }]
         });
-    };
+
+        chart.render();
+    });
+};
 </script>
 @endsection

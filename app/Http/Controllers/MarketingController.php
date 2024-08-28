@@ -15,7 +15,7 @@ class MarketingController extends Controller
     {
         $queryAgreement = Agreement::query();
         $countAgreement = $queryAgreement->count();
-        $getAgreements = $queryAgreement->limit(5)->get();
+        $getAgreements = $queryAgreement->limit(3)->get();
 
         $queryCampaign = Campaign::query();
         $countCampaign = $queryCampaign->count();

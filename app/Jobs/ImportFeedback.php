@@ -67,6 +67,12 @@ class ImportFeedback implements ShouldQueue
                     continue; // Skip rows with empty required fields
                 }
 
+                $uniqueId = random_int(1000000000000000, 9999999999999999); // 16-digit random number
+
+                while (Feedback_report::where('feedback_id', $uniqueId)->exists()) {
+                    $uniqueId = random_int(1000000000000000, 9999999999999999);
+                }
+
                 // Iterate over the template questions
                 foreach ($templates as $templateId) {
                     $scoreIndex = 11 + ($templateId - 1); // Adjust index based on template ID
@@ -88,6 +94,7 @@ class ImportFeedback implements ShouldQueue
                         [
                             'score' => $row[$scoreIndex] ?? null, // Handle cases where score might be missing
                             'updated_at' => now(),
+                            'feedback_id' => $uniqueId
                         ]
                     );
                 }

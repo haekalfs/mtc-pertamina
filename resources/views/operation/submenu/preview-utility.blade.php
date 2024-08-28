@@ -155,7 +155,7 @@ font-weight-bold
                 <div class="card-body">
                     <div class="table-responsive">
                         <table id="listUtilities" class="table table-bordered mt-4">
-                            <thead>
+                            <thead class="thead-light">
                                 <tr>
                                     <th>Tool</th>
                                     <th>Quantity</th>

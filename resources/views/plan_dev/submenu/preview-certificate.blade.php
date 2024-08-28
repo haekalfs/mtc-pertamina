@@ -15,8 +15,8 @@ font-weight-bold
 @section('content')
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
-        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa fa-certificate"></i> Preview Certificate</h1>
-        <p class="mb-3">Utilities Details Information.</a></p>
+        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-certificate"></i> Preview Certificate</h1>
+        <p class="mb-3">Status : @if($data->status == 'Issued') <span class="text-success"><i class="fa fa-check"></i> Issued</span> @else <span><i class="fa fa-spinner"></i> On Process</span> @endif</p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
         <a href="{{ route('certificate') }}" class="btn btn-sm btn-secondary shadow-sm text-white"><i class="fa fa-backward"></i> Go Back</a>
@@ -56,7 +56,7 @@ font-weight-bold
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> List Data</h6>
                 <div class="text-right">
-                    {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Update Data</a> --}}
+                    <a class="btn btn-secondary btn-sm text-white" href="#" data-toggle="modal" data-target="#editDataModal"><i class="fa fa-edit"></i></a>
                 </div>
             </div>
             <div class="card-body">
@@ -82,6 +82,10 @@ font-weight-bold
                                 <tr>
                                     <th>Tanggal Pelaksanaan</th>
                                     <td style="text-align: start; font-weight:500">: {{ $data->batch->date }}</td>
+                                </tr>
+                                <tr>
+                                    <th style="width: 200px;">Keterangan</th>
+                                    <td style="text-align: start; font-weight:500">: {{ $data->keterangan }}</td>
                                 </tr>
                               </tr>
                           </table>
@@ -160,6 +164,47 @@ font-weight-bold
                     </table>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editDataModal" tabindex="-1" role="dialog" aria-labelledby="editDataModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header d-flex flex-row align-items-center justify-content-between">
+                <h5 class="modal-title" id="editDataModalLabel">Edit Data</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" enctype="multipart/form-data" action="{{ route('certificate.update', $data->id) }}">
+                @csrf
+                <div class="modal-body mr-2 ml-2">
+                    <div class="d-flex align-items-center mb-4">
+                        <div style="width: 140px;" class="mr-2">
+                            <p style="margin: 0;">Status :</p>
+                        </div>
+                        <div class="flex-grow-1">
+                            <select class="form-control" id="status" name="status">
+                                <option value="On Process" @if($data->status == 'On Process') selected @endif>On Process</option>
+                                <option value="Issued" @if($data->status == 'Issued') selected @endif>Issued</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-start mb-4">
+                        <div style="width: 140px;" class="mr-2">
+                            <p style="margin: 0;">Keterangan :</p>
+                        </div>
+                        <div class="flex-grow-1">
+                            <textarea class="form-control" rows="3" name="keterangan">{{ $data->keterangan }}</textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Submit Request</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

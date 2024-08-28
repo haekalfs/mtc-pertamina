@@ -93,7 +93,7 @@ font-weight-bold
                         </div>
                     </div>
                     <table id="batchTables" class="table table-bordered">
-                        <thead>
+                        <thead class="thead-light">
                             <tr>
                                 <th>Display</th>
                                 <th>Nama Pelatihan</th>

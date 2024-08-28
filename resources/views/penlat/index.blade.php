@@ -101,13 +101,13 @@ font-weight-bold
                         </div>
                     </div>
                     <table id="penlatTables" class="table table-bordered">
-                        <thead>
+                        <thead class="thead-light">
                             <tr>
                                 <th>Display</th>
                                 <th>Nama Pelatihan</th>
                                 <th>Alias</th>
-                                <th>Jenis Pelatihan</th>
-                                <th>Kategori Program</th>
+                                <th>Jenis</th>
+                                <th>Kategori</th>
                                 <th width="100px">Action</th>
                             </tr>
                         </thead>

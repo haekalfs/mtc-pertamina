@@ -36,7 +36,8 @@ class PDController extends Controller
         $instructors = Instructor::withCount([
             'feedbacks as average_feedback_score' => function ($query) {
                 $query->select(DB::raw('coalesce(avg(score), 0)'));
-            }
+            },
+            'feedbacks' // This will count the number of feedbacks
         ])
         ->orderByDesc('average_feedback_score')
         ->take(3)
@@ -138,19 +139,19 @@ class PDController extends Controller
             }
 
             // Select necessary fields and perform a group by
-            $query->select('nama', 'judul_pelatihan', 'instruktur', 'tgl_pelaksanaan')
-                ->groupBy('nama', 'judul_pelatihan', 'instruktur', 'tgl_pelaksanaan');
+            $query->select('nama', 'judul_pelatihan', 'instruktur', 'tgl_pelaksanaan', 'feedback_id')
+                ->groupBy('nama', 'judul_pelatihan', 'instruktur', 'tgl_pelaksanaan', 'feedback_id');
 
             // Eager load feedback scores for all feedback templates in a single query
             $feedbackData = Feedback_report::whereIn('feedback_template_id', $feedbackTemplates->pluck('id'))
                 ->get()
                 ->groupBy(function($item) {
-                    return $item->nama . '_' . $item->judul_pelatihan . '_' . $item->instruktur;
+                    return $item->nama . '_' . $item->judul_pelatihan . '_' . $item->instruktur . '_' . $item->feedback_id;
                 });
 
             // Transform the reports with feedback data
             $reports = $query->get()->map(function($item) use ($feedbackTemplates, $feedbackData) {
-                $key = $item->nama . '_' . $item->judul_pelatihan . '_' . $item->instruktur;
+                $key = $item->nama . '_' . $item->judul_pelatihan . '_' . $item->instruktur . '_' . $item->feedback_id;
                 $feedbackScores = $feedbackData->get($key, collect())->keyBy('feedback_template_id');
 
                 $feedback = [];
@@ -158,12 +159,15 @@ class PDController extends Controller
                     $feedback['feedback_' . $template->id] = $feedbackScores->get($template->id)->score ?? '-';
                 }
 
+                // Add the feedback_id to the item
+                $item->feedback_id_group = $item->feedback_id;
+
                 return array_merge($item->toArray(), $feedback);
             });
 
             return DataTables::of($reports)
                 ->addColumn('action', function($item) {
-                    return '<a href="#" class="btn btn-sm btn-primary">Action</a>';
+                    return '<a data-id="'. $item['feedback_id_group'] .'" class="btn btn-outline-secondary btn-sm mr-2 edit-btn"><i class="fa fa-edit"></i> Edit</a>';
                 })
                 ->rawColumns(['action'])
                 ->make(true);
@@ -261,6 +265,22 @@ class PDController extends Controller
         ]);
     }
 
+    public function certificate_update(Request $request, $certId)
+    {
+        $validatedData = $request->validate([
+            'keterangan' => 'required',
+            'status' => 'required',
+        ]);
+
+        $penlat = Penlat_certificate::findOrFail($certId);
+        $penlat->keterangan = $request->input('keterangan');
+        $penlat->status = $request->input('status');
+
+        $penlat->save();
+
+        return redirect()->back()->with('success', 'Program data updated successfully.');
+    }
+
     public function certificate_instructor()
     {
         $penlatList = Penlat::all();
@@ -325,7 +345,12 @@ class PDController extends Controller
         }
 
         // Get the filtered data
-        $data = $query->get();
+        $data = $query->withCount([
+            'feedbacks as average_feedback_score' => function ($query) {
+                $query->select(DB::raw('coalesce(avg(score), 0)'));
+            },
+            'feedbacks' // This will count the number of feedbacks
+        ])->get();
 
         // Get all Penlat data
         $penlatList = Penlat::all();
@@ -807,10 +832,25 @@ class PDController extends Controller
 
     public function save_receivable(Request $request)
     {
-        $participant = Receivables_participant_certificate::find($request->id);
-        $participant->date_received = $request->date_received;
-        $participant->status = $request->status;  // Save the checkbox status
-        $participant->save();
+        $participant = Receivables_participant_certificate::findOrFail($request->id);
+        $participant->update([
+            'date_received' => $request->date_received,
+            'status' => $request->status
+        ]);
+
+        $penlatCertificateId = $participant->penlat_certificate_id;
+
+        // Check if there are any participants with status NULL or false
+        $hasIncompleteStatus = Receivables_participant_certificate::where('penlat_certificate_id', $penlatCertificateId)
+            ->where(function($query) {
+                $query->whereNull('status')
+                    ->orWhere('status', 'false');
+            })->exists();
+
+        // If all statuses are true, update the Penlat_certificate status
+        if (!$hasIncompleteStatus) {
+            Penlat_certificate::where('id', $penlatCertificateId)->update(['status' => 'Issued']);
+        }
 
         return response()->json(['status' => 'success']);
     }

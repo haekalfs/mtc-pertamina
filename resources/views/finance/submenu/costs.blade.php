@@ -111,7 +111,7 @@ font-weight-bold
                         </div>
                     </div>
                     <table id="profitsTable" class="table table-bordered">
-                        <thead>
+                        <thead class="thead-light">
                             <tr>
                                 <th>Tanggal Pelaksanaan</th>
                                 <th>Nama Pelatihan</th>

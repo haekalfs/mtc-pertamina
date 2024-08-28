@@ -236,7 +236,7 @@ window.onload = function() {
             var pieChart = new CanvasJS.Chart("chartContainerPie", {
                 theme: "light2",
                 animationEnabled: true,
-                title: { text: "Top Penlat Based on Program & Jumlah Peserta" },
+                title: { text: "Top Penlat Based on Jumlah Peserta" },
                 data: [{
                     type: "doughnut",
                     indexLabel: "{symbol} - {y}",
@@ -251,7 +251,7 @@ window.onload = function() {
             // Column chart for Batch with the Most Used Utility
             const barCtx = document.getElementById("mostUsedUtility").getContext("2d");
             new Chart(barCtx, {
-                type: 'bar',
+                type: 'pie',
                 data: {
                     labels: data.mostUsedUtility.map(dp => dp.label),
                     datasets: [{
