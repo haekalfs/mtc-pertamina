@@ -134,7 +134,7 @@ font-weight-bold
                             <h5 class="card-title font-weight-bold">Profits</h5>
                             <div class="ml-2">
                                 <table class="table table-borderless table-sm">
-                                    @if(!$profits || $profits->isEmpty())
+                                    @if(!$profits)
                                         No Data Available
                                     @else
                                     <tr>
@@ -156,7 +156,7 @@ font-weight-bold
                             <div class="ml-2">
                                 <table class="table table-borderless table-sm">
 
-                                    @if(!$profits || $profits->isEmpty())
+                                    @if(!$profits)
                                         No Data Available
                                     @else
                                     <tr>
@@ -202,7 +202,7 @@ font-weight-bold
                             <h5 class="card-title font-weight-bold">Total Profits</h5>
                             <div class="ml-2">
                                 <table class="table table-borderless table-sm">
-                                    @if(!$profits || $profits->isEmpty())
+                                    @if(!$profits)
                                         No Data Available
                                     @else
                                     <tr>

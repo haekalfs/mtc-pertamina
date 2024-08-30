@@ -45,6 +45,13 @@ font-weight-bold
 <div class="animated fadeIn zoom90">
     <div class="row">
 
+        @php
+        if($selectedQuarter == '-1'){
+            $target = $kpiItem->target;
+        } else {
+            $target = $kpiItem->target / 4;
+        }
+        @endphp
         <div class="card-body">
             <div class="row">
                 <div class="col-md-3">
@@ -54,9 +61,9 @@ font-weight-bold
                                 <div class="indicator__name">{{ $kpiItem->indicator }}</div>
                                 <div class="indicator__data">
                                     <div class="data__entry">
-                                        <div class="mb-1 @if($kpiItem->target / 4 <= $kpiItem->pencapaian->sum('score')) text-success @else text-danger @endif">Target :</div>
+                                        <div class="mb-1 @if($target <= $kpiItem->pencapaian->sum('score')) text-success @else text-danger @endif">Target :</div>
                                         <div class="data__description">{{ $kpiItem->goal }}</div>
-                                        <div class="data__amount">{{ number_format($kpiItem->target / 4, 0, ',', '.') }}</div>
+                                        <div class="data__amount">{{ number_format($target, 0, ',', '.') }}</div>
                                     </div>
                                     <div class="data__entry">
                                         <div class="data__description">Tercapai :</div>
@@ -84,9 +91,9 @@ font-weight-bold
                                     </div>
                                 </div>
                             </div>
-                            <div class="alert @if($kpiItem->target / 4 <= $kpiItem->pencapaian->sum('score')) alert-success @else alert-danger @endif alert-block mt-3">
+                            <div class="alert @if($target <= $kpiItem->pencapaian->sum('score')) alert-success @else alert-danger @endif alert-block mt-3">
                                 <button type="button" class="close" data-dismiss="alert">×</button>
-                                <strong>@if($kpiItem->target / 4 <= $kpiItem->pencapaian->sum('score')) Target is Reached! @else Target is not Reached yet! @endif</strong>
+                                <strong>@if($target <= $kpiItem->pencapaian->sum('score')) Target is Reached! @else Target is not Reached yet! @endif</strong>
                             </div>
                         </div>
                     </div>
@@ -106,7 +113,9 @@ font-weight-bold
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold" id="judul">List Pencapaian - {{ $kpiItem->indicator }}</h6>
                     <div class="text-right">
+                        @if($selectedQuarter != '-1')
                         <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-icon fa fa-plus"></i> Insert Pencapaian</a>
+                        @endif
                     </div>
                 </div>
                 <div class="card-body">
@@ -161,8 +170,8 @@ font-weight-bold
                             <input type="text" class="form-control" id="pencapaian" name="pencapaian" placeholder="Average Test Score..." required>
                         </div>
                         <div class="form-group">
-                            <label for="score">Score Tercapai <small class="text-danger"><i>(in percentage)</i></small></label>
-                            <input type="text" class="form-control" id="score" name="score" placeholder="85%" required>
+                            <label for="score">Score Tercapai <small class="text-danger"><i>(Number Format)</i></small></label>
+                            <input type="text" oninput="formatAmount(this)" class="form-control" id="score" name="score" required>
                         </div>
                     </div>
                 </div>
@@ -234,6 +243,17 @@ window.onload = function () {
                 document.getElementById('delete-pencapaian-kpi-' + itemId).submit();
             }
         });
+    }
+
+    function formatAmount(input) {
+        // Remove non-numeric characters
+        let amount = input.value.replace(/[^0-9]/g, '');
+
+        // Add thousands separator (dots) using a regular expression
+        amount = amount.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+        // Set the formatted value back to the input
+        input.value = amount;
     }
 </script>
 @endsection

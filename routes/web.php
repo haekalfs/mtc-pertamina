@@ -8,7 +8,6 @@ use App\Http\Controllers\DepartmentPositionController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\ImportController;
-use App\Http\Controllers\InstagramController;
 use App\Http\Controllers\InstructorController;
 use App\Http\Controllers\InventoryToolController;
 use App\Http\Controllers\KpiController;
@@ -18,7 +17,6 @@ use App\Http\Controllers\MyProfileController;
 use App\Http\Controllers\OperationController;
 use App\Http\Controllers\PDController;
 use App\Http\Controllers\PenlatController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\UserController;
@@ -71,7 +69,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/delete-kpi/{id}', [KpiController::class, 'destroy'])->name('kpi.destroy');
     Route::delete('/delete-pencapaian-kpi/{id}', [KpiController::class, 'destroy_pencapaian'])->name('pencapaian.kpi.destroy');
     //KPI Report
-    Route::get('/key-performance-indicators/report/{kpiSelected?}/{periodeSelected?}', [KpiController::class, 'report'])->name('report-kpi');
+    Route::get('/key-performance-indicators/report', [KpiController::class, 'report'])->name('report-kpi');
+    Route::post('/key-performance-indicators/downloadPdf', [KPIController::class, 'downloadPdf'])->name('kpi.downloadPdf');
+
     //KPI Unused
     Route::get('/key-performance-indicators/manage-items', [KpiController::class, 'manage'])->name('manage-kpi');
     Route::get('/key-performance-indicators/preview/{id}', [KpiController::class, 'preview'])->name('preview-kpi');

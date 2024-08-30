@@ -107,6 +107,10 @@ font-weight-bold
                             <!-- <canvas id="TrafficChart"></canvas>   -->
                             <canvas id="lineChart"></canvas>
                         </div>
+                        <div class="text-center mb-3">
+                            <span id="CountSTCW"></span><span> & </span>
+                            <span id="CountNonSTCW"></span>
+                        </div>
                     </div>
                 </div> <!-- /.row -->
             </div>
@@ -248,14 +252,13 @@ window.onload = function() {
             });
             pieChart.render();
 
-            // Column chart for Batch with the Most Used Utility
-            const barCtx = document.getElementById("mostUsedUtility").getContext("2d");
-            new Chart(barCtx, {
-                type: 'pie',
+            const pieCtx = document.getElementById("mostUsedUtility").getContext("2d");
+            new Chart(pieCtx, {
+                type: 'doughnut',
                 data: {
                     labels: data.mostUsedUtility.map(dp => dp.label),
                     datasets: [{
-                        label: "Items",
+                        label: "Jumlah Penggunaan",
                         data: data.mostUsedUtility.map(dp => dp.y),
                         backgroundColor: data.mostUsedUtility.map((dp, index) => {
                             const colors = ["#4F81BD", "#C0504D", "#9BBB59", "#8064A2", "#4BACC6", "#F79646"];
@@ -265,33 +268,35 @@ window.onload = function() {
                 },
                 options: {
                     responsive: true,
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Batch'
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Items'
-                            },
-                            suggestedMax: 50,
-                            beginAtZero: true
-                        }
-                    },
                     plugins: {
                         legend: {
-                            display: false
+                            display: true,
+                            position: 'bottom'
                         },
                         title: {
                             display: true,
-                            text: "Batch Pelatihan dengan penggunaan utilitas terbanyak"
+                            text: "Pelatihan dengan Penggunaan Utilitas Terbanyak"
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    let label = data.mostUsedUtility[context.dataIndex].batch || '';
+
+                                    if (label) {
+                                        label += '\n'; // Move batch to the next line
+                                    }
+                                    if (context.raw !== null) {
+                                        label += context.raw.toLocaleString() + ' Items';
+                                    }
+                                    return label;
+                                }
+                            }
                         }
                     }
                 }
             });
+            document.getElementById("CountSTCW").innerText = `STCW: ${data.countSTCW} Peserta`;
+            document.getElementById("CountNonSTCW").innerText = `Non-STCW: ${data.countNonSTCW} Peserta`;
         });
 }
 function redirectToPage() {

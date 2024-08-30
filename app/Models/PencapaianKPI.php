@@ -9,7 +9,7 @@ class PencapaianKPI extends Model
 {
     use HasFactory;
     protected $table = "kpi_pencapaian";
-    protected $fillable = ["id", "pencapaian", 'score', 'periode_start', 'periode_end', 'user_id', 'kpi_id',"created_at", "updated_at"];
+    protected $fillable = ["id", "pencapaian", 'score', 'periode_start', 'periode_end','quarter_id', 'user_id', 'kpi_id',"created_at", "updated_at"];
 
     public function quarter()
     {

@@ -64,19 +64,36 @@ class OperationController extends Controller
 
     public function getChartData($year)
     {
-        // Filter data by the specified year in 'tgl_pelaksanaan' column
-        $dataBatch = Penlat_batch::select('penlat_batch.id', 'penlat_batch.nama_program', 'penlat_batch.batch', DB::raw('SUM(penlat_utility_usage.amount) as total_usage'))
-            ->join('penlat_utility_usage', 'penlat_batch.id', '=', 'penlat_utility_usage.penlat_batch_id')
-            ->whereYear('penlat_batch.date', $year)
-            ->groupBy('penlat_batch.id', 'penlat_batch.nama_program', 'penlat_batch.batch')
-            ->orderBy('total_usage', 'DESC')
-            ->get();
+        // Fetch and group the data by nama_program and batch, summing the total usage
+        $dataBatch = Penlat_batch::select('penlat_batch.nama_program', 'penlat_batch.batch', DB::raw('SUM(penlat_utility_usage.amount) as total_usage'))
+        ->join('penlat_utility_usage', 'penlat_batch.id', '=', 'penlat_utility_usage.penlat_batch_id')
+        ->whereYear('penlat_batch.date', $year)
+        ->groupBy('penlat_batch.nama_program', 'penlat_batch.batch')
+        ->orderBy('total_usage', 'DESC')
+        ->get();
 
-        $mostUsedUtility = [];
-        foreach ($dataBatch as $row) {
-            $mostUsedUtility[] = [
+        // Split the data into top 5 and the rest
+        $top5Data = $dataBatch->take(5);
+        $otherData = $dataBatch->slice(5);
+
+        // Calculate the total for the 'Lain-lain' category
+        $otherTotalUsage = $otherData->sum('total_usage');
+
+        // Prepare the data for the chart, including batch information
+        $mostUsedUtility = $top5Data->map(function ($row) {
+            return [
                 "label" => $row->nama_program,
+                "batch" => $row->batch,
                 "y" => $row->total_usage
+            ];
+        })->toArray();
+
+        // Add the 'Lain-lain' category if there are more than 5 programs
+        if ($otherTotalUsage > 0) {
+            $mostUsedUtility[] = [
+                "label" => 'Lain-lain',
+                "batch" => null, // No batch info for 'Lain-lain'
+                "y" => $otherTotalUsage
             ];
         }
 
@@ -106,6 +123,14 @@ class OperationController extends Controller
             ->where('kategori_program', 'STCW')
             ->groupBy('tgl_pelaksanaan')
             ->get();
+
+        $countSTCW = Infografis_peserta::whereYear('tgl_pelaksanaan', $year)
+            ->where('kategori_program', 'STCW')
+            ->count();
+
+        $countNonSTCW = Infografis_peserta::whereYear('tgl_pelaksanaan', $year)
+            ->where('kategori_program', 'NON STCW')
+            ->count();
 
         $dataByDate2 = Infografis_peserta::select('tgl_pelaksanaan', DB::raw('count(*) as total'))
             ->whereYear('tgl_pelaksanaan', $year)
@@ -145,7 +170,9 @@ class OperationController extends Controller
             'dataPointsSpline1' => $dataPointsSpline1,
             'dataPointsSpline2' => $dataPointsSpline2,
             'pieDataPoints' => $dataPointsPie,
-            'mostUsedUtility' => $mostUsedUtility
+            'mostUsedUtility' => $mostUsedUtility,
+            'countSTCW' => $countSTCW,
+            'countNonSTCW' => $countNonSTCW
         ]);
     }
 

@@ -4,7 +4,7 @@
 <x-auth-session-status class="mb-4" :status="session('status')" />
 <div class="wrap-login100" style="zoom: 80%;">
     <div class="login100-pic text-center js-tilt" data-tilt>
-        <img src="img/mtc-logo-1.png" style="zoom: 150%;" alt="IMG">
+        <img src="img/MTC.png" style="zoom: 150%;" alt="IMG">
     </div>
 
     <form class="login100-form validate-form" method="POST" action="{{ route('login') }}">

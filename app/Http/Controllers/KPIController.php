@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 class KpiController extends Controller
 {
@@ -120,7 +122,13 @@ class KpiController extends Controller
             ->with(['pencapaian' => $pencapaianQuery])
             ->first();
 
-        $kpiTarget = $kpiItem->target / 4;
+        if($quarterSelected == '-1'){
+            $target = $kpiItem->target;
+        } else {
+            $target = $kpiItem->target / 4;
+        }
+
+        $kpiTarget = $target;
         $tercapai = $kpiItem->pencapaian->sum('score');
         $percentage = ($kpiTarget > 0) ? min(($tercapai / $kpiTarget) * 100, 100) : 0;
 
@@ -174,7 +182,9 @@ class KpiController extends Controller
     public function manage()
     {
         $indicators = KPI::all();
-        return view('kpi-view.admin.manage', ['indicators' => $indicators]);
+        $nowYear = date('Y');
+        $yearsBefore = range($nowYear - 4, $nowYear);
+        return view('kpi-view.admin.manage', ['indicators' => $indicators, 'yearsBefore' => $yearsBefore]);
     }
 
     public function preview($kpi)
@@ -183,14 +193,15 @@ class KpiController extends Controller
         return view('kpi-view.admin.preview', ['kpiItem' => $kpiItem]);
     }
 
-    public function report(Request $request, $kpi = 7, $periode = 1)
+    public function report(Request $request)
     {
         // Determine the current year and generate the range of years
         $nowYear = date('Y');
         $yearsBefore = range($nowYear - 4, $nowYear);
 
-        // Set the selected year
-        $periode = $periode ?? $nowYear;
+        // Get the selected values from the request or use default
+        $periode = $request->periode ?? $nowYear;
+        $indicator = $request->indicator ?? '-1';
 
         // Validate the request inputs
         $validator = Validator::make($request->all(), [
@@ -198,32 +209,139 @@ class KpiController extends Controller
             'periode' => 'required'
         ]);
 
-        // Extract period dates from the request
-        $periode = $request->periode;
-        $kpi = $request->nilai_akhlak;
+        // Prepare the query with conditional filtering
+        $query = KPI::query();
 
-        // Get all akhlak points
-        $kpiPoin = KPI::all();
-
-        $pencapaianQuery = PencapaianKPI::query();
-
-        if ($periode != 1) {
-            $pencapaianQuery->where('periode_start', $periode);
+        // Apply indicator filter if a specific indicator is selected
+        if ($indicator != '-1') {
+            $query->where('id', $indicator);
         }
 
-        if ($kpi != 7) {
-            $pencapaianQuery->where('kpi_id', $kpi);
+        // Apply periode filter if a specific period is selected
+        if ($periode) {
+            $query->where('periode', $periode);
         }
 
-        $pencapaian = $pencapaianQuery->get();
+        // Fetch the filtered KPIs
+        $kpis = $query->get();
 
+        $allKPI = KPI::all();
+
+        $data = [];
+        $overallKPI = [
+            'Q1' => 0,
+            'Q2' => 0,
+            'Q3' => 0,
+            'Q4' => 0,
+        ];
+
+        $indicatorCount = 0;
+
+        foreach ($kpis as $kpi) {
+            $pencapaianData = PencapaianKPI::where('kpi_id', $kpi->id)->orderBy('periode_start', 'asc')->get();
+
+            // Initialize quarters with zero values
+            $quarters = [
+                'Q1' => ['Tercapai' => 0, '%' => 0],
+                'Q2' => ['Tercapai' => 0, '%' => 0],
+                'Q3' => ['Tercapai' => 0, '%' => 0],
+                'Q4' => ['Tercapai' => 0, '%' => 0],
+            ];
+
+            // Group scores by quarters
+            foreach ($pencapaianData as $pencapaian) {
+                switch ($pencapaian->quarter_id) {
+                    case 1:
+                        $quarters['Q1']['Tercapai'] += $pencapaian->score;
+                        break;
+                    case 2:
+                        $quarters['Q2']['Tercapai'] += $pencapaian->score;
+                        break;
+                    case 3:
+                        $quarters['Q3']['Tercapai'] += $pencapaian->score;
+                        break;
+                    case 4:
+                        $quarters['Q4']['Tercapai'] += $pencapaian->score;
+                        break;
+                }
+            }
+
+            // Calculate percentages based on the target
+            foreach ($quarters as $key => $quarter) {
+                $quarters[$key]['%'] = $kpi->target > 0 ? min(($quarter['Tercapai'] / ($kpi->target / 4)) * 100, 100) : 0;
+            }
+
+            // Store the data in the $data array
+            $data[$kpi->indicator] = $quarters;
+
+            // Sum up percentages for overall KPI calculation
+            $overallKPI['Q1'] += $quarters['Q1']['%'];
+            $overallKPI['Q2'] += $quarters['Q2']['%'];
+            $overallKPI['Q3'] += $quarters['Q3']['%'];
+            $overallKPI['Q4'] += $quarters['Q4']['%'];
+            $indicatorCount++;
+        }
+
+        // Calculate average percentages for overall KPI
+        if ($indicatorCount > 0) {
+            $overallKPI['Q1'] /= $indicatorCount;
+            $overallKPI['Q2'] /= $indicatorCount;
+            $overallKPI['Q3'] /= $indicatorCount;
+            $overallKPI['Q4'] /= $indicatorCount;
+        }
+
+        $kpiChartsData = [];
+        foreach ($kpis as $kpi) {
+            $weeklyScores = [];
+
+            foreach ($kpi->pencapaian()->orderBy('periode_start', 'asc')->get() as $pencapaian) {
+                $periodeStart = \Carbon\Carbon::parse($pencapaian->periode_start)->startOfWeek();
+                $periodeEnd = \Carbon\Carbon::parse($pencapaian->periode_end);
+
+                for ($date = $periodeStart; $date->lte($periodeEnd); $date->addWeek()) {
+                    $weekStart = $date->timestamp * 1000; // CanvasJS uses timestamp in milliseconds
+                    if (!isset($weeklyScores[$weekStart])) {
+                        $weeklyScores[$weekStart] = 0;
+                    }
+                    $weeklyScores[$weekStart] += $pencapaian->score;
+                }
+            }
+
+            $dataPoints = [];
+            foreach ($weeklyScores as $weekStart => $score) {
+                $dataPoints[] = ['x' => $weekStart, 'y' => $score];
+            }
+
+            $target = $kpi->target;
+
+            $kpiChartsData[] = [
+                'kpi_id' => $kpi->id,
+                'kpiName' => $kpi->indicator,
+                'kpiTarget' => $target,
+                'dataPoints' => $dataPoints
+            ];
+        }
+
+
+        $dataProgress = $kpis->map(function ($kpi){
+            $target = $kpi->target;
+            $kpiTarget = $target;
+            $tercapai = $kpi->pencapaian->sum('score');
+            return $kpiTarget > 0 ? min(($tercapai / $kpiTarget) * 100, 100) : 0;
+        })->toArray();
+
+        $overallProgress = count($dataProgress) > 0 ? array_sum($dataProgress) / count($dataProgress) : 0;
+
+        // Render the view as HTML for preview
         return view('kpi-view.admin.report', [
-            'pencapaian' => $pencapaian,
             'yearsBefore' => $yearsBefore,
             'periode' => $periode,
-            'kpiSelected' => $kpi,
-            'kpiPoin' => $kpiPoin,
-            'periode' => $periode
+            'kpis' => $allKPI,
+            'data' => $data,
+            'overallKPI' => $overallKPI,
+            'kpiChartsData' => $kpiChartsData,
+            'kpiSelected' => $indicator,
+            'overallProgress' => round($overallProgress, 2)
         ]);
     }
 
@@ -232,12 +350,14 @@ class KpiController extends Controller
         $request->validate([
             'kpi' => 'required',
             'target' => 'required',
+            'goal' => 'required',
             'periode' => 'required'
         ]);
 
         $kpi = new KPI();
         $kpi->indicator = $request->input('kpi');
         $kpi->target = $request->input('target');
+        $kpi->goal = $request->input('goal');
         $kpi->periode = $request->input('periode');
         $kpi->save();
 
@@ -249,7 +369,7 @@ class KpiController extends Controller
         // Validate the request data
         $request->validate([
             'pencapaian' => 'required|string|max:255',
-            'score' => 'required|integer',
+            'score' => 'required',
             'daterange' => 'required|string',
         ]);
 
@@ -258,12 +378,15 @@ class KpiController extends Controller
         $periode_start = Carbon::createFromFormat('m/d/Y', trim($daterange[0]))->format('Y-m-d');
         $periode_end = Carbon::createFromFormat('m/d/Y', trim($daterange[1]))->format('Y-m-d');
 
+        $Quarter = $this->getQuarter($periode_start);
+
         // Create a new record in the kpi_pencapaian table
         PencapaianKPI::create([
             'pencapaian' => $request->pencapaian,
-            'score' => $request->score,
+            'score' => preg_replace('/[^0-9]/', '', $request->score),
             'periode_start' => $periode_start,
             'periode_end' => $periode_end,
+            'quarter_id' => $Quarter,
             'kpi_id' => $kpi_id,
             'user_id' => auth()->id(), // assuming the user is authenticated
         ]);
@@ -272,6 +395,20 @@ class KpiController extends Controller
         return redirect()->back()->with('success', 'Pencapaian KPI berhasil ditambahkan!');
     }
 
+    private function getQuarter($date)
+    {
+        $month = Carbon::parse($date)->month;
+
+        if ($month >= 1 && $month <= 3) {
+            return 1; // Q1: January - March
+        } elseif ($month >= 4 && $month <= 6) {
+            return 2; // Q2: April - June
+        } elseif ($month >= 7 && $month <= 9) {
+            return 3; // Q3: July - September
+        } else {
+            return 4; // Q4: October - December
+        }
+    }
     // Other resource methods (index, show, etc.) can be here
 
     /**
@@ -295,5 +432,155 @@ class KpiController extends Controller
         $kpi->delete();
 
         return redirect()->back()->with('success', 'Pencapaian KPI deleted successfully');
+    }
+
+    public function downloadPdf(Request $request)
+    {
+        // Determine the current year and generate the range of years
+        $nowYear = date('Y');
+        $yearsBefore = range($nowYear - 4, $nowYear);
+
+        // Get the selected values from the request or use default
+        $periode = $request->input('periodeInput') ?? $nowYear;
+        $indicator = $request->input('kpiInput') ?? '-1';
+
+        // Prepare the query with conditional filtering
+        $query = KPI::query();
+
+        // Apply indicator filter if a specific indicator is selected
+        if ($indicator != '-1') {
+            $query->where('id', $indicator);
+        }
+
+        // Apply periode filter if a specific period is selected
+        if ($periode) {
+            $query->where('periode', $periode);
+        }
+
+        // Fetch the filtered KPIs
+        $kpis = $query->get();
+
+        $dataProgress = $kpis->map(function ($kpi){
+            $target = $kpi->target;
+            $kpiTarget = $target;
+            $tercapai = $kpi->pencapaian->sum('score');
+            return $kpiTarget > 0 ? min(($tercapai / $kpiTarget) * 100, 100) : 0;
+        })->toArray();
+
+        $overallProgress = count($dataProgress) > 0 ? array_sum($dataProgress) / count($dataProgress) : 0;
+
+        $chartImage = $request->input('chartImage'); // Get the chart image data from the request
+
+        // Your table data and other necessary data for the report
+
+        $data = [];
+        $overallKPI = [
+            'Q1' => 0,
+            'Q2' => 0,
+            'Q3' => 0,
+            'Q4' => 0,
+        ];
+
+        $indicatorCount = 0;
+
+        foreach ($kpis as $kpi) {
+            $pencapaianData = PencapaianKPI::where('kpi_id', $kpi->id)->orderBy('periode_start', 'asc')->get();
+
+            // Initialize quarters with zero values
+            $quarters = [
+                'Q1' => ['Tercapai' => 0, '%' => 0],
+                'Q2' => ['Tercapai' => 0, '%' => 0],
+                'Q3' => ['Tercapai' => 0, '%' => 0],
+                'Q4' => ['Tercapai' => 0, '%' => 0],
+            ];
+
+            // Group scores by quarters
+            foreach ($pencapaianData as $pencapaian) {
+                switch ($pencapaian->quarter_id) {
+                    case 1:
+                        $quarters['Q1']['Tercapai'] += $pencapaian->score;
+                        break;
+                    case 2:
+                        $quarters['Q2']['Tercapai'] += $pencapaian->score;
+                        break;
+                    case 3:
+                        $quarters['Q3']['Tercapai'] += $pencapaian->score;
+                        break;
+                    case 4:
+                        $quarters['Q4']['Tercapai'] += $pencapaian->score;
+                        break;
+                }
+            }
+
+            // Calculate percentages based on the target
+            foreach ($quarters as $key => $quarter) {
+                $quarters[$key]['%'] = $kpi->target > 0 ? min(($quarter['Tercapai'] / ($kpi->target / 4)) * 100, 100) : 0;
+            }
+
+            // Store the data in the $data array
+            $data[$kpi->indicator] = $quarters;
+
+            // Sum up percentages for overall KPI calculation
+            $overallKPI['Q1'] += $quarters['Q1']['%'];
+            $overallKPI['Q2'] += $quarters['Q2']['%'];
+            $overallKPI['Q3'] += $quarters['Q3']['%'];
+            $overallKPI['Q4'] += $quarters['Q4']['%'];
+            $indicatorCount++;
+        }
+
+        // Calculate average percentages for overall KPI
+        if ($indicatorCount > 0) {
+            $overallKPI['Q1'] /= $indicatorCount;
+            $overallKPI['Q2'] /= $indicatorCount;
+            $overallKPI['Q3'] /= $indicatorCount;
+            $overallKPI['Q4'] /= $indicatorCount;
+        }
+
+        $kpiChartsData = [];
+        foreach ($kpis as $kpi) {
+            $weeklyScores = [];
+
+            foreach ($kpi->pencapaian()->orderBy('periode_start', 'asc')->get() as $pencapaian) {
+                $periodeStart = \Carbon\Carbon::parse($pencapaian->periode_start)->startOfWeek();
+                $periodeEnd = \Carbon\Carbon::parse($pencapaian->periode_end);
+
+                for ($date = $periodeStart; $date->lte($periodeEnd); $date->addWeek()) {
+                    $weekStart = $date->timestamp * 1000; // CanvasJS uses timestamp in milliseconds
+                    if (!isset($weeklyScores[$weekStart])) {
+                        $weeklyScores[$weekStart] = 0;
+                    }
+                    $weeklyScores[$weekStart] += $pencapaian->score;
+                }
+            }
+
+            $dataPoints = [];
+            foreach ($weeklyScores as $weekStart => $score) {
+                $dataPoints[] = ['x' => $weekStart, 'y' => $score];
+            }
+
+            $target = $kpi->target;
+
+            $kpiChartsData[] = [
+                'kpi_id' => $kpi->id,
+                'kpiName' => $kpi->indicator,
+                'kpiTarget' => $target,
+                'dataPoints' => $dataPoints
+            ];
+        }
+
+        // Create a view for the PDF
+        $pdfView = view('kpi-view.admin.report-pdf', compact('data', 'chartImage', 'overallProgress', 'overallKPI'))->render();
+
+        // Set options and create the PDF
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isRemoteEnabled', true);
+
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml($pdfView);
+        $dompdf->setPaper('A4', 'potrait');
+        $dompdf->render();
+
+        return $dompdf->stream('KPI_Report.pdf');
     }
 }

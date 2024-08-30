@@ -35,6 +35,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@3.9.0/dist/fullcalendar.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <!-- Fonts -->
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
@@ -159,7 +160,7 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-bar-chart-o"></i>KPI</a>
                         <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-kpi')">
                             <li><i class="fa fa-tachometer"></i><a href="{{ route('kpi') }}" class="@yield('kpi')">Dashboard</a></li>
-                            {{-- <li><i class="fa fa-cog"></i><a href="{{ route('manage-kpi') }}">Manage</a></li> --}}
+                            <li><i class="fa fa-cog"></i><a href="{{ route('manage-kpi') }}" class="@yield('manage-kpi')">Manage KPI</a></li>
                             <li><i class="fa fa-file"></i><a href="{{ route('report-kpi') }}" class="@yield('report-kpi')">Laporan</a></li>
                         </ul>
                     </li>

@@ -4,6 +4,14 @@
 active font-weight-bold
 @endsection
 
+@section('show-kpi')
+show
+@endsection
+
+@section('manage-kpi')
+font-weight-bold
+@endsection
+
 @section('content')
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
@@ -51,9 +59,9 @@ active font-weight-bold
                             <tr>
                                 <th>No.</th>
                                 <th>Indicator</th>
+                                <th>Goal</th>
                                 <th>Target</th>
-                                <th>Periode Start</th>
-                                <th>Periode End</th>
+                                <th>Periode</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -62,11 +70,11 @@ active font-weight-bold
                             <tr>
                                 <td>{{ $no++ }}</td>
                                 <td>{{ $item->indicator }}</td>
-                                <td>{{ $item->target }} %</td>
-                                <td>{{ $item->periode_start }}</td>
-                                <td>{{ $item->periode_end }}</td>
+                                <td>{{ $item->goal }}</td>
+                                <td>{{ $item->target }}</td>
+                                <td>{{ $item->periode }}</td>
                                 <td class="text-center">
-                                    <a href="{{ route('preview-kpi', ['id' => $item->id]) }}" class="btn btn-outline-secondary btn-sm mr-2"><i class="ti-eye"></i> Preview</a>
+                                    <a href="{{ route('preview-kpi', ['id' => $item->id]) }}" class="btn btn-outline-secondary btn-sm mr-2"><i class="fa fa-edit"></i> Edit</a>
                                     <a href="#" class="btn btn-outline-danger btn-sm btn-details" onclick="confirmDelete({{ $item->id }});"><i class="fa fa-ban"></i> Delete</a>
                                     <form id="delete-kpi-{{ $item->id }}" action="{{ route('kpi.destroy', $item->id) }}" method="POST" style="display: none;">
                                         @csrf
@@ -92,28 +100,29 @@ active font-weight-bold
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="post" action="{{ route('kpis.store') }}">
+            <form method="post" enctype="multipart/form-data" action="{{ route('kpis.store') }}">
                 @csrf
                 <div class="modal-body">
                     <div class="col-md-12 zoom90">
                         <div class="form-group">
                             <label for="kpi">KPI</label>
-                            <input type="text" class="form-control" id="kpi" name="kpi" placeholder="Average Test Score..." required>
+                            <input type="text" class="form-control" id="kpi" name="kpi" placeholder="Yearly Revenue..." required>
                         </div>
                         <div class="form-group">
-                            <label for="target">Target <small class="text-danger"><i>(in percentage)</i></small></label>
-                            <input type="text" class="form-control" id="target" name="target" placeholder="85%" required>
+                            <label for="target">Goal</label>
+                            <input type="text" class="form-control" id="goal" name="goal" placeholder="Gain new subscribers..." required>
                         </div>
                         <div class="form-group">
-                            <label for="period">Period</label>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <input type="date" class="form-control" id="period_start" name="period_start">
-                                </div>
-                                <div class="col-md-6">
-                                    <input type="date" class="form-control" id="period_end" name="period_end">
-                                </div>
-                            </div>
+                            <label for="target">Target</label>
+                            <input type="text" class="form-control" id="target" name="target" placeholder="1000" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="periode">Periode</label>
+                            <select class="form-control" id="periode" name="periode" required>
+                                @foreach (array_reverse($yearsBefore) as $year)
+                                    <option value="{{ $year }}">{{ $year }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -125,6 +134,7 @@ active font-weight-bold
         </div>
     </div>
 </div>
+
 <script>
     function confirmDelete(itemId) {
         event.preventDefault();
