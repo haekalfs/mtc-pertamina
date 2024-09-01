@@ -107,17 +107,15 @@ font-weight-bold
                         <div class="card-body">
                             <h5 class="card-title font-weight-bold">Realisasi Peserta</h5>
                             <div class="ml-2">
-                                <table class="table table-borderless table-sm mb-0">
-                                    @if(!$data->infografis_peserta || !$data->infografis_peserta || $data->infografis_peserta->isEmpty())
-                                        No Data Available
-                                    @else
-                                        @foreach ($data->infografis_peserta as $item)
-                                        <tr>
-                                            <td><i class="ti-minus mr-2"></i> {{ $item->nama_peserta }}</td>
-                                        </tr>
-                                        @endforeach
-                                    @endif
-                                </table>
+                                @if(!$data->infografis_peserta || !$data->infografis_peserta || $data->infografis_peserta->isEmpty())
+                                    No Data Available
+                                @else
+                                <ol class="ml-4" style="line-height:200%">
+                                    @foreach ($data->infografis_peserta as $item)
+                                        <li>{{ $item->nama_peserta }}</li>
+                                    @endforeach
+                                </ol>
+                                @endif
                             </div>
                         </div>
                     </div>

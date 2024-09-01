@@ -13,6 +13,16 @@ font-weight-bold
 @endsection
 
 @section('content')
+<style>
+.bg-login {
+    width: 100%;
+    background-image: url(./img/kilang-minyak.png);
+    background-size: cover;     /* Ensures the background image covers the entire area */
+    background-repeat: no-repeat; /* Prevents the background image from repeating */
+    background-position: center;  /* Centers the background image */
+    opacity: 0.9; /* Sets the opacity to 90% */
+}
+</style>
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
         <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-male"></i> Preview Instructor Biodata</h1>
@@ -50,150 +60,174 @@ font-weight-bold
     <strong>{{ $message }}</strong>
 </div>
 @endif
-<div class="row zoom90">
-    <div class="col-xl-12 col-lg-12">
-        <div class="card">
-            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> Biodata</h6>
-                <div class="text-right">
-                    <a class="btn btn-secondary btn-sm" href="{{ route('edit-instructor', $data->id) }}"><i class="menu-Logo fa fa-edit"></i></a>
-                </div>
-            </div>
-            <div class="card-body text-secondary">
-                <div class="col-md-12 mb-3">
-                    <div class="row">
-                        <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding-left: 1em;">
-                            <img src="{{ asset($data->imgFilepath) }}" style="height: 200px; width: 170px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
-                        </div>
-                        <div class="col-md-9">
-                            <h4 class="mb-2 font-weight-bold"><i class="fa fa-user"></i> Profile Instruktur</h4>
-                            <hr>
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <table class="table table-borderless table-sm">
-                                        <tr>
-                                            <th style="width: 200px;">Nama Instruktur</th>
-                                            <td style="text-align: start; font-weight:500">: <span class="ml-2">{{ $data->instructor_name }}</span></td>
-                                        </tr>
-                                        <tr>
-                                            <th>E-Mail Address</th>
-                                            <td style="text-align: start; font-weight:500">: <span class="ml-2">{{ $data->instructor_email }}</span></td>
-                                        </tr>
-                                        <tr>
-                                            <th>Tanggal Lahir / Umur</th>
-                                            <td style="text-align: start; font-weight:500">: <span class="ml-2">{{ $data->instructor_dob }} / {{ \Carbon\Carbon::parse($data->instructor_dob)->age}} Tahun</span></td>
-                                        </tr>
-                                        <tr>
-                                            <th>Address</th>
-                                            <td style="text-align: start; font-weight:500">: <span class="ml-2">{{ $data->instructor_address }}</span></td>
-                                        </tr>
-                                  </table>
-                                </div>
-                                <div class="col-md-4">
-                                    <table class="table table-borderless table-sm">
-                                        <tr>
-                                            <td style="text-align: end; font-size: 20px;">
-                                                @php
-                                                    $roundedScore = round($data->average_feedback_score, 1); // Round to one decimal place
-                                                    $wholeStars = floor($roundedScore);
-                                                    $halfStar = ($roundedScore - $wholeStars) >= 0.5;
-                                                @endphp
-
-                                                @for ($i = 0; $i < 5; $i++)
-                                                    @if ($i < $wholeStars)
-                                                        <i class="fa fa-star text-warning"></i>
-                                                    @elseif ($halfStar && $i == $wholeStars)
-                                                        <i class="fa fa-star-half-o text-warning"></i>
-                                                    @else
-                                                        <i class="fa fa-star-o text-warning"></i>
-                                                    @endif
-                                                @endfor
-                                                {{ $roundedScore ?? '-' }}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style="text-align: end; font-size: 20px;">
-                                                {{ $data->working_hours }}
-                                            </td>
-                                        </tr>
-                                  </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 <div class="animated fadeIn zoom90">
     <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-certificate"></i> Attachments</h6>
-                    <div class="text-right">
-                        {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Add Utilities</a> --}}
+        <div class="col-lg-8">
+            <section class="card">
+                <div class="twt-feed bg-login" style="background-image: url('{{ asset('img/kilang-minyak.png') }}');">
+                    <div class="corner-ribon black-ribon">
+                        {{-- <i class="fa fa-twitter"></i> --}}
+                    </div>
+                    <div class="media ml-4">
+                        <a href="#">
+                            @if($data->imgFilepath)
+                            <img class="align-self-center rounded-circle mr-3" style="width:85px; height:85px;" alt="" src="{{ asset($data->imgFilepath) }}">
+                            @else
+                            <div class="align-self-center rounded-circle mr-3"><i class="no-image-text">No Image Available</i></div>
+                            @endif
+                        </a>
+                        <div class="media-body">
+                            <h2 class="text-white display-6">{{ $data->instructor_name }}</h2>
+                            <p class="text-light">
+                                @php
+                                    $roundedScore = round($data->average_feedback_score, 1); // Round to one decimal place
+                                    $wholeStars = floor($roundedScore);
+                                    $halfStar = ($roundedScore - $wholeStars) >= 0.5;
+                                @endphp
+
+                                @for ($i = 0; $i < 5; $i++)
+                                    @if ($i < $wholeStars)
+                                        <i class="fa fa-star text-warning"></i>
+                                    @elseif ($halfStar && $i == $wholeStars)
+                                        <i class="fa fa-star-half-o text-warning"></i>
+                                    @else
+                                        <i class="fa fa-star-o text-warning"></i>
+                                    @endif
+                                @endfor
+                                {{ $roundedScore ?? '-' }}
+                            </p>
+                        </div>
                     </div>
                 </div>
-                <div class="card-body mb-4">
+                <div class="row mt-4 mb-2 text-center">
+                    <div class="col-md-6">
+                        <a type="button" data-toggle="modal" data-target="#updateHour" href="#"><i class="fa fa-plus"></i> Tambah Jam Mengajar</a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="{{ route('edit-instructor', $data->id) }}"><i class="fa fa-edit"></i> Update Data</a>
+                    </div>
+                </div>
+                <hr>
+                <div class="twt-write ml-5 mt-4 col-sm-12">
                     <div class="row">
-                        <div class="col-md-6">
-                            <h4 class="mb-3 card-title font-weight-bold">Attachments</h4>
-                            <div class="list-group mt-2">
-                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                    Curriculum Vitae
-                                    <a href="{{ asset($data->cvFilepath) }}" target="_blank" class="btn btn-primary btn-sm"><i class="fa fa-download fa-2x" style="font-size: 1.5em;"></i></a>
-                                </div>
-                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                    Ijazah
-                                    <a href="{{ asset($data->ijazahFilepath) }}" target="_blank" class="btn btn-primary btn-sm"><i class="fa fa-download fa-2x" style="font-size: 1.5em;"></i></a>
-                                </div>
-                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                    Dokumen Pendukung
-                                    <a href="{{ asset($data->documentPendukungFilepath) }}" target="_blank" class="btn btn-primary btn-sm"><i class="fa fa-download fa-2x" style="font-size: 1.5em;"></i></a>
-                                </div>
-                            </div>
+                        <div class="col-md-5">
+                            <label>Email</label>
                         </div>
-                        <div class="col-md-6">
-                            <h4 class="card-title font-weight-bold">@if($penlatId == '-1') All @else Qualified @endif Certificates</h4>
-                            <div class="ml-2">
-                                <table class="table table-borderless table-sm">
-                                    @php
-                                        $badgeColors = ['bg-success'];
-                                    @endphp
+                        <div class="col-md-7">
+                            <p>: {{ $data->instructor_email }}</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-5">
+                            <label>Umur</label>
+                        </div>
+                        <div class="col-md-7">
+                            <p>: {{ \Carbon\Carbon::parse($data->instructor_dob)->age}} Tahun</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-5">
+                            <label>Tanggal Lahir</label>
+                        </div>
+                        <div class="col-md-7">
+                            <p>: {{ $data->instructor_dob }}</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-5">
+                            <label>Address</label>
+                        </div>
+                        <div class="col-md-7">
+                            <p>: {{ $data->instructor_address }}</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-5">
+                            <label>Total Jam Mengajar</label>
+                        </div>
+                        <div class="col-md-7">
+                            <p>: {{ $data->working_hours }} Jam</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-5">
+                            <label>Curriculum Vitae</label>
+                        </div>
+                        <div class="col-md-7">
+                            <p>: <a href="{{ asset($data->cvFilepath) }}" target="_blank"><u><i class="fa fa-download"></i> Download </a></u></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-5">
+                            <label>Ijazah</label>
+                        </div>
+                        <div class="col-md-7">
+                            <p>: <a href="{{ asset($data->ijazahFilepath) }}" target="_blank"><u><i class="fa fa-download"></i> Download </a></u></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-5">
+                            <label>Dokumen Pendukung</label>
+                        </div>
+                        <div class="col-md-7">
+                            <p>: <a href="{{ asset($data->documentPendukungFilepath) }}" target="_blank"><u><i class="fa fa-download"></i> Download </a></u></p>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="row ml-2 mt-2 col-sm-12 mb-4">
+                    <div class="col-md-3 font-weight-bold">
+                        <label>Certificates : </label>
+                    </div>
+                    <div class="col-md-9 pl-0">
+                        <p>
+                            @php
+                                $badgeColors = ['bg-success'];
+                            @endphp
 
-                                    @foreach($certificateData as $index => $certificateItem)
-                                        <tr>
-                                            <td class="mb-2">
-                                                <i class="ti-minus mr-2"></i>
-                                                <span class="badge text-white p-2 {{ $badgeColors[$index % count($badgeColors)] }}">
-                                                    {{ $certificateItem->catalog->certificate_name }}
-                                                </span>
-                                                {{-- <span class="text-success"><i class="fa fa-check"></i></span> --}}
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </table>
-                            </div>
-                            <div class="ml-2">
-                                <table class="table table-borderless table-sm">
-                                    @php
-                                        $otherBadges = ['bg-secondary'];
-                                    @endphp
+                            @foreach($certificateData as $index => $certificateItem)
+                                @if ($certificateItem->catalog)
+                                    <span class="badge text-white p-2 mb-1 {{ $badgeColors[$index % count($badgeColors)] }}">
+                                        {{ $certificateItem->catalog->certificate_name }}
+                                    </span>
+                                @endif
+                            @endforeach
 
-                                    @foreach($remainingCerts as $index => $certs)
-                                        <tr>
-                                            <td class="mb-2">
-                                                <i class="ti-minus mr-2"></i>
-                                                <span class="badge text-white p-2 {{ $otherBadges[$index % count($otherBadges)] }}">
-                                                    {{ $certs->catalog->certificate_name }}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </table>
-                            </div>
+                            @php
+                                $otherBadges = ['bg-secondary'];
+                            @endphp
+
+                            @foreach($remainingCerts as $index => $certs)
+                                @if ($certs->catalog)
+                                    <span class="badge text-white p-2 mb-1 {{ $otherBadges[$index % count($otherBadges)] }}">
+                                        {{ $certs->catalog->certificate_name }}
+                                    </span>
+                                @endif
+                            @endforeach
+                        </p>
+                    </div>
+                    <ul class="ml-4">
+                        <li class="text-success">Green = Qualified Certificates for selected Penlat.</li>
+                        <li class="text-secondary">Grey = Other certificates owned by instructor.</li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+        <div class="col-xl-4 col-lg-4">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <span class="text-danger font-weight-bold">Instructor Data Verification</span>
+                        </div>
+                        <div class="card-body" style="background-color: rgb(247, 247, 247);">
+                            <h6 class="h6 mb-2 font-weight-bold text-gray-800">General Guidelines</h6>
+                            <ul class="ml-4">
+                                <li>Ensure all user data is accurately updated in accordance with company policies.</li>
+                                <li>Verify and validate user information to maintain data integrity.</li>
+                                <li>Unauthorized modifications to user records are strictly prohibited.</li>
+                                <li>Double-check user details for completeness and correctness before saving changes.</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -201,6 +235,59 @@ font-weight-bold
         </div>
     </div>
 </div>
+<div class="modal fade" id="updateHour" tabindex="-1" role="dialog" aria-labelledby="modalSign" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+            <div class="modal-header d-flex flex-row align-items-center justify-content-between border-bottom-1">
+				<h5 class="modal-title m-0 font-weight-bold text-secondary" id="exampleModalLabel">Update Instructor Working Hours</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+            <form method="POST" action="{{ route('instructor.update.hours', $data->id) }}">
+                @csrf
+                <div class="modal-body">
+                    <div class="col-md-12 zoom90">
+                        <div class="d-flex align-items-center mb-4">
+                            <div style="width: 140px;" class="mr-2">
+                                <p style="margin: 0;">Update Hours :</p>
+                            </div>
+                            <div class="flex-grow-1 ml-4">
+                                <div class="counter">
+                                    <span class="down" onclick='decreaseCount(event, this)'><i class="fa fa-minus text-danger"></i></span>
+                                    <input class="form-control" name="working_hours" type="text" value="{{ $data->working_hours }}">
+                                    <span class="up" onclick='increaseCount(event, this)'><i class="fa fa-plus text-success"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+		</div>
+	</div>
+</div>
+<script>
+function increaseCount(a, b) {
+  var input = b.previousElementSibling;
+  var value = parseInt(input.value, 10);
+  value = isNaN(value) ? 0 : value;
+  value++;
+  input.value = value;
+}
 
+function decreaseCount(a, b) {
+  var input = b.nextElementSibling;
+  var value = parseInt(input.value, 10);
+  if (value > 1) {
+    value = isNaN(value) ? 0 : value;
+    value--;
+    input.value = value;
+  }
+}
+</script>
 @endsection
 

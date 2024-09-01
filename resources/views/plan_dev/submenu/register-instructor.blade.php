@@ -97,7 +97,7 @@ font-weight-bold
                         </div>
                         <div class="row form-group">
                             <div class="col col-md-3"><label for="working_hour" class=" form-control-label">Jam Mengajar</label></div>
-                            <div class="col-12 col-md-9"><input type="text" id="working_hour" name="working_hour" placeholder="Jam Mengajar" class="form-control"></div>
+                            <div class="col-12 col-md-9"><input type="number" id="working_hour" name="working_hour" placeholder="Jam Mengajar" class="form-control"></div>
                         </div>
                         <div class="row form-group">
                             <div class="col col-md-3"><label for="user_status" class=" form-control-label">Instructor Status</label></div>

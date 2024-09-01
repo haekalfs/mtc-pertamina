@@ -69,6 +69,7 @@ font-weight-bold
     <strong>{{ $message }}</strong>
 </div>
 @endif
+@if($kpis->isNotEmpty())
 <section>
     <div class="indicators">
         @foreach ($kpis as $kpi)
@@ -98,6 +99,18 @@ font-weight-bold
         @endforeach
     </div>
 </section>
+@else
+<div class="alert alert-warning alert-block">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>
+        <h5 class="mb-2">KPI for this year is not exist, please create the indicator in <a href="{{ route('manage-kpi') }}"><u>Manage KPI</u></a> menu or if you want to create the indicators same as before, click below!</h5>
+        <form id="duplicateKpisForm" method="POST" action="{{ route('kpis.duplicate', $yearSelected) }}">
+            @csrf
+            <button type="button" class="btn btn-primary btn-sm" onclick="confirmDuplicate()">Duplicate KPIs for {{ $yearSelected }}</button>
+        </form>
+    </strong>
+</div>
+@endif
 <div class="animated fadeIn">
     <div class="row">
         <div class="col-md-12">
@@ -208,12 +221,6 @@ font-weight-bold
                             @endforeach
                         </tbody>
                     </table>
-                    <div class="text-right mb-4">
-                        {{-- button or else --}}
-                        <small><i class="ti-fullscreen"></i>
-                            <a href="#" onclick="toggleFullScreen('mainContainer')">&nbsp;<i>Fullscreen</i></a>
-                        </small>
-                    </div>
                 </div>
             </div>
         </div>
@@ -307,6 +314,22 @@ font-weight-bold
     });
 </script>
 <script type="text/javascript">
+function confirmDuplicate() {
+    swal({
+        title: "Are you sure?",
+        text: "Do you want to duplicate the KPIs for {{ $yearSelected }}?",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+    })
+    .then((willDuplicate) => {
+        if (willDuplicate) {
+            document.getElementById('duplicateKpisForm').submit();
+        } else {
+            swal("Your KPIs were not duplicated.");
+        }
+    });
+}
 const kpiChartsData = {!! json_encode($kpiChartsData, JSON_NUMERIC_CHECK) !!};
 
 window.onload = function() {

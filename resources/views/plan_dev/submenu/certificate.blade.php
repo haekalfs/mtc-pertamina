@@ -197,7 +197,6 @@ font-weight-bold
         </div>
     </div>
 </div>
-
 <script>
 $(document).ready(function() {
     var table = $('#listIssuedCertificates').DataTable({

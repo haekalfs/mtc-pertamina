@@ -70,19 +70,19 @@ font-weight-bold
                             <table class="table table-borderless table-sm">
                                 <tr>
                                     <th style="width: 200px;">Nama Ruangan</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $data->room_name }}</td>
+                                    <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $data->room_name }}</span></td>
                                 </tr>
                                 <tr>
                                     <th style="width: 200px;">Lokasi</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $data->location->description }}</td>
+                                    <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $data->location->description }}</span></td>
                                 </tr>
                                 <tr>
                                     <th>Jumlah Asset</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $data->list->sum('amount') }} Items</td>
+                                    <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $data->list->sum('amount') }} Items</span></td>
                                 </tr>
                                 <tr>
                                     <th>Last Updated At</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $data->updated_at }}</td>
+                                    <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $data->updated_at }}</span></td>
                                 </tr>
                             </table>
                         </div>

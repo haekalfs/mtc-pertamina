@@ -19,7 +19,11 @@ font-weight-bold
         <p class="mb-4">Managing Access based on roles.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
-        {{-- <a class="btn btn-secondary btn-sm shadow-sm mr-2" href="/invoicing/list"><i class="fas fa-solid fa-backward fa-sm text-white-50"></i> Go Back</a> --}}
+        <select class="form-control" id="yearSelected" name="yearSelected" required onchange="redirectToPage()" style="width: 100px;">
+            @foreach (array_reverse($yearsBefore) as $year)
+                <option value="{{ $year }}" {{ $year == $yearSelected ? 'selected' : '' }}>{{ $year }}</option>
+            @endforeach
+        </select>
     </div>
 </div>
 @if ($message = Session::get('success'))
@@ -74,7 +78,7 @@ font-weight-bold
                                 <td>{{ $item->target }}</td>
                                 <td>{{ $item->periode }}</td>
                                 <td class="text-center">
-                                    <a href="{{ route('preview-kpi', ['id' => $item->id]) }}" class="btn btn-outline-secondary btn-sm mr-2"><i class="fa fa-edit"></i> Edit</a>
+                                    {{-- <a href="{{ route('preview-kpi', ['id' => $item->id]) }}" class="btn btn-outline-secondary btn-sm mr-2"><i class="fa fa-edit"></i> Edit</a> --}}
                                     <a href="#" class="btn btn-outline-danger btn-sm btn-details" onclick="confirmDelete({{ $item->id }});"><i class="fa fa-ban"></i> Delete</a>
                                     <form id="delete-kpi-{{ $item->id }}" action="{{ route('kpi.destroy', $item->id) }}" method="POST" style="display: none;">
                                         @csrf
@@ -120,7 +124,7 @@ font-weight-bold
                             <label for="periode">Periode</label>
                             <select class="form-control" id="periode" name="periode" required>
                                 @foreach (array_reverse($yearsBefore) as $year)
-                                    <option value="{{ $year }}">{{ $year }}</option>
+                                    <option value="{{ $year }}" {{ $year == $yearSelected ? 'selected' : '' }}>{{ $year }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -136,19 +140,24 @@ font-weight-bold
 </div>
 
 <script>
-    function confirmDelete(itemId) {
-        event.preventDefault();
-        swal({
-            title: "Are you sure?",
-            text: "Once deleted, you will not be able to recover this KPI!",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true,
-        }).then((willDelete) => {
-            if (willDelete) {
-                document.getElementById('delete-kpi-' + itemId).submit();
-            }
-        });
-    }
+function redirectToPage() {
+    var selectedOption = document.getElementById("yearSelected").value;
+    var url = "{{ url('/key-performance-indicators/manage-items') }}" + "/" + selectedOption;
+    window.location.href = url; // Redirect to the desired page
+}
+function confirmDelete(itemId) {
+    event.preventDefault();
+    swal({
+        title: "Are you sure?",
+        text: "Once deleted, you will not be able to recover this KPI!",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+    }).then((willDelete) => {
+        if (willDelete) {
+            document.getElementById('delete-kpi-' + itemId).submit();
+        }
+    });
+}
 </script>
 @endsection

@@ -55,7 +55,7 @@ font-weight-bold
         <div class="card-body">
             <div class="row">
                 <div class="col-md-3">
-                    <section class="shadow bg-secondary">
+                    <section>
                         <div class="indicators">
                             <div class="indicator">
                                 <div class="indicator__name">{{ $kpiItem->indicator }}</div>

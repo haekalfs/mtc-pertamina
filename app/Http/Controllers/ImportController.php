@@ -10,6 +10,7 @@ use App\Jobs\ImportVendorPayment;
 use App\Jobs\ProfitsImport;
 use App\Models\Infografis_peserta;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
@@ -22,14 +23,20 @@ class ImportController extends Controller
 {
     public function import(Request $request)
     {
-        // Validate and upload the file as before
+        // Validate and upload the file
         $validator = Validator::make($request->all(), [
-            'file' => 'required|file',
+            'file' => 'required|file|mimes:xlsx|max:40960', // Accept only XLSX files and limit size to 50 MB (40960 KB)
+        ], [
+            'file.required' => 'Error: The file is required.',
+            'file.file' => 'Error: The uploaded file must be a valid file.',
+            'file.mimes' => 'Error: The file must be an XLSX file.',
+            'file.max' => 'Error: The file size must be less than 50 MB.',
         ]);
 
         if ($validator->fails()) {
-            Session::flash('failed', "Error: Invalid file type.");
-            return redirect('/operation/participant-infographics/import-page');
+            $messages = $validator->errors()->all(); // Get all error messages
+            Session::flash('failed', implode(' ', $messages)); // Combine them into a single string
+            return redirect()->route('participant-infographics-import-page')->withInput();
         }
 
         $file = $request->file('file');
@@ -43,6 +50,11 @@ class ImportController extends Controller
             // Dispatch the job
             ImportParticipantInfographics::dispatch($filePath);
 
+            // Set a cache indicating the job is processing, if it doesn't already exist
+            if (!Cache::has('jobs_processing')) {
+                Cache::put('jobs_processing', true, now()->addMinutes(10)); // Cache for 10 minutes
+            }
+
             return redirect()->back()->with('success', 'Data import started successfully, please wait until the data is all processed.');
         } catch (\Exception $e) {
             Session::flash('failed', 'Error dispatching the job: ' . $e->getMessage());
@@ -52,14 +64,19 @@ class ImportController extends Controller
 
     public function import_profits(Request $request)
     {
-        // Validate and upload the file
         $validator = Validator::make($request->all(), [
-            'file' => 'required',
+            'file' => 'required|file|mimes:xlsx|max:40960', // Accept only XLSX files and limit size to 50 MB (40960 KB)
+        ], [
+            'file.required' => 'Error: The file is required.',
+            'file.file' => 'Error: The uploaded file must be a valid file.',
+            'file.mimes' => 'Error: The file must be an XLSX file.',
+            'file.max' => 'Error: The file size must be less than 50 MB.',
         ]);
 
         if ($validator->fails()) {
-            Session::flash('failed', "Error: Invalid file type.");
-            return redirect('/dashboard');
+            $messages = $validator->errors()->all(); // Get all error messages
+            Session::flash('failed', implode(' ', $messages)); // Combine them into a single string
+            return redirect()->route('costs.import')->withInput();
         }
 
         $file = $request->file('file');
@@ -72,6 +89,10 @@ class ImportController extends Controller
         try {
             // Dispatch the job
             ProfitsImport::dispatch($filePath);
+            // Set a cache indicating the job is processing, if it doesn't already exist
+            if (!Cache::has('jobs_processing')) {
+                Cache::put('jobs_processing', true, now()->addMinutes(10)); // Cache for 10 minutes
+            }
 
             return redirect()->back()->with('success', 'Data import started successfully, please wait until the data is all processed.');
         } catch (\Exception $e) {
@@ -82,14 +103,19 @@ class ImportController extends Controller
 
     public function import_penlat(Request $request)
     {
-        // Validate and upload the file
         $validator = Validator::make($request->all(), [
-            'file' => 'required',
+            'file' => 'required|file|mimes:xlsx|max:40960', // Accept only XLSX files and limit size to 50 MB (40960 KB)
+        ], [
+            'file.required' => 'Error: The file is required.',
+            'file.file' => 'Error: The uploaded file must be a valid file.',
+            'file.mimes' => 'Error: The file must be an XLSX file.',
+            'file.max' => 'Error: The file size must be less than 50 MB.',
         ]);
 
         if ($validator->fails()) {
-            Session::flash('failed', "Error: Invalid file type.");
-            return redirect()->route('penlat');
+            $messages = $validator->errors()->all(); // Get all error messages
+            Session::flash('failed', implode(' ', $messages)); // Combine them into a single string
+            return redirect()->route('penlat-import')->withInput();
         }
 
         $file = $request->file('file');
@@ -102,6 +128,10 @@ class ImportController extends Controller
         try {
             // Dispatch the job
             ImportPenlat::dispatch($filePath);
+            // Set a cache indicating the job is processing, if it doesn't already exist
+            if (!Cache::has('jobs_processing')) {
+                Cache::put('jobs_processing', true, now()->addMinutes(10)); // Cache for 10 minutes
+            }
 
             return redirect()->back()->with('success', 'Data import started successfully, please wait until the data is all processed.');
         } catch (\Exception $e) {
@@ -114,12 +144,18 @@ class ImportController extends Controller
     {
         // Validate and upload the file
         $validator = Validator::make($request->all(), [
-            'file' => 'required',
+            'file' => 'required|file|mimes:xlsx|max:40960', // Accept only XLSX files and limit size to 50 MB (40960 KB)
+        ], [
+            'file.required' => 'Error: The file is required.',
+            'file.file' => 'Error: The uploaded file must be a valid file.',
+            'file.mimes' => 'Error: The file must be an XLSX file.',
+            'file.max' => 'Error: The file size must be less than 50 MB.',
         ]);
 
         if ($validator->fails()) {
-            Session::flash('failed', "Error: Invalid file type.");
-            return redirect()->route('penlat');
+            $messages = $validator->errors()->all(); // Get all error messages
+            Session::flash('failed', implode(' ', $messages)); // Combine them into a single string
+            return redirect()->route('feedback-report-import-page')->withInput();
         }
 
         $file = $request->file('file');
@@ -132,6 +168,10 @@ class ImportController extends Controller
         try {
             // Dispatch the job
             ImportFeedback::dispatch($filePath);
+            // Set a cache indicating the job is processing, if it doesn't already exist
+            if (!Cache::has('jobs_processing')) {
+                Cache::put('jobs_processing', true, now()->addMinutes(10)); // Cache for 10 minutes
+            }
 
             return redirect()->back()->with('success', 'Data import started successfully, please wait until the data is all processed.');
         } catch (\Exception $e) {
@@ -144,12 +184,18 @@ class ImportController extends Controller
     {
         // Validate and upload the file
         $validator = Validator::make($request->all(), [
-            'file' => 'required',
+            'file' => 'required|file|mimes:xlsx|max:40960', // Accept only XLSX files and limit size to 50 MB (40960 KB)
+        ], [
+            'file.required' => 'Error: The file is required.',
+            'file.file' => 'Error: The uploaded file must be a valid file.',
+            'file.mimes' => 'Error: The file must be an XLSX file.',
+            'file.max' => 'Error: The file size must be less than 50 MB.',
         ]);
 
         if ($validator->fails()) {
-            Session::flash('failed', "Error: Invalid file type.");
-            return redirect()->route('penlat');
+            $messages = $validator->errors()->all(); // Get all error messages
+            Session::flash('failed', implode(' ', $messages)); // Combine them into a single string
+            return redirect()->route('vendor-payment-importer')->withInput();
         }
 
         $file = $request->file('file');
@@ -162,6 +208,10 @@ class ImportController extends Controller
         try {
             // Dispatch the job
             ImportVendorPayment::dispatch($filePath);
+            // Set a cache indicating the job is processing, if it doesn't already exist
+            if (!Cache::has('jobs_processing')) {
+                Cache::put('jobs_processing', true, now()->addMinutes(10)); // Cache for 10 minutes
+            }
 
             return redirect()->back()->with('success', 'Data import started successfully, please wait until the data is all processed.');
         } catch (\Exception $e) {
@@ -174,12 +224,18 @@ class ImportController extends Controller
     {
         // Validate and upload the file
         $validator = Validator::make($request->all(), [
-            'file' => 'required',
+            'file' => 'required|file|mimes:xlsx|max:40960', // Accept only XLSX files and limit size to 50 MB (40960 KB)
+        ], [
+            'file.required' => 'Error: The file is required.',
+            'file.file' => 'Error: The uploaded file must be a valid file.',
+            'file.mimes' => 'Error: The file must be an XLSX file.',
+            'file.max' => 'Error: The file size must be less than 50 MB.',
         ]);
 
         if ($validator->fails()) {
-            Session::flash('failed', "Error: Invalid file type.");
-            return redirect()->route('penlat');
+            $messages = $validator->errors()->all(); // Get all error messages
+            Session::flash('failed', implode(' ', $messages)); // Combine them into a single string
+            return redirect()->route('feedback-mtc-import-page')->withInput();
         }
 
         $file = $request->file('file');
@@ -192,6 +248,10 @@ class ImportController extends Controller
         try {
             // Dispatch the job
             ImportFeedbackMTC::dispatch($filePath);
+            // Set a cache indicating the job is processing, if it doesn't already exist
+            if (!Cache::has('jobs_processing')) {
+                Cache::put('jobs_processing', true, now()->addMinutes(10)); // Cache for 10 minutes
+            }
 
             return redirect()->back()->with('success', 'Data import started successfully, please wait until the data is all processed.');
         } catch (\Exception $e) {

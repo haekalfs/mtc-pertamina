@@ -7,6 +7,7 @@ use App\Models\Infografis_peserta;
 use App\Models\Profit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -54,6 +55,7 @@ class DashboardController extends Controller
         '))
         ->value('average_score');
 
+        // Cache::forget('jobs_processing');
         return view('dashboard', ['headline' => $headline, 'getPesertaCount' => $getPesertaCount, 'countCampaign' => $countCampaign, 'rawProfits' => $rawProfits, 'averageFeedbackScore' => $averageFeedbackScore]);
     }
 }

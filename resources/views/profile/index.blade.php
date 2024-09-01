@@ -26,21 +26,11 @@ active font-weight-bold
     <strong>{{ $message }}</strong>
 </div>
 @endif
-<style>
-.bg-login {
-    width: 100%;
-    background-image: url(../img/kilang-minyak.png);
-    background-size: cover;     /* Ensures the background image covers the entire area */
-    background-repeat: no-repeat; /* Prevents the background image from repeating */
-    background-position: center;  /* Centers the background image */
-    opacity: 0.9; /* Sets the opacity to 90% */
-}
-</style>
 <div class="animated fadeIn zoom90">
     <div class="row">
         <div class="col-lg-8">
             <section class="card">
-                <div class="twt-feed bg-login">
+                <div class="twt-feed bg-login" style="background-image: url('{{ asset('img/kilang-minyak.png') }}');">
                     <div class="corner-ribon black-ribon">
                         {{-- <i class="fa fa-twitter"></i> --}}
                     </div>

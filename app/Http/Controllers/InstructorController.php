@@ -237,4 +237,22 @@ class InstructorController extends Controller
         // Return a success response
         return response()->json(['success' => 'Instructor, related certificates, and files deleted successfully.']);
     }
+
+    public function update_hours(Request $request, $id)
+    {
+        // Validate the input
+        $request->validate([
+            'working_hours' => 'required|numeric|min:0', // Adjust validation as needed
+        ]);
+
+        // Find the instructor by ID
+        $instructor = Instructor::findOrFail($id);
+
+        // Update the working_hours column
+        $instructor->working_hours = $request->input('working_hours');
+        $instructor->save();
+
+        // Redirect back with a success message
+        return redirect()->back()->with('success', 'Working hours updated successfully.');
+    }
 }

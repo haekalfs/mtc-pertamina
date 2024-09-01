@@ -43,7 +43,7 @@ class KpiController extends Controller
                 ->orderBy('periode_start', 'asc');
         };
 
-        $kpis = Kpi::with(['pencapaian' => $pencapaianQuery])->get();
+        $kpis = Kpi::with(['pencapaian' => $pencapaianQuery])->where('periode', $currentYear)->get();
 
         $data = $kpis->map(function ($kpi) use ($quarterSelected) {
             $target = $quarterSelected == '-1' ? $kpi->target : $kpi->target / 4;
@@ -179,12 +179,15 @@ class KpiController extends Controller
         ]);
     }
 
-    public function manage()
+    public function manage($yearSelected = null)
     {
-        $indicators = KPI::all();
         $nowYear = date('Y');
         $yearsBefore = range($nowYear - 4, $nowYear);
-        return view('kpi-view.admin.manage', ['indicators' => $indicators, 'yearsBefore' => $yearsBefore]);
+        $yearSelected = $yearSelected ?? $nowYear;
+
+        $indicators = KPI::where('periode', $yearSelected)->get();
+
+        return view('kpi-view.admin.manage', ['indicators' => $indicators, 'yearsBefore' => $yearsBefore, 'yearSelected' => $yearSelected]);
     }
 
     public function preview($kpi)
@@ -582,5 +585,30 @@ class KpiController extends Controller
         $dompdf->render();
 
         return $dompdf->stream('KPI_Report.pdf');
+    }
+
+    public function duplicateKpis($newYear)
+    {
+        // Find the closest year to $newYear in the database
+        $closestYear = Kpi::select('periode')
+            ->orderByRaw('ABS(periode - ?) ASC', [$newYear])
+            ->first()
+            ->periode;
+
+        // Fetch all the KPIs for the closest year
+        $closestYearKpis = Kpi::where('periode', $closestYear)->get();
+
+        foreach ($closestYearKpis as $kpi) {
+            // Duplicate the KPI with a different year
+            Kpi::create([
+                'indicator' => $kpi->indicator,
+                'goal' => $kpi->goal,
+                'target' => $kpi->target,
+                'periode' => $newYear, // Assign the new year
+                'isAvg' => $kpi->isAvg,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'KPIs duplicated for the year ' . $newYear);
     }
 }

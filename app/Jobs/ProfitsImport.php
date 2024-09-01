@@ -5,12 +5,15 @@ namespace App\Jobs;
 use App\Models\Penlat;
 use App\Models\Penlat_batch;
 use App\Models\Profit;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
@@ -44,39 +47,29 @@ class ProfitsImport implements ShouldQueue
             // Load the Excel file
             $reader = IOFactory::createReaderForFile($this->filePath);
             $spreadsheet = $reader->load($this->filePath);
+            $sheet = $spreadsheet->getActiveSheet();
+            $rows = $sheet->toArray();
 
-            // Convert to CSV if not already a CSV
-            $extension = pathinfo($this->filePath, PATHINFO_EXTENSION);
-            if ($extension !== 'csv') {
-                $csvFilePath = pathinfo($this->filePath, PATHINFO_DIRNAME) . '/' . pathinfo($this->filePath, PATHINFO_FILENAME) . '.csv';
-                $writer = new Csv($spreadsheet);
-                $writer->save($csvFilePath);
-            } else {
-                $csvFilePath = $this->filePath;
-            }
-
-            // Process the CSV file
-            $handle = fopen($csvFilePath, 'r');
-
-            // Skip the header row
-            fgetcsv($handle);
+            DB::beginTransaction();
 
             // Loop through the rows and save the data to the database
-            while (($row = fgetcsv($handle)) !== FALSE) {
+            foreach ($rows as $index => $row) {
+                if ($index == 0) continue; // Skip the header row
+
                 // Check if the row contains a date in the first column
                 if ($this->isDate($row[0])) {
                     // Convert the date to 'Y-m-d' format
-                    $currentDate = \DateTime::createFromFormat('d-M-y', $row[0])->format('Y-m-d');
+                    $currentDate = Carbon::createFromFormat('d-M-y', $row[0])->format('Y-m-d');
                 }
 
                 if (strpos($row[0], '/') !== false) {
-                    //get penlat
+                    // Get penlat
                     $parts = explode('/', $row[0]);
                     $firstWord = $parts[0];
 
-                    //make sure its not exists
+                    // Make sure the batch doesn't already exist
                     $checkBatch = Penlat_batch::where('batch', $row[0])->exists();
-                    if(!$checkBatch){
+                    if (!$checkBatch) {
                         $getPenlat = Penlat::where('alias', $firstWord)->first();
                         Penlat_batch::updateOrCreate(
                             [
@@ -85,12 +78,12 @@ class ProfitsImport implements ShouldQueue
                             [
                                 'penlat_id' => $getPenlat->id,
                                 'nama_program' => $getPenlat->description,
-                                'date' => $currentDate
+                                'date' => $currentDate,
                             ]
                         );
                     }
 
-                    Penlat_batch::updateOrCreate(
+                    Profit::updateOrCreate(
                         [
                             'tgl_pelaksanaan' => $currentDate,
                             'pelaksanaan' => $row[0],
@@ -112,26 +105,44 @@ class ProfitsImport implements ShouldQueue
                         []
                     );
                 } else {
-                    Log::warning('Skipped row due to missing date: ' . implode(', ', $row));
+                    Log::warning('Skipped row due to missing or invalid date: ' . implode(', ', $row));
                 }
             }
 
-            fclose($handle);
+            DB::commit();
 
-            // Clean up CSV file if it was converted
-            if ($extension !== 'csv') {
-                unlink($csvFilePath);
+            // Delete the Excel file after processing
+            if (file_exists($this->filePath)) {
+                unlink($this->filePath);
             }
-
+            Cache::forget('jobs_processing');
         } catch (\Exception $e) {
+            DB::rollBack();
+
+            // Delete the Excel file after processing
+            if (file_exists($this->filePath)) {
+                unlink($this->filePath);
+            }
+            Cache::forget('jobs_processing');
             // Log or handle the exception as needed
             Log::error('Error processing the file: ' . $e->getMessage());
         }
     }
 
+    /**
+     * Check if the given value is a valid date in the 'd-M-y' format.
+     */
     private function isDate($value)
     {
         $date = \DateTime::createFromFormat('d-M-y', $value);
         return $date ? $date->format('Y-m-d') : false;
+    }
+
+    /**
+     * Sanitize the given number by removing any non-numeric characters.
+     */
+    private function sanitizeNumber($value)
+    {
+        return preg_replace('/[^0-9]/', '', str_replace(',00', '', $value));
     }
 }

@@ -50,26 +50,12 @@ font-weight-bold
     <strong>{{ $message }}</strong>
 </div>
 @endif
-<style>
-
-.alert-success-saving-mid {
-  display: none;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  padding: 20px;
-  border-radius: 5px;
-  text-align: center;
-  z-index: 10000;
-}
-</style>
 <div class="animated fadeIn zoom90">
     <div class="row">
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-secondary" id="judul">Search Report</h6>
+                    <h6 class="m-0 font-weight-bold text-secondary" id="judul">Upload File</h6>
                     <div class="text-right">
                         {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-icon fa fa-download"></i> Download</a> --}}
                     </div>
@@ -80,7 +66,7 @@ font-weight-bold
                         <div class="row">
                             <div class="col-md-11">
                                 <div class="form-group">
-                                    <label for="file">CSV File :</label>
+                                    <label for="file">Xlsx File :</label>
                                     <div class="custom-file">
                                         <input type="file" class="custom-file-input" id="file" name="file" aria-describedby="file" onchange="displayFileName()">
                                         <label class="custom-file-label" for="file" id="file-label">Choose file</label>
@@ -97,18 +83,20 @@ font-weight-bold
                 </div>
             </div>
             <div class="card mb-4">
-                <div class="card-header">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <span class="text-danger font-weight-bold">Data Import Guidelines</span>
                 </div>
                 <div class="card-body" style="background-color: rgb(247, 247, 247);">
                     <h6 class="h6 mb-2 font-weight-bold text-gray-800">Import Rules</h6>
                     <ul class="ml-4">
-                        <li>Ensure all import files are in the correct format (e.g., CSV, XLSX) as specified in the guidelines.</li>
+                        <li>Ensure all import files are in the correct format (XLSX) as specified in the guidelines.</li>
+                        <li>Maximum file size is 50MB.</li>
                         <li>Verify the data in the files for accuracy and completeness before importing.</li>
                         <li>Check for and resolve any data inconsistencies or errors in the file to prevent import issues.</li>
                         <li>Unauthorized changes to import files or procedures are strictly prohibited.</li>
-                        <li>Double-check the mapping of data fields to ensure they align with the database schema.</li>
+                        <li class="text-danger">Double-check the mapping of data fields to ensure they align with the database schema, the layout of the data should look like below image.</li>
                     </ul>
+                    <img src="{{ asset('uploads/example5.png') }}" class="img-fluid" style="padding: 1rem;">
                 </div>
             </div>
         </div>

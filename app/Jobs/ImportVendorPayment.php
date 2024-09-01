@@ -12,6 +12,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -21,7 +22,8 @@ class ImportVendorPayment implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $filePath; // Define the property
+    protected $filePath;
+
     /**
      * Create a new job instance.
      *
@@ -41,31 +43,26 @@ class ImportVendorPayment implements ShouldQueue
     {
         ini_set('memory_limit', '1024M'); // Adjust memory limit as needed
 
-        $csvFilePath = pathinfo($this->filePath, PATHINFO_DIRNAME) . '/' . pathinfo($this->filePath, PATHINFO_FILENAME) . '.csv';
-
         try {
-            // Load the Excel file and convert to CSV
+            // Load the Excel file
             $reader = IOFactory::createReaderForFile($this->filePath);
             $spreadsheet = $reader->load($this->filePath);
-            $writer = new Csv($spreadsheet);
-            $writer->save($csvFilePath);
+            $sheet = $spreadsheet->getActiveSheet();
+            $rows = $sheet->toArray();
 
             // Begin a database transaction
             DB::beginTransaction();
 
-            // Open the CSV file for reading
-            $handle = fopen($csvFilePath, 'r');
+            // Skip the header rows (assuming the first two rows are headers)
+            foreach ($rows as $index => $row) {
+                if ($index < 2) continue;
 
-            // Skip the header rows
-            fgetcsv($handle);
-            fgetcsv($handle);
-
-            // Loop through the rows and save the data to the database
-            while (($row = fgetcsv($handle)) !== FALSE) {
+                // Skip rows with empty required fields
                 if (empty($row[1]) || empty($row[6]) || empty($row[7])) {
-                    break; // Skip rows with empty required fields
+                    continue;
                 }
 
+                // Insert or update the Vendor_payment records
                 Vendor_payment::updateOrCreate(
                     [
                         'tanggal_terima_dokumen_invoice' => $row[1],
@@ -95,18 +92,23 @@ class ImportVendorPayment implements ShouldQueue
                 );
             }
 
-            fclose($handle);
-
             // Commit the transaction
             DB::commit();
 
-            // Clean up the CSV file
-            unlink($csvFilePath);
-
+            // Delete the Excel file after processing
+            if (file_exists($this->filePath)) {
+                unlink($this->filePath);
+            }
+            Cache::forget('jobs_processing');
         } catch (\Exception $e) {
             // Rollback the transaction if any error occurs
             DB::rollBack();
 
+            // Delete the Excel file after processing
+            if (file_exists($this->filePath)) {
+                unlink($this->filePath);
+            }
+            Cache::forget('jobs_processing');
             // Log the error
             Log::error('Error processing the file: ' . $e->getMessage());
         }

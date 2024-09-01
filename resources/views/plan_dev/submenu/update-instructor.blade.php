@@ -16,7 +16,7 @@ font-weight-bold
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
         <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-male"></i> Update Instructor's Data</h1>
-        <p class="mb-4">Managing Users Account</a></p>
+        <p class="mb-4">Update Instructor Data</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
         <a href="{{ route('instructor') }}" class="btn btn-sm btn-secondary shadow-sm text-white"><i class="fa fa-backward"></i> Go Back</a>
@@ -65,7 +65,7 @@ font-weight-bold
                                     <span>Deleting your account is a permanent action and cannot be undone. If you are sure you want to delete your account, select the button below.</span>
                                 </div>
                                 <div>
-                                    <a data-id="{{ $data->id }}" class="btn btn-outline-danger delete-instructor text-secondary">I Understand, delete the account</a>
+                                    <a data-id="{{ $data->id }}" class="btn btn-outline-danger delete-instructor text-danger">I Understand, delete the account</a>
                                 </div>
                             </div>
                         </div>
@@ -96,7 +96,7 @@ font-weight-bold
                         </div>
                         <div class="row form-group">
                             <div class="col col-md-3"><label for="working_hour" class=" form-control-label">Jam Mengajar</label></div>
-                            <div class="col-12 col-md-9"><input type="text" id="working_hour" name="working_hour" placeholder="Jam Mengajar" class="form-control" value="{{ $data->working_hours }}"></div>
+                            <div class="col-12 col-md-9"><input type="number" id="working_hour" name="working_hour" placeholder="Jam Mengajar" class="form-control" value="{{ $data->working_hours }}"></div>
                         </div>
                         <div class="row form-group">
                             <div class="col col-md-3"><label for="user_status" class=" form-control-label">Instructor Status</label></div>

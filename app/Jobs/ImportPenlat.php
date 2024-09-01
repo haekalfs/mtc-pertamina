@@ -8,6 +8,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
@@ -37,30 +39,25 @@ class ImportPenlat implements ShouldQueue
     {
         ini_set('memory_limit', '1024M'); // Adjust the memory limit as needed
 
-        $csvFilePath = pathinfo($this->filePath, PATHINFO_DIRNAME) . '/' . pathinfo($this->filePath, PATHINFO_FILENAME) . '.csv';
-
         try {
             // Load the Excel file
             $reader = IOFactory::createReaderForFile($this->filePath);
             $spreadsheet = $reader->load($this->filePath);
+            $sheet = $spreadsheet->getActiveSheet();
+            $rows = $sheet->toArray();
 
-            // Convert to CSV
-            $writer = new Csv($spreadsheet);
-            $writer->save($csvFilePath);
+            DB::beginTransaction();
 
-            // Process the CSV file
-            $handle = fopen($csvFilePath, 'r');
+            // Skip the header rows (assuming the first two rows are headers)
+            foreach ($rows as $index => $row) {
+                if ($index < 2) continue;
 
-            // Skip the header row
-            fgetcsv($handle);
-            fgetcsv($handle);
-
-            // Loop through the rows and save the data to the database
-            while (($row = fgetcsv($handle)) !== FALSE) {
+                // Skip rows with empty required fields
                 if (empty($row[60]) || empty($row[68]) || empty($row[69])) {
-                    break; // Skip rows with empty required fields
+                    continue;
                 }
 
+                // Insert or update the Penlat records
                 Penlat::updateOrCreate(
                     [
                         'description' => $row[60],
@@ -72,12 +69,21 @@ class ImportPenlat implements ShouldQueue
                 );
             }
 
-            fclose($handle);
+            DB::commit();
 
-            // Clean up CSV file
-            unlink($csvFilePath);
-
+            // Delete the Excel file after processing
+            if (file_exists($this->filePath)) {
+                unlink($this->filePath);
+            }
+            Cache::forget('jobs_processing');
         } catch (\Exception $e) {
+            DB::rollBack();
+
+            // Delete the Excel file after processing
+            if (file_exists($this->filePath)) {
+                unlink($this->filePath);
+            }
+            Cache::forget('jobs_processing');
             // Log or handle the exception as needed
             Log::error('Error processing the file: ' . $e->getMessage());
         }

@@ -22,6 +22,7 @@ use App\Http\Controllers\RolesController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,15 +46,12 @@ Route::middleware(['suspicious'])->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::middleware(['checkForErrors'])->group(function () {
-    });
-
+    Route::post('/clear-toast-session', function () {
+        Session::forget('loading-import');
+        return response()->json(['status' => 'success']);
+    })->name('clear.toast.session');
     Route::get('/api/chart-data/{year}', [OperationController::class, 'getChartData']);
     Route::get('/api/chart-data-profits/{year}', [FinanceController::class, 'getChartDataProfits']);
-    //External User Registration
-    Route::get('/user-registration', [RegistrationController::class, 'index'])->name('ext.register.user');
-    //KPI
-    Route::get('/key-performance-indicators/index/{quarterSelected?}/{yearSelected?}', [KpiController::class, 'index'])->name('kpi');
     Route::get('/encrypt-params', function () {
         $quarter = request('quarter');
         $year = request('year');
@@ -63,17 +61,24 @@ Route::middleware('auth')->group(function () {
 
         return redirect()->to('/key-performance-indicators/index/' . $encryptedQuarter . '/' . $encryptedYear);
     });
+
+    //External User Registration
+    // Route::get('/user-registration', [RegistrationController::class, 'index'])->name('ext.register.user');
+
+    //KPI
+    Route::middleware(['checkForErrors'])->group(function () {
+        Route::post('/duplicate-kpis/{year}', [KpiController::class, 'duplicateKpis'])->name('kpis.duplicate');
+        Route::post('/key-performance-indicators/downloadPdf', [KPIController::class, 'downloadPdf'])->name('kpi.downloadPdf');
+    });
+    Route::get('/key-performance-indicators/index/{quarterSelected?}/{yearSelected?}', [KpiController::class, 'index'])->name('kpi');
     Route::post('/kpi-store', [KpiController::class, 'store'])->name('kpis.store');
     Route::post('/pencapaian-kpi/store/{kpi}', [KpiController::class, 'store_pencapaian'])->name('pencapaian.kpi.store');
     Route::get('/key-performance-indicators/achievements/{id}/{quarter}/{year}', [KpiController::class, 'pencapaian'])->name('pencapaian-kpi');
     Route::delete('/delete-kpi/{id}', [KpiController::class, 'destroy'])->name('kpi.destroy');
     Route::delete('/delete-pencapaian-kpi/{id}', [KpiController::class, 'destroy_pencapaian'])->name('pencapaian.kpi.destroy');
-    //KPI Report
+    Route::get('/key-performance-indicators/manage-items/{yearSelected?}', [KpiController::class, 'manage'])->name('manage-kpi');
     Route::get('/key-performance-indicators/report', [KpiController::class, 'report'])->name('report-kpi');
-    Route::post('/key-performance-indicators/downloadPdf', [KPIController::class, 'downloadPdf'])->name('kpi.downloadPdf');
-
     //KPI Unused
-    Route::get('/key-performance-indicators/manage-items', [KpiController::class, 'manage'])->name('manage-kpi');
     Route::get('/key-performance-indicators/preview/{id}', [KpiController::class, 'preview'])->name('preview-kpi');
 
     //Pencapaian AKhlak
@@ -84,7 +89,10 @@ Route::middleware('auth')->group(function () {
 
     //Operation
     Route::get('/operation-dashboard/{yearSelected?}', [OperationController::class, 'index'])->name('operation');
-
+    Route::middleware(['checkForErrors'])->group(function () {
+        Route::post('/duplicate-kpis/{year}', [KpiController::class, 'duplicateKpis'])->name('kpis.duplicate');
+        Route::post('/key-performance-indicators/downloadPdf', [KPIController::class, 'downloadPdf'])->name('kpi.downloadPdf');
+    });
     //penlat
     Route::get('/penlat/list-pelatihan', [PenlatController::class, 'index'])->name('penlat');
     Route::get('/penlat/pelatihan-preview/{penlatId}', [PenlatController::class, 'preview_penlat'])->name('preview-penlat');
@@ -94,7 +102,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/penlat/{id}/edit', [PenlatController::class, 'edit'])->name('penlat.edit');
     Route::put('/penlat-update/{id}', [PenlatController::class, 'update'])->name('penlat.update');
     Route::delete('/penlat-delete/{id}', [PenlatController::class, 'delete'])->name('delete.penlat');
-
 
     //participant-infographics
     Route::get('/operation/participant-infographics', [OperationController::class, 'participant_infographics'])->name('participant-infographics');
@@ -228,6 +235,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/planning-development/instructor-registration', [PDController::class, 'register_instructor'])->name('register-instructor');
     Route::get('/planning-development/instructor-update-data/{instructorId}', [InstructorController::class, 'edit_instructor'])->name('edit-instructor');
     Route::put('/planning-development/instructor-update/{instructorId}', [InstructorController::class, 'update'])->name('instructor.update');
+    Route::post('/planning-development/instructor-update-hours/{id}', [InstructorController::class, 'update_hours'])->name('instructor.update.hours');
     Route::post('/planning-development/instructor-store', [InstructorController::class, 'store'])->name('instructor.store');
     Route::delete('/planning-development/instructor-delete/{id}', [InstructorController::class, 'deleteInstructor'])->name('instructor.delete');
 

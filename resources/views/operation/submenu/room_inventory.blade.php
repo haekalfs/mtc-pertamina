@@ -81,25 +81,17 @@ font-weight-bold
                                         <div class="col-md-8 text-left mt-sm-2">
                                             <h5 class="card-title font-weight-bold">{{ $item->room_name }}</h5>
                                             <div class="ml-2">
-                                                <table class="table table-borderless table-sm">
+                                                <ol class="ml-4" style="line-height:200%">
                                                     @foreach($item->list as $index => $list)
                                                         @if($index < 4)
-                                                            <tr>
-                                                                <td style="width: 200px;" class="mb-2">
-                                                                    <i class="ti-minus mr-2"></i> <span>{{ $list->tools->asset_name }}&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;{{ $list->amount }} Pcs</span>
-                                                                </td>
-                                                            </tr>
+                                                        <li><span class="">{{ $list->tools->asset_name }}&nbsp;&nbsp;&nbsp; : &nbsp;</span><span>{{ $list->amount }} Units</li>
                                                         @endif
                                                     @endforeach
 
                                                     @if($item->list->count() > 4)
-                                                        <tr>
-                                                            <td colspan="2" style="width: 300px;" class="mb-2">
-                                                                <i class="ti-minus mr-2"></i> <a href="{{ route('preview-room-user', $item->id) }}"><i>Show More</i></a>
-                                                            </td>
-                                                        </tr>
+                                                        <li><span class=""><a href="{{ route('preview-room-user', $item->id) }}"><i>Show More...</i></li>
                                                     @endif
-                                                </table>
+                                                </ol>
                                             </div>
                                         </div>
                                     </div>

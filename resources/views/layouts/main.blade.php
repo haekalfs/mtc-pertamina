@@ -11,27 +11,26 @@
     <link href="{{ asset('img/mtc-logo-1.jpg') }}" rel="icon">
     <link href="{{ asset('img/mtc-logo-1.jpg') }}" rel="apple-touch-icon">
 
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="{{ asset('js/chartjs-plugin-annotation') }}"></script>
+    <script src="{{ asset('js/chartjs.js') }}"></script>
 
     <!-- CSS Libraries -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.0/normalize.min.css">
+    {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.0/normalize.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lykmapipo/themify-icons@0.1.2/css/themify-icons.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pixeden-stroke-7-icon@1.2.3/pe-icon-7-stroke/dist/pe-icon-7-stroke.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.2.0/css/flag-icon.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.2.0/css/flag-icon.min.css"> --}}
+
+    <link rel="stylesheet" href="{{ asset('assets/css/normalize.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/font-awesome.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/themify-icons.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/pe-icon-7-stroke.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/flag-icon.min.css') }}">
+
     <link rel="stylesheet" href="{{ asset('assets/css/cs-skin-elastic.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/lib/chosen/chosen.min.css') }}">
-    <!-- Date Range Picker -->
-    <script type="text/javascript" src="{{ asset('js/daterangepicker.min.js') }}"></script>
-    <!-- Date Range Picker CSS -->
-    <link rel="stylesheet" type="text/css" href="{{ asset('css/daterangepicker.css') }}" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chartist@0.11.0/dist/chartist.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jqvmap@1.5.1/dist/jqvmap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/weathericons@2.1.0/css/weather-icons.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@3.9.0/dist/fullcalendar.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
 
@@ -72,7 +71,7 @@
     <!-- Left Panel -->
     <aside id="left-panel" class="left-panel">
         <div class="sidebar-footer">
-            <a href="{{ route('profile.view') }}" class="sidebar-user mr-4 ml-3 mt-2 mb-2">
+            <a href="{{ route('profile.view') }}" class="sidebar-user mr-3 ml-3 mt-2 mb-2">
                 <span class="sidebar-user-img">
                     <picture>
                         @if(Auth::user()->users_detail->profile_pic)
@@ -274,6 +273,18 @@
                 </div>
             </div>
         </header>
+        @if(Cache::has('jobs_processing'))
+            <div id="toastNotification" class="toast__container position-fixed bottom-0 right-0 p-3" style="z-index: 5; right: 0; bottom: 0;">
+                <div class="toast toast--yellow">
+                    <div class="toast__icon">
+                    </div>
+                    <div class="toast__content">
+                        <p class="toast__type"><i class="fa fa-spinner fa-spin"></i> Loading</p>
+                        <p class="toast__message">Data is being imported!! Please wait until the data is all processed.</p>
+                    </div>
+                </div>
+            </div>
+        @endif
         <!-- /#header -->
         @yield('breadcumbs')
         <!-- Content -->
@@ -306,15 +317,6 @@
     <script src="{{ asset('assets/js/main.js') }}"></script>
     <script src="{{ asset('assets/js/lib/chosen/chosen.jquery.min.js') }}"></script>
 
-    <!-- Chartist Chart -->
-    <script src="https://cdn.jsdelivr.net/npm/chartist@0.11.0/dist/chartist.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartist-plugin-legend@0.6.2/chartist-plugin-legend.min.js"></script>
-
-    <!-- Flot Charts -->
-    <script src="https://cdn.jsdelivr.net/npm/jquery.flot@0.8.3/jquery.flot.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flot-pie@1.0.0/src/jquery.flot.pie.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flot-spline@0.0.1/js/jquery.flot.spline.min.js"></script>
-
     <!-- FullCalendar -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@3.9.0/dist/fullcalendar.min.js"></script>
     <script src="{{ asset('assets/js/init/fullcalendar-init.js') }}"></script>
@@ -328,6 +330,13 @@
                 disable_search_threshold: 10,
                 no_results_text: "Oops, nothing found!",
                 width: "100%"
+            });
+        });
+        jQuery(document).ready(function(){
+            jQuery('.toast__close').click(function(e){
+                e.preventDefault();
+                var parent = $(this).parent('.toast');
+                parent.fadeOut("slow", function() { $(this).remove(); } );
             });
         });
     </script>

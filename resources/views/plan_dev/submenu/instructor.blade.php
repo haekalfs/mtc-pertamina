@@ -162,19 +162,19 @@ font-weight-bold
                                                 <div class="ml-2">
                                                     <table class="table table-borderless table-sm">
                                                         <tr>
-                                                            <td style="width: 180px;"><i class="ti-minus mr-2"></i> Email</td>
+                                                            <td style="width: 180px;"><i class="fa fa-caret-right mr-2"></i> Email</td>
                                                             <td style="text-align: start;">: {{ $item->instructor_email }}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td><i class="ti-minus mr-2"></i> Umur</td>
+                                                            <td><i class="fa fa-caret-right mr-2"></i> Umur</td>
                                                             <td style="text-align: start;">: {{ \Carbon\Carbon::parse($item->instructor_dob)->age }} Tahun</td>
                                                         </tr>
                                                         <tr>
-                                                            <td><i class="ti-minus mr-2"></i> Jam Mengajar</td>
-                                                            <td style="text-align: start;">: {{ $item->working_hours }}</td>
+                                                            <td><i class="fa fa-caret-right mr-2"></i> Jam Mengajar</td>
+                                                            <td style="text-align: start;">: {{ $item->working_hours }} Jam</td>
                                                         </tr>
                                                         <tr>
-                                                            <td style="width: 180px;"><i class="ti-minus mr-2"></i> Avg Nilai Feedback</td>
+                                                            <td style="width: 180px;"><i class="fa fa-caret-right mr-2"></i> Avg Nilai Feedback</td>
                                                             <td style="text-align: start;">:
                                                                 @php
                                                                     $roundedScore = round($item->average_feedback_score, 1); // Round to one decimal place
@@ -201,9 +201,8 @@ font-weight-bold
                                         </div>
                                     </td>
                                     <td class="actions text-center">
-                                        <div>
-                                            <a class="btn btn-outline-secondary btn-sm mr-2" href="{{ route('preview-instructor', ['id' => $item->id, 'penlatId' => $penlatId]) }}"><i class="menu-Logo fa fa-eye"></i> Summary</a>
-                                        </div>
+                                        <a class="btn btn-outline-secondary btn-sm mr-2" href="{{ route('preview-instructor', ['id' => $item->id, 'penlatId' => $penlatId]) }}"><i class="menu-Logo fa fa-eye"></i> Preview</a>
+                                        <a class="btn btn-outline-secondary btn-sm" href="{{ route('edit-instructor', $item->id) }}"><i class="fa fa-edit"></i> Update</a>
                                     </td>
                                 </tr>
                                 @endforeach

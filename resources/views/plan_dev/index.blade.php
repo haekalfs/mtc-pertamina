@@ -87,7 +87,7 @@ font-weight-bold
         <div class="col-lg-6 mb-2">
             <div class="card-leaderboard">
                 <div class="card-header-leaderboard bg-secondary">
-                    <i class="trophy-icon"></i>
+                    <i class="fa fa-trophy"></i>
                     <span class="title">Top Rated Instructors</span>
                     <span class="subtitle">LEADERBOARD</span>
                 </div>
