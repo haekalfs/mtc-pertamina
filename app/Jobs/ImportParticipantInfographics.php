@@ -43,11 +43,8 @@ class ImportParticipantInfographics implements ShouldQueue
         ini_set('memory_limit', '1024M'); // Adjust the memory limit as needed
 
         try {
-            // Load the Excel file
-            $reader = IOFactory::createReaderForFile($this->filePath);
-            $spreadsheet = $reader->load($this->filePath);
-            $sheet = $spreadsheet->getActiveSheet();
-            $rows = $sheet->toArray();
+            // Load the CSV file
+            $rows = array_map('str_getcsv', file($this->filePath));
 
             DB::beginTransaction();
 

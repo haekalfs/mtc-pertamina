@@ -20,32 +20,36 @@ class ImportPenlat implements ShouldQueue
 
     protected $filePath;
 
+    /**
+     * Create a new job instance.
+     *
+     * @return void
+     */
     public function __construct($filePath)
     {
         $this->filePath = $filePath;
     }
 
+    /**
+     * Execute the job.
+     *
+     * @return void
+     */
     public function handle()
     {
         try {
-            // Load the spreadsheet and get the first sheet
-            $spreadsheet = IOFactory::load($this->filePath);
-            $sheet = $spreadsheet->getActiveSheet();
-            $rows = $sheet->toArray();
-
-            // Remove empty rows (ensure your row index starts from 1)
-            $filteredRows = array_filter($rows, function($row) {
-                // Assuming columns 60, 68, 69, and 70 should not be empty
-                return !empty($row[60]) && !empty($row[68]) && !empty($row[69]) && !empty($row[70]);
-            });
+            // Load the CSV file
+            $rows = array_map('str_getcsv', file($this->filePath));
 
             DB::beginTransaction();
 
-            // Skip the header rows (assuming the first two rows are headers)
-            foreach ($filteredRows as $index => $row) {
+            foreach ($rows as $index => $row) {
                 if ($index < 2) continue;
 
-                // Insert or update the Penlat records
+                if (empty($row[60]) || empty($row[68]) || empty($row[69]) || empty($row[70])) {
+                    continue;
+                }
+
                 Penlat::updateOrCreate(
                     [
                         'description' => $row[60],
@@ -59,7 +63,6 @@ class ImportPenlat implements ShouldQueue
 
             DB::commit();
 
-            // Delete the Excel file after processing
             if (file_exists($this->filePath)) {
                 unlink($this->filePath);
             }
@@ -67,12 +70,10 @@ class ImportPenlat implements ShouldQueue
         } catch (\Exception $e) {
             DB::rollBack();
 
-            // Delete the Excel file if an error occurs
             if (file_exists($this->filePath)) {
                 unlink($this->filePath);
             }
             Cache::forget('jobs_processing');
-            // Log or handle the exception as needed
             Log::error('Error processing the file: ' . $e->getMessage());
         }
     }

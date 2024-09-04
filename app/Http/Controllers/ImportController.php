@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ConvertXlsxToCsv;
+use App\Jobs\ConvertXlsxToCsvInfografis;
 use App\Jobs\ImportFeedback;
 use App\Jobs\ImportFeedbackMTC;
 use App\Jobs\ImportParticipantInfographics;
@@ -48,7 +50,7 @@ class ImportController extends Controller
 
         try {
             // Dispatch the job
-            ImportParticipantInfographics::dispatch($filePath);
+            ConvertXlsxToCsvInfografis::dispatch($filePath);
 
             // Set a cache indicating the job is processing, if it doesn't already exist
             if (!Cache::has('jobs_processing')) {
@@ -104,7 +106,7 @@ class ImportController extends Controller
     public function import_penlat(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'file' => 'required|file|mimes:xlsx|max:40960', // Accept only XLSX files and limit size to 50 MB (40960 KB)
+            'file' => 'required|file|mimes:xlsx|max:40960',
         ], [
             'file.required' => 'Error: The file is required.',
             'file.file' => 'Error: The uploaded file must be a valid file.',
@@ -113,8 +115,8 @@ class ImportController extends Controller
         ]);
 
         if ($validator->fails()) {
-            $messages = $validator->errors()->all(); // Get all error messages
-            Session::flash('failed', implode(' ', $messages)); // Combine them into a single string
+            $messages = $validator->errors()->all();
+            Session::flash('failed', implode(' ', $messages));
             return redirect()->route('penlat-import')->withInput();
         }
 
@@ -126,14 +128,13 @@ class ImportController extends Controller
         $filePath = $destinationPath . '/' . $filename;
 
         try {
-            // Dispatch the job
-            ImportPenlat::dispatch($filePath);
-            // Set a cache indicating the job is processing, if it doesn't already exist
+            // Dispatch the ConvertXlsxToCsv job
+            ConvertXlsxToCsv::dispatch($filePath);
             if (!Cache::has('jobs_processing')) {
-                Cache::put('jobs_processing', true, now()->addMinutes(5)); // Cache for 10 minutes
+                Cache::put('jobs_processing', true, now()->addMinutes(5));
             }
 
-            return redirect()->back()->with('success', 'Data import started successfully, please wait until the data is all processed.');
+            return redirect()->back()->with('success', 'Data conversion started successfully, please wait until the data is processed.');
         } catch (\Exception $e) {
             Session::flash('failed', 'Error dispatching the job: ' . $e->getMessage());
             return redirect()->back();
