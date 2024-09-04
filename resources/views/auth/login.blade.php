@@ -14,7 +14,7 @@
         </span>
 
         <div class="wrap-input100 validate-input" data-validate = "Valid email is required: ex@abc.xyz">
-            <input class="input100" id="email" value="haekal@narademy.com" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" >
+            <input class="input100" id="email" placeholder="your email..." class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" >
             <span class="focus-input100"></span>
             <span class="symbol-input100">
                 <i class="fa fa-envelope" aria-hidden="true"></i>
@@ -23,7 +23,7 @@
         <x-input-error :messages="$errors->get('email')" class="mt-2" />
 
         <div class="wrap-input100 validate-input" data-validate = "Password is required">
-            <input class="input100" id="password" value="Haekal@726" class="block mt-1 w-full"
+            <input class="input100" id="password" placeholder="your password..." class="block mt-1 w-full"
             type="password"
             name="password"
             required autocomplete="current-password" >
