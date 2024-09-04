@@ -16,7 +16,7 @@ font-weight-bold
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
         <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="menu-icon ti-stats-down"></i> Profits & Loss</h1>
-        <p class="mb-4">{{ $selectedPenlat->description }}</a></p>
+        <p class="mb-4">Profits & Loss : {{ $selectedPenlat->description }}</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
         <a href="{{ route('profits') }}" class="btn btn-sm btn-secondary shadow-sm text-white"><i class="fa fa-backward"></i> Go Back</a>
@@ -62,14 +62,14 @@ font-weight-bold
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold" id="judul">List Data</h6>
+                    <h6 class="m-0 font-weight-bold" id="judul">List Batch</h6>
                     <div class="d-flex">
                         {{-- <a id="addApproversBtn" class="btn btn-sm btn-primary shadow-sm text-white"><i class="fa fa-file-text fa-sm"></i> Filter</a>
                         <a id="hideApproversBtn" class="btn btn-sm btn-secondary shadow-sm text-white" style="display: none;"><i class="fa fa-backward fa-sm"></i> Cancel</a> --}}
                     </div>
                 </div>
                 <div class="card-body zoom80">
-                    <div class="row d-flex justify-content-start mb-4">
+                    {{-- <div class="row d-flex justify-content-start mb-4">
                         <div class="col-md-12">
                             <div class="row align-items-center">
                                 <div class="col-md-4">
@@ -109,7 +109,7 @@ font-weight-bold
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
                     <table id="profitsTable" class="table table-bordered">
                         <thead class="thead-light">
                             <tr>
@@ -124,6 +124,69 @@ font-weight-bold
                         </thead>
                         <tbody></tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-secondary" id="judul">Overall Penggunaan Utilitas</h6>
+                    <div class="text-right">
+                        {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Add Utilities</a> --}}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <table id="docLetter" class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr>
+                                <th style="width:60%">Tool</th>
+                                <th style="width:10%">Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if($listUtilities->isNotEmpty())
+                                @foreach($listUtilities as $tool)
+                                    <tr>
+                                        <td data-th="Product">
+                                            <div class="row">
+                                                <div class="col-md-4 text-left">
+                                                    <img src="{{ asset($tool['filepath']) }}" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
+                                                </div>
+                                                <div class="col-md-8 text-left mt-sm-2">
+                                                    <h5>{{ $tool['utility_name'] }}</h5>
+                                                    <p class="font-weight-light">Satuan Default ({{ $tool['utility_unit'] }})</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center" style="width:7%">
+                                            {{ $tool['amount'] }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @else
+                                <tr class="text-center">
+                                    <td colspan="2">No Data Available</td>
+                                </tr>
+                            @endif
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <span class="text-danger font-weight-bold">Summary</span>
+                </div>
+                <div class="card-body" style="background-color: rgb(247, 247, 247);">
+                    <h6 class="h6 mb-2 font-weight-bold text-gray-800">General Guidelines</h6>
+                    <ul class="ml-4">
+                        <li>Table diatas adalah List Batch beserta Revenue, Cost & Nett Income.</li>
+                        <li>Nominal dari table diatas, diambil dari masing-masing revenue, cost & nett Income batch tersebut.</li>
+                        <li>List Batch adalah Sub data dari List Pelatihan, batch dibuat berdasarkan Induk Data Pelatihan.</li>
+                        <li>Data di samping adalah total penggunaan utilitas dari semua batch diatas.</li>
+                        <li>Anda bisa mengklik detail dari pelatihan tersebut dengan mengklik batchnya, yang nanti akan menampilkan informasi lebih detail, beserta list costnya.</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -216,7 +279,7 @@ $(document).ready(function() {
         processing: true,
         serverSide: true,
         ajax: {
-            url: "{{ route('cost', $selectedPenlat->id) }}", // Ensure this route points to the controller's costs method
+            url: "{{ route('cost', [$selectedPenlat->id, $month, $year]) }}", // Ensure this route points to the controller's costs method
             data: function(d) {
                 d.namaPenlat = $('#namaPenlat').val();
                 d.jenisPenlat = $('#jenisPenlat').val();

@@ -9,15 +9,15 @@ class Penlat_requirement extends Model
 {
     use HasFactory;
     protected $table = "penlat_requirement";
-    protected $fillable = ["id", "penlat_id", "requirement", "amount","created_at", "updated_at"];
+    protected $fillable = ["id", "penlat_id", "inventory_tool_id", "amount","created_at", "updated_at"];
 
     public function penlat()
     {
         return $this->belongsTo('App\Models\Penlat')->withDefault();
     }
 
-    public function tool()
+    public function tools()
     {
-        return $this->belongsTo('App\Models\Inventory_tool')->withDefault();
+    	return $this->belongsTo('App\Models\Inventory_tools', 'inventory_tool_id', 'id');
     }
 }

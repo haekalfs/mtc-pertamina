@@ -73,17 +73,25 @@ font-weight-bold
                                 <td data-th="Product">
                                     <div class="row">
                                         <div class="col-md-3 d-flex justify-content-center align-items-center text-center">
-                                            <img src="{{ $item->filepath ? asset($item->filepath) : 'https://via.placeholder.com/150x150/5fa9f8/ffffff' }}" style="height: 150px; width: 150px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
+                                            <a href="{{ route('preview-requirement', $item->id) }}" class="animateBox">
+                                                <img src="{{ $item->filepath ? asset($item->filepath) : 'https://via.placeholder.com/150x150/5fa9f8/ffffff' }}" style="height: 150px; width: 150px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
+                                            </a>
                                         </div>
                                         <div class="col-md-9 text-left mt-sm-2">
                                             <h5 class="card-title font-weight-bold">{{ $item->description }}</h5>
                                             <div class="ml-2">
                                                 <table class="table table-borderless table-sm">
-                                                    @foreach ($item->requirement as $requirement)
-                                                    <tr>
-                                                        <td class="mb-2"><i class="ti-minus mr-2"></i> {{ $requirement->requirement }}</td>
-                                                    </tr>
+                                                    @foreach($item->requirement as $index => $list)
+                                                        @if($index < 4)
+                                                        <tr>
+                                                            <td class="mb-2"><i class="ti-minus mr-2"></i>{{ $list->tools->asset_name }}&nbsp;&nbsp;&nbsp; : &nbsp;</span><span>{{ $list->amount }} Units</td>
+                                                        </tr>
+                                                        @endif
                                                     @endforeach
+
+                                                    @if($item->requirement->count() > 4)
+                                                        <li><span class=""><a href="{{ route('preview-room-user', $item->id) }}"><i>Show More...</i></li>
+                                                    @endif
                                                 </table>
                                             </div>
                                         </div>
@@ -91,9 +99,9 @@ font-weight-bold
                                 </td>
                                 <td class="actions text-center">
                                     <div>
-                                        <button data-id="{{ $item->id }}" class="btn btn-outline-secondary btn-md mb-2 mr-2 edit-button">
+                                        <a href="{{ route('preview-requirement', $item->id) }}" class="btn btn-outline-secondary btn-md mb-2 mr-2">
                                             <i class="fa fa-edit"></i>
-                                        </button>
+                                        </a>
                                         <button data-id="{{ $item->id }}" class="btn btn-outline-danger btn-md mb-2">
                                             <i class="fa fa-trash-o"></i>
                                         </button>
@@ -126,7 +134,7 @@ font-weight-bold
                             <div>
                                 <div class="document-list-item mb-4 mt-3">
                                     <div class="d-flex align-items-center mb-4">
-                                        <div style="width: 140px;" class="mr-2">
+                                        <div style="width: 120px;" class="mr-2">
                                             <p style="margin: 0;">Nama Penlat :</p>
                                         </div>
                                         <div class="flex-grow-1">
@@ -139,81 +147,31 @@ font-weight-bold
                                         </div>
                                     </div>
                                     <div class="d-flex align-items-start">
-                                        <div style="width: 140px;" class="mr-2">
-                                            <p style="margin: 0;">Kebutuhan :</p>
+                                        <div style="width: 180px;" class="mr-2">
+                                            <p style="margin: 0;">List Alat :</p>
                                         </div>
                                         <div class="flex-grow-1 textarea-container" id="documents-list-container">
-                                            <div class="document-item">
-                                                <input type="text" class="form-control mb-2" rows="2" name="documents[]" required></input>
+                                            <div class="document-item mb-2">
+                                                <div class="row">
+                                                    <div class="col-md-10">
+                                                        <select class="form-control mb-2" name="tool[]" required>
+                                                            @foreach ($assets as $item)
+                                                                <option value="{{ $item->id }}">{{ $item->asset_name }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-2 p-0">
+                                                        <input type="number" class="form-control" name="amount[]" placeholder="Pcs" required></input>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="ml-2 text-white">
+                                        <div class="ml-4 text-white">
                                             <div class="col-md-12">
                                                 <button type="button" class="btn btn-success mb-2 shadow-sm btn-sm add-document-list"><i class="fa fa-plus"></i> Add More &nbsp;&nbsp;</button>
                                             </div>
                                             <div class="col-md-12">
                                                 <a class="btn shadow-sm btn-sm btn-danger delete-document-list" style="display: none;"><i class="fa fa-trash-alt"></i> Delete Item</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Submit Request</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="editDataModal" tabindex="-1" role="dialog" aria-labelledby="editDataModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 700px;" role="document">
-        <div class="modal-content">
-            <div class="modal-header d-flex flex-row align-items-center justify-content-between">
-                <h5 class="modal-title" id="editDataModalLabel">Edit Data</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form method="post" enctype="multipart/form-data" action="{{ route('requirement.update') }}">
-                @csrf
-                <div class="modal-body mr-2 ml-2">
-                    <div class="row no-gutters">
-                        <div class="col-md-12">
-                            <div>
-                                <div class="document-list-item mb-4 mt-3">
-                                    <div class="d-flex align-items-center mb-4">
-                                        <div style="width: 140px;" class="mr-2">
-                                            <p style="margin: 0;">Nama Penlat :</p>
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <select id="editpenlatSelect" class="form-control select2" name="edit_penlat">
-                                                <option selected disabled>Select Pelatihan...</option>
-                                                @foreach ($penlatList as $item)
-                                                <option value="{{ $item->id }}">{{ $item->description }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex align-items-start">
-                                        <div style="width: 140px;" class="mr-2">
-                                            <p style="margin: 0;">Kebutuhan :</p>
-                                        </div>
-                                        <div class="flex-grow-1 edit-textarea-container" id="edit-documents-list-container">
-                                            <div class="edit-document-item">
-                                                <input type="text" class="form-control mb-2" rows="2" name="edit_documents[]" required></input>
-                                            </div>
-                                        </div>
-                                        <div class="ml-2 text-white">
-                                            <div class="col-md-12">
-                                                <button type="button" class="btn btn-success mb-2 shadow-sm btn-sm edit-add-document-list"><i class="fa fa-plus"></i> Add More &nbsp;&nbsp;</button>
-                                            </div>
-                                            <div class="col-md-12">
-                                                <a class="btn shadow-sm btn-sm btn-danger edit-delete-document-list" style="display: none;"><i class="fa fa-trash-alt"></i> Delete Item</a>
                                             </div>
                                         </div>
                                     </div>
@@ -254,10 +212,6 @@ font-weight-bold
         $(".add-document-list").on("click", function () {
             // Clone the entire document-item div
             var clonedDocumentItem = $(".document-item:first").clone();
-
-            // Clear the content of the cloned textarea and file input
-            clonedDocumentItem.find("textarea").val("");
-            clonedDocumentItem.find("input[type=file]").val("");
 
             // Create a new container for the cloned document-item div
             var clonedContainer = $("<div class='document-item'></div>").append(clonedDocumentItem.html());
@@ -313,61 +267,6 @@ font-weight-bold
                         });
                     }
                 });
-            }
-        });
-    });
-
-    $(document).on('click', '.edit-button', function () {
-        var penlatId = $(this).data('id');
-
-        // Generate the URL using the route name
-        var fetchUrl = "{{ route('requirement.data', ':id') }}";
-        fetchUrl = fetchUrl.replace(':id', penlatId);
-
-        // Fetch data via AJAX
-        $.ajax({
-            url: fetchUrl,
-            method: 'GET',
-            success: function (data) {
-                // Prefill the penlat select
-                $('#editpenlatSelect').val(data.penlat_id).trigger('change');
-
-                // Clear the existing document items
-                $('#edit-documents-list-container').empty();
-
-                // Prefill document fields
-                data.documents.forEach(function (document) {
-                    var documentItem = '<div class="edit-document-item"><input type="text" class="form-control mb-2" name="edit_documents[]" value="' + document + '" required></div>';
-                    $('#edit-documents-list-container').append(documentItem);
-                });
-
-                // Show the delete button if there are multiple items
-                if (data.documents.length > 1) {
-                    $('.edit-delete-document-list').show();
-                } else {
-                    $('.edit-delete-document-list').hide();
-                }
-
-                // Show the modal
-                $('#editDataModal').modal('show');
-            }
-        });
-    });
-
-    $(document).ready(function () {
-        // Add document field
-        $(".edit-add-document-list").on("click", function () {
-            var clonedDocumentItem = $(".edit-document-item:first").clone();
-            clonedDocumentItem.find("input").val("");
-            $("#edit-documents-list-container").append(clonedDocumentItem);
-            $(".edit-delete-document-list").show();
-        });
-
-        // Delete document field
-        $(".edit-delete-document-list").on("click", function () {
-            $(".edit-document-item:last").remove();
-            if ($(".edit-document-item").length <= 1) {
-                $(".edit-delete-document-list").hide();
             }
         });
     });

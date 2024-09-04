@@ -111,6 +111,17 @@ class PDController extends Controller
         ]);
     }
 
+    public function getFeedbackChartData()
+    {
+        $feedbackData = DB::table('feedback_reports as fr')
+            ->join('feedback_template as ft', 'fr.feedback_template_id', '=', 'ft.id')
+            ->select('ft.questioner', DB::raw('AVG(fr.score) as average_score'))
+            ->groupBy('ft.questioner')
+            ->get();
+
+        return response()->json($feedbackData);
+    }
+
     public function feedback_report_main()
     {
         return view('plan_dev.feedback-main');
@@ -365,14 +376,32 @@ class PDController extends Controller
         ]);
     }
 
-    public function training_reference()
+    public function training_reference(Request $request)
     {
-        $penlatList = Penlat::all();
+        // Initialize the query with all Penlat data
+        $query = Penlat::query();
+
+        // Apply filters only if they are selected
+        if ($request->has('namaPenlat') && $request->namaPenlat != '-1') {
+            $query->where('id', $request->namaPenlat);
+        }
+
+        if ($request->has('stcw') && $request->stcw != '-1') {
+            $query->where('kategori_pelatihan', $request->stcw);
+        }
+
+        // Get the penlat_ids that exist in the training references
         $getData = Training_reference::groupBy('penlat_id')->pluck('penlat_id')->toArray();
+        $data = $query->whereIn('id', $getData)->get();
 
-        $data = Penlat::whereIn('id', $getData)->get();
+        // Fetch all Penlat data for the dropdown list
+        $penlatList = Penlat::all();
 
-        return view('plan_dev.submenu.training-reference', ['penlatList' => $penlatList, 'data' => $data]);
+        // Return view with data and penlatList
+        return view('plan_dev.submenu.training-reference', [
+            'penlatList' => $penlatList,
+            'data' => $data
+        ]);
     }
 
     public function upload_certificate()

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Inventory_tools;
 use App\Models\Location;
 use App\Models\Penlat;
 use App\Models\Penlat_batch;
@@ -66,10 +67,42 @@ class PenlatController extends Controller
         return view('penlat.index', ['data' => $data]);
     }
 
-    public function preview_penlat($penlatId)
+    public function preview_penlat(Request $request, $penlatId)
     {
         $data = Penlat::find($penlatId);
-        return view('penlat.preview-penlat', ['data' => $data]);
+
+        if ($request->ajax()) {
+            $query = Penlat_batch::with('penlat');
+
+            $query->whereHas('penlat', function($q) use ($penlatId) {
+                $q->where('id', $penlatId);
+            });
+
+            $dataBatch = $query->get();
+
+            return DataTables::of($dataBatch)
+                ->addColumn('display', function($item) {
+                    $imageUrl = $item->filepath ? asset($item->filepath) : 'https://via.placeholder.com/50x50/5fa9f8/ffffff';
+                    return '<a href="' . route('preview-batch', $item->id) . '"><img src="' . $imageUrl . '" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow animateBox"></a>';
+                })
+                ->addColumn('nama_pelatihan', function($item) {
+                    return $item->penlat->description;
+                })
+                ->addColumn('batch', function($item) {
+                    return $item->batch;
+                })
+                ->addColumn('jenis_pelatihan', function($item) {
+                    return $item->penlat->jenis_pelatihan;
+                })
+                ->addColumn('tgl_pelaksanaan', function($item) {
+                    return $item->date;
+                })
+                ->rawColumns(['display'])  // Enable raw HTML for the 'display' and 'action' columns
+                ->make(true);
+        }
+
+        $penlatList = Penlat::all();
+        return view('penlat.preview-penlat', ['data' => $data, 'penlatList' => $penlatList]);
     }
 
     public function tool_requirement_penlat()
@@ -77,14 +110,36 @@ class PenlatController extends Controller
         $penlatList = Penlat::all();
         $getData = Penlat_requirement::groupBy('penlat_id')->pluck('penlat_id')->toArray();
         $penlat = Penlat::whereIn('id', $getData)->get();
-        $locations = Location::all();
-        return view('operation.submenu.requirement_penlat', ['locations' => $locations, 'penlat' => $penlat, 'penlatList' => $penlatList]);
+        $assets = Inventory_tools::all();
+
+        return view('operation.submenu.requirement_penlat', ['assets' => $assets, 'penlat' => $penlat, 'penlatList' => $penlatList]);
     }
 
-    public function preview_requirement_penlat($penlatId)
+    public function preview_requirement($penlatId)
     {
-        $data = Penlat::findOrFail($penlatId);
-        return view('operation.submenu.requirement_preview', ['data' => $data]);
+        $data = Penlat::find($penlatId);
+        $assets = Inventory_tools::all();
+        return view('operation.submenu.preview-requirement', ['assets' => $assets, 'data' => $data]);
+    }
+
+    public function requirement_insert_item(Request $request, $roomId)
+    {
+        // Validate the request
+        $validated = $request->validate([
+            'tool.*' => 'required',
+            'amount.*' => 'required',
+        ]);
+
+         // Save the tools associated with this room
+        foreach ($validated['tool'] as $key => $toolId) {
+            Penlat_requirement::create([
+                'penlat_id' => $roomId,
+                'inventory_tool_id' => $toolId,
+                'amount' => $validated['amount'][$key],
+            ]);
+        }
+
+        return redirect()->route('preview-requirement', $roomId)->with('success', 'Requirement saved successfully!');
     }
 
     public function store(Request $request)
@@ -135,43 +190,24 @@ class PenlatController extends Controller
         ]);
     }
 
-    public function update_requirement(Request $request)
+    public function update_requirement(Request $request, $toolId)
     {
-        // Validate the request
+        // Retrieve the penlat_usage record by ID
+        $inventoryItem = Penlat_requirement::findOrFail($toolId);
+
+        // Validate and update the amount
         $request->validate([
-            'edit_penlat' => 'required',
-            'edit_documents' => 'required',
-            'edit_documents.*' => 'required',
+            'amount' => 'required|numeric|min:0'
         ]);
-        $penlatId = $request->input('edit_penlat');
-        try {
-            // Check if the Penlat is used in the Penlat_batch table
-            $isRequirementExist = Penlat_requirement::where('penlat_id', $penlatId)->exists();
 
-            if (!$isRequirementExist) {
-                return response()->json(['error' => 'Requirement cannot be deleted because it is not found!'], 400);
-            }
 
-            $item = Penlat_requirement::where('penlat_id', $penlatId);
-            $item->delete();
+        if ($inventoryItem) {
+            $inventoryItem->amount = $request->input('amount');
+            $inventoryItem->save();
 
-            $documents = $request->input('edit_documents');
-
-            // Loop through the documents and create a new record for each
-            foreach ($documents as $key => $document) {
-                Penlat_requirement::create([
-                    'penlat_id' => $request->edit_penlat,
-                    'requirement' => $document,
-                ]);
-            }
-
-            // Redirect back with a success message
-            return redirect()->back()->with('success', 'Requirements submitted successfully!');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json(['error' => 'Record not found.'], 404);
-        } catch (\Exception $e) {
-            // Log the exception for debugging
-            Log::error('Failed to delete Penlat: ' . $e->getMessage());
+            return response()->json(['message' => 'Utility usage updated successfully.'], 200);
+        } else {
+            return response()->json(['message' => 'Utility not found.'], 404);
         }
     }
 
@@ -194,7 +230,7 @@ class PenlatController extends Controller
         } catch (\Exception $e) {
             // Log the exception for debugging
             Log::error('Failed to delete Penlat: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to delete record due to an unexpected error.'], 500);
+            return response()->json(['error' => 'Error 500.'], 404);
         }
     }
 
@@ -202,10 +238,10 @@ class PenlatController extends Controller
     {
         try {
             // Check if the Penlat is used in the Penlat_batch table
-            $isRequirementExist = Penlat_requirement::where('id', $id)->exists();
+            $isItemExist = Penlat_requirement::where('id', $id)->exists();
 
-            if (!$isRequirementExist) {
-                return response()->json(['error' => 'Requirement cannot be deleted because it is not found!'], 400);
+            if (!$isItemExist) {
+                return redirect()->back()->with('success', 'Failed to delete record due to unexist item.');
             }
 
             $item = Penlat_requirement::where('id', $id);
@@ -217,7 +253,7 @@ class PenlatController extends Controller
         } catch (\Exception $e) {
             // Log the exception for debugging
             Log::error('Failed to delete Penlat: ' . $e->getMessage());
-            return redirect()->back()->with('success', 'Failed to delete record due to an unexpected error.');
+            return response()->json(['error' => 'Record not found.'], 404);
         }
     }
 
@@ -255,7 +291,7 @@ class PenlatController extends Controller
 
         if ($request->hasFile('display')) {
             // Delete the old image if exists
-            if ($penlat->filepath) {
+            if ($penlat->filepath && file_exists(public_path($penlat->filepath))) {
                 unlink(public_path($penlat->filepath));
             }
 
@@ -296,19 +332,18 @@ class PenlatController extends Controller
     public function requirement_store(Request $request)
     {
         // Validate the request
-        $request->validate([
+        $validated = $request->validate([
             'penlat' => 'required',
-            'documents' => 'required',
-            'documents.*' => 'required',
+            'tool.*' => 'required',
+            'amount.*' => 'required',
         ]);
 
-        $documents = $request->input('documents');
-
-        // Loop through the documents and create a new record for each
-        foreach ($documents as $key => $document) {
+        // Save the tools associated with this room
+        foreach ($validated['tool'] as $key => $toolId) {
             Penlat_requirement::create([
                 'penlat_id' => $request->penlat,
-                'requirement' => $document,
+                'inventory_tool_id' => $toolId,
+                'amount' => $validated['amount'][$key],
             ]);
         }
 
@@ -451,7 +486,7 @@ class PenlatController extends Controller
 
         if ($request->hasFile('edit_display')) {
             // Delete the old image if exists
-            if ($penlat->filepath) {
+            if ($penlat->filepath && file_exists(public_path($penlat->filepath))) {
                 unlink(public_path($penlat->filepath));
             }
 

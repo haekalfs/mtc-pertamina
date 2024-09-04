@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Akhlak;
+use App\Models\Nilai;
 use App\Models\Quarter;
 use App\Models\User;
 use App\Models\User_pencapaian_akhlak;
@@ -110,6 +111,7 @@ class AkhlakController extends Controller
         $users = User::all();
         $akhlakPoin = Akhlak::all();
         $quarterList = Quarter::all();
+        $nilai = Nilai::all();
 
         // Map data for the radar chart
         $labels = ['Kompeten', 'Harmonis', 'Loyal', 'Adaptif', 'Kolaboratif', 'Amanah'];
@@ -142,6 +144,7 @@ class AkhlakController extends Controller
             'userSelected' => $userSelected,
             'userSelectedOpt' => $userSelectedOpt,
             'data' => $data,
+            'nilai' => $nilai,
             'labels' => $labels
         ]);
     }

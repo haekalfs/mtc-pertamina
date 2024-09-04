@@ -105,14 +105,14 @@ font-weight-bold
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> Pemakaian Utilities</h6>
+                    <h6 class="m-0 font-weight-bold text-secondary" id="judul">Pemakaian Utilitas : {{ $data->batch }}</h6>
                     <div class="text-right">
                         {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Add Utilities</a> --}}
                     </div>
                 </div>
                 <div class="card-body">
-                    <table class="table table-bordered">
-                        <thead>
+                    <table id="docLetter" class="table table-bordered">
+                        <thead class="thead-light">
                             <tr>
                                 <th style="width:60%">Tool</th>
                                 <th style="width:10%">Quantity</th>
@@ -153,7 +153,7 @@ font-weight-bold
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                            <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> List Costs</h6>
+                            <h6 class="m-0 font-weight-bold text-secondary" id="judul">List Costs : {{ $data->batch }}</h6>
                             <div class="text-right">
                                 {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Edit Data</a> --}}
                             </div>
@@ -241,7 +241,7 @@ font-weight-bold
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                            <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> List Costs</h6>
+                            <h6 class="m-0 font-weight-bold text-secondary" id="judul">Grafik : {{ $data->batch }}</h6>
                         </div>
                         <div class="card-body">
                             <div id="chartContainer" style="height: 370px; width: 100%;"></div>

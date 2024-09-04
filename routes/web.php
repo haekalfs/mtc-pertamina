@@ -43,15 +43,23 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['au
 
 Route::middleware(['suspicious'])->group(function () {
 
+    Route::middleware(['checkForErrors'])->group(function () {
+    });
 });
 
 Route::middleware('auth')->group(function () {
+    //Import data
     Route::post('/clear-toast-session', function () {
         Session::forget('loading-import');
         return response()->json(['status' => 'success']);
     })->name('clear.toast.session');
+
+    //Charts
     Route::get('/api/chart-data/{year}', [OperationController::class, 'getChartData']);
     Route::get('/api/chart-data-profits/{year}', [FinanceController::class, 'getChartDataProfits']);
+    Route::get('/feedback-chart-data', [PDController::class, 'getFeedbackChartData']);
+
+    //Encrypt
     Route::get('/encrypt-params', function () {
         $quarter = request('quarter');
         $year = request('year');
@@ -66,10 +74,6 @@ Route::middleware('auth')->group(function () {
     // Route::get('/user-registration', [RegistrationController::class, 'index'])->name('ext.register.user');
 
     //KPI
-    Route::middleware(['checkForErrors'])->group(function () {
-        Route::post('/duplicate-kpis/{year}', [KpiController::class, 'duplicateKpis'])->name('kpis.duplicate');
-        Route::post('/key-performance-indicators/downloadPdf', [KPIController::class, 'downloadPdf'])->name('kpi.downloadPdf');
-    });
     Route::get('/key-performance-indicators/index/{quarterSelected?}/{yearSelected?}', [KpiController::class, 'index'])->name('kpi');
     Route::post('/kpi-store', [KpiController::class, 'store'])->name('kpis.store');
     Route::post('/pencapaian-kpi/store/{kpi}', [KpiController::class, 'store_pencapaian'])->name('pencapaian.kpi.store');
@@ -78,6 +82,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/delete-pencapaian-kpi/{id}', [KpiController::class, 'destroy_pencapaian'])->name('pencapaian.kpi.destroy');
     Route::get('/key-performance-indicators/manage-items/{yearSelected?}', [KpiController::class, 'manage'])->name('manage-kpi');
     Route::get('/key-performance-indicators/report', [KpiController::class, 'report'])->name('report-kpi');
+    Route::post('/duplicate-kpis/{year}', [KpiController::class, 'duplicateKpis'])->name('kpis.duplicate');
+    Route::post('/key-performance-indicators/downloadPdf', [KPIController::class, 'downloadPdf'])->name('kpi.downloadPdf');
     //KPI Unused
     Route::get('/key-performance-indicators/preview/{id}', [KpiController::class, 'preview'])->name('preview-kpi');
 
@@ -89,10 +95,6 @@ Route::middleware('auth')->group(function () {
 
     //Operation
     Route::get('/operation-dashboard/{yearSelected?}', [OperationController::class, 'index'])->name('operation');
-    Route::middleware(['checkForErrors'])->group(function () {
-        Route::post('/duplicate-kpis/{year}', [KpiController::class, 'duplicateKpis'])->name('kpis.duplicate');
-        Route::post('/key-performance-indicators/downloadPdf', [KPIController::class, 'downloadPdf'])->name('kpi.downloadPdf');
-    });
     //penlat
     Route::get('/penlat/list-pelatihan', [PenlatController::class, 'index'])->name('penlat');
     Route::get('/penlat/pelatihan-preview/{penlatId}', [PenlatController::class, 'preview_penlat'])->name('preview-penlat');
@@ -136,8 +138,9 @@ Route::middleware('auth')->group(function () {
     //Penlat Requirement
     Route::get('/penlat/tool-requirement-penlat', [PenlatController::class, 'tool_requirement_penlat'])->name('tool-requirement-penlat');
     Route::post('/store-penlat-requirement', [PenlatController::class, 'requirement_store'])->name('requirement.store');
-    Route::get('/penlat-requirement/{id}/edit', [PenlatController::class, 'edit_requirement'])->name('requirement.data');
-    Route::post('/penlat-requirement-update', [PenlatController::class, 'update_requirement'])->name('requirement.update');
+    Route::post('/insert-item-to-penlat-requirement/{penlatId}', [PenlatController::class, 'requirement_insert_item'])->name('requirement.insert.item');
+    Route::get('/penlat/tool-requirement-penlat/preview-item/{id}', [PenlatController::class, 'preview_requirement'])->name('preview-requirement');
+    Route::put('/penlat-requirement-update/{id}', [PenlatController::class, 'update_requirement'])->name('requirement.update');
     Route::delete('/penlat-requirement-delete/{id}', [PenlatController::class, 'delete_requirement'])->name('delete.requirement');
     Route::get('/penlat-item-requirement-delete/{id}', [PenlatController::class, 'delete_item_requirement'])->name('delete.item.requirement');
 
@@ -181,7 +184,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/import-vendor-payments', [ImportController::class, 'import_vendor_payment'])->name('vendor_payment.import');
 
     Route::get('/finances/profits-loss', [FinanceController::class, 'profits'])->name('profits');
-    Route::get('/finances/costs/{penlatId}', [FinanceController::class, 'costs'])->name('cost');
+    Route::get('/finances/costs/{penlatId}/{month}/{year}', [FinanceController::class, 'costs'])->name('cost');
     Route::get('/finances/import-profits-loss-page', [FinanceController::class, 'profits_import'])->name('costs.import');
     Route::post('/import-profits-loss', [ImportController::class, 'import_profits'])->name('profits.import');
     Route::get('/finances/costs/preview-item/{id}', [FinanceController::class, 'preview_costs'])->name('preview-costs');
@@ -249,7 +252,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/fetch-penlat-references/{penlatId}', [PDController::class, 'fetch_reference_data'])->name('references.data');
     Route::post('/update-penlat-references', [PDController::class, 'update_references'])->name('references.update');
 
-
     Route::get('/planning-development/instructor/upload-certificate', [PDController::class, 'upload_certificate'])->name('upload-certificate');
 
 
@@ -263,6 +265,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/manage-users', [UserController::class, 'manage'])->name('manage.users');
     Route::get('/manage-users/registration', [UserController::class, 'register'])->name('register.users');
     Route::post('/register/user', [UserController::class, 'store'])->name('register.user');
+    Route::get('/manage-users/preview-user/{id}', [UserController::class, 'edit'])->name('edit.user');
+    Route::put('/manage-users/update-user/{userId}', [UserController::class, 'update'])->name('update.user');
 
     //manage roles
     Route::get('/manage-roles', [RolesController::class, 'index'])->name('manage.roles');

@@ -71,6 +71,7 @@ font-weight-bold
                                     <tr>
                                         <th>No</th>
                                         <th>Department Name</th>
+                                        <th>Created At</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -80,9 +81,10 @@ font-weight-bold
                                         <tr>
                                             <td>{{ $noDept++ }}</td>
                                             <td>{{ $item->department_name }}</td>
+                                            <td>{{ $item->created_at }}</td>
                                             <td class="text-center">
                                                 <a href="#" class="btn btn-outline-secondary btn-sm btn-details mr-2"><i class="fa fa-info-circle"></i> Edit</a>
-                                                <a href="#" class="btn btn-outline-danger btn-sm btn-details mr-2" onclick="event.preventDefault(); document.getElementById('delete-department-form-{{ $item->id }}').submit();"><i class="fa fa-ban"></i> Delete</a>
+                                                <a href="#" class="btn btn-outline-danger btn-sm btn-details mr-2" onclick="confirmDelete('department', {{ $item->id }}); return false;"><i class="fa fa-ban"></i> Delete</a>
                                                 <form id="delete-department-form-{{ $item->id }}" action="{{ route('department.destroy', $item->id) }}" method="POST" style="display: none;">
                                                     @csrf
                                                     @method('DELETE')
@@ -100,6 +102,7 @@ font-weight-bold
                                         <th>No</th>
                                         <th>Position Name</th>
                                         <th>Priority</th>
+                                        <th>Created At</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -109,10 +112,11 @@ font-weight-bold
                                         <tr>
                                             <td>{{ $noPost++ }}</td>
                                             <td>{{ $item->position_name }}</td>
-                                            <td>{{ $item->position_level }}</td>
+                                            <td>{!! $item->position_level ? ($item->position_level == 2 ? '<i class="fa fa-circle text-danger"></i>' : '<i class="fa fa-circle text-secondary"></i>') : '' !!}</td>
+                                            <td>{{ $item->created_at }}</td>
                                             <td class="text-center">
                                                 <a href="#" class="btn btn-outline-secondary btn-sm btn-details mr-2"><i class="fa fa-info-circle"></i> Edit</a>
-                                                <a href="#" class="btn btn-outline-danger btn-sm btn-details mr-2" onclick="event.preventDefault(); document.getElementById('delete-position-form-{{ $item->id }}').submit();"><i class="fa fa-ban"></i> Delete</a>
+                                                <a href="#" class="btn btn-outline-danger btn-sm btn-details mr-2" onclick="confirmDelete('position', {{ $item->id }}); return false;"><i class="fa fa-ban"></i> Delete</a>
                                                 <form id="delete-position-form-{{ $item->id }}" action="{{ route('position.destroy', $item->id) }}" method="POST" style="display: none;">
                                                     @csrf
                                                     @method('DELETE')
@@ -187,4 +191,31 @@ font-weight-bold
         </div>
     </div>
 </div>
+<script>
+    function confirmDelete(type, id) {
+        let formId = '';
+        let typeName = '';
+
+        if (type === 'department') {
+            formId = 'delete-department-form-' + id;
+            typeName = 'department';
+        } else if (type === 'position') {
+            formId = 'delete-position-form-' + id;
+            typeName = 'position';
+        }
+
+        swal({
+            title: "Are you sure?",
+            text: `Once deleted, you will not be able to recover this ${typeName}!`,
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+        .then((willDelete) => {
+            if (willDelete) {
+                document.getElementById(formId).submit();
+            }
+        });
+    }
+</script>
 @endsection

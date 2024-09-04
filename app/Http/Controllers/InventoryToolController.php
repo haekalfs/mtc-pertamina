@@ -19,7 +19,6 @@ class InventoryToolController extends Controller
             'asset_name' => 'required',
             'asset_number' => 'nullable|string|max:20',
             'maker' => 'required',
-            'running_hour' => 'required',
             'condition' => 'required',
             'location' => 'required',
             'last_maintenance' => 'required',
@@ -38,7 +37,6 @@ class InventoryToolController extends Controller
         $tool->asset_stock = $request->input('stock');
         $tool->initial_stock = $request->input('stock');
         $tool->location_id = $request->input('location');
-        $tool->used_time = $request->input('running_hour');
         $tool->last_maintenance = $request->input('last_maintenance');
         $tool->next_maintenance = $request->input('next_maintenance');
 
@@ -78,7 +76,6 @@ class InventoryToolController extends Controller
             'asset_name' => $tool->asset_name,
             'asset_id' => $tool->asset_id,
             'asset_maker' => $tool->asset_maker,
-            'used_time' => $tool->used_time,
             'asset_condition_id' => $tool->asset_condition_id,
             'initial_stock' => $tool->initial_stock,
             'location_id' => $tool->location_id,
@@ -114,7 +111,6 @@ class InventoryToolController extends Controller
         $tool->asset_name = $request->input('asset_name');
         $tool->asset_id = $request->input('asset_number');
         $tool->asset_maker = $request->input('maker');
-        $tool->used_time = $request->input('running_hour');
         $tool->asset_condition_id = $request->input('condition');
         $tool->location_id = $request->input('location');
         $tool->initial_stock = $initialStocks;
@@ -126,7 +122,7 @@ class InventoryToolController extends Controller
         // Handle the tool image update
         if ($request->hasFile('tool_image')) {
             // Delete the old image if it exists
-            if ($tool->img && $tool->img->filepath) {
+            if ($tool->img && $tool->img->filepath && file_exists(public_path($tool->img->filepath))) {
                 unlink(public_path($tool->img->filepath));
             }
 
@@ -152,7 +148,7 @@ class InventoryToolController extends Controller
         // Handle the optional file upload for the maintenance guide
         if ($request->hasFile('maintenance_guide')) {
             // Delete the old guide if it exists
-            if ($tool->asset_guidance) {
+            if ($tool->asset_guidance && file_exists(public_path($tool->asset_guidance))) {
                 unlink(public_path($tool->asset_guidance));
             }
 

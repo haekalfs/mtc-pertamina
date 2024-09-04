@@ -57,12 +57,12 @@ font-weight-bold
     <strong>{{ $message }}</strong>
 </div>
 @endif
-<div class="animated fadeIn zoom90">
+<div class="animated fadeIn">
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-12 zoom90">
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold" id="judul">List Data</h6>
+                    <h6 class="m-0 font-weight-bold" id="judul">List Data <span id="tahun"></span></h6>
                     <div class="d-flex">
                         {{-- <a id="addApproversBtn" class="btn btn-sm btn-primary shadow-sm text-white"><i class="fa fa-file-text fa-sm"></i> Filter</a>
                         <a id="hideApproversBtn" class="btn btn-sm btn-secondary shadow-sm text-white" style="display: none;"><i class="fa fa-backward fa-sm"></i> Cancel</a> --}}
@@ -72,7 +72,7 @@ font-weight-bold
                     <div class="row d-flex justify-content-start mb-4">
                         <div class="col-md-12">
                             <div class="row align-items-center">
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label for="namaPenlat">Nama Pelatihan :</label>
                                         <select class="custom-select" id="namaPenlat" name="namaPenlat">
@@ -83,7 +83,7 @@ font-weight-bold
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <div class="form-group">
                                         <label for="jenisPenlat">Jenis Penlat :</label>
                                         <select class="form-control" id="jenisPenlat" name="jenisPenlat">
@@ -105,9 +105,20 @@ font-weight-bold
                                         </select>
                                     </div>
                                 </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label for="status">Month :</label>
+                                        <select class="form-control" id="month" name="month" required>
+                                            <option value="-1" selected>Show All</option>
+                                            @foreach(range(1, 12) as $month)
+                                                <option value="{{ $month }}">{{ date("F", mktime(0, 0, 0, $month, 1)) }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label for="position_id">Periode :</label>
+                                        <label for="position_id">Year :</label>
                                         <select name="periode" class="form-control" id="periode">
                                             <option value="-1" selected>Show All</option>
                                             @foreach(range(date('Y'), date('Y') - 5) as $year)
@@ -137,7 +148,7 @@ font-weight-bold
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold" id="judul">Group by Yearly Data</h6>
+                    <h6 class="m-0 font-weight-bold" id="judul">Summary <span id="tahunSummary"></span></h6>
                     <div class="d-flex">
                         {{-- <a id="addApproversBtn" class="btn btn-sm btn-primary shadow-sm text-white"><i class="fa fa-file-text fa-sm"></i> Filter</a>
                         <a id="hideApproversBtn" class="btn btn-sm btn-secondary shadow-sm text-white" style="display: none;"><i class="fa fa-backward fa-sm"></i> Cancel</a> --}}
@@ -145,7 +156,7 @@ font-weight-bold
                 </div>
                 <div class="card-body zoom80">
                     <div class="">
-                        <h5 class="card-title font-weight-bold">Revenue & Operating Expenses</h5>
+                        <h5 class="card-title font-weight-bold">Revenue & Operating Expenses <span id="tahunRevenue"></span></h5>
                         <div class="ml-2">
                             <table class="table table-borderless table-sm">
                                 <tr>
@@ -187,7 +198,7 @@ font-weight-bold
                             </table>
                         </div>
                         <hr>
-                        <h5 class="card-title font-weight-bold">Nett Income</h5>
+                        <h5 class="card-title font-weight-bold">Nett Income <span id="tahunIncome"></span></h5>
                         <div class="ml-2">
                             <table class="table table-borderless table-sm">
                                 <tr>
@@ -208,15 +219,45 @@ font-weight-bold
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6 zoom90">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <span class="text-danger font-weight-bold">User Manual</span>
+                </div>
+                <div class="card-body" style="background-color: rgb(247, 247, 247);">
+                    <h6 class="h6 mb-2 font-weight-bold text-gray-800">General Guidelines</h6>
+                    <ul class="ml-4" style="line-height:200%">
+                        <li>Table diatas adalah List Pelatihan beserta Revenue, Cost & Nett Income.</li>
+                        <li>Nominal dari table diatas, diambil dari semua batch yang dimiliki oleh pelatihan tersebut.</li>
+                        <li>List Pelatihan adalah Induk Data dari Penlat, yang mana 1 Pelatihan bisa memiliki banyak batch.</li>
+                        <li>Data di samping adalah summary dari semua revenue, cost & nett income data pelatihan.</li>
+                        <li>Anda bisa mengklik detail dari pelatihan tersebut dengan mengklik gambarnya, yang nanti akan menampilkan batch-batch yang sudah diadakan, beserta list costnya.</li>
+                        <li class="text-danger font-weight-bold">Untuk menampilkan summary & grafik, anda perlu memilih periode tahun.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold" id="judul">Yearly Chart</h6>
+                    <h6 class="m-0 font-weight-bold" id="judul">Grafik</h6>
                     <div class="d-flex">
                     </div>
                 </div>
                 <div class="card-body">
                     <div id="chartContainerSpline" style="height: 370px; width: 100%;"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold" id="judul">Grafik</h6>
+                    <div class="d-flex">
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="stackedArea" style="height: 370px; width: 100%;"></div>
                 </div>
             </div>
         </div>
@@ -233,10 +274,59 @@ window.onload = function () {
 };
 function loadChartData() {
     var selectedOption = document.getElementById("periode").value;
+    if(selectedOption != '-1'){
+        var selectedYear = selectedOption;
+    } else {
+        var selectedYear = '';
+    }
     fetch('/api/chart-data-profits/' + selectedOption)
         .then(response => response.json())
         .then(data => {
-            // Render the chart
+            var chart = new CanvasJS.Chart("stackedArea", {
+                animationEnabled: true,
+                title: {
+                    text: "Comparison of Profits: " + selectedYear + " vs Previous Year"
+                },
+                axisX: {
+                    interval: 1,
+                    labelFormatter: function(e) {
+                        return e.label; // Use the label provided in the data points
+                    }
+                },
+                axisY: {
+                    includeZero: true,
+                    title: "Profits",
+                    prefix: "Rp",
+                    labelFormatter: function(e) {
+                        return CanvasJS.formatNumber(e.value, "#,##0");
+                    }
+                },
+                toolTip: {
+                    shared: true
+                },
+                legend: {
+                    cursor: "pointer",
+                    itemclick: toggleDataSeries
+                },
+                data: [
+                    {
+                        type: "stackedArea",
+                        name: "Current Year",
+                        showInLegend: true,
+                        yValueFormatString: "#,##0 Rupiah",
+                        dataPoints: data.dataPointsCurrentYear
+                    },
+                    {
+                        type: "stackedArea",
+                        name: "Previous Year",
+                        showInLegend: true,
+                        yValueFormatString: "#,##0 Rupiah",
+                        dataPoints: data.dataPointsPreviousYear
+                    }
+                ]
+            });
+            chart.render();
+
             var chart = new CanvasJS.Chart("chartContainerSpline", {
                 animationEnabled: true,
                 zoomEnabled: true,
@@ -258,6 +348,17 @@ function loadChartData() {
             chart.render();
 
             // Update financial data on the page
+            if(selectedOption != '-1'){
+                document.getElementById('tahun').innerText = selectedOption;
+                document.getElementById('tahunSummary').innerText = selectedOption;
+                document.getElementById('tahunRevenue').innerText = selectedOption;
+                document.getElementById('tahunIncome').innerText = selectedOption;
+            } else {
+                document.getElementById('tahun').innerText = 'Overall';
+                document.getElementById('tahunSummary').innerText = '';
+                document.getElementById('tahunRevenue').innerText = '';
+                document.getElementById('tahunIncome').innerText = '';
+            }
             document.getElementById('revenue').innerText = formatCurrency(data.array.revenue);
             document.getElementById('total_biaya_instruktur').innerText = formatCurrency(data.array.total_biaya_instruktur);
             document.getElementById('total_pnbp').innerText = formatCurrency(data.array.total_pnbp);
@@ -271,6 +372,10 @@ function loadChartData() {
             document.getElementById('nett_income').innerText = formatCurrency(data.array.nett_income);
             document.getElementById('totalCosts').innerText = formatCurrency(data.array.total_costs);
         });
+    function toggleDataSeries(e) {
+        e.dataSeries.visible = typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible;
+        chart.render();
+    }
 }
 
 // Function to format currency
@@ -292,6 +397,7 @@ $(document).ready(function() {
                 d.jenisPenlat = $('#jenisPenlat').val();
                 d.stcw = $('#stcw').val();
                 d.periode = $('#periode').val();
+                d.month = $('#month').val();
             }
         },
         columns: [
@@ -303,7 +409,7 @@ $(document).ready(function() {
         ]
     });
     // Redraw the table based on filter changes
-    $('#namaPenlat, #jenisPenlat, #stcw, #periode').change(function() {
+    $('#namaPenlat, #jenisPenlat, #stcw, #periode, #month').change(function() {
         table.draw();
     });
 });

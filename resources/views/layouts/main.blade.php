@@ -75,7 +75,7 @@
                 <span class="sidebar-user-img">
                     <picture>
                         @if(Auth::user()->users_detail->profile_pic)
-                        <img src="{{ asset('/img/avatar/'. Auth::user()->users_detail->profile_pic) }}" alt="User name">
+                        <img class="rounded-circle" alt="" src="{{ asset('/img/avatar/'. Auth::user()->users_detail->profile_pic) }}">
                         @else
                         <img src="{{ asset('images/admin.jpg') }}" alt="User name">
                         @endif
@@ -249,7 +249,7 @@
                     <div class="user-area dropdown float-right">
                         <a href="#" class="dropdown-toggle active" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             @if(Auth::user()->users_detail->profile_pic)
-                            <img class="user-avatar rounded-circle" src="{{ asset('/img/avatar/'. Auth::user()->users_detail->profile_pic) }}" alt="User Avatar">
+                            <img class="user-avatar rounded-circle" style="width:38px; height:38px;" src="{{ asset('/img/avatar/'. Auth::user()->users_detail->profile_pic) }}" alt="User Avatar">
                             @else
                             <img class="user-avatar rounded-circle" src="{{ asset('images/admin.jpg') }}" alt="User Avatar">
                             @endif

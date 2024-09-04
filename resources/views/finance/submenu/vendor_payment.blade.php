@@ -94,18 +94,19 @@ font-weight-bold
                     <table id="listPayments" class="table table-bordered">
                         <thead class="text-center thead-light zoom90">
                             <tr>
+                                <th>Tanggal Invoice</th>
+                                <th>Jenis Vendor</th>
                                 <th>Vendor</th>
-                                <th>Nomor Vendor</th>
-                                <th>Uraian</th>
-                                <th>WAPU</th>
-                                <th>Kode Pajak</th>
                                 <th>No Invoice</th>
                                 <th>Nilai</th>
-                                <th>Pajak</th>
-                                <th>No Req ID</th>
                                 <th>No PR</th>
+                                <th>Req. ID</th>
                                 <th>No PO</th>
                                 <th>No SA GR</th>
+                                <th>No Req. Payment Approval</th>
+                                <th>No Req. BMC</th>
+                                <th>Tgl Kirim Edoc</th>
+                                <th>Ket</th>
                                 <th>Tanggal Terbayarkan</th>
                                 <!-- Add any other relevant columns -->
                             </tr>
@@ -131,19 +132,20 @@ $(document).ready(function() {
             }
         },
         columns: [
-            { data: 'vendor', name: 'vendor' },
-            { data: 'nomor_vendor', name: 'nomor_vendor' },
-            { data: 'uraian', name: 'uraian' },
-            { data: 'wapu', name: 'wapu' },
-            { data: 'kode_pajak', name: 'kode_pajak' },
-            { data: 'no_invoice', name: 'no_invoice' },
-            { data: 'nilai', name: 'nilai' },
-            { data: 'pajak', name: 'pajak' },
-            { data: 'no_req_id', name: 'no_req_id' },
-            { data: 'no_pr', name: 'no_pr' },
-            { data: 'no_po', name: 'no_po' },
-            { data: 'no_sa_gr', name: 'no_sa_gr' },
-            { data: 'tanggal_terbayarkan', name: 'tanggal_terbayarkan' },
+            { data: 'tanggal_terima_dokumen_invoice', name: 'tanggal_terima_dokumen_invoice' }, // "Tanggal Invoice"
+            { data: 'jenis_vendor', name: 'jenis_vendor' }, // "Jenis Vendor"
+            { data: 'vendor', name: 'vendor' }, // "Vendor"
+            { data: 'no_invoice', name: 'no_invoice' }, // "No Invoice"
+            { data: 'nilai', name: 'nilai' }, // "Nilai"
+            { data: 'no_pr', name: 'no_pr' }, // "No PR"
+            { data: 'no_req_id', name: 'no_req_id' }, // "Req. ID"
+            { data: 'no_po', name: 'no_po' }, // "No PO"
+            { data: 'no_sa_gr', name: 'no_sa_gr' }, // "No SA GR"
+            { data: 'no_req_payment_approval', name: 'no_req_payment_approval' }, // "No Req. Payment Approval"
+            { data: 'no_req_bmc', name: 'no_req_bmc' }, // "No Req. BMC"
+            { data: 'tanggal_kirim_ke_edoc_ssc', name: 'tanggal_kirim_ke_edoc_ssc' }, // "Tgl Kirim Edoc"
+            { data: 'keterangan', name: 'keterangan' }, // "Ket"
+            { data: 'tanggal_terbayarkan', name: 'tanggal_terbayarkan' } // "Tanggal Terbayarkan"
         ]
     });
 

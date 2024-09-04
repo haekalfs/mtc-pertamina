@@ -104,12 +104,14 @@ class AgreementController extends Controller
         // Handle file uploads for SPK and image
         if ($request->hasFile('spk_file')) {
             // Delete the old SPK file if it exists
-            if ($agreement->spk_filepath && file_exists(storage_path('app/' . $agreement->spk_filepath))) {
-                unlink(storage_path('app/' . $agreement->spk_filepath));
+            if ($agreement->spk_filepath && file_exists(public_path($agreement->spk_filepath))) {
+                unlink(public_path($agreement->spk_filepath));
             }
-            // Store the new SPK file
-            $spkFilePath = $request->file('spk_file')->store('spk_files');
-            $agreement->spk_filepath = $spkFilePath;
+            // Store the new SPK file in the same way as the store function
+            $image = $request->file('spk_file');
+            $filename = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('uploads/agreement/spk'), $filename);
+            $agreement->spk_filepath = 'uploads/agreement/spk/' . $filename;
         } else {
             // Update non-SPK details if no SPK file is uploaded
             $agreement->non_spk = $request->input('non_spk_details');
@@ -118,12 +120,14 @@ class AgreementController extends Controller
         // Handle image upload
         if ($request->hasFile('img')) {
             // Delete the old image if it exists
-            if ($agreement->img_filepath && file_exists(storage_path('app/' . $agreement->img_filepath))) {
-                unlink(storage_path('app/' . $agreement->img_filepath));
+            if ($agreement->img_filepath && file_exists(public_path($agreement->img_filepath))) {
+                unlink(public_path($agreement->img_filepath));
             }
-            // Store the new image file
-            $imgFilePath = $request->file('img')->store('images');
-            $agreement->img_filepath = $imgFilePath;
+            // Store the new image file in the same way as the store function
+            $image = $request->file('img');
+            $filename = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('uploads/agreement'), $filename);
+            $agreement->img_filepath = 'uploads/agreement/' . $filename;
         }
 
         // Save the updated agreement details

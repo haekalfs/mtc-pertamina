@@ -105,6 +105,9 @@ font-weight-bold
                 </div>
                 <div class="card-body">
                     <div class="row">
+                        @if(!$getAgreements || $getAgreements->isEmpty())
+                            No Data Available
+                        @else
                         @foreach($getAgreements as $agreement)
                         <div class="col-md-12">
                             <div class="container-video">
@@ -128,6 +131,7 @@ font-weight-bold
                                 <small>Show More...</small>
                             </a>
                         </div>
+                        @endif
                     </div>
                 </div>
             </div>

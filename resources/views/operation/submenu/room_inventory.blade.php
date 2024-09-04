@@ -60,6 +60,33 @@ font-weight-bold
                     </div>
                 </div>
                 <div class="card-body">
+                    <form method="GET" action="{{ route('room-inventory') }}">
+                        @csrf
+                        <div class="row d-flex justify-content-right mb-4">
+                            <div class="col-md-12">
+                                <div class="row align-items-center">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="year">Filter :</label>
+                                            <select class="form-control" name="locationFilter">
+                                                <option value="-1" selected>Show All</option>
+                                                @foreach ($locations as $item)
+                                                    <option value="{{ $item->id }}" @if($item->id == $selectedLocation) selected @endif>{{ $item->description }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1 d-flex align-self-end justify-content-start">
+                                        <div class="form-group">
+                                            <div class="align-self-center">
+                                                <button type="submit" class="btn btn-primary" style="padding-left: 1.2em; padding-right: 1.2em;"><i class="ti-search"></i></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                     <table id="dataTable" class="table table-bordered mt-2">
                         <thead class="thead-light">
                             <tr>

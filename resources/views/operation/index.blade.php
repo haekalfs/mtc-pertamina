@@ -153,9 +153,10 @@ window.onload = function() {
     fetch('/api/chart-data/' + selectedOption)
         .then(response => response.json())
         .then(data => {
+            // Map the labels to show month names and year
             const labels = data.dataPointsSpline1.map(dp => {
                 const date = new Date(dp.x);
-                return `${date.getDate()} ${date.toLocaleString('default', { month: 'short' })}`;
+                return date.toLocaleString('default', { month: 'short', year: 'numeric' }); // Show Month and Year
             });
 
             const dataset1 = {
@@ -186,8 +187,8 @@ window.onload = function() {
             const myChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: labels,
-                    datasets: [dataset1, dataset2]  // Multiple datasets
+                    labels: labels,  // Monthly labels
+                    datasets: [dataset1, dataset2]
                 },
                 options: {
                     responsive: true,
@@ -195,7 +196,7 @@ window.onload = function() {
                         x: {
                             title: {
                                 display: true,
-                                text: 'Date'
+                                text: 'Month'  // Update the x-axis label to 'Month'
                             }
                         },
                         y: {

@@ -42,7 +42,7 @@ font-weight-bold
     <strong>{{ $message }}</strong>
 </div>
 @endif
-<div class="animated fadeIn zoom90">
+<div class="animated fadeIn">
     <div class="row">
 
         @php
@@ -52,50 +52,46 @@ font-weight-bold
             $target = $kpiItem->target / 4;
         }
         @endphp
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-3">
-                    <section>
-                        <div class="indicators">
-                            <div class="indicator">
-                                <div class="indicator__name">{{ $kpiItem->indicator }}</div>
-                                <div class="indicator__data">
-                                    <div class="data__entry">
-                                        <div class="mb-1 @if($target <= $kpiItem->pencapaian->sum('score')) text-success @else text-danger @endif">Target :</div>
-                                        <div class="data__description">{{ $kpiItem->goal }}</div>
-                                        <div class="data__amount">{{ number_format($target, 0, ',', '.') }}</div>
-                                    </div>
-                                    <div class="data__entry">
-                                        <div class="data__description">Tercapai :</div>
-                                        <div class="por-txt mt-1">{{ number_format($kpiItem->pencapaian->sum('score'), 0, ',', '.') }} ({{ round($percentage) }}%)</div>
-                                    </div>
-                                </div>
+        <div class="col-md-3 zoom90">
+            <section>
+                <div class="indicators">
+                    <div class="indicator">
+                        <div class="indicator__name bg-primary text-white">{{ $kpiItem->indicator }}</div>
+                        <div class="indicator__data">
+                            <div class="data__entry">
+                                <div class="mb-1 @if($target <= $kpiItem->pencapaian->sum('score')) text-success @else text-danger @endif">Target :</div>
+                                <div class="data__description">{{ $kpiItem->goal }}</div>
+                                <div class="data__amount">{{ number_format($target, 0, ',', '.') }}</div>
+                            </div>
+                            <div class="data__entry">
+                                <div class="data__description">Tercapai :</div>
+                                <div class="por-txt mt-1">{{ number_format($kpiItem->pencapaian->sum('score'), 0, ',', '.') }} ({{ round($percentage) }}%)</div>
                             </div>
                         </div>
-                    </section>
+                    </div>
                 </div>
-                <div class="col-md-9">
-                    <div class="card">
-
-                        <div class="card-body">
-                            <div class="progress-box-modified progress-1" style="font-size: 20px;">
-                                <h4 class="por-title mb-3">Realisasi Pencapaian {{ $kpiItem->indicator }}</h4>
-                                <div class="progress" style="height: 20px;">
-                                    <div class="progress-bar
-                                         @if($percentage >= 75) bg-success
-                                         @elseif($percentage >= 50) bg-warning
-                                         @else bg-danger
-                                         @endif"
-                                         role="progressbar" style="width: {{ $percentage }}%; font-size: 15px;" aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100">
-                                        {{ round($percentage) }}%
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="alert @if($target <= $kpiItem->pencapaian->sum('score')) alert-success @else alert-danger @endif alert-block mt-3">
-                                <button type="button" class="close" data-dismiss="alert">×</button>
-                                <strong>@if($target <= $kpiItem->pencapaian->sum('score')) Target is Reached! @else Target is not Reached yet! @endif</strong>
+            </section>
+        </div>
+        <div class="col-md-9 zoom90">
+            <div class="card">
+                <div class="card-body">
+                    <div class="progress-box-modified progress-1" style="font-size: 20px;">
+                        <h4 class="por-title">Realisasi Pencapaian {{ $kpiItem->indicator }}</h4>
+                        <div class="por-txt">Target : {{ number_format($kpiItem->pencapaian->sum('score'), 0, ',', '.') }} ({{ round($percentage) }}%)</div>
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar
+                                 @if($percentage >= 75) bg-success
+                                 @elseif($percentage >= 50) bg-warning
+                                 @else bg-danger
+                                 @endif"
+                                 role="progressbar" style="width: {{ $percentage }}%; font-size: 15px;" aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100">
+                                {{ round($percentage) }}%
                             </div>
                         </div>
+                    </div>
+                    <div class="alert @if($target <= $kpiItem->pencapaian->sum('score')) alert-success @else alert-danger @endif alert-block mt-3">
+                        <button type="button" class="close" data-dismiss="alert">×</button>
+                        <strong>@if($target <= $kpiItem->pencapaian->sum('score')) Target is Reached! @else Target is not Reached yet! @endif</strong>
                     </div>
                 </div>
             </div>
@@ -108,7 +104,7 @@ font-weight-bold
             </div>
         </div>
 
-        <div class="col-md-12">
+        <div class="col-md-12 zoom90">
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold" id="judul">List Pencapaian - {{ $kpiItem->indicator }}</h6>
@@ -221,6 +217,7 @@ window.onload = function () {
         },
         data: [{
             type: "splineArea",
+            color: "#6599FF",
             markerSize: 5,
             xValueType: "dateTime",
             dataPoints: {!! json_encode($dataPoints, JSON_NUMERIC_CHECK) !!}

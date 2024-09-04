@@ -69,10 +69,20 @@ font-weight-bold
                                         <div class="form-group">
                                             <label for="email">Nama Pelatihan :</label>
                                             <select class="custom-select" id="namaPenlat" name="namaPenlat">
-                                                <option value="1" selected>Show All</option>
+                                                <option value="-1" selected>Show All</option>
                                                 @foreach ($penlatList as $item)
                                                 <option value="{{ $item->id }}">{{ $item->description }}</option>
                                                 @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="email">Kategori Pelatihan :</label>
+                                            <select class="custom-select" id="stcw" name="stcw">
+                                                <option value="-1" selected>Show All</option>
+                                                <option value="STCW">STCW</option>
+                                                <option value="NON STCW">NON STCW</option>
                                             </select>
                                         </div>
                                     </div>

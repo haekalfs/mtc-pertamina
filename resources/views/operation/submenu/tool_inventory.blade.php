@@ -186,7 +186,13 @@ font-weight-bold
                                                         </tr>
                                                         <tr>
                                                             <td style="width: 200px;" class="mb-2"><i class="fa fa-chevron-right mr-2"></i> Running Hour</td>
-                                                            <td style="text-align: start;">: {{ $item->used_time }} Hours</td>
+                                                            @php
+                                                                $purchaseDate = \Carbon\Carbon::parse($item->last_maintenance);
+                                                                $currentDate = \Carbon\Carbon::now();
+                                                                $hoursDifference = $currentDate->diffInHours($purchaseDate);
+                                                            @endphp
+
+                                                            <td style="text-align: start;">: {{ $hoursDifference }} hours</td>
                                                         </tr>
                                                         <tr>
                                                             <td style="width: 200px;" class="mb-2"><i class="fa fa-chevron-right mr-2"></i> Next Maintenance</td>
@@ -317,14 +323,6 @@ font-weight-bold
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Running Hour :</p>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <input type="text" class="form-control" name="running_hour">
-                                            </div>
-                                        </div>
                                         <div class="row">
                                             <div class="col-md-8">
                                                 <div class="d-flex align-items-center mb-4">
@@ -438,14 +436,6 @@ font-weight-bold
                                             </div>
                                             <div class="flex-grow-1">
                                                 <input type="text" class="form-control" name="maker" id="edit_maker">
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Running Hour :</p>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <input type="text" class="form-control" name="running_hour" id="edit_running_hour">
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-4">
@@ -569,7 +559,6 @@ font-weight-bold
                 $('#edit_asset_name').val(response.asset_name);
                 $('#edit_asset_number').val(response.asset_id);
                 $('#edit_maker').val(response.asset_maker);
-                $('#edit_running_hour').val(response.used_time);
                 $('#edit_condition').val(response.asset_condition_id);
                 $('#edit_initial_stock').val(response.initial_stock);
                 $('#edit_used_amount').val(response.used_amount);

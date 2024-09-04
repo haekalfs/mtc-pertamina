@@ -103,6 +103,10 @@ active font-weight-bold
                             <div id="chartContainerSpline" style="height: 370px; width: 100%;"></div>
                             <canvas id="lineChart"></canvas>
                         </div>
+                        <div class="text-center mb-3">
+                            <span id="CountSTCW"></span><span> & </span>
+                            <span id="CountNonSTCW"></span>
+                        </div>
                     </div>
                 </div> <!-- /.row -->
             </div>
@@ -128,6 +132,9 @@ active font-weight-bold
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-12">
+                            @if(!$headline || $headline->isEmpty())
+                                No Data Available
+                            @else
                             <div id="carouselExampleIndicators2" class="carousel slide" data-ride="carousel">
 
                                 <div class="carousel-inner">
@@ -151,6 +158,7 @@ active font-weight-bold
                                     @endforeach
                                 </div>
                             </div>
+                            @endif
 
                             <div class="col-12 text-right p-0">
                                 <a class="btn btn-primary mr-1" href="#carouselExampleIndicators2" role="button" data-slide="prev">
@@ -172,12 +180,13 @@ active font-weight-bold
 window.onload = function() {
     loadChartData();
     var selectedOption = "{{ date('Y') }}";
-    fetch('/api/chart-data/' + selectedOption) // Fixed concatenation
+    fetch('/api/chart-data/' + selectedOption)
         .then(response => response.json())
         .then(data => {
+            // Map the labels to show month names and year
             const labels = data.dataPointsSpline1.map(dp => {
                 const date = new Date(dp.x);
-                return `${date.getDate()} ${date.toLocaleString('default', { month: 'short' })}`;
+                return date.toLocaleString('default', { month: 'short', year: 'numeric' }); // Show Month and Year
             });
 
             const dataset1 = {
@@ -208,8 +217,8 @@ window.onload = function() {
             const myChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: labels,
-                    datasets: [dataset1, dataset2]  // Multiple datasets
+                    labels: labels,  // Monthly labels
+                    datasets: [dataset1, dataset2]
                 },
                 options: {
                     responsive: true,
@@ -217,7 +226,7 @@ window.onload = function() {
                         x: {
                             title: {
                                 display: true,
-                                text: 'Date'
+                                text: 'Month'  // Update the x-axis label to 'Month'
                             }
                         },
                         y: {
@@ -258,6 +267,9 @@ window.onload = function() {
                     }
                 }
             });
+
+            document.getElementById("CountSTCW").innerText = `STCW: ${data.countSTCW} Peserta`;
+            document.getElementById("CountNonSTCW").innerText = `Non-STCW: ${data.countNonSTCW} Peserta`;
         });
 }
 

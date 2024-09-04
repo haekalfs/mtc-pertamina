@@ -70,7 +70,7 @@ font-weight-bold
                                 <td>{{ $item->description }}</td>
                                 <td>{{ $item->role_description }}</td>
                                 <td class="text-center">
-                                    <a href="#" class="btn btn-outline-danger btn-sm btn-details mr-2" onclick="event.preventDefault(); document.getElementById('delete-role-form-{{ $item->id }}').submit();"><i class="fa fa-ban"></i> Delete</a>
+                                    <a href="#" class="btn btn-outline-danger btn-sm btn-details mr-2" onclick="confirmDelete('{{ $item->id }}'); return false;"><i class="fa fa-ban"></i> Delete</a>
                                     <form id="delete-role-form-{{ $item->id }}" action="{{ route('roles.destroy', $item->id) }}" method="POST" style="display: none;">
                                         @csrf
                                         @method('DELETE')
@@ -137,4 +137,20 @@ font-weight-bold
 		</div>
 	</div>
 </div>
+<script>
+    function confirmDelete(id) {
+        swal({
+            title: "Are you sure?",
+            text: "Once deleted, you will not be able to recover this role!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+        .then((willDelete) => {
+            if (willDelete) {
+                document.getElementById('delete-role-form-' + id).submit();
+            }
+        });
+    }
+</script>
 @endsection

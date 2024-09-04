@@ -93,38 +93,43 @@ font-weight-bold
                 </div>
                 <div class="card-body-leaderboard bg-white">
                     <table id="leaderboard" class="table table-borderless">
-                        <tbody>@php $no = 1; @endphp
-                            @foreach($instructors as $instructor)
-                            <tr class="text-secondary">
-                                <td>
-                                    <a href="{{ route('preview-instructor', ['id' => $instructor->id, 'penlatId' => '-1']) }}">
-                                        <div class="d-flex align-items-center animateBox">
-                                            {{ $no++ }}. &nbsp;&nbsp;<img src="{{ asset($instructor->imgFilepath) }}" alt="" class="rounded mr-2 shadow" style="width:50px; height:60px; border: 0.5px solid rgb(211, 211, 211);">
-                                            <span class="instructor-name zoom90 mt-2">{{ $instructor->instructor_name }}<br>{{ \Carbon\Carbon::parse($instructor->instructor_dob)->age }} Tahun</span>
-                                        </div>
-                                    </a>
-                                </td>
-                                <td class="text-center zoom90 pt-4">
-                                    @php
-                                        $roundedScore = round($instructor->average_feedback_score, 1);
-                                        $wholeStars = floor($roundedScore);
-                                        $halfStar = ($roundedScore - $wholeStars) >= 0.5;
-                                    @endphp
+                        <tbody>
+                            @if(!$instructors || $instructors->isEmpty())
+                                No Data Available
+                            @else
+                                @php $no = 1; @endphp
+                                @foreach($instructors as $instructor)
+                                <tr class="text-secondary">
+                                    <td>
+                                        <a href="{{ route('preview-instructor', ['id' => $instructor->id, 'penlatId' => '-1']) }}">
+                                            <div class="d-flex align-items-center animateBox">
+                                                {{ $no++ }}. &nbsp;&nbsp;<img src="{{ asset($instructor->imgFilepath) }}" alt="" class="rounded mr-2 shadow" style="width:50px; height:60px; border: 0.5px solid rgb(211, 211, 211);">
+                                                <span class="instructor-name zoom90 mt-2">{{ $instructor->instructor_name }}<br>{{ \Carbon\Carbon::parse($instructor->instructor_dob)->age }} Tahun</span>
+                                            </div>
+                                        </a>
+                                    </td>
+                                    <td class="text-center zoom90 pt-4">
+                                        @php
+                                            $roundedScore = round($instructor->average_feedback_score, 1);
+                                            $wholeStars = floor($roundedScore);
+                                            $halfStar = ($roundedScore - $wholeStars) >= 0.5;
+                                        @endphp
 
-                                    @for ($i = 0; $i < 5; $i++)
-                                        @if ($i < $wholeStars)
-                                            <i class="fa fa-star text-warning"></i>
-                                        @elseif ($halfStar && $i == $wholeStars)
-                                            <i class="fa fa-star-half-o text-warning"></i>
-                                        @else
-                                            <i class="fa fa-star-o text-secondary"></i>
-                                        @endif
-                                    @endfor
-                                    <span class="ml-2">{{ $roundedScore }}</span><br>
-                                    <small class="ml-4">({{ $instructor->feedbacks_count / 5 }} feedbacks)</small>
-                                </td>
-                            </tr>
-                            @endforeach
+                                        @for ($i = 0; $i < 5; $i++)
+                                            @if ($i < $wholeStars)
+                                                <i class="fa fa-star text-warning"></i>
+                                            @elseif ($halfStar && $i == $wholeStars)
+                                                <i class="fa fa-star-half-o text-warning"></i>
+                                            @else
+                                                <i class="fa fa-star-o text-secondary"></i>
+                                            @endif
+                                        @endfor
+                                        <span class="ml-2">{{ $roundedScore }}</span><br>
+                                        <small class="ml-4">({{ $instructor->feedbacks_count / 5 }} feedbacks)</small>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            @endif
                         </tbody>
                     </table>
                 </div>
@@ -138,24 +143,28 @@ font-weight-bold
                 <div class="card-body">
                     <table class="table table-borderless">
                         <tbody>
+                            @if(!$regulations || $regulations->isEmpty())
+                                No Data Available
+                            @else
                             @foreach($regulations as $item)
-                                <tr class="text-secondary">
-                                    <td class="d-flex align-items-center animateBox">
-                                        <a href="{{ route('preview-regulation', $item->id) }}">
-                                            <div>
-                                                <i class="fa fa-info-circle mr-2"></i> <span>{{ $item->description }}</span>
-                                            </div>
-                                        </a>
-                                    </td>
-                                </tr>
-                                @endforeach
-                                <tr class="text-secondary">
-                                    <td class="text-right">
-                                        <a href="{{ route('regulation') }}">
-                                            <small>Show More...</small>
-                                        </a>
-                                    </td>
-                                </tr>
+                            <tr class="text-secondary">
+                                <td class="d-flex align-items-center animateBox">
+                                    <a href="{{ route('preview-regulation', $item->id) }}">
+                                        <div>
+                                            <i class="fa fa-info-circle mr-2"></i> <span>{{ $item->description }}</span>
+                                        </div>
+                                    </a>
+                                </td>
+                            </tr>
+                            @endforeach
+                            <tr class="text-secondary">
+                                <td class="text-right">
+                                    <a href="{{ route('regulation') }}">
+                                        <small>Show More...</small>
+                                    </a>
+                                </td>
+                            </tr>
+                            @endif
                         </tbody>
                     </table>
                 </div>
@@ -173,8 +182,20 @@ font-weight-bold
                 </div> <!-- /.row -->
             </div>
         </div>
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card-body d-flex justify-content-center align-items-center">
+                            <canvas id="feedbackChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                </div> <!-- /.row -->
+            </div>
+        </div>
     </div>
 </div>
+
 <style>
 .card-leaderboard {
     width: 100%;
@@ -295,5 +316,33 @@ window.onload = function () {
     });
     chart.render();
 }
+fetch('/feedback-chart-data')
+    .then(response => response.json())
+    .then(data => {
+        const labels = data.map(item => item.questioner);
+        const scores = data.map(item => item.average_score);
+
+        const ctx = document.getElementById('feedbackChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Average Score',
+                    data: scores,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
 </script>
 @endsection

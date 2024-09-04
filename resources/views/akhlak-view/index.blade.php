@@ -13,7 +13,6 @@ font-weight-bold
 @endsection
 
 @section('content')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
     .header-pencapaian {
         display: flex;
@@ -119,40 +118,12 @@ font-weight-bold
 <div class="text-right">
     {{-- <a class="btn btn-primary btn-sm text-white mb-4" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-icon fa fa-plus"></i> Insert Pencapaian</a> --}}
 </div>
-<style>
-/* Form Labels */
-.modal-body label {
-    font-weight: bold;
-}
-
-/* Form Inputs */
-.modal-body input[type="text"], .modal-body input[type="date"] {
-    margin-bottom: 10px;
-}
-
-/* Radio Buttons */
-.radio-inline {
-    margin-right: 50px;
-}
-
-</style>
 <div class="animated fadeIn zoom90">
     <div class="row">
         <div class="col-md-12">
-            <div class="card">
+            <div class="card shadow">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-secondary" id="judul">Pencapaian AKHLAK - @if ($userSelected) {{ $userSelected->name }} @else Overall @endif</h6>
-                    <div class="text-right">
-                        <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-icon fa fa-plus"></i> Insert Pencapaian</a>
-                    </div>
-                    {{-- <div class="text-right">
-                        <select class="form-control" id="yearSelected" name="yearSelected" required onchange="redirectToPage()">
-                            <option value="1" selected>All</option>
-                            @foreach (array_reverse($yearsBefore) as $year)
-                                <option value="{{ $year }}" @if ($year == $yearSelected) selected @endif>{{ $year }}</option>
-                            @endforeach
-                        </select>
-                    </div> --}}
+                    <h6 class="m-0 font-weight-bold text-secondary" id="judul">Search Report</h6>
                 </div>
                 <div class="card-body">
                     <form method="GET" action="/akhlak-achievements">
@@ -204,132 +175,108 @@ font-weight-bold
                             </div>
                         </div>
                     </form>
-                    <div class="col-md-12">
-                        <div class="d-flex align-items-center justify-content-between mb-4">
-                            <h6 class="h6 m-0 font-weight-bold text-secondary"><i class="fa fa-user"></i> Avg. Pencapaian <span style="color: #403D4D;">AKH</span><span style="color: #029195;">LAK</span> @if ($userSelected) {{ $userSelected->name }} @else Pekerja @endif </h6>
-                            {{-- <a class="btn btn-primary btn-sm text-white" href="#" id="btn-insert" data-toggle="modal" data-target="#inputDataModal"><i class="menu-icon fa fa-plus"></i> Insert Pencapaian</a> --}}
+                </div>
+            </div>
+        </div>
+        <!-- Information Panel -->
+        @if($userSelected)
+        <div class="col-md-6">
+            <section class="card" style="border: 1px solid grey;">
+                <div class="card-header user-header alt bg-secondary mb-3">
+                    <div class="media">
+                        <a href="#">
+                            <img class="align-self-center rounded-circle mr-3" style="width:85px; height:85px;" alt="" src="images/admin.jpg">
+                        </a>
+                        <div class="media-body">
+                            <h3 class="text-white display-6 mt-1">{{ $userSelected->name }}</h3>
+                            <p class="text-white">Nomor Pekerja : {{ $userSelected->users_detail->employee_id }}</p>
                         </div>
-                        <hr class="sidebar-divider">
                     </div>
-                    <div class="row mb-4 bg-white" id="akhlakContainer">
-                        <!-- Information Panel -->
-                        <div class="col-md-6">
-                            <ul class="ml-4 zoom90" style="padding-left: 1em;">
-                                @foreach ($data as $index => $score)
-                                    <li><strong>{{ $labels[$index] }}:</strong> {{ $score }} %
-                                        @if ($labels[$index] == 'Kompeten')
-                                            <p>This score indicates the level of competence achieved. A higher value reflects greater proficiency in required skills.</p>
-                                        @elseif ($labels[$index] == 'Harmonis')
-                                            <p>This score measures harmony within the team. A higher score suggests better interpersonal relationships and teamwork.</p>
-                                        @elseif ($labels[$index] == 'Loyal')
-                                            <p>This score represents the degree of loyalty demonstrated. A high score indicates strong commitment and reliability.</p>
-                                        @elseif ($labels[$index] == 'Adaptif')
-                                            <p>This score shows adaptability to changing circumstances. A higher value means greater flexibility and responsiveness.</p>
-                                        @elseif ($labels[$index] == 'Kolaboratif')
-                                            <p>This score evaluates collaboration efforts. A higher score reflects effective teamwork and cooperative behavior.</p>
-                                        @elseif ($labels[$index] == 'Amanah')
-                                            <p>This score reflects trustworthiness and integrity. A higher score suggests a strong adherence to ethical standards.</p>
-                                        @endif
-                                    </li>
-                                @endforeach
-                            </ul>
-                        </div>
-                        <!-- Chart -->
-                        <div class="col-md-6">
+                </div>
+                <ul class="ml-4 zoom90" style="padding-left: 1em;">
+                    @foreach ($data as $index => $score)
+                    <li><strong>{{ $labels[$index] }}:</strong> {{ $score }} %
+                        @if ($labels[$index] == 'Kompeten')
+                            <p>Kompeten: Berupaya terus menerus meningkatkan kapabilitas dan memberikan hasil terbaik.</p>
+                        @elseif ($labels[$index] == 'Harmonis')
+                            <p>Harmonis: Menghargai perbedaan, saling peduli, dan membangun lingkungan kerja yang kondusif.</p>
+                        @elseif ($labels[$index] == 'Loyal')
+                            <p>Loyal: Berdedikasi dan mengutamakan kepentingan Bangsa dan Negara.</p>
+                        @elseif ($labels[$index] == 'Adaptif')
+                            <p>Adaptif: Terus berinovasi dan antusias dalam menggerakkan atau menghadapi perubahan.</p>
+                        @elseif ($labels[$index] == 'Kolaboratif')
+                            <p>Kolaboratif: Membangun kerjasama yang sinergis.</p>
+                        @elseif ($labels[$index] == 'Amanah')
+                            <p>Amanah: Memegang teguh kepercayaan yang diberikan.</p>
+                        @endif
+                    </li>
+                    @endforeach
+                </ul>
+            </section>
+        </div>
+        @endif
+        @if(!$userSelected)
+        <div class="col-md-6">
+            <div class="card mb-4 shadow">
+                <div class="card-header">
+                    <span class="text-primary font-weight-bold">Overview</span>
+                </div>
+                <div class="card-body" style="background-color: rgb(247, 247, 247);">
+                    <h6 class="h6 mb-2 font-weight-bold text-gray-800">General Guidelines</h6>
+                    <ul class="ml-4">
+                        <li>Review the overall and specific user charts to ensure alignment with Akhlak BUMN values.</li>
+                        <li>Ensure that all user data is presented accurately and reflects the principles of integrity and professionalism.</li>
+                        <li>Unauthorized changes to user performance data or charts are not permitted to maintain data accuracy.</li>
+                        <li>Thoroughly verify all data visualizations for accuracy and completeness before finalizing any reports or updates.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        @endif
+        <div class="col-md-6">
+            <div class="card">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card-body d-flex justify-content-center align-items-center">
                             <canvas id="radarChart" style="max-width: 100%; height: 500px; margin: auto;"></canvas>
                         </div>
-                        @if($userSelected)
-                        <div class="col-md-12">
-                            {{-- <div class="d-flex align-items-center justify-content-between mt-4 mb-4">
-                                <h6 class="h6 m-0 font-weight-bold"><i class="fa fa-user"></i> Pencapaian Akhlak - {{ $userSelected->name }}</h6>
-                                <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-icon fa fa-plus"></i> Insert Pencapaian</a>
-                            </div>
-                            <hr class="sidebar-divider"> --}}
-                        </div>
-                        <div class="col-xl-4 col-lg-4 col-md-12 mt-4">
-                            <div class="card profile-header">
-                                <div class="body">
-                                    <div class="row">
-                                        <div class="col-lg-4 col-md-4 col-12">
-                                            <div class="profile-image float-md-right"> <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt=""> </div>
-                                        </div>
-                                        <div class="col-lg-8 col-md-8 col-12">
-                                            <h4 class="m-t-0 m-b-0 mb-2"><strong>{{ $userSelected->name }}</strong></h4>
-                                            <p>Nomor Pekerja : {{ $userSelected->users_detail->employee_id }}</p>
-                                            <span class="job_post">{{ $userSelected->users_detail->position->position_name }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xl-8 col-lg-8 col-md-12 mt-4 mb-4 zoom90">
-                            <table  id="listPencapaianUser" class="table table-striped table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Judul Kegiatan</th>
-                                        <th>Score</th>
-                                        <th>Intended to</th>
-                                        <th>Quarter</th>
-                                        <th>Periode</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($pencapaian as $item)
-                                    <tr>
-                                        <td>{{ $item->judul_kegiatan }}</td>
-                                        <td>{{ $item->score }} %</td>
-                                        <td>{{ $item->akhlak->indicator }}</td>
-                                        <td>{{ $item->quarter_id }}</td>
-                                        <td>{{ $item->periode }}</td>
-                                        <td class="text-center">
-                                            <a href="#" class="btn btn-outline-secondary btn-sm btn-details mr-2"><i class="fa fa-info-circle"></i> Preview</a>
-                                            {{-- <a data-toggle="modal" data-target="#editInvoiceModal" data-item-id="{{ $docs->id }}" class="btn btn-danger btn-sm"><i class="fas fa-fw fa-trash-alt"></i> Delete</a> --}}
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                        @else
-                        <div class="col-xl-12 col-lg-12 col-md-12 mt-4">
-                            <table  id="docLetter" class="table table-striped table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Employee Name</th>
-                                        <th>Judul Kegiatan</th>
-                                        <th>Score</th>
-                                        <th>Intended to</th>
-                                        <th>Quarter</th>
-                                        <th>Periode</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($pencapaian as $item)
-                                    <tr>
-                                        <td>{{ $item->user->name }}</td>
-                                        <td>{{ $item->judul_kegiatan }}</td>
-                                        <td>{{ $item->score }} %</td>
-                                        <td>{{ $item->akhlak->indicator }}</td>
-                                        <td>{{ $item->quarter->quarter_name }}</td>
-                                        <td>{{ $item->periode }}</td>
-                                        <td class="text-center">
-                                            <a href="#" class="btn btn-outline-secondary btn-sm btn-details mr-2"><i class="fa fa-info-circle"></i> Preview</a>
-                                            {{-- <a data-toggle="modal" data-target="#editInvoiceModal" data-item-id="{{ $docs->id }}" class="btn btn-danger btn-sm"><i class="fas fa-fw fa-trash-alt"></i> Delete</a> --}}
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                        @endif
-                        <div class="col-md-12 text-right mt-4">
-                            <small><i class="ti-fullscreen"></i>
-                                <a href="#" onclick="toggleFullScreen('akhlakContainer')">&nbsp;<i>Fullscreen</i></a>
-                            </small>
-                        </div>
                     </div>
+                </div> <!-- /.row -->
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-secondary" id="judul">Pencapaian AKHLAK - @if ($userSelected) {{ $userSelected->name }} @else Overall @endif</h6>
+                    <div class="text-right">
+                        <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-icon fa fa-plus"></i> Insert Pencapaian</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <table  id="docLetter" class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Employee Name</th>
+                                <th>Judul Kegiatan</th>
+                                <th>Nilai</th>
+                                <th>Core Value</th>
+                                <th>Quarter</th>
+                                <th>Periode</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($pencapaian as $item)
+                            <tr>
+                                <td>{{ $item->user->name }}</td>
+                                <td>{{ $item->judul_kegiatan }}</td>
+                                <td>{{ $item->score }} %</td>
+                                <td>{{ $item->akhlak->indicator }}</td>
+                                <td>{{ $item->quarter->quarter_name }}</td>
+                                <td>{{ $item->periode }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -383,10 +330,10 @@ font-weight-bold
                         </div>
                         <div class="form-group">
                             <label for="activity_title">Judul Kegiatan</label>
-                            <input type="text" class="form-control" id="activity_title" name="activity_title" placeholder="Average Test Score..." required>
+                            <input type="text" class="form-control" id="activity_title" name="activity_title" placeholder="e.g Corporate Social Responsibility (CSR) “Event 1”" required>
                         </div>
                         <div class="form-group">
-                            <label for="akhlak_points"><span style="color: #403D4D;">AKH</span><span style="color: #029195;">LAK</span></label>
+                            <label for="akhlak_points">Core Values</label>
                             <select data-placeholder="Akhlak Poin" multiple class="standardSelect form-control" id="akhlak_points" name="akhlak_points[]">
                                 @foreach ($akhlakPoin as $item)
                                 <option value="{{ $item->id }}">{{ $item->indicator }}</option>
@@ -394,8 +341,12 @@ font-weight-bold
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="akhlak_value">Nilai <span style="color: #403D4D;">AKH</span><span style="color: #029195;">LAK</span> <small class="text-danger"><i>(in percentage)</i></small></label>
-                            <input type="text" class="form-control" id="akhlak_value" name="akhlak_value" placeholder="85%" required>
+                            <label for="akhlak_value">Nilai <span style="color: #403D4D;">AKH</span><span style="color: #029195;">LAK</span></label>
+                            <select class="form-control" id="akhlak_value" name="akhlak_value" required>
+                                @foreach ($nilai as $item)
+                                    <option value="{{ $item->id }}">{{ $item->description }}</option>
+                                @endforeach
+                            </select>
                         </div>
                         <div class="form-group">
                             <label for="evidence">Evidence <small class="text-danger"><i>(only document allowed!)</i></small></label>
@@ -425,23 +376,6 @@ font-weight-bold
                                 </div>
                             </div>
                         </div>
-                        {{-- <div class="form-group">
-                            <label for="period">Periode</label>
-                            <div class="row">
-                                @php
-                                    if($periode_start){
-                                        // Deduct one day from the start date if it exists
-                                        $adjustedStartDate = $periode_start ? \Carbon\Carbon::createFromFormat('Y-m-d', $periode_start)->addDay()->format('Y-m-d') : '';
-                                    }
-                                @endphp
-                                <div class="col-md-6">
-                                    <input type="date" class="form-control" id="period_start" name="period_start" @if ($periode_start) value="{{ $adjustedStartDate }}" @endif>
-                                </div>
-                                <div class="col-md-6">
-                                    <input type="date" class="form-control" id="period_end" name="period_end" @if ($periode_end) value="{{ $periode_end }}" @endif>
-                                </div>
-                            </div>
-                        </div> --}}
                     </div>
                 </div>
                 <div class="modal-footer">

@@ -18,8 +18,11 @@ class KpiController extends Controller
 {
     public function index($encryptedQuarter = null, $encryptedYear = null)
     {
+        //decrypting
         $quarterSelected = $encryptedQuarter ? Crypt::decryptString($encryptedQuarter) : -1;
         $yearSelected = $encryptedYear ? Crypt::decryptString($encryptedYear) : null;
+
+        //date
         $nowYear = date('Y');
         $yearsBefore = range($nowYear - 4, $nowYear);
         $currentYear = $yearSelected ?? $nowYear;
@@ -86,6 +89,8 @@ class KpiController extends Controller
             ];
         }
 
+        $quarterRow = Quarter::find($quarterSelected);
+
         return view('kpi-view.index', [
             'kpis' => $kpis,
             'yearsBefore' => $yearsBefore,
@@ -93,7 +98,8 @@ class KpiController extends Controller
             'yearSelected' => $currentYear,
             'overallProgress' => round($overallProgress, 2),
             'quarters' => $quarters,
-            'kpiChartsData' => $kpiChartsData
+            'kpiChartsData' => $kpiChartsData,
+            'quarterRow' => $quarterRow
         ]);
     }
 
@@ -228,7 +234,7 @@ class KpiController extends Controller
         // Fetch the filtered KPIs
         $kpis = $query->get();
 
-        $allKPI = KPI::all();
+        $allKPI = KPI::where('periode', $periode)->get();
 
         $data = [];
         $overallKPI = [

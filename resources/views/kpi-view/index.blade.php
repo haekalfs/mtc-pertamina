@@ -116,29 +116,33 @@ font-weight-bold
         <div class="col-md-12">
             <div class="card mb-4 mt-2">
                 <div class="card-header">
-                    <span class="text-secondary font-weight-bold">Infographics KPI</span>
+                    <span class="text-secondary font-weight-bold">Realisasi KPI {{ $quarterRow ? $quarterRow->months : 'Overall' }}</span>
                 </div>
                 <div class="card-body" style="background-color: rgb(247, 247, 247);">
                     <div class="row">
-                        <div class="col-md-5">
-                            <div class="card-body d-flex align-items-center justify-content-center">
-                                {{-- circle progress bar --}}
-                                <h4 class="mb-2">Realisasi KPI Overall</h4>
-                                <a class="progress-circle-wrapper animateBox">
-                                    <div class="progress-circle p{{ round($overallProgress, 0) }} @if(round($overallProgress, 2) >= 50) over50 @endif">
-                                        <span>{{ round($overallProgress, 2) }}%</span>
-                                        <div class="left-half-clipper">
-                                            <div class="first50-bar"></div>
-                                            <div class="value-bar"></div>
-                                        </div>
+                        <div class="col-md-3 d-flex justify-content-center">
+                            <a class="progress-circle-wrapper animateBox">
+                                <div class="progress-circle p{{ round($overallProgress, 0) }} @if(round($overallProgress, 2) >= 50) over50 @endif">
+                                    <span>{{ round($overallProgress, 2) }}%</span>
+                                    <div class="left-half-clipper">
+                                        <div class="first50-bar"></div>
+                                        <div class="value-bar"></div>
                                     </div>
-                                </a>
-                            </div>
+                                </div>
+                            </a>
                         </div>
-                        <div class="col-md-7">
+                        @php
+                            $indicatorsArray = $kpis->pluck('indicator')->toArray();
+                            $lastIndicator = array_pop($indicatorsArray); // Remove the last item
+                            $indicators = implode(', ', $indicatorsArray); // Join the remaining items with commas
+                            if ($lastIndicator) {
+                                $indicators .= ' and ' . $lastIndicator; // Append the last item with 'and'
+                            }
+                        @endphp
+                        <div class="col-md-9">
                             <h6 class="h6 mb-2 font-weight-bold text-gray-800">Guidelines for KPI Realization</h6>
                             <ul class="ml-4">
-                                <li><strong>KPI Realization Overview:</strong> This section provides an overview of the Key Performance Indicators (KPIs) realization for Pertamina MTC. It focuses on evaluating the performance and achievements of various KPIs, highlighting areas of success and identifying opportunities for improvement. The goal is to assess how well the targets have been met and to provide insights for strategic planning and decision-making within the organization.</li>
+                                <li><strong>KPI Realization Overview:</strong> This section provides an overview of the Key Performance Indicators (KPIs) realization for Pertamina MTC. It focuses on evaluating the performance and achievements of various KPIs such as {{ $indicators }} highlighting areas of success and identifying opportunities for improvement. The goal is to assess how well the targets have been met and to provide insights for strategic planning and decision-making within the organization.</li>
                             </ul>
                         </div>
                     </div>

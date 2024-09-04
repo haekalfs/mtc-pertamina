@@ -27,7 +27,7 @@ class Inventory_tools extends Model
         'last_maintenance',
         'initial_stock',
         'location_id',
-        'used_time',
+        'purchased_date',
         'used_amount'
     ];
 

@@ -36,7 +36,7 @@ class OperationController extends Controller
         $yearSelected = $yearSelected ?? $nowYear;
 
         // Get counts for various items
-        $getPesertaCount = Infografis_peserta::count();
+        $getPesertaCount = Infografis_peserta::whereYear('tgl_pelaksanaan', $yearSelected)->count();
         $getKebutuhanCount = Penlat_requirement::count();
         $getAssetCount = Inventory_tools::count();
         $getAssetStock = Inventory_tools::sum('initial_stock');
@@ -117,11 +117,11 @@ class OperationController extends Controller
             ]);
         }
 
-        // Fetch data by date for the spline chart
-        $dataByDate1 = Infografis_peserta::select('tgl_pelaksanaan', DB::raw('count(*) as total'))
+        // Fetch data by month for the spline chart
+        $dataByMonth1 = Infografis_peserta::select(DB::raw('DATE_FORMAT(tgl_pelaksanaan, "%Y-%m") as month'), DB::raw('count(*) as total'))
             ->whereYear('tgl_pelaksanaan', $year)
             ->where('kategori_program', 'STCW')
-            ->groupBy('tgl_pelaksanaan')
+            ->groupBy('month')
             ->get();
 
         $countSTCW = Infografis_peserta::whereYear('tgl_pelaksanaan', $year)
@@ -132,25 +132,25 @@ class OperationController extends Controller
             ->where('kategori_program', 'NON STCW')
             ->count();
 
-        $dataByDate2 = Infografis_peserta::select('tgl_pelaksanaan', DB::raw('count(*) as total'))
+        $dataByMonth2 = Infografis_peserta::select(DB::raw('DATE_FORMAT(tgl_pelaksanaan, "%Y-%m") as month'), DB::raw('count(*) as total'))
             ->whereYear('tgl_pelaksanaan', $year)
             ->where('kategori_program', 'NON STCW')
-            ->groupBy('tgl_pelaksanaan')
+            ->groupBy('month')
             ->get();
 
         // Prepare data points for the spline chart
         $dataPointsSpline1 = [];
         $dataPointsSpline2 = [];
-        foreach ($dataByDate1 as $row) {
+        foreach ($dataByMonth1 as $row) {
             $dataPointsSpline1[] = [
-                "x" => Carbon::parse($row->tgl_pelaksanaan)->timestamp * 1000,
+                "x" => Carbon::parse($row->month)->timestamp * 1000,  // Parse month as timestamp
                 "y" => $row->total
             ];
         }
 
-        foreach ($dataByDate2 as $row) {
+        foreach ($dataByMonth2 as $row) {
             $dataPointsSpline2[] = [
-                "x" => Carbon::parse($row->tgl_pelaksanaan)->timestamp * 1000,
+                "x" => Carbon::parse($row->month)->timestamp * 1000,  // Parse month as timestamp
                 "y" => $row->total
             ];
         }
@@ -578,12 +578,24 @@ class OperationController extends Controller
         return view('operation.submenu.tool_usage');
     }
 
-    public function room_inventory()
+    public function room_inventory(Request $request)
     {
         $assets = Inventory_tools::all();
         $locations = Location::all();
-        $rooms = Room::all();
-        return view('operation.submenu.room_inventory', ['assets' => $assets, 'locations' => $locations, 'rooms' => $rooms]);
+
+        $selectedLocation = '-1';
+
+        if($request->locationFilter){
+            $selectedLocation = $request->locationFilter;
+        }
+
+        if($selectedLocation != '-1'){
+            $rooms = Room::where('location_id', $selectedLocation)->get();
+        } else {
+            $rooms = Room::all();
+        }
+
+        return view('operation.submenu.room_inventory', ['assets' => $assets, 'locations' => $locations,'selectedLocation' => $selectedLocation, 'rooms' => $rooms]);
     }
 
     public function utility(Request $request)
@@ -742,11 +754,11 @@ class OperationController extends Controller
 
             return redirect()->back()->with('success', 'Deleted Successfully.');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json(['error' => 'Record not found.'], 404);
+            return redirect()->back()->with('success', 'Deleted Successfully.');
         } catch (\Exception $e) {
             // Log the exception for debugging
             Log::error('Failed to delete Penlat: ' . $e->getMessage());
-            return redirect()->back()->with('success', 'Failed to delete record due to an unexpected error.');
+            return response()->json(['error' => 'Record not found.'], 404);
         }
     }
 
