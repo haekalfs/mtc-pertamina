@@ -105,10 +105,20 @@ class ImportFeedback implements ShouldQueue
             // Commit the transaction
             DB::commit();
 
+            // Delete the Excel file after processing
+            if (file_exists($this->filePath)) {
+                unlink($this->filePath);
+            }
+
             Cache::forget('jobs_processing');
         } catch (\Exception $e) {
             // Rollback the transaction if any error occurs
             DB::rollBack();
+
+            // Delete the Excel file after processing
+            if (file_exists($this->filePath)) {
+                unlink($this->filePath);
+            }
 
             Cache::forget('jobs_processing');
             // Log the error

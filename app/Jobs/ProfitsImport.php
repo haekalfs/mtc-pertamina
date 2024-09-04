@@ -63,24 +63,34 @@ class ProfitsImport implements ShouldQueue
                 }
 
                 if (strpos($row[0], '/') !== false) {
-                    // Get penlat
-                    $parts = explode('/', $row[0]);
-                    $firstWord = $parts[0];
 
-                    // Make sure the batch doesn't already exist
-                    $checkBatch = Penlat_batch::where('batch', $row[0])->exists();
-                    if (!$checkBatch) {
-                        $getPenlat = Penlat::where('alias', $firstWord)->first();
-                        Penlat_batch::updateOrCreate(
-                            [
-                                'batch' => $row[0],
-                            ],
-                            [
-                                'penlat_id' => $getPenlat->id,
-                                'nama_program' => $getPenlat->description,
-                                'date' => $currentDate,
-                            ]
-                        );
+                    try {
+                        // Get penlat
+                        $parts = explode('/', $row[0]);
+                        $firstWord = $parts[0];
+
+                        // Make sure the batch doesn't already exist
+                        $checkBatch = Penlat_batch::where('batch', $row[0])->exists();
+                        if (!$checkBatch) {
+
+                            $checkPenlat = Penlat::where('alias', $firstWord)->exists();
+                            if($checkPenlat){
+                                $getPenlat = Penlat::where('alias', $firstWord)->first();
+                                Penlat_batch::updateOrCreate(
+                                    [
+                                        'batch' => $row[0],
+                                    ],
+                                    [
+                                        'penlat_id' => $getPenlat->id,
+                                        'nama_program' => $getPenlat->description,
+                                        'date' => $currentDate,
+                                    ]
+                                );
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        // Log or handle the exception as needed
+                        Log::error('Error processing the file: ' . $e->getMessage());
                     }
 
                     Profit::updateOrCreate(
