@@ -379,7 +379,7 @@ class OperationController extends Controller
             'penlat' => 'required',
             'batch' => 'required',
             'date' => 'required',
-            'image' => 'required|image',
+            'image' => 'sometimes|image',
             'program' => 'sometimes'
         ]);
 
@@ -413,6 +413,12 @@ class OperationController extends Controller
             } else {
                 // If the batch exists, fetch the existing Penlat_batch record
                 $penlatUtility = Penlat_batch::where('batch', $request->batch)->first();
+                // Update the necessary fields
+                if($imagePath){
+                    $penlatUtility->filepath = $imagePath;  // Replace 'field_name' with the actual field and 'new_value' with the new value
+                    // Save the changes to the database
+                    $penlatUtility->save();
+                }
             }
 
             // Loop through the tools and save the PenlatUtilityUsage entries
@@ -420,17 +426,19 @@ class OperationController extends Controller
                 if (strpos($key, 'qty_') === 0) {
                     $id = substr($key, 4); // Extract the tool id from the key
                     $quantity = $value;
-                    $unit = $request->input('unit_' . $id);
 
-                    Penlat_utility_usage::updateOrCreate(
-                        [
-                            'penlat_batch_id' => $penlatUtility->id,
-                            'utility_id' => $id, // Assuming you want to store the tool's id as utility_id
-                        ],
-                        [
-                            'amount' => $quantity,
-                        ]
-                    );
+                    // Only proceed if the quantity is not zero, null, or empty
+                    if (!is_null($quantity) && $quantity !== '' && $quantity > 0) {
+                        Penlat_utility_usage::updateOrCreate(
+                            [
+                                'penlat_batch_id' => $penlatUtility->id,
+                                'utility_id' => $id, // Assuming you want to store the tool's id as utility_id
+                            ],
+                            [
+                                'amount' => $quantity,
+                            ]
+                        );
+                    }
                 }
             }
 

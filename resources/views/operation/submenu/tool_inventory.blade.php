@@ -281,7 +281,7 @@ font-weight-bold
                                      style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
                                      <small style="font-size: 10px;"><i><u>Click above to upload image!</u></i></small>
                             </label>
-                            <input id="file-upload" type="file" name="tool_image" style="display: none;" accept="image/*" onchange="previewImage(event)">
+                            <input id="file-upload" type="file" name="tool_image" style="display: none;" accept="image/*" onchange="previewImage(event)" required>
                         </div>
                         <div class="col-md-9">
                             <div class="card-body text-secondary">
@@ -300,7 +300,7 @@ font-weight-bold
                                                 <p style="margin: 0;">Nomor Asset :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <input type="text" class="form-control" name="asset_number">
+                                                <input type="text" class="form-control" name="asset_number" required>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-4">
@@ -308,7 +308,7 @@ font-weight-bold
                                                 <p style="margin: 0;">Maker :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <input type="text" class="form-control" name="maker">
+                                                <input type="text" class="form-control" name="maker" required>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-4">
@@ -316,7 +316,7 @@ font-weight-bold
                                                 <p style="margin: 0;">Lokasi :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <select class="form-control" name="location">
+                                                <select class="form-control" name="location" required>
                                                     @foreach ($locations as $item)
                                                         <option value="{{ $item->id }}">{{ $item->description }}</option>
                                                     @endforeach
@@ -330,7 +330,7 @@ font-weight-bold
                                                         <p style="margin: 0;">Kondisi Alat :</p>
                                                     </div>
                                                     <div class="flex-grow-1">
-                                                        <select name="condition" class="form-control">
+                                                        <select name="condition" class="form-control" required>
                                                             @foreach($assetCondition as $item)
                                                             <option value="{{ $item->id }}">{{ $item->condition }}</option>
                                                             @endforeach
@@ -344,7 +344,7 @@ font-weight-bold
                                                         <p style="margin: 0;">Stock :</p>
                                                     </div>
                                                     <div class="flex-grow-1">
-                                                        <input type="text" class="form-control" name="stock">
+                                                        <input type="text" class="form-control" name="stock" required>
                                                     </div>
                                                 </div>
                                             </div>
@@ -354,7 +354,7 @@ font-weight-bold
                                                 <p style="margin: 0;">Last Maintenance :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <input type="date" class="form-control" name="last_maintenance">
+                                                <input type="date" class="form-control" name="last_maintenance" required>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-4">
@@ -362,7 +362,7 @@ font-weight-bold
                                                 <p style="margin: 0;">Next Maintenance :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <input type="date" class="form-control" name="next_maintenance">
+                                                <input type="date" class="form-control" name="next_maintenance" required>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-4">

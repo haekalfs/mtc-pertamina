@@ -57,8 +57,12 @@ font-weight-bold
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> List Data</h6>
                 <div class="text-right">
+                    {{-- @mtd_acc(4) --}}
                     <a href="#" class="btn btn-danger btn-sm text-white delete-campaign mr-2" data-id="{{ $data->id }}"><i class="menu-Logo fa fa-trash-o"></i> Delete</a>
+                    {{-- @endmtd_acc
+                    @mtd_acc(3) --}}
                     <a href="#" class="btn btn-secondary btn-sm text-white edit-campaign" data-id="{{ $data->id }}"><i class="menu-Logo fa fa-edit"></i> Update Data</a>
+                    {{-- @endmtd_acc --}}
                 </div>
             </div>
             <div class="card-body">

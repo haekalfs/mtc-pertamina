@@ -115,7 +115,9 @@ font-weight-bold
                             <div class="col-12 col-md-9">
                                 <input type="file" id="cv" name="cvFilepath" class="form-control">
                                 @if($data->cvFilepath)
-                                    <a href="{{ asset($data->cvFilepath) }}" target="_blank">View CV</a>
+                                <small>
+                                    Existing : <a href="{{ asset($data->cvFilepath) }}" target="_blank"><u>{{ $data->cvFilepath }}</u> <i class="fa fa-download"></i></a>
+                                </small>
                                 @endif
                             </div>
                         </div>
@@ -124,17 +126,21 @@ font-weight-bold
                             <div class="col-12 col-md-9">
                                 <input type="file" id="ijazah" name="ijazahFilepath" class="form-control">
                                 @if($data->ijazahFilepath)
-                                    <a href="{{ asset($data->ijazahFilepath) }}" target="_blank">View Ijazah</a>
+                                    <small>
+                                        Existing : <a href="{{ asset($data->ijazahFilepath) }}" target="_blank"><u>{{ $data->ijazahFilepath }}</u> <i class="fa fa-download"></i></a>
+                                    </small>
                                 @endif
                             </div>
                         </div>
 
-                        <div class="row form-group">
+                        <div class="row form-group mb-4">
                             <div class="col col-md-3"><label for="documentPendukungFilepath" class="form-control-label">Dokument Pendukung</label></div>
                             <div class="col-12 col-md-9">
                                 <input type="file" id="documentPendukungFilepath" name="documentPendukungFilepath" class="form-control">
                                 @if($data->documentPendukungFilepath)
-                                    <a href="{{ asset($data->documentPendukungFilepath) }}" target="_blank">View File</a>
+                                    <small>
+                                        Existing : <a href="{{ asset($data->documentPendukungFilepath) }}" target="_blank"><u>{{ $data->documentPendukungFilepath }}</u> <i class="fa fa-download"></i></a>
+                                    </small>
                                 @endif
                             </div>
                         </div>

@@ -83,22 +83,61 @@ font-weight-bold
         </div>
     </div>
     <div class="row">
-        <div class="col-lg-8">
-            <div class="card">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="card-body d-flex justify-content-center align-items-center">
-                            <!-- <canvas id="TrafficChart"></canvas>   -->
-                            <div id="chartContainer" style="height: 370px; width: 100%;"></div>
+        <div class="col-lg-12 zoom90">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold">Marketing Event</h6>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            @if(!$headline || $headline->isEmpty())
+                                No Data Available
+                            @else
+                            <div id="carouselExampleIndicators2" class="carousel slide" data-ride="carousel">
+
+                                <div class="carousel-inner">
+                                    @foreach($headline->chunk(3) as $index => $chunk)
+                                    <div class="carousel-item{{ $index === 0 ? ' active' : '' }}">
+                                        <div class="row">
+                                            @foreach($chunk as $hl)
+                                            <div class="col-md-4 mb-1">
+                                                <div class="card" style=" border: 1px solid #e1e1e1;">
+                                                    <img class="img-fluid" alt="100%x280" style="max-height: 200px;" src="{{ asset($hl->img_filepath) }}">
+                                                    <div class="card-body">
+                                                        <h4 class="card-title">{{ $hl->campaign_name }}</h4>
+                                                        <div class="card-text short-news mb-3">{!! Str::limit($hl->campaign_result, 300, '...') !!}</div>
+                                                        <a class="btn btn-secondary btn-sm read-more-button" href="{{ route('preview-campaign', $hl->id) }}">Read More</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                            @endif
+
+                            <div class="col-12 text-right p-0">
+                                <a class="btn btn-primary mr-1" href="#carouselExampleIndicators2" role="button" data-slide="prev">
+                                    <i class="fa fa-arrow-left"></i>
+                                </a>
+                                <a class="btn btn-primary " href="#carouselExampleIndicators2" role="button" data-slide="next">
+                                    <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </div>
                         </div>
                     </div>
-                </div> <!-- /.row -->
+                </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-12">
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-sitemap"></i> Company Agreement</h6>
+                    <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-sitemap"></i> Recent Agreement</h6>
                     <div class="text-right">
                         {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Add Utilities</a> --}}
                     </div>
@@ -109,14 +148,14 @@ font-weight-bold
                             No Data Available
                         @else
                         @foreach($getAgreements as $agreement)
-                        <div class="col-md-12">
+                        <div class="col-md-3">
                             <div class="container-video">
-                                <div class="file-man-box">
+                                <div class="file-man-box" style=" border: 1px solid #e1e1e1;">
                                     <div class="file-img-box">
                                         <img src="{{ asset($agreement->img_filepath ? $agreement->img_filepath : 'https://via.placeholder.com/250x150/5fa9f8/ffffff') }}" alt="icon">
                                     </div>
                                     <a href="{{ route('preview-company', $agreement->id) }}" target="_blank" class="file-download">
-                                        <small><i class="fa fa-external-link"></i></small>
+                                        <small><i class="fa fa-external-link animateBox"></i></small>
                                     </a>
                                     <div class="file-man-title">
                                         <h5 class="mb-0 text-overflow">{{ $agreement->company_name }}</h5>

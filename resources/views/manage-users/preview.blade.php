@@ -4,8 +4,24 @@
 active font-weight-bold
 @endsection
 
-@section('content')
+@section('show-user')
+show
+@endsection
 
+@section('manage-users')
+font-weight-bold
+@endsection
+
+@section('content')
+<div class="d-sm-flex align-items-center zoom90 justify-content-between">
+    <div>
+        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-user"></i> Preview User : {{ $data->id }}</h1>
+        <p class="mb-4">Managing Users Account</a></p>
+    </div>
+    <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
+        <a href="{{ route('manage.users') }}" class="btn btn-sm btn-secondary shadow-sm text-white"><i class="fa fa-backward"></i> Go Back</a>
+    </div>
+</div>
 @if ($message = Session::get('success'))
 <div class="alert alert-success alert-block">
     <button type="button" class="close" data-dismiss="alert">×</button>
@@ -37,24 +53,24 @@ active font-weight-bold
 
                     <div class="media ml-4">
                         <a href="#">
-                            @if(Auth::user()->users_detail->profile_pic)
-                            <img class="align-self-center rounded-circle mr-3" style="width:85px; height:85px;" alt="" src="{{ asset(Auth::user()->users_detail->profile_pic) }}">
+                            @if($data->users_detail->profile_pic)
+                            <img class="align-self-center rounded-circle mr-3" style="width:85px; height:85px;" alt="" src="{{ $data->users_detail->profile_pic ? asset($data->users_detail->profile_pic) : 'https://via.placeholder.com/150x150/5fa9f8/ffffff' }}">
                             @else
                             <div class="align-self-center rounded-circle mr-3"><i class="no-image-text">No Image Available</i></div>
                             @endif
                         </a>
                         <div class="media-body">
-                            <h2 class="text-white display-6">{{ Auth::user()->name }}</h2>
-                            <p class="text-light">{{ Auth::user()->users_detail->position->position_name }}</p>
+                            <h2 class="text-white display-6">{{ $data->name }}</h2>
+                            <p class="text-light">{{ $data->users_detail->position->position_name }}</p>
                         </div>
                     </div>
                 </div>
                 <div class="row mt-4 mb-2 text-center">
                     <div class="col-md-6">
-                        <a href="#" type="button" data-toggle="modal" data-target="#changePicture" id="changePictureButton"><i class="fa fa-picture-o"></i> Change Picture</a>
+                        <a type="button" data-toggle="modal" data-target="#changePass" id="manButton" href="#"><i class="menu-icon fa fa-lock"></i> Reset Password</a>
                     </div>
                     <div class="col-md-6">
-                        <a type="button" data-toggle="modal" data-target="#changePass" id="manButton" href="#"><i class="menu-icon fa fa-lock"></i> Change Password</a>
+                        <a href="{{ route('edit.user', $data->id) }}"><i class="fa fa-edit"></i> Update Data</a>
                     </div>
                 </div>
                 <hr>
@@ -64,7 +80,7 @@ active font-weight-bold
                             <label>Nomor Pekerja</label>
                         </div>
                         <div class="col-md-6">
-                            <p>{{ Auth::user()->users_detail->employee_id }}</p>
+                            <p>{{ $data->users_detail->employee_id }}</p>
                         </div>
                     </div>
                     <div class="row">
@@ -72,7 +88,7 @@ active font-weight-bold
                             <label>User Id</label>
                         </div>
                         <div class="col-md-6">
-                            <p>{{ Auth::user()->id }}</p>
+                            <p>{{ $data->id }}</p>
                         </div>
                     </div>
                     <div class="row">
@@ -80,7 +96,7 @@ active font-weight-bold
                             <label>Name</label>
                         </div>
                         <div class="col-md-6">
-                            <p>{{ Auth::user()->name }}</p>
+                            <p>{{ $data->name }}</p>
                         </div>
                     </div>
                     <div class="row">
@@ -88,7 +104,7 @@ active font-weight-bold
                             <label>Email</label>
                         </div>
                         <div class="col-md-6">
-                            <p>{{ Auth::user()->email }}</p>
+                            <p>{{ $data->email }}</p>
                         </div>
                     </div>
                     <div class="row">
@@ -96,7 +112,7 @@ active font-weight-bold
                             <label>Department</label>
                         </div>
                         <div class="col-md-6">
-                            <p>{{ Auth::user()->users_detail->department->department_name }}</p>
+                            <p>{{ $data->users_detail->department->department_name }}</p>
                         </div>
                     </div>
                     <div class="row">
@@ -104,7 +120,7 @@ active font-weight-bold
                             <label>Position</label>
                         </div>
                         <div class="col-md-6">
-                            <p>{{ Auth::user()->users_detail->position->position_name }}</p>
+                            <p>{{ $data->users_detail->position->position_name }}</p>
                         </div>
                     </div>
                     <div class="row">
@@ -116,7 +132,7 @@ active font-weight-bold
                                 @php
                                     $badgeColors = ['bg-success', 'bg-danger', 'bg-warning', 'bg-info', 'bg-primary', 'bg-secondary'];
                                 @endphp
-                                @foreach (Auth::user()->role_id as $index => $usrRole)
+                                @foreach ($data->role_id as $index => $usrRole)
                                     @if ($usrRole->role)
                                         <span class="badge text-white {{ $badgeColors[$index % count($badgeColors)] }}">{{ $usrRole->role->description }}</span>
                                     @endif
@@ -156,43 +172,6 @@ active font-weight-bold
         </div>
     </div>
 </div>
-
-<div class="modal fade" id="changePicture" tabindex="-1" role="dialog" aria-labelledby="changePictureLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
-        <div class="modal-content">
-            <div class="modal-header d-flex flex-row align-items-center justify-content-between border-bottom-1">
-                <h5 class="modal-title m-0 font-weight-bold text-secondary" id="changePictureLabel">Upload Profile Picture</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form method="POST" action="{{ route('change.profile.picture') }}" enctype="multipart/form-data" id="profilForm">
-                @csrf
-                <div class="modal-body">
-                    <div class="col-md-12 zoom90">
-                        <div class="form-group d-flex align-items-center">
-                            <label for="email" style="margin-bottom: 0;">
-                                <span class="text-danger"><i>File :</i></span>
-                            </label>
-                        </div>
-                        <div class="form-group">
-                            <div class="custom-file">
-                                <input type="file" class="custom-file-input" id="picture" name="picture" accept="image/*" onchange="changeFileName('picture', 'picture-label')">
-                                <label class="custom-file-label" for="picture" id="picture-label">Choose file</label>
-                            </div>
-                            <small style="color: red;"><i>Only picture type allowed!</i></small>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save changes</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
 <div class="modal fade" id="changePass" tabindex="-1" role="dialog" aria-labelledby="modalSign" aria-hidden="true">
 	<div class="modal-dialog modal-dialog-centered" role="document">
 		<div class="modal-content">
@@ -202,7 +181,7 @@ active font-weight-bold
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<form id="resetPasswordForm" method="POST" action="{{ route('profile.reset.password') }}">
+			<form id="resetPasswordForm" method="POST" action="{{ route('reset.user.password', $data->id) }}">
                 @csrf
                 <div class="modal-body">
                     <div class="col-md-12 zoom90">

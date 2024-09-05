@@ -8,7 +8,7 @@ active font-weight-bold
 show
 @endsection
 
-@section('manage-access')
+@section('manage-request')
 font-weight-bold
 @endsection
 
@@ -16,7 +16,7 @@ font-weight-bold
 @section('content')
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
-        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-users"></i> Manage Access</h1>
+        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-users"></i> Manage Allowed Methods</h1>
         <p class="mb-4">Managing Access based on roles.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
@@ -55,17 +55,17 @@ font-weight-bold
                     </div>
                 </div>
                 <div class="card-body">
-                    <form method="post" action="{{ route('assign.roles.to.page') }}">
+                    <form method="post" action="{{ route('assign.roles.to.method') }}">
                         @csrf
                         <div class="col-md-12">
                             <div class="row">
                                 <div class="col-md-5">
                                     <div class="form-group">
-                                        <label for="email">Page :</label>
-                                        <select class="custom-select" id="inputPage" name="inputPage" required>
+                                        <label for="email">Method :</label>
+                                        <select class="custom-select" id="inputPage" name="inputPage">
                                             <option selected disabled>Choose...</option>
-                                            @foreach ($pages as $page)
-                                                <option value="{{ $page->id }}">{{ $page->description }}</option>
+                                            @foreach ($methods as $method)
+                                                <option value="{{ $method->id }}">{{ $method->method }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -73,7 +73,7 @@ font-weight-bold
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="password">Roles :</label>
-                                        <select class="custom-select" id="inputRole" name="inputRole" required>
+                                        <select class="custom-select" id="inputRole" name="inputRole">
                                             <option selected disabled>Choose...</option>
                                             @foreach($r_name as $rn)
                                                 <option value="{{ $rn->id }}">{{ $rn ->description }}</option>
@@ -86,7 +86,19 @@ font-weight-bold
                                         <button type="submit" id="insert-data-fingerprint" class="btn btn-primary">Insert</button>
                                     </div>
                                 </div>
-                                <div class="col-md-12 mt-4">
+                                <div class="col-md-12"><br>
+                                    <div class="alert alert-success alert-success-saving" role="alert" style="display: none;">
+                                        Your entry has been saved successfully.
+                                    </div>
+                                    <div class="alert alert-danger" role="alert" style="display: none;">
+                                        An error occurred while saving your entry. Please try again.
+                                    </div>
+                                    <div class="alert alert-danger alert-success-delete" role="alert" style="display: none;">
+                                        Client has been deleted successfully.
+                                    </div>
+                                    <div class="alert alert-danger alert-danger-delete" role="alert" style="display: none;">
+                                        An error occurred while saving your entry. Please try again.
+                                    </div>
                                     <div class="table-responsive">
                                         <table class="table table-bordered" width="100%" id="docLetter" cellspacing="0">
                                             <thead class="thead-light">
@@ -101,12 +113,10 @@ font-weight-bold
                                                 @foreach ($access as $userAc)
                                                     <tr>
                                                         <td style="width: 5%;">{{ $userAc['id'] }}</td>
-                                                        <td>{{ $userAc['page'] }}</td>
+                                                        <td>{{ $userAc['method'] }}</td>
                                                         <td>{{ $userAc['grantTo'] }}</td>
                                                         <td class="text-center" style="width: 10%;">
-                                                            <a class="btn btn-danger btn-sm" href="javascript:void(0);" onclick="confirmReset('{{ route('remove.access', $userAc['page_id']) }}')">
-                                                                <i class='fas fa-fw fa-undo-alt'></i> Reset
-                                                            </a>
+                                                            <a class="btn btn-danger btn-sm" onclick='isconfirm();' href="{{ route('remove.method.access', $userAc['method_id']) }}"><i class='fas fa-fw fa-undo-alt'></i> Reset</a>
                                                         </td>
                                                     </tr>
                                                 @endforeach
@@ -122,26 +132,4 @@ font-weight-bold
         </div>
     </div>
 </div>
-<script>
-    function confirmReset(url) {
-        // Show SweetAlert confirmation
-        swal({
-            title: "Are you sure?",
-            text: "Once reset, this action cannot be undone!",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true,
-        }).then((willReset) => {
-            if (willReset) {
-                // If confirmed, redirect to the provided URL
-                window.location.href = url;
-            } else {
-                // If canceled, do nothing
-                swal("Your action has been canceled!", {
-                    icon: "info",
-                });
-            }
-        });
-    }
-</script>
 @endsection

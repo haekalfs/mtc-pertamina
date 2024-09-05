@@ -15,11 +15,11 @@ font-weight-bold
 @section('content')
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
-        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-users"></i> Update User : {{ $data->id }}</h1>
+        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-user"></i> Update User : {{ $data->id }}</h1>
         <p class="mb-4">Managing Users Account</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
-        {{-- <a class="btn btn-secondary btn-sm shadow-sm mr-2" href="/invoicing/list"><i class="fas fa-solid fa-backward fa-sm text-white-50"></i> Go Back</a> --}}
+        <a href="{{ url()->previous() }}" class="btn btn-sm btn-secondary shadow-sm text-white"><i class="fa fa-backward"></i> Go Back</a>
     </div>
 </div>
 <form action="{{ route('update.user', $data->id) }}" method="post" enctype="multipart/form-data" class="form-horizontal">
@@ -34,29 +34,27 @@ font-weight-bold
                         <h6 class="m-0 font-weight-bold">Profile Picture</h6>
                     </div>
                     <div class="card-body">
-                        <div class="form-group">
-                            <label>Profile Picture :</label>
-                            <div class="custom-file">
-                                <input type="file" class="custom-file-input" id="profile_picture" name="profile_picture" onchange="changeFileName('profile_picture', 'profile-label')">
-                                <label class="custom-file-label" for="profile_picture" id="profile-label">Choose file</label>
-                            </div>
-                            <img id="profile-preview" src="{{ $data->profile_photo_path ? asset('storage/' . $data->profile_photo_path) : '' }}" class="mt-4" style="max-width: 110px; max-height: 200px; object-fit:fill;">
+                        <div class="d-flex align-items-top justify-content-center text-center">
+                            <label for="file-upload" style="cursor: pointer;">
+                                <img id="image-preview" src="{{ $data->users_detail->profile_pic ? asset($data->users_detail->profile_pic) : 'https://via.placeholder.com/150x150/5fa9f8/ffffff' }}" style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
+                                     <small style="font-size: 10px;"><i><u>Click above to upload image!</u></i></small>
+                            </label>
+                            <input id="file-upload" type="file" name="profile_picture" style="display: none;" accept="image/*" onchange="previewImage(event)">
                         </div>
                     </div>
                 </div>
                 <!-- User Data Verification Section -->
-                <div class="card mb-4">
+                <div class="card mb-4 shadow">
                     <div class="card-header">
-                        <span class="text-danger font-weight-bold">User Data Verification</span>
+                        <span class="text-danger font-weight-bold">Delete Account</span>
                     </div>
-                    <div class="card-body" style="background-color: rgb(247, 247, 247);">
-                        <h6 class="h6 mb-2 font-weight-bold text-gray-800">General Guidelines</h6>
-                        <ul class="ml-4">
-                            <li>Ensure all user data is accurately updated in accordance with company policies.</li>
-                            <li>Verify and validate user information to maintain data integrity.</li>
-                            <li>Unauthorized modifications to user records are strictly prohibited.</li>
-                            <li>Double-check user details for completeness and correctness before saving changes.</li>
-                        </ul>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <span>Deleting your account is a permanent action and cannot be undone. If you are sure you want to delete your account, select the button below.</span>
+                        </div>
+                        <div>
+                            <a data-id="{{ $data->id }}" class="btn btn-outline-danger delete-user text-danger">I Understand, delete the account</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -68,22 +66,22 @@ font-weight-bold
                     <div class="card-body card-block">
                         <!-- Employee ID -->
                         <div class="row form-group">
-                            <div class="col col-md-3"><label class="form-control-label">Emp. ID</label></div>
+                            <div class="col col-md-3"><label class="form-control-label">Emp. ID <span class="text-danger">*</span></label></div>
                             <div class="col-12 col-md-9"><input type="text" id="employee_id" name="employee_id" placeholder="Employee ID" class="form-control" value="{{ old('employee_id', $data->users_detail->employee_id ?? '') }}"></div>
                         </div>
                         <!-- User ID -->
                         <div class="row form-group">
-                            <div class="col col-md-3"><label class="form-control-label">User ID</label></div>
+                            <div class="col col-md-3"><label class="form-control-label">User ID <span class="text-danger">*</span></label></div>
                             <div class="col-12 col-md-9"><input type="text" id="user_id" name="user_id" placeholder="User ID" class="form-control" value="{{ old('user_id', $data->id) }}" readonly></div>
                         </div>
                         <!-- Full Name -->
                         <div class="row form-group">
-                            <div class="col col-md-3"><label for="full_name" class="form-control-label">Full Name</label></div>
+                            <div class="col col-md-3"><label for="full_name" class="form-control-label">Full Name <span class="text-danger">*</span></label></div>
                             <div class="col-12 col-md-9"><input type="text" id="full_name" name="full_name" placeholder="Full Name" class="form-control" value="{{ old('full_name', $data->name) }}"></div>
                         </div>
                         <!-- Email -->
                         <div class="row form-group">
-                            <div class="col col-md-3"><label for="email" class="form-control-label">E-Mail Address</label></div>
+                            <div class="col col-md-3"><label for="email" class="form-control-label">E-Mail Address <span class="text-danger">*</span></label></div>
                             <div class="col-12 col-md-9"><input type="email" id="email" name="email" placeholder="Enter Email" class="form-control" value="{{ old('email', $data->email) }}"></div>
                         </div>
                         <!-- Password -->
@@ -91,7 +89,7 @@ font-weight-bold
                             <div class="col col-md-3"><label for="password" class="form-control-label">Password</label></div>
                             <div class="col-12 col-md-9">
                                 <div class="input-group">
-                                    <input type="password" id="password" name="password" placeholder="Enter Password" class="form-control">
+                                    <input type="password" id="password" name="password" placeholder="Leave it blank to make no changes..." class="form-control">
                                     <div class="input-group-append">
                                         <button class="btn btn-default" type="button" onclick="togglePasswordVisibility()">
                                             <i class="fa fa-eye" id="toggle-password-icon"></i>
@@ -104,7 +102,7 @@ font-weight-bold
                         </div>
                         <!-- Department -->
                         <div class="row form-group">
-                            <div class="col col-md-3"><label for="department" class="form-control-label">Department</label></div>
+                            <div class="col col-md-3"><label for="department" class="form-control-label">Department <span class="text-danger">*</span></label></div>
                             <div class="col-12 col-md-9">
                                 <select name="department" id="department" class="form-control">
                                     <option disabled selected>Please select</option>
@@ -116,7 +114,7 @@ font-weight-bold
                         </div>
                         <!-- Position -->
                         <div class="row form-group">
-                            <div class="col col-md-3"><label for="position" class="form-control-label">Position</label></div>
+                            <div class="col col-md-3"><label for="position" class="form-control-label">Position <span class="text-danger">*</span></label></div>
                             <div class="col-12 col-md-9">
                                 <select name="position" id="position" class="form-control">
                                     <option disabled selected>Please select</option>
@@ -128,7 +126,7 @@ font-weight-bold
                         </div>
                         <!-- User Status -->
                         <div class="row form-group">
-                            <div class="col col-md-3"><label for="user_status" class="form-control-label">User Status</label></div>
+                            <div class="col col-md-3"><label for="user_status" class="form-control-label">User Status <span class="text-danger">*</span></label></div>
                             <div class="col-12 col-md-9">
                                 <select name="user_status" id="user_status" class="form-control">
                                     <option disabled selected>Please select</option>
@@ -187,10 +185,58 @@ font-weight-bold
             togglePasswordIcon.classList.add('fa-eye');
         }
     }
-    function changeFileName(inputId, labelId) {
-        var input = document.getElementById(inputId);
-        var label = document.getElementById(labelId);
-        label.textContent = input.files[0].name;
+    function previewImage(event) {
+        const reader = new FileReader();
+        reader.onload = function(){
+            const output = document.getElementById('image-preview');
+            output.src = reader.result;
+        };
+        reader.readAsDataURL(event.target.files[0]);
     }
+</script>
+<script>
+$(document).ready(function() {
+    $('.delete-user').click(function(e) {
+        e.preventDefault();
+        let id = $(this).data('id');
+
+        swal({
+            title: "Are you sure?",
+            text: "Once deleted, you will not be able to recover this account!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+        .then((willDelete) => {
+            if (willDelete) {
+                // Make AJAX request to delete the instructor
+                $.ajax({
+                    url: '{{ route("user.delete", ":id") }}'.replace(':id', id),
+                    method: 'DELETE',
+                    data: {
+                        _token: '{{ csrf_token() }}', // Include the CSRF token
+                    },
+                    success: function(response) {
+                        swal("Success! The account has been deleted!", {
+                            icon: "success",
+                        }).then(() => {
+                            window.location.href = '{{ route("manage.users") }}'; // Redirect after deletion
+                        });
+                    },
+                    error: function(xhr) {
+                        swal("Error! Something went wrong.", {
+                            icon: "error",
+                        });
+                    }
+                });
+            } else {
+                // Show a message if deletion is canceled
+                swal("Your record is safe!", {
+                    icon: "info",
+                });
+            }
+        });
+    });
+});
 </script>
 @endsection

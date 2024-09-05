@@ -16,13 +16,23 @@ class SuspiciousFileCheck
      */
     public function handle(Request $request, Closure $next)
     {
-        /// Check if it's a POST request
-        if ($request->isMethod('post')) {
+        // Check if it's a POST or PUT request
+        if ($request->isMethod('post') || $request->isMethod('put')) {
             $files = $request->allFiles();
+
+            // Iterate through all files
             foreach ($files as $fileInput) {
-                if ($this->isSuspicious($fileInput)) {
-                    // Abort the request if a suspicious file is detected
-                    abort(403, 'Suspicious file detected.');
+                // Handle both single files and arrays of files
+                if (is_array($fileInput)) {
+                    foreach ($fileInput as $file) {
+                        if ($this->isSuspicious($file)) {
+                            abort(403, 'Suspicious file detected.');
+                        }
+                    }
+                } else {
+                    if ($this->isSuspicious($fileInput)) {
+                        abort(403, 'Suspicious file detected.');
+                    }
                 }
             }
         }
@@ -30,12 +40,15 @@ class SuspiciousFileCheck
         return $next($request);
     }
 
+    /**
+     * Check if the uploaded file is suspicious.
+     *
+     * @param  \Illuminate\Http\UploadedFile  $file
+     * @return bool
+     */
     private function isSuspicious($file)
     {
         // Implement your file checking logic here
-        // You can check file type, size, content, etc.
-        // Return true if the file is suspicious, false if not.
-        // Example: Check for file extension
         $extension = $file->getClientOriginalExtension();
         return in_array($extension, ['exe', 'php', 'js']);
     }

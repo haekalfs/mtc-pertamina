@@ -13,7 +13,6 @@ font-weight-bold
 @endsection
 
 @section('content')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
         <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-bullhorn"></i> Marketing Campaign</h1>
@@ -170,7 +169,7 @@ font-weight-bold
 </div>
 
 <div class="modal fade zoom90" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 900px;" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 1000px;" role="document">
         <div class="modal-content">
             <div class="modal-header d-flex flex-row align-items-center justify-content-between">
                 <h5 class="modal-title" id="inputDataModalLabel">Input Data</h5>
@@ -185,7 +184,7 @@ font-weight-bold
                         <div class="col-md-3 d-flex align-items-top justify-content-center text-center">
                             <label for="file-upload" style="cursor: pointer;">
                                 <img id="image-preview" src="https://via.placeholder.com/50x50/5fa9f8/ffffff"
-                                     style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
+                                     style="height: 150px; width: 200px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
                                      <small style="font-size: 10px;"><i><u>Click above to upload image!</u></i></small>
                             </label>
                             <input id="file-upload" type="file" name="img" style="display: none;" accept="image/*" onchange="previewImage(event)">
@@ -199,7 +198,7 @@ font-weight-bold
                                                 <p style="margin: 0;">Nama Kegiatan :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <input type="text" class="form-control" name="activity_name" required>
+                                                <input type="text" class="form-control underline-input" name="activity_name" required>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-3">
@@ -207,7 +206,7 @@ font-weight-bold
                                                 <p style="margin: 0;">Informasi Kegiatan :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <input type="text" class="form-control" name="activity_info">
+                                                <input type="text" class="form-control underline-input" name="activity_info">
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-3">
@@ -215,7 +214,7 @@ font-weight-bold
                                                 <p style="margin: 0;">PIC :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <select class="custom-select" id="namaPenlat" name="namaPenlat">
+                                                <select class="custom-select underline-input" id="namaPenlat" name="namaPenlat">
                                                     @foreach($users as $user)
                                                     <option value="{{ $user->id }}" selected>{{ $user->name }}</option>
                                                     @endforeach
@@ -227,7 +226,7 @@ font-weight-bold
                                                 <p style="margin: 0;">Tanggal :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <input type="date" class="form-control" name="activity_date">
+                                                <input type="date" class="form-control underline-input" name="activity_date">
                                             </div>
                                         </div>
                                     </div>
@@ -235,13 +234,10 @@ font-weight-bold
                             </div>
                         </div>
                         <div class="col-md-12">
-                            <div class="d-flex align-items-start mb-4">
-                                <div style="width: 140px;" class="mr-2">
-                                    <p style="margin: 0;">Hasil Kegiatan :</p>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <textarea id="summernote" name="activity_result"></textarea>
-                                </div>
+                            <div class="form-group has-success">
+                                <p for="summernote" class="control-label mb-2">Hasil Kegiatan :</p>
+                                <textarea id="summernote" name="activity_result"></textarea>
+                                <span class="help-block field-validation-valid" data-valmsg-for="cc-name" data-valmsg-replace="true"></span>
                             </div>
                         </div>
                     </div>

@@ -19,6 +19,11 @@ font-weight-bold
         <p class="mb-4">Dashboard Planning & Development.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
+        <select class="form-control" id="yearSelected" name="yearSelected" required onchange="redirectToPage()" style="width: 100px;">
+            @foreach (array_reverse($yearsBefore) as $year)
+                <option value="{{ $year }}" {{ $year == $yearSelected ? 'selected' : '' }}>{{ $year }}</option>
+            @endforeach
+        </select>
     </div>
 </div>
 <div class="animated fadeIn">
@@ -185,12 +190,20 @@ font-weight-bold
         <div class="col-lg-12">
             <div class="card">
                 <div class="row">
+                    <div class="col-lg-12 d-flex justify-content-end align-items-end">
+                        <select class="form-control mt-3 mr-4 zoom90" id="instructorSelected" name="instructorSelected" style="width: 200px;">
+                            <option value="all" selected>Show All</option> <!-- Add Show All option -->
+                            @foreach ($instructorsList as $instructor)
+                                <option value="{{ $instructor->instructor_name }}">{{ $instructor->instructor_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                     <div class="col-lg-12">
                         <div class="card-body d-flex justify-content-center align-items-center">
-                            <canvas id="feedbackChart" width="400" height="200"></canvas>
+                            <div id="feedbackChart" style="height: 370px; width: 100%;"></div>
                         </div>
                     </div>
-                </div> <!-- /.row -->
+                </div>
             </div>
         </div>
     </div>
@@ -282,6 +295,55 @@ font-weight-bold
 
 <script>
 window.onload = function () {
+    const instructorSelected = document.getElementById('instructorSelected');
+    // Fetch and render chart data based on selected instructor
+    function fetchAndRenderChart(instructorId) {
+        const url = instructorId === 'all' ? '/feedback-chart-data/{{ $yearSelected }}' : `/feedback-chart-data/{{ $yearSelected }}?instructorId=${instructorId}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const dataPoints = data.map(item => {
+                    return { label: item.questioner, y: item.average_score };
+                });
+
+                var chart = new CanvasJS.Chart("feedbackChart", {
+                    animationEnabled: true,
+                    title: {
+                        text: instructorId === 'all' ? "Rating Feedback terhadap Semua Instruktur" : "Rating Feedback " + instructorId
+                    },
+                    axisY: {
+                        title: "Average Score",
+                        minimum: 2,
+                        maximum: 5,
+                        stripLines: [{
+                            value: 4.5,
+                            label: "Target Minimum: 4.5",
+                            color: "#FF0000",
+                            thickness: 2,
+                            labelPlacement: "outside",
+                            labelAlign: "center",
+                            zIndex: 10
+                        }]
+                    },
+                    data: [{
+                        type: "column",
+                        yValueFormatString: "#0.##",
+                        dataPointWidth: 50,
+                        dataPoints: dataPoints
+                    }]
+                });
+                chart.render();
+            });
+    }
+
+    // Initial fetch and render for "Show All" option
+    fetchAndRenderChart('all');
+
+    // Event listener to fetch and render data whenever the instructor is changed
+    instructorSelected.addEventListener('change', function() {
+        fetchAndRenderChart(this.value);
+    });
     var chart = new CanvasJS.Chart("chartContainer", {
         animationEnabled: true,
         title: {
@@ -309,40 +371,18 @@ window.onload = function () {
             dataPointWidth: 50, // Set the width of each bar (in pixels)
             dataPoints: [
                 @foreach ($averages as $column => $average)
-                    { label: "{{ str_replace('_', ' ', ucwords($column)) }}", y: {{ $average }} },
+                    { label: "{{ str_replace('_', ' ', ucwords($column)) }}", y: {{ $average ?? 0 }} }, // Ensuring 'y' is not null
                 @endforeach
             ]
         }]
     });
     chart.render();
 }
-fetch('/feedback-chart-data')
-    .then(response => response.json())
-    .then(data => {
-        const labels = data.map(item => item.questioner);
-        const scores = data.map(item => item.average_score);
 
-        const ctx = document.getElementById('feedbackChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Average Score',
-                    data: scores,
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    });
+function redirectToPage() {
+    var selectedOption = document.getElementById("yearSelected").value;
+    var url = "{{ url('/planning-development') }}" + "/" + selectedOption;
+    window.location.href = url; // Redirect to the desired page
+}
 </script>
 @endsection

@@ -13,6 +13,7 @@ class MarketingController extends Controller
 {
     public function index()
     {
+        $headline = Campaign::orderBy('updated_at', 'desc')->take(min(Campaign::count(), 12))->get();
         $queryAgreement = Agreement::query();
         $countAgreement = $queryAgreement->count();
         $getAgreements = $queryAgreement->limit(3)->get();
@@ -24,7 +25,7 @@ class MarketingController extends Controller
         ->get();
 
 
-        return view('marketing.index', ['countAgreement' => $countAgreement, 'getAgreements' => $getAgreements, 'campaignChart' => $campaignChart, 'countCampaign' => $countCampaign]);
+        return view('marketing.index', ['headline' => $headline, 'countAgreement' => $countAgreement, 'getAgreements' => $getAgreements, 'campaignChart' => $campaignChart, 'countCampaign' => $countCampaign]);
     }
 
     public function campaign(Request $request)

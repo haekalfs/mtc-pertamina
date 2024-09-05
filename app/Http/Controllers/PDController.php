@@ -30,8 +30,15 @@ use Yajra\DataTables\Facades\DataTables;
 
 class PDController extends Controller
 {
-    public function index()
+    public function index($yearSelected = null)
     {
+        $nowYear = date('Y');
+        $yearsBefore = range($nowYear - 4, $nowYear);
+
+        // Set the selected year
+        $yearSelected = $yearSelected ?? $nowYear;
+
+        $getInstructors = Instructor::all();
         // Calculate average feedback score and order instructors by it
         $instructors = Instructor::withCount([
             'feedbacks as average_feedback_score' => function ($query) {
@@ -51,7 +58,7 @@ class PDController extends Controller
         $referencesCount = Penlat::whereIn('id', $getData)->count();
 
         // Calculate the average feedback score
-        $averageFeedbackScore = DB::table('feedback_mtc')
+        $averageFeedbackScore = DB::table('feedback_mtc')->whereYear('tgl_pelaksanaan', $yearSelected)
         ->select(DB::raw('
             avg(
                 (
@@ -95,7 +102,7 @@ class PDController extends Controller
         // Fetch the average for each column
         $averages = [];
         foreach ($columns as $column) {
-            $average = Feedback_mtc::avg(DB::raw("CAST($column AS DECIMAL(10,2))"));
+            $average = Feedback_mtc::whereYear('tgl_pelaksanaan', $yearSelected)->avg(DB::raw("CAST($column AS DECIMAL(10,2))"));
             $averages[$column] = $average;
         }
 
@@ -107,17 +114,27 @@ class PDController extends Controller
             'instructors' => $instructors,
             'averageFeedbackScore' => $averageFeedbackScore,
             'averages' => $averages,
-            'regulations' => $regulations
+            'regulations' => $regulations,
+            'instructorsList' => $getInstructors,
+            'yearsBefore' => $yearsBefore,
+            'yearSelected'=> $yearSelected,
         ]);
     }
 
-    public function getFeedbackChartData()
+    public function getFeedbackChartData(Request $request, $year)
     {
-        $feedbackData = DB::table('feedback_reports as fr')
+        $selectedInstructorId = $request->input('instructorId');
+
+        $query = DB::table('feedback_reports as fr')
             ->join('feedback_template as ft', 'fr.feedback_template_id', '=', 'ft.id')
-            ->select('ft.questioner', DB::raw('AVG(fr.score) as average_score'))
-            ->groupBy('ft.questioner')
-            ->get();
+            ->select('ft.questioner', DB::raw('AVG(fr.score) as average_score'));
+
+        // If an instructor is selected, filter by instructor; otherwise, return all
+        if ($selectedInstructorId && $selectedInstructorId !== 'all') {
+            $query->where('fr.instruktur', $selectedInstructorId);
+        }
+
+        $feedbackData = $query->whereYear('tgl_pelaksanaan', $year)->groupBy('ft.questioner')->get();
 
         return response()->json($feedbackData);
     }

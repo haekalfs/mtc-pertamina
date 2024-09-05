@@ -138,16 +138,16 @@ font-weight-bold
                     <div class="row no-gutters mb-3">
                         <div class="col-md-3 d-flex align-items-top justify-content-center text-center">
                             <label for="file-upload" style="cursor: pointer;">
-                                <img id="image-preview" src="https://via.placeholder.com/50x50/5fa9f8/ffffff"
+                                <img id="image-preview" src="https://via.placeholder.com/150x150/5fa9f8/ffffff"
                                      style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
-                                     <small style="font-size: 10px;"><i><u>Click above to upload image!</u></i></small>
+                                     <small style="font-size: 12px;" class="text-secondary"><i><u>Uploading Image is Optional!</u></i></small>
                             </label>
                             <input id="file-upload" type="file" name="image" style="display: none;" accept="image/*" onchange="previewImage(event)">
                         </div>
                         <div class="col-md-9">
                             <div class="d-flex align-items-center mb-4">
                                 <div style="width: 140px;" class="mr-2">
-                                    <p style="margin: 0;">Nama Pelatihan :</p>
+                                    <p style="margin: 0;">Nama Pelatihan <span class="text-danger">*</span>:</p>
                                 </div>
                                 <div class="flex-grow-1">
                                     <select id="penlatSelect" class="form-control select2" name="penlat">
@@ -160,7 +160,7 @@ font-weight-bold
                             </div>
                             <div class="d-flex align-items-center mb-4">
                                 <div style="width: 140px;" class="mr-2">
-                                    <p style="margin: 0;">Nama Program :</p>
+                                    <p style="margin: 0;">Nama Program <span class="text-danger">*</span>:</p>
                                 </div>
                                 <div class="flex-grow-1">
                                     <input type="text" id="programInput" class="form-control" name="program">
@@ -168,7 +168,7 @@ font-weight-bold
                             </div>
                             <div class="d-flex align-items-center mb-4">
                                 <div style="width: 140px;" class="mr-2">
-                                    <p style="margin: 0;">Batch :</p>
+                                    <p style="margin: 0;">Batch <span class="text-danger">*</span>:</p>
                                 </div>
                                 <div class="flex-grow-1">
                                     <select id="mySelect2" class="form-control" name="batch">
@@ -180,7 +180,7 @@ font-weight-bold
                             </div>
                             <div class="d-flex align-items-center mb-4">
                                 <div style="width: 140px;" class="mr-2">
-                                    <p style="margin: 0;">Tgl Pelaksanaan :</p>
+                                    <p style="margin: 0;">Tgl Pelaksanaan <span class="text-danger">*</span>:</p>
                                 </div>
                                 <div class="flex-grow-1">
                                     <input type="date" class="form-control" name="date">
@@ -189,12 +189,13 @@ font-weight-bold
                         </div>
                     </div>
                     <div class="table-responsive zoom90">
-                        <table class="table table-bordered mt-4">
-                            <thead>
+                        <table class="table table-bordered mt-3">
+                            <thead class="thead-light">
                                 <tr>
                                     <th>Tool</th>
+                                    <th>Harga Satuan</th>
                                     <th>Quantity</th>
-                                    <th>Satuan</th>
+                                    <th>Total</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -202,7 +203,7 @@ font-weight-bold
                                 <tr>
                                     <td data-th="Product">
                                         <div class="row">
-                                            <div class="col-md-3 text-left">
+                                            <div class="col-md-4 text-left">
                                                 <img src="{{ asset($tool->filepath) }}" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow ">
                                             </div>
                                             <div class="col-md-8 text-left mt-sm-2">
@@ -211,14 +212,14 @@ font-weight-bold
                                             </div>
                                         </div>
                                     </td>
+                                    <td data-th="Price" style="width:20%">
+                                        <input type="text" class="form-control form-control-md underline-input" data-type="currency" name="price_{{ $tool->id }}">
+                                    </td>
                                     <td data-th="Quantity" style="width:20%">
-                                        <input type="number" class="form-control form-control-md text-center" name="qty_{{ $tool->id }}" value="1">
+                                        <input type="number" class="form-control form-control-md text-center underline-input" name="qty_{{ $tool->id }}" value="1" min="0">
                                     </td>
                                     <td data-th="Price" style="width:20%">
-                                        <select class="custom-select form-control form-control-sm" name="unit_{{ $tool->id }}">
-                                            <option value="{{ $tool->utility_unit }}" selected>{{ $tool->utility_unit }}</option>
-                                            <!-- Add other options if necessary -->
-                                        </select>
+                                        <input type="text" class="form-control form-control-md underline-input" data-type="currency" name="total_{{ $tool->id }}">
                                     </td>
                                 </tr>
                                 @endforeach
@@ -326,6 +327,89 @@ $(document).ready(function() {
         }
     });
 });
+// Jquery Dependency
+
+$("input[data-type='currency']").on({
+    keyup: function() {
+      formatCurrency($(this));
+    },
+    blur: function() {
+      formatCurrency($(this));
+    }
+});
+
+
+function formatNumber(n) {
+  // format number 1000000 to 1,234,567
+  return n.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+}
+
+
+function formatCurrency(input, blur) {
+    // appends $ to value, validates decimal side
+    // and puts cursor back in right position.
+
+    // get input value
+    var input_val = input.val();
+
+    // don't validate empty input
+    if (input_val === "") { return; }
+
+    // original length
+    var original_len = input_val.length;
+
+    // initial caret position
+    var caret_pos = input.prop("selectionStart");
+
+    // check for decimal
+    if (input_val.indexOf(".") >= 0) {
+
+        // get position of first decimal
+        // this prevents multiple decimals from
+        // being entered
+        var decimal_pos = input_val.indexOf(".");
+
+        // split number by decimal point
+        var left_side = input_val.substring(0, decimal_pos);
+        var right_side = input_val.substring(decimal_pos);
+
+        // add commas to left side of number
+        left_side = formatNumber(left_side);
+
+        // validate right side
+        right_side = formatNumber(right_side);
+
+        // On blur make sure 2 numbers after decimal
+        if (blur === "blur") {
+            right_side += "00";
+        }
+
+        // Limit decimal to only 2 digits
+        right_side = right_side.substring(0, 2);
+
+        // join number by .
+        input_val = "IDR " + left_side + "." + right_side;
+
+    } else {
+        // no decimal entered
+        // add commas to number
+        // remove all non-digits
+        input_val = formatNumber(input_val);
+        input_val = "IDR " + input_val;
+
+        // final formatting
+        if (blur === "blur") {
+            input_val += ".00";
+        }
+    }
+    // send updated string to input
+    input.val(input_val);
+
+    // put caret back in the right position
+    var updated_len = input_val.length;
+    caret_pos = updated_len - original_len + caret_pos;
+    input[0].setSelectionRange(caret_pos, caret_pos);
+}
 </script>
 <script>
     function previewImage(event) {

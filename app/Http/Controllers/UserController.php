@@ -9,6 +9,8 @@ use App\Models\User;
 use App\Models\Users_detail;
 use App\Models\Usr_role;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
@@ -47,9 +49,26 @@ class UserController extends Controller
             return redirect('/manage-users');
         }
 
+        // Check if the User ID exists in the database
+        $idExists = User::where('id', $request->user_id)->exists();
+        if ($idExists) {
+            Session::flash('failed',"User ID is taken! Recreate it with different unique User ID");
+            return redirect()->route('register.users');
+        }
+
         // Handle profile picture upload
         if ($request->hasFile('profile_picture')) {
-            $profile_picture_path = $request->file('profile_picture')->store('profile_pictures', 'public');
+            // Get the file from the request
+            $profile_picture = $request->file('profile_picture');
+
+            // Generate a unique file name using the current timestamp and the original file name
+            $profile_picture_name = time() . '_' . $profile_picture->getClientOriginalName();
+
+            // Move the file to the 'public/img/avatar/' directory
+            $profile_picture->move(public_path('img/avatar/'), $profile_picture_name);
+
+            // Set the path for storing in the database (if needed)
+            $profile_picture_path = 'img/avatar/' . $profile_picture_name;
         } else {
             $profile_picture_path = null;
         }
@@ -91,7 +110,7 @@ class UserController extends Controller
         $roles = Role::all();
         $departments = Department::all();
         $positions = Position::all();
-        return view('manage-users.preview-user', ['data' => $getUser,'roles' => $roles, 'departments' => $departments, 'positions' => $positions]);
+        return view('manage-users.edit-user', ['data' => $getUser,'roles' => $roles, 'departments' => $departments, 'positions' => $positions]);
     }
 
     public function update(Request $request, $id)
@@ -121,7 +140,7 @@ class UserController extends Controller
         if ($request->hasFile('profile_picture')) {
             // Delete old profile picture if exists
             if ($userDetail->profile_pic) {
-                $oldImagePath = public_path('img/' . $userDetail->profile_pic);
+                $oldImagePath = public_path($userDetail->profile_pic);
                 if (file_exists($oldImagePath)) {
                     unlink($oldImagePath);
                 }
@@ -129,6 +148,7 @@ class UserController extends Controller
             // Save the new profile picture to public/img directory
             $profile_picture = $request->file('profile_picture');
             $profile_picture_name = time() . '_' . $profile_picture->getClientOriginalName();
+            $profile_picture_path = 'img/avatar/' . $profile_picture_name;
             $profile_picture->move(public_path('img/avatar/'), $profile_picture_name);
         } else {
             $profile_picture_name = $userDetail->profile_pic; // Retain old profile picture
@@ -147,7 +167,7 @@ class UserController extends Controller
             'department_id' => $request->department,
             'position_id' => $request->position,
             'employment_status' => $request->user_status,
-            'profile_pic' => $profile_picture_name,
+            'profile_pic' => $profile_picture_path,
         ]);
 
         // Update roles (first remove all roles, then add the selected ones)
@@ -162,5 +182,81 @@ class UserController extends Controller
         }
 
         return redirect('/manage-users')->with('success', 'User updated successfully');
+    }
+
+    public function preview($userId)
+    {
+        $data = User::find($userId);
+
+        return view('manage-users.preview', ['data' => $data]);
+    }
+
+    public function reset_user_password(Request $request, $userId)
+    {
+        // Validate the request
+        $request->validate([
+            'password_reset' => 'required|string|min:8', // Add confirmed for password confirmation
+        ]);
+
+        // Hash the new password
+        $hash_pwd = Hash::make($request->password_reset);
+
+        // Get the user by ID
+        $user = User::find($userId);
+
+        // Update the password
+        $user->password = $hash_pwd;
+        $user->save();
+
+        // Check if the reset user is the currently authenticated user
+        if (Auth::id() == $user->id) {
+            // Log the user out
+            Auth::logout();
+
+            // Invalidate the session
+            $request->session()->invalidate();
+
+            // Regenerate the token to prevent session fixation
+            $request->session()->regenerateToken();
+
+            // Redirect to the login page with a success message
+            return redirect('/login')->with('success', 'Your password has been reset and you have been logged out.');
+        }
+
+        // If it's not the authenticated user, redirect back with a success message
+        return redirect()->back()->with('success', "Password has been reset for $user->name.");
+    }
+
+    public function delete($userId)
+    {
+        // Find the instructor
+        $user = User::findOrFail($userId);
+
+        // Define the path to the instructor's directory in the public folder
+        $userDir = public_path($user->users_detail->profile_pic);
+
+        // Check if the directory exists and delete it
+        if (file_exists($userDir)) {
+            unlink($userDir);
+        }
+
+        // Delete related certificates
+        $user->users_detail()->role_id()->delete();
+        $user->users_detail()->delete();
+
+        // Delete the instructor
+        $user->delete();
+
+        // Return a success response
+        return response()->json(['success' => 'Instructor, related certificates, and files deleted successfully.']);
+    }
+
+    public function checkUserId($userId)
+    {
+        // Check if the User ID exists in the database
+        $exists = User::where('id', $userId)->exists();
+
+        // Return the response in JSON format
+        return response()->json(['exists' => $exists]);
     }
 }

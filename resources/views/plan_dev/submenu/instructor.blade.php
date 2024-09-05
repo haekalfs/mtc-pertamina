@@ -201,8 +201,8 @@ font-weight-bold
                                         </div>
                                     </td>
                                     <td class="actions text-center">
-                                        <a class="btn btn-outline-secondary btn-sm mr-2" href="{{ route('preview-instructor', ['id' => $item->id, 'penlatId' => $penlatId]) }}"><i class="menu-Logo fa fa-eye"></i> Preview</a>
-                                        <a class="btn btn-outline-secondary btn-sm" href="{{ route('edit-instructor', $item->id) }}"><i class="fa fa-edit"></i> Update</a>
+                                        <a class="btn btn-outline-secondary btn-sm mr-2" href="{{ route('edit-instructor', $item->id) }}"><i class="fa fa-edit"></i> Update</a>
+                                        <a class="btn btn-outline-secondary btn-sm" href="{{ route('preview-instructor', ['id' => $item->id, 'penlatId' => $penlatId]) }}"><i class="fa fa-info-circle"></i> Preview</a>
                                     </td>
                                 </tr>
                                 @endforeach

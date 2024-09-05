@@ -83,7 +83,7 @@ font-weight-bold
                                             <td>{{ $item->department_name }}</td>
                                             <td>{{ $item->created_at }}</td>
                                             <td class="text-center">
-                                                <a href="#" class="btn btn-outline-secondary btn-sm btn-details mr-2"><i class="fa fa-info-circle"></i> Edit</a>
+                                                {{-- <a href="#" class="btn btn-outline-secondary btn-sm btn-details mr-2"><i class="fa fa-info-circle"></i> Edit</a> --}}
                                                 <a href="#" class="btn btn-outline-danger btn-sm btn-details mr-2" onclick="confirmDelete('department', {{ $item->id }}); return false;"><i class="fa fa-ban"></i> Delete</a>
                                                 <form id="delete-department-form-{{ $item->id }}" action="{{ route('department.destroy', $item->id) }}" method="POST" style="display: none;">
                                                     @csrf
@@ -115,7 +115,7 @@ font-weight-bold
                                             <td>{!! $item->position_level ? ($item->position_level == 2 ? '<i class="fa fa-circle text-danger"></i>' : '<i class="fa fa-circle text-secondary"></i>') : '' !!}</td>
                                             <td>{{ $item->created_at }}</td>
                                             <td class="text-center">
-                                                <a href="#" class="btn btn-outline-secondary btn-sm btn-details mr-2"><i class="fa fa-info-circle"></i> Edit</a>
+                                                {{-- <a href="#" class="btn btn-outline-secondary btn-sm btn-details mr-2"><i class="fa fa-info-circle"></i> Edit</a> --}}
                                                 <a href="#" class="btn btn-outline-danger btn-sm btn-details mr-2" onclick="confirmDelete('position', {{ $item->id }}); return false;"><i class="fa fa-ban"></i> Delete</a>
                                                 <form id="delete-position-form-{{ $item->id }}" action="{{ route('position.destroy', $item->id) }}" method="POST" style="display: none;">
                                                     @csrf

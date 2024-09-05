@@ -115,32 +115,6 @@ font-weight-bold
     </div> --}}
 </div>
 <div class="animated fadeIn zoom90">
-    {{-- <div class="row zoom90 mb-4">
-        <div class="col-md-6">
-            <div class="card custom-card mb-3 bg-white shadow">
-                <div class="row no-gutters">
-                    <div class="col-md-4 d-flex align-items-center justify-content-center" style="padding-left: 1em;">
-                        <img src="{{ asset('img/kilang-minyak.jpg') }}" style="border-radius: 15px;" class="card-img" alt="...">
-                    </div>
-                    <div class="col-md-8">
-                        <div class="card-body text-secondary">
-                            <div>
-                                <h4 class="card-title font-weight-bold">Nama Penlat</h4>
-                                <ul class="ml-3">
-                                    <li class="card-text">Kebutuhan Tool 1</li>
-                                    <li class="card-text">Kebutuhan Tool 2</li>
-                                    <li class="card-text">Kebutuhan Tool 3</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="card-icons">
-                            <a href="#"><i class="fa fa-cog"></i></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> --}}
     <div class="row">
         <div class="col-md-12">
             <div class="card">
@@ -158,8 +132,9 @@ font-weight-bold
                             <thead class="thead-light">
                                 <tr>
                                     <th>Tool</th>
+                                    <th>Harga Satuan</th>
                                     <th>Quantity</th>
-                                    <th>Satuan</th>
+                                    <th>Total</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -168,7 +143,7 @@ font-weight-bold
                                     <tr>
                                         <td>
                                             <div class="row">
-                                                <div class="col-md-3 text-left">
+                                                <div class="col-md-4 text-left">
                                                     <img src="{{ asset($tool->utility->filepath) }}" style="height: 100px; width: 100px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
                                                 </div>
                                                 <div class="col-md-8 text-left mt-sm-2">
@@ -177,11 +152,14 @@ font-weight-bold
                                                 </div>
                                             </div>
                                         </td>
-                                        <td style="width:10%">
-                                            <input type="number" class="form-control form-control-md text-center" name="qty_{{ $tool->id }}" value="{{ $tool->amount }}">
+                                        <td style="width:20%">
+                                            <input type="number" class="form-control form-control-md text-center underline-input" name="qty_{{ $tool->id }}" value="{{ $tool->amount }}">
                                         </td>
-                                        <td style="width:10%" class="text-center">
-                                            {{ $tool->utility->utility_unit }}
+                                        <td style="width:10%">
+                                            <input type="number" class="form-control form-control-md text-center underline-input" name="qty_{{ $tool->id }}" value="{{ $tool->amount }}">
+                                        </td>
+                                        <td style="width:20%">
+                                            <input type="number" class="form-control form-control-md text-center underline-input" name="qty_{{ $tool->id }}" value="{{ $tool->amount }}">
                                         </td>
                                         <td class="actions text-center">
                                             <button class="btn btn-white btn-sm border-secondary bg-white btn-md mb-2 update-utility" data-id="{{ $tool->id }}">

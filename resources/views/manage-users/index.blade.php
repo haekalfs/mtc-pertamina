@@ -90,7 +90,7 @@ font-weight-bold
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    <a href="{{ route('edit.user', $item->id) }}" class="btn btn-outline-secondary btn-sm btn-details mr-2"><i class="fa fa-info-circle"></i> Preview</a>
+                                    <a href="{{ route('preview.user', $item->id) }}" class="btn btn-outline-secondary btn-sm btn-details mr-2"><i class="fa fa-info-circle"></i> Preview</a>
                                     {{-- <a data-toggle="modal" data-target="#editInvoiceModal" data-item-id="{{ $docs->id }}" class="btn btn-danger btn-sm"><i class="fas fa-fw fa-trash-alt"></i> Delete</a> --}}
                                 </td>
                             </tr>

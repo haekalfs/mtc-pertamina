@@ -116,7 +116,7 @@ font-weight-bold
                                      style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
                                      <small style="font-size: 10px;"><i><u>Click above to upload image!</u></i></small>
                             </label>
-                            <input id="file-upload" type="file" name="image" style="display: none;" accept="image/*" onchange="previewImage(event)">
+                            <input id="file-upload" type="file" name="image" style="display: none;" accept="image/*" onchange="previewImage(event)" required>
                         </div>
                         <div class="col-md-9">
                             <div class="d-flex align-items-center mb-4">
@@ -124,7 +124,7 @@ font-weight-bold
                                     <p style="margin: 0;">Nama Pelatihan :</p>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <select id="penlatSelect" class="form-control select2" name="penlat">
+                                    <select id="penlatSelect" class="form-control select2" name="penlat" required>
                                         <option selected disabled>Select Pelatihan...</option>
                                         @foreach ($penlatList as $item)
                                         <option value="{{ $item->id }}">{{ $item->description }}</option>
@@ -137,7 +137,7 @@ font-weight-bold
                                     <p style="margin: 0;">Nama Program :</p>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <input type="text" id="programInput" class="form-control" name="program">
+                                    <input type="text" id="programInput" class="form-control" name="program" required>
                                 </div>
                             </div>
                             <div class="d-flex align-items-center mb-4">
@@ -145,7 +145,7 @@ font-weight-bold
                                     <p style="margin: 0;">Batch :</p>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <input type="text" class="form-control" name="batch">
+                                    <input type="text" class="form-control" name="batch" required>
                                 </div>
                             </div>
                             <div class="d-flex align-items-center mb-4">
@@ -153,7 +153,7 @@ font-weight-bold
                                     <p style="margin: 0;">Tgl Pelaksanaan :</p>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <input type="date" class="form-control" name="date">
+                                    <input type="date" class="form-control" name="date" required>
                                 </div>
                             </div>
                         </div>

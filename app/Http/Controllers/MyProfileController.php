@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Users_detail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,14 +27,24 @@ class MyProfileController extends Controller
         $hash_pwd = Hash::make($request->password_reset);
 
         // Get the authenticated user
-        $user = Auth::user();
+        $userId = Auth::id();
+        $user = User::find($userId);
+
         // Update the password
         $user->password = $hash_pwd;
-        // Save the user
         $user->save();
 
-        // Redirect back with success message
-        return redirect()->back()->with('success', "Password has been reset!");
+        // Log the user out
+        Auth::logout();
+
+        // Invalidate the session
+        $request->session()->invalidate();
+
+        // Regenerate the token to prevent session fixation
+        $request->session()->regenerateToken();
+
+        // Redirect to the login page with a success message
+        return redirect('/login')->with('success', 'Password has been reset! Please log in with your new password.');
     }
 
     public function change_picture(Request $request)

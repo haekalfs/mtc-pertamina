@@ -12,32 +12,6 @@ show
 font-weight-bold
 @endsection
 
-{{-- @section('breadcumbs')
-<div class="breadcrumbs">
-    <div class="breadcrumbs-inner">
-        <div class="row m-0">
-            <div class="col-sm-4">
-                <div class="page-header float-left">
-                    <div class="page-title">
-                        <h1>Manage Users</h1>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-8">
-                <div class="page-header float-right">
-                    <div class="page-title">
-                        <ol class="breadcrumb text-right">
-                            <li><a href="#">Users</a></li>
-                            <li><a href="#">Register User</a></li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-@endsection --}}
-
 @section('content')
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
@@ -64,17 +38,12 @@ font-weight-bold
                                     <!-- Card Body -->
                                 <div class="card-body">
                                     <div class="col-md-12">
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="form-group">
-                                                    <label>Profile Picture :</label>
-                                                    <div class="custom-file">
-                                                        <input type="file" class="custom-file-input" id="profile_picture" name="profile_picture" onchange="changeFileName('profile_picture', 'profile-label')">
-                                                        <label class="custom-file-label" for="profile_picture" id="profile-label">Choose file</label>
-                                                    </div>
-                                                    <img id="profile-preview" src="" class="mt-4" style="max-width: 110px; max-height: 200px; object-fit:fill;"></img>
-                                                </div>
-                                            </div>
+                                        <div class="d-flex align-items-top justify-content-center text-center">
+                                            <label for="file-upload" style="cursor: pointer;">
+                                                <img id="image-preview" src="https://via.placeholder.com/150x150/5fa9f8/ffffff" style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
+                                                     <small style="font-size: 10px;"><i><u>Click above to upload image!</u></i></small>
+                                            </label>
+                                            <input id="file-upload" type="file" name="profile_picture" style="display: none;" accept="image/*" onchange="previewImage(event)">
                                         </div>
                                     </div>
                                 </div>
@@ -106,26 +75,38 @@ font-weight-bold
                     </div>
                     <div class="card-body card-block">
                         <div class="row form-group">
-                            <div class="col col-md-3"><label class=" form-control-label">Emp. ID</label></div>
-                            <div class="col-12 col-md-9"><input type="text" id="employee_id" name="employee_id" placeholder="Employee ID" class="form-control"></div>
+                            <div class="col col-md-3"><label class=" form-control-label">Emp. Number <span class="text-danger">*</span></label></div>
+                            <div class="col-12 col-md-9"><input type="number" id="employee_id" name="employee_id" placeholder="Employment Number" class="form-control" required></div>
                         </div>
                         <div class="row form-group">
-                            <div class="col col-md-3"><label class=" form-control-label">User ID</label></div>
-                            <div class="col-12 col-md-9"><input type="text" id="user_id" name="user_id" placeholder="User ID" class="form-control"></div>
+                            <div class="col col-md-3">
+                                <label class="form-control-label">User ID <span class="text-danger">*</span></label>
+                            </div>
+                            <div class="col-12 col-md-9">
+                                <input type="text" id="user_id" name="user_id" placeholder="User ID" class="form-control" oninput="validateUserId()" required>
+                                <small id="user_id_help" class="help-block form-text text-danger d-none">
+                                    User ID cannot contain numbers, symbols, or spaces! Use an underscore if needed...
+                                </small>
+                                <small id="user_id_taken" class="help-block form-text text-danger d-none">
+                                    User ID is already taken!
+                                </small>
+                            </div>
                         </div>
                         <div class="row form-group">
-                            <div class="col col-md-3"><label for="full_name" class=" form-control-label">Full Name</label></div>
-                            <div class="col-12 col-md-9"><input type="text" id="full_name" name="full_name" placeholder="Full Name" class="form-control"></div>
+                            <div class="col col-md-3"><label for="full_name" class=" form-control-label">Full Name <span class="text-danger">*</span></label></div>
+                            <div class="col-12 col-md-9"><input type="text" id="full_name" name="full_name" placeholder="Full Name" class="form-control" required></div>
                         </div>
                         <div class="row form-group">
-                            <div class="col col-md-3"><label for="email" class=" form-control-label">E-Mail Address</label></div>
-                            <div class="col-12 col-md-9"><input type="email" id="email" name="email" placeholder="Enter Email" class="form-control"></div>
+                            <div class="col col-md-3"><label for="email" class=" form-control-label">E-Mail Address <span class="text-danger">*</span></label></div>
+                            <div class="col-12 col-md-9"><input type="email" id="email" name="email" placeholder="Enter Email" class="form-control" required></div>
                         </div>
                         <div class="row form-group">
-                            <div class="col col-md-3"><label for="password" class="form-control-label">Password</label></div>
+                            <div class="col col-md-3">
+                                <label for="password" class="form-control-label">Password <span class="text-danger">*</span></label>
+                            </div>
                             <div class="col-12 col-md-9">
                                 <div class="input-group">
-                                    <input type="password" id="password" name="password" placeholder="Enter Password" class="form-control">
+                                    <input type="password" id="password" name="password" placeholder="Enter Password" class="form-control" oninput="validatePassword()" required>
                                     <div class="input-group-append">
                                         <button class="btn btn-default" type="button" onclick="togglePasswordVisibility()">
                                             <i class="fa fa-eye" id="toggle-password-icon"></i>
@@ -133,15 +114,17 @@ font-weight-bold
                                         <button class="btn btn-primary" type="button" onclick="generatePassword()">Generate</button>
                                     </div>
                                 </div>
-                                <small class="help-block form-text">Please enter a complex password!</small>
+                                <small id="password_help" class="help-block form-text text-danger d-none">
+                                    Password cannot contain spaces!
+                                </small>
                             </div>
                         </div>
                         <h6 class="h6 m-0 font-weight-bold mt-4 mb-4"><i class="fa fa-user"></i> Users Department & Position</h6>
                         <hr class="sidebar-divider mb-4">
                         <div class="row form-group">
-                            <div class="col col-md-3"><label for="department" class=" form-control-label">Department</label></div>
+                            <div class="col col-md-3"><label for="department" class=" form-control-label">Department <span class="text-danger">*</span></label></div>
                             <div class="col-12 col-md-9">
-                                <select name="department" id="department" class="form-control form-control">
+                                <select name="department" id="department" class="form-control form-control" required>
                                     <option disabled selected>Please select</option>
                                     @foreach ($departments as $item)
                                     <option value="{{ $item->id }}">{{ $item->department_name }}</option>
@@ -150,9 +133,9 @@ font-weight-bold
                             </div>
                         </div>
                         <div class="row form-group">
-                            <div class="col col-md-3"><label for="position" class=" form-control-label">Position</label></div>
+                            <div class="col col-md-3"><label for="position" class=" form-control-label">Position <span class="text-danger">*</span></label></div>
                             <div class="col-12 col-md-9">
-                                <select name="position" id="position" class="form-control form-control">
+                                <select name="position" id="position" class="form-control form-control" required>
                                     <option disabled selected>Please select</option>
                                     @foreach ($positions as $item)
                                     <option value="{{ $item->id }}">{{ $item->position_name }}</option>
@@ -161,9 +144,9 @@ font-weight-bold
                             </div>
                         </div>
                         <div class="row form-group">
-                            <div class="col col-md-3"><label for="user_status" class=" form-control-label">User Status</label></div>
+                            <div class="col col-md-3"><label for="user_status" class=" form-control-label">User Status <span class="text-danger">*</span></label></div>
                             <div class="col-12 col-md-9">
-                                <select name="user_status" id="user_status" class="form-control form-control">
+                                <select name="user_status" id="user_status" class="form-control form-control" required>
                                     <option disabled selected>Please select</option>
                                     <option value="1">Active</option>
                                     <option value="0">Non Active</option>
@@ -204,7 +187,12 @@ font-weight-bold
             const randomIndex = Math.floor(Math.random() * chars.length);
             password += chars[randomIndex];
         }
-        document.getElementById('password').value = password;
+
+        // Ensure no spaces are in the generated password
+        if (!password.includes(' ')) {
+            document.getElementById('password').value = password;
+            document.getElementById('password_help').classList.add('d-none'); // Hide the notification
+        }
     }
 
     function togglePasswordVisibility() {
@@ -220,10 +208,71 @@ font-weight-bold
             togglePasswordIcon.classList.add('fa-eye');
         }
     }
-    function changeFileName(inputId, labelId) {
-        var input = document.getElementById(inputId);
-        var label = document.getElementById(labelId);
-        label.textContent = input.files[0].name;
+
+    function validatePassword() {
+        const passwordField = document.getElementById('password');
+        const passwordHelp = document.getElementById('password_help');
+
+        // Check if the password contains spaces
+        if (passwordField.value.includes(' ')) {
+            passwordHelp.classList.remove('d-none'); // Show notification
+        } else {
+            passwordHelp.classList.add('d-none'); // Hide notification
+        }
+    }
+
+    function previewImage(event) {
+        const reader = new FileReader();
+        reader.onload = function(){
+            const output = document.getElementById('image-preview');
+            output.src = reader.result;
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    }
+
+    function validateUserId() {
+        const userIdInput = document.getElementById('user_id');
+        const userIdHelp = document.getElementById('user_id_help');
+        const userIdTaken = document.getElementById('user_id_taken');
+
+        // Regex to allow letters and underscores only (no numbers, spaces, or symbols)
+        const regex = /^[a-zA-Z_]+$/;
+
+        if (!regex.test(userIdInput.value)) {
+            // Show invalid format message
+            userIdHelp.classList.remove('d-none');
+            userIdInput.classList.add('is-invalid'); // Add red outline
+        } else {
+            // Hide invalid format message
+            userIdHelp.classList.add('d-none');
+            userIdInput.classList.remove('is-invalid'); // Remove red outline
+
+            // Check if the User ID is already taken
+            checkUserIdAvailability(userIdInput.value);
+        }
+    }
+
+    function checkUserIdAvailability(userId) {
+        const userIdInput = document.getElementById('user_id');
+        const userIdTaken = document.getElementById('user_id_taken');
+
+        // AJAX request to check if the User ID is taken
+        fetch(`/check-user-id/${userId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.exists) {
+                    // Show 'User ID is taken' message and add red outline
+                    userIdTaken.classList.remove('d-none');
+                    userIdInput.classList.add('is-invalid');
+                } else {
+                    // Hide 'User ID is taken' message and remove red outline
+                    userIdTaken.classList.add('d-none');
+                    userIdInput.classList.remove('is-invalid');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
     }
 </script>
 @endsection

@@ -95,38 +95,11 @@ active font-weight-bold
     <!-- /Widgets -->
     <!--  Traffic  -->
     <div class="row">
-        <div class="col-lg-12">
-            <div class="card">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="card-body d-flex justify-content-center align-items-center">
-                            <div id="chartContainerSpline" style="height: 370px; width: 100%;"></div>
-                            <canvas id="lineChart"></canvas>
-                        </div>
-                        <div class="text-center mb-3">
-                            <span id="CountSTCW"></span><span> & </span>
-                            <span id="CountNonSTCW"></span>
-                        </div>
-                    </div>
-                </div> <!-- /.row -->
-            </div>
-        </div><!-- /# column -->
-        <div class="col-lg-12">
-            <div class="card">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="card-body d-flex justify-content-center align-items-center">
-                            <div id="chartContainerSpline2" style="height: 370px; width: 100%;"></div>
-                        </div>
-                    </div>
-                </div> <!-- /.row -->
-            </div>
-        </div><!-- /# column -->
         <div class="col-xl-12 col-md-12 zoom90 mb-3">
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold">News & Event Information</h6>
+                    <h6 class="m-0 font-weight-bold">Marketing Event</h6>
                 </div>
                 <!-- Card Body -->
                 <div class="card-body">
@@ -171,6 +144,33 @@ active font-weight-bold
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card-body d-flex justify-content-center align-items-center">
+                            <div id="chartContainerSpline" style="height: 370px; width: 100%;"></div>
+                            <canvas id="lineChart"></canvas>
+                        </div>
+                        <div class="text-center mb-3">
+                            <span id="CountSTCW"></span><span> & </span>
+                            <span id="CountNonSTCW"></span>
+                        </div>
+                    </div>
+                </div> <!-- /.row -->
+            </div>
+        </div><!-- /# column -->
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card-body d-flex justify-content-center align-items-center">
+                            <div id="chartContainerSpline2" style="height: 370px; width: 100%;"></div>
+                        </div>
+                    </div>
+                </div> <!-- /.row -->
             </div>
         </div>
     </div>

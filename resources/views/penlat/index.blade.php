@@ -156,7 +156,7 @@ font-weight-bold
                                                 <p style="margin: 0;">Alias :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <input type="text" class="form-control" name="alias">
+                                                <input type="text" class="form-control" name="alias" required>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-4">
@@ -164,7 +164,7 @@ font-weight-bold
                                                 <p style="margin: 0;">Jenis Pelatihan :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <input type="text" class="form-control" name="jenis_pelatihan">
+                                                <input type="text" class="form-control" name="jenis_pelatihan" required>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-4">
@@ -172,7 +172,7 @@ font-weight-bold
                                                 <p style="margin: 0;">Kategori Program :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <input type="text" class="form-control" name="kategori_program">
+                                                <input type="text" class="form-control" name="kategori_program" required>
                                             </div>
                                         </div>
                                     </div>

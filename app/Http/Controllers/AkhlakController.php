@@ -8,8 +8,8 @@ use App\Models\Quarter;
 use App\Models\User;
 use App\Models\User_pencapaian_akhlak;
 use App\Models\User_pencapaian_akhlak_files;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
-use PDF;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -17,6 +17,8 @@ class AkhlakController extends Controller
 {
     public function index(Request $request)
     {
+        $accessController = new AccessController();
+        $result = $accessController->usr_acc(106);
         // Determine the current year and generate the range of years
         $nowYear = date('Y');
         $yearsBefore = range($nowYear - 4, $nowYear);
@@ -285,7 +287,7 @@ class AkhlakController extends Controller
 
         $pencapaian = $pencapaianQuery->get();
 
-        $pdf = PDF::loadView('akhlak-view.laporan.pdf', [
+        $pdf = Pdf::loadView('akhlak-view.laporan.pdf', [
             'pencapaian' => $pencapaian,
             'periode' => $periode,
             'akhlakSelected' => $akhlak,

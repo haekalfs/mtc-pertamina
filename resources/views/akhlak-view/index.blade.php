@@ -185,7 +185,7 @@ font-weight-bold
                 <div class="card-header user-header alt bg-secondary mb-3">
                     <div class="media">
                         <a href="#">
-                            <img class="align-self-center rounded-circle mr-3" style="width:85px; height:85px;" alt="" src="images/admin.jpg">
+                            <img class="align-self-center rounded-circle mr-3" style="width:85px; height:85px;" alt="" src="{{ asset(Auth::user()->users_detail->profile_pic) }}">
                         </a>
                         <div class="media-body">
                             <h3 class="text-white display-6 mt-1">{{ $userSelected->name }}</h3>

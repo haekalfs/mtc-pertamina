@@ -4,7 +4,6 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>MTC Performance | Pertamina</title>
-    <meta name="description" content="Ela Admin - HTML5 Admin Template">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Favicon and Apple Touch Icon -->
@@ -72,12 +71,12 @@
     <aside id="left-panel" class="left-panel">
         <div class="sidebar-footer">
             <a href="{{ route('profile.view') }}" class="sidebar-user mr-3 ml-3 mt-2 mb-2">
-                <span class="sidebar-user-img">
+                <span class="sidebar-user-img mr-2">
                     <picture>
                         @if(Auth::user()->users_detail->profile_pic)
-                        <img class="rounded-circle" alt="" src="{{ asset('/img/avatar/'. Auth::user()->users_detail->profile_pic) }}">
+                        <img class="rounded-circle" alt="" src="{{ asset(Auth::user()->users_detail->profile_pic) }}">
                         @else
-                        <img src="{{ asset('images/admin.jpg') }}" alt="User name">
+                        <img src="images/admin.jpg" alt="User name">
                         @endif
                     </picture>
                 </span>
@@ -191,6 +190,7 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-ban"></i>User Access Control</a>
                         <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-access')">
                             <li><i class="menu-icon fa fa-sign-in"></i><a href="{{ route('manage.access') }}" class="@yield('manage-access')">Manage Access</a></li>
+                            {{-- <li><i class="menu-icon fa fa-sign-in"></i><a href="{{ route('manage.request') }}" class="@yield('manage-request')">Manage Allowed Method</a></li> --}}
                         </ul>
                     </li>
                     @endusr_acc
@@ -249,9 +249,9 @@
                     <div class="user-area dropdown float-right">
                         <a href="#" class="dropdown-toggle active" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             @if(Auth::user()->users_detail->profile_pic)
-                            <img class="user-avatar rounded-circle" style="width:38px; height:38px;" src="{{ asset('/img/avatar/'. Auth::user()->users_detail->profile_pic) }}" alt="User Avatar">
+                            <img class="user-avatar rounded-circle" style="width:38px; height:38px;" src="{{ asset(Auth::user()->users_detail->profile_pic) }}" alt="User Avatar">
                             @else
-                            <img class="user-avatar rounded-circle" src="{{ asset('images/admin.jpg') }}" alt="User Avatar">
+                            <img class="user-avatar rounded-circle" src="images/admin.jpg" alt="User Avatar">
                             @endif
                         </a>
 

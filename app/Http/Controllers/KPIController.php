@@ -596,16 +596,22 @@ class KpiController extends Controller
     public function duplicateKpis($newYear)
     {
         // Find the closest year to $newYear in the database
-        $closestYear = Kpi::select('periode')
+        $closestYearKpi = Kpi::select('periode')
             ->orderByRaw('ABS(periode - ?) ASC', [$newYear])
-            ->first()
-            ->periode;
+            ->first();
+
+        // Check if a KPI for the closest year exists
+        if (!$closestYearKpi) {
+            // If no KPI is found, redirect to 'manage-kpi' route with a failure message
+            return redirect()->route('manage-kpi')
+                ->with('failed', 'Failure to find existing KPI for the closest year. You have to create it manually here...');
+        }
 
         // Fetch all the KPIs for the closest year
-        $closestYearKpis = Kpi::where('periode', $closestYear)->get();
+        $closestYearKpis = Kpi::where('periode', $closestYearKpi->periode)->get();
 
         foreach ($closestYearKpis as $kpi) {
-            // Duplicate the KPI with a different year
+            // Duplicate the KPI with the new year
             Kpi::create([
                 'indicator' => $kpi->indicator,
                 'goal' => $kpi->goal,
@@ -615,6 +621,7 @@ class KpiController extends Controller
             ]);
         }
 
+        // Redirect with success message after duplication
         return redirect()->back()->with('success', 'KPIs duplicated for the year ' . $newYear);
     }
 }
