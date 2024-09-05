@@ -40,11 +40,12 @@ class ImportParticipantInfographics implements ShouldQueue
      */
     public function handle()
     {
-        ini_set('memory_limit', '1024M'); // Adjust the memory limit as needed
-
         try {
-            // Load the CSV file
-            $rows = array_map('str_getcsv', file($this->filePath));
+            // Load the Excel file
+            $reader = IOFactory::createReaderForFile($this->filePath);
+            $spreadsheet = $reader->load($this->filePath);
+            $sheet = $spreadsheet->getActiveSheet();
+            $rows = $sheet->toArray();
 
             DB::beginTransaction();
 
@@ -54,11 +55,6 @@ class ImportParticipantInfographics implements ShouldQueue
 
                 if (empty($row[2]) || empty($row[11]) || empty($row[12]) || empty($row[13]) || empty($row[14])) {
                     continue; // Skip rows with empty required fields
-                }
-
-                // Additional validation if needed
-                if (strlen($row[2]) > 255 || !is_string($row[2])) {
-                    continue; // Skip invalid entries
                 }
 
                 Infografis_peserta::updateOrCreate(

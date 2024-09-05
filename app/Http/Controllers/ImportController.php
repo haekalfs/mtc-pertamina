@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\ConvertXlsxToCsv;
-use App\Jobs\ConvertXlsxToCsvInfografis;
 use App\Jobs\ImportFeedback;
 use App\Jobs\ImportFeedbackMTC;
 use App\Jobs\ImportParticipantInfographics;
@@ -50,7 +49,7 @@ class ImportController extends Controller
 
         try {
             // Dispatch the job
-            ConvertXlsxToCsvInfografis::dispatch($filePath);
+            ImportParticipantInfographics::dispatch($filePath);
 
             // Set a cache indicating the job is processing, if it doesn't already exist
             if (!Cache::has('jobs_processing')) {
