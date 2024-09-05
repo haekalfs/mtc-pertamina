@@ -2,6 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\FeedbackImport;
+use App\Imports\FeedbackMTCImport;
+use App\Imports\ImportFeedback as ImportsImportFeedback;
+use App\Imports\ImportProfits;
+use App\Imports\InfografisImport;
+use App\Imports\PenlatImport;
+use App\Imports\VendorPaymentImport;
 use App\Jobs\ConvertXlsxToCsv;
 use App\Jobs\ImportFeedback;
 use App\Jobs\ImportFeedbackMTC;
@@ -49,7 +56,7 @@ class ImportController extends Controller
 
         try {
             // Dispatch the job
-            ImportParticipantInfographics::dispatch($filePath);
+            Excel::queueImport(new InfografisImport, $filePath);
 
             // Set a cache indicating the job is processing, if it doesn't already exist
             if (!Cache::has('jobs_processing')) {
@@ -89,7 +96,7 @@ class ImportController extends Controller
 
         try {
             // Dispatch the job
-            ProfitsImport::dispatch($filePath);
+            Excel::queueImport(new ImportProfits, $filePath);
             // Set a cache indicating the job is processing, if it doesn't already exist
             if (!Cache::has('jobs_processing')) {
                 Cache::put('jobs_processing', true, now()->addMinutes(5)); // Cache for 10 minutes
@@ -127,8 +134,7 @@ class ImportController extends Controller
         $filePath = $destinationPath . '/' . $filename;
 
         try {
-            // Dispatch the ConvertXlsxToCsv job
-            ConvertXlsxToCsv::dispatch($filePath);
+            Excel::queueImport(new PenlatImport, $filePath);
             if (!Cache::has('jobs_processing')) {
                 Cache::put('jobs_processing', true, now()->addMinutes(5));
             }
@@ -167,7 +173,7 @@ class ImportController extends Controller
 
         try {
             // Dispatch the job
-            ImportFeedback::dispatch($filePath);
+            Excel::queueImport(new FeedbackImport, $filePath);
             // Set a cache indicating the job is processing, if it doesn't already exist
             if (!Cache::has('jobs_processing')) {
                 Cache::put('jobs_processing', true, now()->addMinutes(5)); // Cache for 10 minutes
@@ -207,7 +213,7 @@ class ImportController extends Controller
 
         try {
             // Dispatch the job
-            ImportVendorPayment::dispatch($filePath);
+            Excel::queueImport(new VendorPaymentImport, $filePath);
             // Set a cache indicating the job is processing, if it doesn't already exist
             if (!Cache::has('jobs_processing')) {
                 Cache::put('jobs_processing', true, now()->addMinutes(5)); // Cache for 10 minutes
@@ -247,7 +253,7 @@ class ImportController extends Controller
 
         try {
             // Dispatch the job
-            ImportFeedbackMTC::dispatch($filePath);
+            Excel::queueImport(new FeedbackMTCImport, $filePath);
             // Set a cache indicating the job is processing, if it doesn't already exist
             if (!Cache::has('jobs_processing')) {
                 Cache::put('jobs_processing', true, now()->addMinutes(5)); // Cache for 10 minutes

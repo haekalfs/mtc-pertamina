@@ -231,9 +231,12 @@ font-weight-bold
                         <li>Nominal dari table diatas, diambil dari semua batch yang dimiliki oleh pelatihan tersebut.</li>
                         <li>List Pelatihan adalah Induk Data dari Penlat, yang mana 1 Pelatihan bisa memiliki banyak batch.</li>
                         <li>Data di samping adalah summary dari semua revenue, cost & nett income data pelatihan.</li>
-                        <li>Anda bisa mengklik detail dari pelatihan tersebut dengan mengklik gambarnya, yang nanti akan menampilkan batch-batch yang sudah diadakan, beserta list costnya.</li>
                         <li class="text-danger font-weight-bold">Untuk menampilkan summary & grafik, anda perlu memilih periode tahun.</li>
                     </ul>
+                    <div class="alert alert-warning alert-block">
+                        <button type="button" class="close" data-dismiss="alert">×</button>
+                        <strong>Jika Import data berhasil namun data tidak muncul, artinya list pelatihan tidak ada/belum diimport.</strong>
+                    </div>
                 </div>
             </div>
         </div>
