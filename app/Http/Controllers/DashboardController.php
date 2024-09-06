@@ -14,6 +14,15 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        try {
+            $roles = Auth::user()->role_id->pluck('role_name')->toArray();
+            if (!session()->has('allowed_roles')) {
+                session()->put('allowed_roles', $roles);
+            }
+        } catch (\Exception $e) {
+            // Do nothing
+        }
+
         $headline = Campaign::orderBy('updated_at', 'desc')->take(min(Campaign::count(), 12))->get();
         $getPesertaCount = Infografis_peserta::count();
         $queryCampaign = Campaign::query();

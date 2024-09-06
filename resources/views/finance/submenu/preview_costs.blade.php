@@ -13,7 +13,6 @@ font-weight-bold
 @endsection
 
 @section('content')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
         <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="menu-icon ti-stats-down"></i> Preview Costs Training</h1>
@@ -52,6 +51,13 @@ font-weight-bold
 </div>
 @endif
 
+@if($item->tgl_pelaksanaan !== $data->date)
+<div class="alert alert-danger alert-block">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong><small class="text-danger">Date between batch master data and excel profits is not synchronized! Consider review both data to take care of consistency...</small></strong>
+</div>
+@endif
+
 <div class="row zoom90">
     <div class="col-xl-12 col-lg-12">
         <div class="card">
@@ -83,7 +89,7 @@ font-weight-bold
                                 </tr>
                                 <tr>
                                     <th>Tanggal Pelaksanaan</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $data->date }}</td>
+                                    <td style="text-align: start; font-weight:500">: {{ $data->date }} </td>
                                 </tr>
                             </table>
                           <small class="font-weight-bold text-danger">

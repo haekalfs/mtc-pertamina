@@ -129,7 +129,7 @@ font-weight-bold
                                     </td>
                                     <td class="actions text-center">
                                         <div>
-                                            <a class="btn btn-outline-secondary btn-sm" href="{{ route('preview-company', $item->id) }}"><i class="menu-Logo fa fa-eye"></i> Preview Agreement</a>
+                                            <a class="btn btn-outline-secondary btn-sm" href="{{ route('preview-company', $item->id) }}"><i class="fa fa-info-circle"></i> Preview Agreement</a>
                                         </div>
                                     </td>
                                 </tr>

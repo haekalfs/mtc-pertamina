@@ -690,7 +690,7 @@ class PDController extends Controller
         $request->validate([
             'penlat' => 'required',
             'documents.*' => 'required',
-            'attachments.*' => 'sometimes|file', // Adjust the allowed file types and size
+            'attachments.*' => 'sometimes|file|mimes:pdf,docx,xlsx,xls,jpeg,png,jpg,gif', // Adjust max size as needed
         ]);
 
         // Get the form data

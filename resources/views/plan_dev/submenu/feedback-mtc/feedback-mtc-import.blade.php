@@ -96,7 +96,7 @@ font-weight-bold
                         <li>Unauthorized changes to import files or procedures are strictly prohibited.</li>
                         <li class="text-danger">Double-check the mapping of data fields to ensure they align with the database schema, The excel should start from row 2, the layout of the data should look like below image.</li>
                     </ul>
-                    <img src="{{ asset('uploads/example4.png') }}" class="img-fluid" style="padding: 1rem;">
+                    <img src="{{ asset('uploads/example5.png') }}" class="img-fluid" style="padding: 1rem;">
                 </div>
             </div>
         </div>

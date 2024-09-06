@@ -201,7 +201,7 @@ font-weight-bold
                             <tbody>
                                 @foreach($utilities as $tool)
                                 <tr>
-                                    <td data-th="Product">
+                                    <td>
                                         <div class="row">
                                             <div class="col-md-4 text-left">
                                                 <img src="{{ asset($tool->filepath) }}" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow ">
@@ -212,14 +212,14 @@ font-weight-bold
                                             </div>
                                         </div>
                                     </td>
-                                    <td data-th="Price" style="width:20%">
-                                        <input type="text" class="form-control form-control-md underline-input" data-type="currency" name="price_{{ $tool->id }}">
+                                    <td style="width:20%">
+                                        <input type="text" class="form-control form-control-md underline-input price-input" data-type="currency" name="price_{{ $tool->id }}" id="price_{{ $tool->id }}">
                                     </td>
-                                    <td data-th="Quantity" style="width:20%">
-                                        <input type="number" class="form-control form-control-md text-center underline-input" name="qty_{{ $tool->id }}" value="1" min="0">
+                                    <td style="width:20%">
+                                        <input type="number" class="form-control form-control-md text-center underline-input qty-input" name="qty_{{ $tool->id }}" id="qty_{{ $tool->id }}" value="1" min="0">
                                     </td>
-                                    <td data-th="Price" style="width:20%">
-                                        <input type="text" class="form-control form-control-md underline-input" data-type="currency" name="total_{{ $tool->id }}">
+                                    <td style="width:20%">
+                                        <input type="text" class="form-control form-control-md underline-input total-input" name="total_{{ $tool->id }}" id="total_{{ $tool->id }}" readonly>
                                     </td>
                                 </tr>
                                 @endforeach
@@ -327,89 +327,73 @@ $(document).ready(function() {
         }
     });
 });
-// Jquery Dependency
+$(document).ready(function() {
+    // Listen for keyup and blur events on the price and quantity fields
+    $("input[data-type='currency'], .qty-input").on({
+        keyup: function() {
+            formatCurrency($(this));
+            updateTotal($(this).closest('tr'));  // Calculate total on keyup
+        }
+    });
 
-$("input[data-type='currency']").on({
-    keyup: function() {
-      formatCurrency($(this));
-    },
-    blur: function() {
-      formatCurrency($(this));
+    // Function to calculate and update the total
+    function updateTotal(row) {
+        var priceInput = row.find('.price-input').val().replace(/[IDR,]/g, ''); // Remove IDR and commas
+        var qtyInput = row.find('.qty-input').val();
+
+        var price = parseFloat(priceInput) || 0;
+
+        // Calculate the total
+        var total = price * qtyInput;
+
+        // Format the total as currency and update the total input field
+        row.find('.total-input').val('IDR ' + formatNumber(total.toFixed(2)));
+    }
+
+    // Format number function (same as you had before)
+    function formatNumber(n) {
+        return n.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    // Format currency function (same as you had before)
+    function formatCurrency(input, blur) {
+        var input_val = input.val();
+
+        if (input_val === "") { return; }
+
+        var original_len = input_val.length;
+        var caret_pos = input.prop("selectionStart");
+
+        if (input_val.indexOf(".") >= 0) {
+            var decimal_pos = input_val.indexOf(".");
+            var left_side = input_val.substring(0, decimal_pos);
+            var right_side = input_val.substring(decimal_pos);
+
+            left_side = formatNumber(left_side);
+            right_side = formatNumber(right_side);
+
+            if (blur === "blur") {
+                right_side += "00";
+            }
+
+            right_side = right_side.substring(0, 2);
+            input_val = "IDR " + left_side + "." + right_side;
+        } else {
+            input_val = formatNumber(input_val);
+            input_val = "IDR " + input_val;
+
+            if (blur === "blur") {
+                input_val += ".00";
+            }
+        }
+
+        input.val(input_val);
+
+        var updated_len = input_val.length;
+        caret_pos = updated_len - original_len + caret_pos;
+        input[0].setSelectionRange(caret_pos, caret_pos);
     }
 });
-
-
-function formatNumber(n) {
-  // format number 1000000 to 1,234,567
-  return n.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-}
-
-
-function formatCurrency(input, blur) {
-    // appends $ to value, validates decimal side
-    // and puts cursor back in right position.
-
-    // get input value
-    var input_val = input.val();
-
-    // don't validate empty input
-    if (input_val === "") { return; }
-
-    // original length
-    var original_len = input_val.length;
-
-    // initial caret position
-    var caret_pos = input.prop("selectionStart");
-
-    // check for decimal
-    if (input_val.indexOf(".") >= 0) {
-
-        // get position of first decimal
-        // this prevents multiple decimals from
-        // being entered
-        var decimal_pos = input_val.indexOf(".");
-
-        // split number by decimal point
-        var left_side = input_val.substring(0, decimal_pos);
-        var right_side = input_val.substring(decimal_pos);
-
-        // add commas to left side of number
-        left_side = formatNumber(left_side);
-
-        // validate right side
-        right_side = formatNumber(right_side);
-
-        // On blur make sure 2 numbers after decimal
-        if (blur === "blur") {
-            right_side += "00";
-        }
-
-        // Limit decimal to only 2 digits
-        right_side = right_side.substring(0, 2);
-
-        // join number by .
-        input_val = "IDR " + left_side + "." + right_side;
-
-    } else {
-        // no decimal entered
-        // add commas to number
-        // remove all non-digits
-        input_val = formatNumber(input_val);
-        input_val = "IDR " + input_val;
-
-        // final formatting
-        if (blur === "blur") {
-            input_val += ".00";
-        }
-    }
-    // send updated string to input
-    input.val(input_val);
-
-    // put caret back in the right position
-    var updated_len = input_val.length;
-    caret_pos = updated_len - original_len + caret_pos;
-    input[0].setSelectionRange(caret_pos, caret_pos);
-}
 </script>
 <script>
     function previewImage(event) {
