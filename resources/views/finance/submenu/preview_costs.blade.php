@@ -173,11 +173,11 @@ font-weight-bold
                 <div class="card-body" style="background-color: rgb(247, 247, 247);">
                     <h6 class="h6 mb-2 font-weight-bold text-gray-800">General Guidelines</h6>
                     <ul class="ml-4">
-                        <li>Table diatas adalah List Batch beserta Revenue, Cost & Nett Income.</li>
-                        <li>Nominal dari table diatas, diambil dari masing-masing revenue, cost & nett Income batch tersebut.</li>
-                        <li>List Batch adalah Sub data dari List Pelatihan, batch dibuat berdasarkan Induk Data Pelatihan.</li>
-                        <li>Data di samping adalah total penggunaan utilitas dari semua batch diatas.</li>
-                        <li>Anda bisa mengklik detail dari pelatihan tersebut dengan mengklik batchnya, yang nanti akan menampilkan informasi lebih detail, beserta list costnya.</li>
+                        <li>Halaman ini menampilkan List Cost, Grafik, List Penggunaan Alat serta Harga & Total.</li>
+                        <li>Nominal-nominal tersebut, diambil dari masing-masing revenue, cost & nett Income batch tersebut.</li>
+                        <li>Jika tanggal pelaksanaan batch & excel Profits & Loss tidak sama, maka akan muncul notifikasi.</li>
+                        <li>Data di samping adalah total penggunaan utilitas dari batch diatas.</li>
+                        <li>Untuk mengedit data, cukup mengedit ulang excelnya kemudian import ulang.</li>
                     </ul>
                 </div>
             </div>

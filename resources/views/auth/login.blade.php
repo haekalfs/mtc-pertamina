@@ -2,8 +2,16 @@
 
 @section('content')
 <x-auth-session-status class="mb-4" :status="session('status')" />
-<div class="wrap-login100" style="zoom: 80%;">
-    <div class="login100-pic text-center js-tilt" data-tilt>
+<div class="wrap-login100" style="zoom: 80%; position: relative;">
+    <div class="red-background" style="position: absolute; top: 0; left: 0; background-color: #ff0000; width: 50%; height: 100px; border-bottom-right-radius: 50px; z-index: 1;">
+        <div class="ml-3" style="position: absolute; top: 10px; left: 10px; color: #fff; z-index: 2; font-family: Poppins-Bold;">
+            <h4 class="corner-text font-weight-bold mt-2">Sistem Informasi Manajemen MTC</h4>
+            <p class="text-white">Pertamina Maritime Training Center</p>
+        </div>
+    </div>
+
+    <!-- Text Content Positioned on Top of Red Background -->
+    <div class="login100-pic text-center pr-3">
         <img src="img/MTC.png" style="zoom: 150%;" alt="IMG">
     </div>
 

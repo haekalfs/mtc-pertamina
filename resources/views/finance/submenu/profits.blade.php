@@ -402,12 +402,10 @@ function loadSummaryData(value) {
         .then(data => {
             // Update financial data on the page
             if(selectedOption != '-1'){
-                document.getElementById('tahun').innerText = selectedOption;
                 document.getElementById('tahunSummary').innerText = selectedOption;
                 document.getElementById('tahunRevenue').innerText = selectedOption;
                 document.getElementById('tahunIncome').innerText = selectedOption;
             } else {
-                document.getElementById('tahun').innerText = 'Overall';
                 document.getElementById('tahunSummary').innerText = '';
                 document.getElementById('tahunRevenue').innerText = '';
                 document.getElementById('tahunIncome').innerText = '';
