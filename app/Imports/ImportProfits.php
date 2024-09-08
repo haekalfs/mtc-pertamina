@@ -4,6 +4,7 @@ namespace App\Imports;
 
 use App\Models\Penlat;
 use App\Models\Penlat_batch;
+use App\Models\Penlat_utility_usage;
 use App\Models\Profit;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -31,6 +32,7 @@ class ImportProfits implements ToCollection, WithBatchInserts, WithChunkReading,
             $currentDate = null;
             // Loop through the rows and save the data to the database
             foreach ($rows as $row) {
+                $totalUsageCost = 0;
                 // Try to check if it's a date in 'd-M-Y' format (displayed format)
                 if ($this->getFormattedDate($row[0])) {
                     $currentDate = $this->getFormattedDate($row[0]);
@@ -60,6 +62,11 @@ class ImportProfits implements ToCollection, WithBatchInserts, WithChunkReading,
                                 ]
                             );
                         }
+                    } else {
+                        $findBatch = Penlat_batch::where('batch', $row[0])->first();
+                        // Get the sum of all 'total' values from Penlat_utility_usage for the given batch
+                        $totalUsageCost = Penlat_utility_usage::where('penlat_batch_id', $findBatch->id)
+                            ->sum('total');
                     }
 
                     Profit::updateOrCreate(
@@ -78,6 +85,7 @@ class ImportProfits implements ToCollection, WithBatchInserts, WithChunkReading,
                             'penagihan_snack' => preg_replace('/[^0-9]/', '', $row[12]),
                             'penagihan_makan_siang' => preg_replace('/[^0-9]/', '', $row[13]),
                             'penagihan_laundry' => preg_replace('/[^0-9]/', '', $row[14]),
+                            'penlat_usage' => preg_replace('/[^0-9]/', '', $totalUsageCost),
                             'jumlah_biaya' => preg_replace('/[^0-9]/', '', str_replace(',00', '', $row[15])),
                             'profit' => preg_replace('/[^0-9]/', '', $row[16]),
                         ],

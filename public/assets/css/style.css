@@ -3071,6 +3071,7 @@ footer.site-footer {
     border: 4px solid #57a0ff;
     border-radius: 12px; /* Add border-radius to round the border */
 }
+
 .underline-input {
     border: none;
     border-bottom: 2px solid #cacaca; /* Change the color and thickness as needed */
@@ -3080,10 +3081,6 @@ footer.site-footer {
     width: 95%; /* Adjust the width as needed */
     max-width: 100%; /* Optional: set a maximum width */
     border-radius: 0; /* Remove border-radius to eliminate curvature */
-}
-
-.underline-input:focus {
-    border-bottom-color: #007BFF; /* Change the color on focus */
 }
 
 .noline-input {

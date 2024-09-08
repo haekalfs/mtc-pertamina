@@ -108,7 +108,7 @@ font-weight-bold
 
 <div class="animated fadeIn zoom90">
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-8">
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-secondary" id="judul">Pemakaian Utilitas : {{ $data->batch }}</h6>
@@ -120,8 +120,10 @@ font-weight-bold
                     <table id="docLetter" class="table table-bordered">
                         <thead class="thead-light">
                             <tr>
-                                <th style="width:60%">Tool</th>
-                                <th style="width:10%">Quantity</th>
+                                <th>Tool</th>
+                                <th>Quantity</th>
+                                <th>Harga Satuan</th>
+                                <th>Total</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -142,15 +144,41 @@ font-weight-bold
                                         <td class="text-center" style="width:7%">
                                             {{ $tool->amount }}
                                         </td>
+                                        <td class="text-center">
+                                            {{ $tool->price ? 'IDR ' . number_format($tool->price, 0, ',', '.') : '-' }}
+                                        </td>
+                                        <td class="text-center">
+                                            {{ $tool->total ? 'IDR ' . number_format($tool->total, 0, ',', '.') : '-' }}
+                                        </td>
                                     </tr>
                                 @endforeach
                             @else
                                 <tr class="text-center">
-                                    <td colspan="2">No Data Available</td>
+                                    <td colspan="4">No Data Available</td>
                                 </tr>
                             @endif
                         </tbody>
                     </table>
+                    <div class="text-right mt-3">
+                        <p>Total : {{ $item->penlat_usage ? 'Rp ' . number_format($item->penlat_usage, 0, ',', '.') : '-' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <span class="text-danger font-weight-bold">Summary</span>
+                </div>
+                <div class="card-body" style="background-color: rgb(247, 247, 247);">
+                    <h6 class="h6 mb-2 font-weight-bold text-gray-800">General Guidelines</h6>
+                    <ul class="ml-4">
+                        <li>Table diatas adalah List Batch beserta Revenue, Cost & Nett Income.</li>
+                        <li>Nominal dari table diatas, diambil dari masing-masing revenue, cost & nett Income batch tersebut.</li>
+                        <li>List Batch adalah Sub data dari List Pelatihan, batch dibuat berdasarkan Induk Data Pelatihan.</li>
+                        <li>Data di samping adalah total penggunaan utilitas dari semua batch diatas.</li>
+                        <li>Anda bisa mengklik detail dari pelatihan tersebut dengan mengklik batchnya, yang nanti akan menampilkan informasi lebih detail, beserta list costnya.</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -165,7 +193,7 @@ font-weight-bold
                             </div>
                         </div>
                         <div class="card-body">
-                            <h5 class="card-title font-weight-bold">Profits</h5>
+                            <h5 class="card-title font-weight-bold">Profits &nbsp;<i class="fa fa-plus text-success"></i></h5>
                             <div class="ml-2">
                                 <table class="table table-borderless table-sm">
                                     <tr>
@@ -182,7 +210,7 @@ font-weight-bold
                                     </tr>
                                 </table>
                             </div>
-                            <h5 class="card-title font-weight-bold">Loss</h5>
+                            <h5 class="card-title font-weight-bold">Cost &nbsp;<i class="fa fa-minus text-danger"></i></h5>
                             <div class="ml-2">
                                 <table class="table table-borderless table-sm">
                                     <tr>
@@ -221,38 +249,43 @@ font-weight-bold
                                         <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Penagihan Laundry</td>
                                         <td style="text-align: start;">: &nbsp; {{ $item->penagihan_laundry ? 'Rp ' . number_format($item->penagihan_laundry, 0, ',', '.') : '-' }}</td>
                                     </tr>
+                                    <tr>
+                                        <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Penggunaan Alat</td>
+                                        <td style="text-align: start;">: &nbsp; {{ $item->penlat_usage ? 'Rp ' . number_format($item->penlat_usage, 0, ',', '.') : '-' }}</td>
+                                    </tr>
                                 </table>
                             </div>
                             <hr>
-                            <h5 class="card-title font-weight-bold">Total Profits</h5>
+                            <h5 class="card-title font-weight-bold">Nett Income</h5>
                             <div class="ml-2">
                                 <table class="table table-borderless table-sm">
                                     <tr>
-                                        <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Total Biaya Pendaftaran</td>
-                                        <td style="text-align: start;" class="">: &nbsp; {{ $item->total_biaya_pendaftaran_peserta ? 'Rp ' . number_format($item->total_biaya_pendaftaran_peserta, 0, ',', '.') : '-' }} </td>
+                                        <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Total Keuntungan</td>
+                                        <td style="text-align: start;" class="">: &nbsp; {{ $item->total_biaya_pendaftaran_peserta ? 'Rp ' . number_format($item->total_biaya_pendaftaran_peserta, 0, ',', '.') : '-' }} &nbsp;<i class="fa fa-plus text-success"></i></td>
                                     </tr>
+                                    @php $totalBiaya = $item->jumlah_biaya + $item->penlat_usage; @endphp
                                     <tr>
-                                        <td style="width: 250px;" class="mb-2 "><i class="ti-minus mr-2"></i> Jumlah Biaya (COST) </td>
-                                        <td style="text-align: start;" class="">: &nbsp; {{ $item->jumlah_biaya ? 'Rp ' . number_format($item->jumlah_biaya, 0, ',', '.') : '-' }}</td>
+                                        <td style="width: 250px;" class="mb-2 "><i class="ti-minus mr-2"></i> Jumlah Biaya </td>
+                                        <td style="text-align: start;" class="">: &nbsp; {{ $totalBiaya ? 'Rp ' . number_format($totalBiaya, 0, ',', '.') : '-' }} &nbsp;<i class="fa fa-minus text-danger"></i></td>
                                     </tr>
                                     <tr>
                                         <td style="width: 250px;" class="mb-2 font-weight-bold text-success"><i class="ti-minus mr-2"></i> Total Profits</td>
-                                        <td style="text-align: start;" class="font-weight-bold text-success">: &nbsp; {{ $item->profit ? 'Rp ' . number_format($item->profit, 0, ',', '.') : '-' }} <i class="fa fa-plus"></i></td>
+                                        <td style="text-align: start;" class="font-weight-bold text-success">: &nbsp; {{ $item->profit ? 'Rp ' . number_format($item->profit - $totalBiaya, 0, ',', '.') : '-' }} <i class="fa fa-plus"></i></td>
                                     </tr>
                                 </table>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                            <h6 class="m-0 font-weight-bold text-secondary" id="judul">Grafik : {{ $data->batch }}</h6>
-                        </div>
-                        <div class="card-body">
-                            <div id="chartContainer" style="height: 370px; width: 100%;"></div>
-                        </div>
-                    </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-secondary" id="judul">Grafik : {{ $data->batch }}</h6>
+                </div>
+                <div class="card-body">
+                    <div id="chartContainer" style="height: 370px; width: 100%;"></div>
                 </div>
             </div>
         </div>

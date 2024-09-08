@@ -278,25 +278,26 @@ function loadChartData() {
     fetch('/api/chart-data-profits/' + selectedOption) // Fixed concatenation
         .then(response => response.json())
         .then(data => {
-            var chart = new CanvasJS.Chart("chartContainerSpline2", {
+            var chartProfit = new CanvasJS.Chart("chartContainerSpline2", {
                 animationEnabled: true,
                 zoomEnabled: true,
                 theme: "light2",
-                title: { text: "Data Profits MTC" },
-                axisX: { valueFormatString: "DD MMM" },
+                title: { text: "Data Profits (Quarterly)" },
+                axisX: {
+                    interval: 1, // Ensure one label per point
+                    labelAngle: -45 // Rotate labels if necessary to fit
+                },
                 axisY: {
                     includeZero: true
                 },
                 data: [{
                     type: "splineArea",
                     color: "#6599FF",
-                    xValueType: "dateTime",
-                    xValueFormatString: "DD MMM",
                     yValueFormatString: "#,##0 Rupiah",
-                    dataPoints: data.profitDataPoints
+                    dataPoints: data.profitDataPoints // Use the updated data points with label and y values
                 }]
             });
-            chart.render();
+            chartProfit.render();
         });
 }
 </script>

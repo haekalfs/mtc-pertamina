@@ -180,7 +180,7 @@ font-weight-bold
                         <div class="row">
                             @foreach($kpiChartsData as $index => $chartData)
                             <div class="@if($index == 0) col-lg-8 @elseif($index == 1) col-lg-4 @elseif($index == 4) col-lg-12 @else col-lg-6 @endif">
-                                <div class="card">
+                                <div class="card shadow-none" style="border: 1px solid grey;">
                                     <div class="row">
                                         <div class="col-lg-12">
                                             <div class="card-body d-flex justify-content-center align-items-center">

@@ -16,7 +16,7 @@ font-weight-bold
 @section('content')
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
-        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-users"></i> Manage Access</h1>
+        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-ban"></i> Manage Access</h1>
         <p class="mb-4">Managing Access based on roles.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->

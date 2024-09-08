@@ -138,7 +138,7 @@
                         <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-marketing')">
                             <li><i class="menu-icon fa fa-tachometer"></i><a href="{{ route('marketing') }}" class="@yield('marketing')">Dashboard</a></li>
                             <li><i class="fa fa-bullhorn"></i><a href="{{ route('marketing-campaign') }}" class="@yield('marketing-campaign')">Marketing Campaign</a></li>
-                            <li><i class="ti-instagram"></i><a href="#" class="@yield('socmed')">Social Media Enggagement</a></li>
+                            {{-- <li><i class="ti-instagram"></i><a href="#" class="@yield('socmed')">Social Media Enggagement</a></li> --}}
                             <li><i class="fa fa-sitemap"></i><a href="{{ route('company-agreement') }}" class="@yield('company-agreement')">Company Agreement</a></li>
                         </ul>
                     </li>
@@ -189,8 +189,8 @@
                     <li class="menu-item-has-children dropdown @yield('active-access') @yield('show-access')" style="padding-bottom: 15%;">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-ban"></i>User Access Control</a>
                         <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-access')">
-                            <li><i class="menu-icon fa fa-sign-in"></i><a href="{{ route('manage.access') }}" class="@yield('manage-access')">Manage Access</a></li>
-                            {{-- <li><i class="menu-icon fa fa-sign-in"></i><a href="{{ route('manage.request') }}" class="@yield('manage-request')">Manage Allowed Method</a></li> --}}
+                            <li><i class="menu-icon fa fa-ban"></i><a href="{{ route('manage.access') }}" class="@yield('manage-access')">Manage Access</a></li>
+                            <li><i class="menu-icon fa fa-times-circle"></i><a href="{{ route('manage.request') }}" class="@yield('manage-request')">Manage Allowed Method</a></li>
                         </ul>
                     </li>
                     @endusr_acc

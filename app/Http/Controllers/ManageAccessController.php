@@ -87,7 +87,7 @@ class ManageAccessController extends Controller
         $methods = Method::all();
 
         $user_access = DB::table('roles')
-        ->select('roles.id', 'methods.method AS methodDesc', 'roles.description', 'methods.id AS method_id', 'http_request_access.created_at')
+        ->select('roles.id', 'methods.method AS methodDesc', 'methods.description AS method_description', 'roles.description', 'methods.id AS method_id', 'http_request_access.created_at')
         ->leftJoin('http_request_access', 'roles.id', '=', 'http_request_access.role_id')
         ->rightJoin('methods', 'methods.id', '=', 'http_request_access.method_id')
         ->orderBy('method_id', 'asc')
@@ -101,6 +101,7 @@ class ManageAccessController extends Controller
                 $usersAcData[$userAc->method_id] = [
                     'method_id' => $userAc->method_id,
                     'method' => $userAc->methodDesc,
+                    'method_description' => $userAc->method_description,
                     'GrantAcc' => [],
                     'created_at' => $userAc->created_at
                 ];
@@ -119,6 +120,7 @@ class ManageAccessController extends Controller
                 'id' => $autoIncrement++,
                 'method_id' => $userAcData['method_id'],
                 'method' => $userAcData['method'],
+                'method_description' => $userAcData['method_description'],
                 'grantTo' => $grantList,
                 'created_at' => $userAcData['created_at']
             ];

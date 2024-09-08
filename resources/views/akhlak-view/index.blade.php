@@ -85,11 +85,22 @@ font-weight-bold
         padding: 15px 0;
         color: #424242
     }
+    .akhlak-indicator {
+        font-weight: bold;
+    }
+
+    .akhlak-indicator .akh {
+        color: #1d2a57; /* Dark Blue for AKH */
+    }
+
+    .akhlak-indicator .lak {
+        color: #009eaa; /* Green for LAK */
+    }
 </style>
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
         <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="ti-stats-up"></i> Pencapaian Akhlak</h1>
-        <p class="mb-4">Managing Access based on roles.</a></p>
+        <p class="mb-4">Menampilkan grafik & hasil pencapaian AKHLAK secara overall dari berbagai core values AKHLAK.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
         <img class="logo-img" src="{{ asset('/img/logo_akhlak.png') }}" alt="User name">
@@ -118,9 +129,9 @@ font-weight-bold
 <div class="text-right">
     {{-- <a class="btn btn-primary btn-sm text-white mb-4" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-icon fa fa-plus"></i> Insert Pencapaian</a> --}}
 </div>
-<div class="animated fadeIn zoom90">
+<div class="animated fadeIn">
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-12 zoom90">
             <div class="card shadow">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-secondary" id="judul">Search Report</h6>
@@ -133,9 +144,9 @@ font-weight-bold
                                 <div class="row align-items-center">
                                     <div class="col-md-5">
                                         <div class="form-group">
-                                            <label for="email">Nama Pekerja :</label>
+                                            <label for="userId">Nama Pekerja :</label>
                                             <select class="custom-select" id="userId" name="userId">
-                                                <option value="1" selected>Show All</option>
+                                                <option value="-1" selected>Show All</option>
                                                 @foreach ($users as $user)
                                                     <option value="{{ $user->id }}" @if ($user->id == $userSelectedOpt) selected @endif>{{ $user->name }}</option>
                                                 @endforeach
@@ -144,9 +155,9 @@ font-weight-bold
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-group">
-                                            <label for="periode_start">Periode</label>
+                                            <label for="quarter">Periode</label>
                                             <select class="form-control" name="quarter" required>
-                                                <option value="99" selected>Show All</option>
+                                                <option value="-1" selected>Show All</option>
                                                 @foreach ($quarterList as $quarter)
                                                     <option value="{{ $quarter->id }}" @if ($quarter->id == $quarterSelected) selected @endif>{{ $quarter->quarter_name }}</option>
                                                 @endforeach
@@ -155,9 +166,9 @@ font-weight-bold
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-group">
-                                            <label for="periode_end">Year</label>
+                                            <label for="year">Year</label>
                                             <select class="form-control" name="year" required>
-                                                <option value="1" selected>Show All</option>
+                                                <option value="-1" selected>Show All</option>
                                                 @foreach (array_reverse($yearsBefore) as $year)
                                                     <option value="{{ $year }}" @if ($year == $yearSelected) selected @endif>{{ $year }}</option>
                                                 @endforeach
@@ -180,12 +191,12 @@ font-weight-bold
         </div>
         <!-- Information Panel -->
         @if($userSelected)
-        <div class="col-md-6">
+        <div class="col-md-6 zoom90">
             <section class="card" style="border: 1px solid grey;">
-                <div class="card-header user-header alt bg-secondary mb-3">
+                <div class="card-header bg-login alt mb-4 p-4" style="background-image: url('{{ asset('img/kilang-minyak.png') }}');">
                     <div class="media">
                         <a href="#">
-                            <img class="align-self-center rounded-circle mr-3" style="width:85px; height:85px;" alt="" src="{{ asset(Auth::user()->users_detail->profile_pic) }}">
+                            <img class="align-self-center rounded-circle mr-3" style="width:85px; height:85px;" alt="" src="{{ asset($userSelected->users_detail->profile_pic) }}">
                         </a>
                         <div class="media-body">
                             <h3 class="text-white display-6 mt-1">{{ $userSelected->name }}</h3>
@@ -193,30 +204,47 @@ font-weight-bold
                         </div>
                     </div>
                 </div>
-                <ul class="ml-4 zoom90" style="padding-left: 1em;">
-                    @foreach ($data as $index => $score)
-                    <li><strong>{{ $labels[$index] }}:</strong> {{ $score }} %
-                        @if ($labels[$index] == 'Kompeten')
-                            <p>Kompeten: Berupaya terus menerus meningkatkan kapabilitas dan memberikan hasil terbaik.</p>
-                        @elseif ($labels[$index] == 'Harmonis')
-                            <p>Harmonis: Menghargai perbedaan, saling peduli, dan membangun lingkungan kerja yang kondusif.</p>
-                        @elseif ($labels[$index] == 'Loyal')
-                            <p>Loyal: Berdedikasi dan mengutamakan kepentingan Bangsa dan Negara.</p>
-                        @elseif ($labels[$index] == 'Adaptif')
-                            <p>Adaptif: Terus berinovasi dan antusias dalam menggerakkan atau menghadapi perubahan.</p>
-                        @elseif ($labels[$index] == 'Kolaboratif')
-                            <p>Kolaboratif: Membangun kerjasama yang sinergis.</p>
-                        @elseif ($labels[$index] == 'Amanah')
-                            <p>Amanah: Memegang teguh kepercayaan yang diberikan.</p>
-                        @endif
-                    </li>
+                <ul class="ml-4 zoom90" style="padding-left: 1em; padding-bottom: 1em;">
+                    @if($generalPencapaianResults->isNotEmpty())
+                    @foreach ($generalPencapaianResults as $result)
+                        <li>
+                            <strong class="akhlak-indicator">
+                            @if ($result->akhlak->indicator == 'Amanah')
+                                <span class="akh">{{ substr($result->akhlak->indicator, 0, 1) }}</span><span>{{ substr($result->akhlak->indicator, 1) }}</span>
+                                </strong>: {{ $result->nilai_description }}
+                                <p>Memegang teguh kepercayaan yang diberikan.</p>
+                            @elseif ($result->akhlak->indicator == 'Kompeten')
+                                <span class="akh">{{ substr($result->akhlak->indicator, 0, 1) }}</span><span>{{ substr($result->akhlak->indicator, 1) }}</span>
+                                </strong>: {{ $result->nilai_description }}
+                                <p>Berupaya terus menerus meningkatkan kapabilitas dan memberikan hasil terbaik.</p>
+                            @elseif ($result->akhlak->indicator == 'Harmonis')
+                                <span class="akh">{{ substr($result->akhlak->indicator, 0, 1) }}</span><span>{{ substr($result->akhlak->indicator, 1) }}</span>
+                                </strong>: {{ $result->nilai_description }}
+                                <p>Menghargai perbedaan, saling peduli, dan membangun lingkungan kerja yang kondusif.</p>
+                            @elseif ($result->akhlak->indicator == 'Loyal')
+                                <span class="lak">{{ substr($result->akhlak->indicator, 0, 1) }}</span><span>{{ substr($result->akhlak->indicator, 1) }}</span>
+                                </strong>: {{ $result->nilai_description }}
+                                <p>Berdedikasi dan mengutamakan kepentingan Bangsa dan Negara.</p>
+                            @elseif ($result->akhlak->indicator == 'Adaptif')
+                                <span class="lak">{{ substr($result->akhlak->indicator, 0, 1) }}</span><span>{{ substr($result->akhlak->indicator, 1) }}</span>
+                                </strong>: {{ $result->nilai_description }}
+                                <p>Terus berinovasi dan antusias dalam menggerakkan atau menghadapi perubahan.</p>
+                            @elseif ($result->akhlak->indicator == 'Kolaboratif')
+                                <span class="lak">{{ substr($result->akhlak->indicator, 0, 1) }}</span><span>{{ substr($result->akhlak->indicator, 1) }}</span>
+                                </strong>: {{ $result->nilai_description }}
+                                <p>Membangun kerjasama yang sinergis.</p>
+                            @endif
+                        </li>
                     @endforeach
+                    @else
+                    <li>No Data Available</li>
+                    @endif
                 </ul>
             </section>
         </div>
         @endif
         @if(!$userSelected)
-        <div class="col-md-6">
+        <div class="col-md-6 zoom90">
             <div class="card mb-4 shadow">
                 <div class="card-header">
                     <span class="text-primary font-weight-bold">Overview</span>
@@ -244,7 +272,7 @@ font-weight-bold
                 </div> <!-- /.row -->
             </div>
         </div>
-        <div class="col-md-12">
+        <div class="col-md-12 zoom90">
             <div class="card shadow">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-secondary" id="judul">Pencapaian AKHLAK - @if ($userSelected) {{ $userSelected->name }} @else Overall @endif</h6>
@@ -253,26 +281,28 @@ font-weight-bold
                     </div>
                 </div>
                 <div class="card-body">
-                    <table  id="docLetter" class="table table-striped table-bordered">
+                    <table id="listPencapaianAkhlak" class="table table-striped table-bordered">
                         <thead>
                             <tr>
-                                <th>Employee Name</th>
-                                <th>Judul Kegiatan</th>
-                                <th>Nilai</th>
                                 <th>Core Value</th>
+                                <th>Nilai Akhlak</th>
+                                {{-- <th>Avg. Nilai</th> --}}
                                 <th>Quarter</th>
                                 <th>Periode</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($pencapaian as $item)
+                            @foreach ($pencapaianResults as $item)
                             <tr>
-                                <td>{{ $item->user->name }}</td>
-                                <td>{{ $item->judul_kegiatan }}</td>
-                                <td>{{ $item->score }} %</td>
                                 <td>{{ $item->akhlak->indicator }}</td>
+                                <td>{{ $item->nilai_description }}</td>
+                                {{-- <td>{{ $item->average_score }} %</td> --}}
                                 <td>{{ $item->quarter->quarter_name }}</td>
                                 <td>{{ $item->periode }}</td>
+                                <td class="text-center">
+                                    <a href="" class="btn btn-outline-secondary btn-sm btn-details mr-2"><i class="fa fa-info-circle"></i> Preview</a>
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -282,30 +312,6 @@ font-weight-bold
         </div>
     </div>
 </div>
-
-<script>
-    const ctx = document.getElementById('radarChart').getContext('2d');
-    const radarChart = new Chart(ctx, {
-        type: 'radar',
-        data: {
-            labels: ['Kompeten', 'Harmonis', 'Loyal', 'Adaptif', 'Kolaboratif', 'Amanah'],
-            datasets: [{
-                label: 'Pencapaian Rata-Rata AKHLAK @if ($userSelected) {{ $userSelected->name }} @else Overall @endif',
-                data: @json($data),
-                backgroundColor: 'rgba(153, 102, 255, 0.2)',
-                borderColor: 'rgba(153, 102, 255, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                r: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-</script>
 <div class="modal fade" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -343,7 +349,7 @@ font-weight-bold
                         <div class="form-group">
                             <label for="akhlak_value">Nilai <span style="color: #403D4D;">AKH</span><span style="color: #029195;">LAK</span></label>
                             <select class="form-control" id="akhlak_value" name="akhlak_value" required>
-                                @foreach ($nilai as $item)
+                                @foreach ($nilaiList as $item)
                                     <option value="{{ $item->id }}">{{ $item->description }}</option>
                                 @endforeach
                             </select>
@@ -386,7 +392,6 @@ font-weight-bold
         </div>
     </div>
 </div>
-
 <script>
     function redirectToPage() {
         var selectedOption = document.getElementById("yearSelected").value;
@@ -430,5 +435,33 @@ font-weight-bold
             element.style.overflow = ''; // Reset to default
         }
     }
+</script>
+<script>
+    const ctx = document.getElementById('radarChart').getContext('2d');
+
+    const radarChart = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: {!! $akhlakLabels !!},  // Akhlak descriptions (e.g., 'Kompeten', 'Harmonis', etc.)
+            datasets: [{
+                label: 'Pencapaian Rata-Rata AKHLAK @if ($userSelected) {{ $userSelected->name }} @else Overall MTC @endif',
+                data: {!! $averageScores !!},  // Average scores for each akhlak point
+                backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                borderColor: 'rgba(153, 102, 255, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    ticks: {
+                        min: 0,
+                        max: 5  // Adjust based on the scoring system (e.g., if max score is 5)
+                    }
+                }
+            }
+        }
+    });
 </script>
 @endsection

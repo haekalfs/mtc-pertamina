@@ -149,9 +149,10 @@ font-weight-bold
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold" id="judul">Summary <span id="tahunSummary"></span></h6>
-                    <div class="d-flex">
-                        {{-- <a id="addApproversBtn" class="btn btn-sm btn-primary shadow-sm text-white"><i class="fa fa-file-text fa-sm"></i> Filter</a>
-                        <a id="hideApproversBtn" class="btn btn-sm btn-secondary shadow-sm text-white" style="display: none;"><i class="fa fa-backward fa-sm"></i> Cancel</a> --}}
+                    <div class="d-flex zoom90">
+                        <select name="summaryPeriode" class="form-control" id="summaryPeriode">
+                            <option value="-1" selected disabled>Select Periode...</option>
+                        </select>
                     </div>
                 </div>
                 <div class="card-body zoom80">
@@ -190,6 +191,10 @@ font-weight-bold
                                 <tr>
                                     <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Penagihan Laundry</td>
                                     <td style="text-align: start;">: &nbsp; <span id="total_penagihan_laundry">-</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Penggunaan Alat</td>
+                                    <td style="text-align: start;">: &nbsp; <span id="total_penggunaan_alat">-</span></td>
                                 </tr>
                                 <tr>
                                     <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Total Peserta</td>
@@ -242,41 +247,69 @@ font-weight-bold
         </div>
         <div class="col-md-12">
             <div class="card">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold" id="judul">Grafik</h6>
-                    <div class="d-flex">
+                <div class="row">
+                    <div class="col-lg-12 d-flex justify-content-end align-items-end">
+                        <select class="form-control mt-3 mr-4 zoom90" id="chartPeriode" name="chartPeriode" style="width: 150px;">
+                            <option value="-1" selected disabled>Select Periode...</option>
+                        </select>
                     </div>
-                </div>
-                <div class="card-body">
-                    <div id="chartContainerSpline" style="height: 370px; width: 100%;"></div>
-                </div>
+                    <div class="col-lg-12">
+                        <div class="card-body d-flex justify-content-center align-items-center">
+                            <div id="chartContainerSpline" style="height: 370px; width: 100%;"></div>
+                        </div>
+                    </div>
+                </div> <!-- /.row -->
             </div>
-        </div>
-        <div class="col-md-12">
             <div class="card">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold" id="judul">Grafik</h6>
-                    <div class="d-flex">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card-body d-flex justify-content-center align-items-center">
+                            <div id="stackedArea" style="height: 370px; width: 100%;"></div>
+                        </div>
                     </div>
-                </div>
-                <div class="card-body">
-                    <div id="stackedArea" style="height: 370px; width: 100%;"></div>
-                </div>
+                </div> <!-- /.row -->
             </div>
         </div>
     </div>
 </div>
 <script>
 window.onload = function () {
-    loadChartData();
+    // Get the current year
+    var currentYear = new Date().getFullYear();
 
-    // Add event listener to dropdown
-    document.getElementById("periode").addEventListener("change", function() {
-        loadChartData(); // Load chart data whenever the dropdown changes
+    // Populate the dropdowns with the current year as default
+    var summaryPeriodeDropdown = document.getElementById("summaryPeriode");
+    var chartPeriodeDropdown = document.getElementById("chartPeriode");
+
+    // Populate both dropdowns with options from current year and previous years
+    for (var year = currentYear; year >= currentYear - 4; year--) {
+        var summaryOption = new Option(year, year);
+        var chartOption = new Option(year, year);
+        summaryPeriodeDropdown.add(summaryOption);
+        chartPeriodeDropdown.add(chartOption);
+    }
+
+    // Set default selected value to current year
+    summaryPeriodeDropdown.value = currentYear;
+    chartPeriodeDropdown.value = currentYear;
+
+    // Auto-load summary and chart data based on the default selected year
+    loadSummaryData(currentYear);
+    loadChartData(currentYear);
+
+    // Add event listener to dropdowns for future changes
+    summaryPeriodeDropdown.addEventListener("change", function() {
+        var selectedOption = summaryPeriodeDropdown.value;
+        loadSummaryData(selectedOption);
+    });
+
+    chartPeriodeDropdown.addEventListener("change", function() {
+        var selectedOption = chartPeriodeDropdown.value;
+        loadChartData(selectedOption); // Load chart data whenever the dropdown changes
     });
 };
-function loadChartData() {
-    var selectedOption = document.getElementById("periode").value;
+function loadChartData(value) {
+    var selectedOption = value;
     if(selectedOption != '-1'){
         var selectedYear = selectedOption;
     } else {
@@ -330,26 +363,43 @@ function loadChartData() {
             });
             chart.render();
 
-            var chart = new CanvasJS.Chart("chartContainerSpline", {
+            var chartProfit = new CanvasJS.Chart("chartContainerSpline", {
                 animationEnabled: true,
                 zoomEnabled: true,
                 theme: "light2",
-                title: { text: "Data Profits" },
-                axisX: { valueFormatString: "DD MMM" },
+                title: { text: "Data Profits (Quarterly)" },
+                axisX: {
+                    interval: 1, // Ensure one label per point
+                    labelAngle: -45 // Rotate labels if necessary to fit
+                },
                 axisY: {
                     includeZero: true
                 },
                 data: [{
-                    type: "splineArea",
+                    type: "column",
                     color: "#6599FF",
-                    xValueType: "dateTime",
-                    xValueFormatString: "DD MMM",
                     yValueFormatString: "#,##0 Rupiah",
-                    dataPoints: data.profitDataPoints
+                    dataPoints: data.profitDataPoints // Use the updated data points with label and y values
                 }]
             });
-            chart.render();
+            chartProfit.render();
+        });
+    function toggleDataSeries(e) {
+        e.dataSeries.visible = typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible;
+        chart.render();
+    }
+}
 
+function loadSummaryData(value) {
+    var selectedOption = value;
+    if(selectedOption != '-1'){
+        var selectedYear = selectedOption;
+    } else {
+        var selectedYear = '';
+    }
+    fetch('/api/summary-data-profits/' + selectedOption)
+        .then(response => response.json())
+        .then(data => {
             // Update financial data on the page
             if(selectedOption != '-1'){
                 document.getElementById('tahun').innerText = selectedOption;
@@ -371,16 +421,12 @@ function loadChartData() {
             document.getElementById('total_penagihan_snack').innerText = formatCurrency(data.array.total_penagihan_snack);
             document.getElementById('total_penagihan_makan_siang').innerText = formatCurrency(data.array.total_penagihan_makan_siang);
             document.getElementById('total_penagihan_laundry').innerText = formatCurrency(data.array.total_penagihan_laundry);
+            document.getElementById('total_penggunaan_alat').innerText = formatCurrency(data.array.total_penggunaan_alat);
             document.getElementById('total_peserta').innerText = data.array.total_peserta;
             document.getElementById('nett_income').innerText = formatCurrency(data.array.nett_income);
             document.getElementById('totalCosts').innerText = formatCurrency(data.array.total_costs);
         });
-    function toggleDataSeries(e) {
-        e.dataSeries.visible = typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible;
-        chart.render();
-    }
 }
-
 // Function to format currency
 function formatCurrency(value) {
     return 'Rp ' + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");

@@ -13,7 +13,6 @@ font-weight-bold
 @endsection
 
 @section('content')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
     .header-pencapaian {
         display: flex;
@@ -84,38 +83,26 @@ font-weight-bold
                 <div class="card-body">
                     <form method="GET" action="/akhlak-report">
                         @csrf
-                        <div class="row d-flex justify-content-start mb-3">
+                        <div class="row d-flex justify-content-start mb-4 zoom90">
                             <div class="col-md-12">
                                 <div class="row align-items-center">
-                                    <div class="col-md-4">
+                                    <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="email">Nama Pekerja :</label>
+                                            <label for="userId">Nama Pekerja :</label>
                                             <select class="custom-select" id="userId" name="userId">
-                                                <option value="1" selected>Show All</option>
+                                                <option selected disabled>Select Employee...</option>
                                                 @foreach ($users as $user)
-                                                    <option value="{{ $user->id }}" @if ($user->id == $userSelected) selected @endif>{{ $user->name }}</option>
+                                                    <option value="{{ $user->id }}" @if ($user->id == $userSelectedOpt) selected @endif>{{ $user->name }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-5">
                                         <div class="form-group">
-                                            <label for="position_id">Nilai Akhlak :</label>
-                                            <select name="nilai_akhlak" class="form-control" id="nilai_akhlak">
-                                                <option value="7">All Indicators</option>
-                                                @foreach ($akhlakPoin as $item)
-                                                <option value="{{ $item->id }}" @if ($item->id == $akhlakSelected) selected @endif>{{ $item->indicator }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label for="status">Periode :</label>
-                                            <select class="form-control" id="periode" name="periode" required>
-                                                <option value="1" selected>All</option>
+                                            <label for="year">Periode</label>
+                                            <select class="form-control" name="year" required>
                                                 @foreach (array_reverse($yearsBefore) as $year)
-                                                    <option value="{{ $year }}" @if ($year == $periode) selected @endif>{{ $year }}</option>
+                                                    <option value="{{ $year }}" @if ($year == $yearSelected) selected @endif>{{ $year }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -123,7 +110,7 @@ font-weight-bold
                                     <div class="col-md-1 d-flex align-self-end justify-content-start">
                                         <div class="form-group">
                                             <div class="align-self-center">
-                                                <input type="submit" class="btn btn-primary" value="Show"/>
+                                                <button type="submit" class="btn btn-primary" style="padding-left: 1.2em; padding-right: 1.2em;"><i class="ti-search"></i></button>
                                             </div>
                                         </div>
                                     </div>
@@ -136,7 +123,7 @@ font-weight-bold
         </div>
     </div>
 </div>
-@if($userInfo)
+
 <div class="animated fadeIn zoom90">
     <div class="row">
         <div class="col-md-12">
@@ -144,107 +131,168 @@ font-weight-bold
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> Laporan Pencapaian <span style="color: #403D4D;">AKH</span><span style="color: #029195;">LAK</span></h6>
                     <div class="text-right">
-                        <a class="btn btn-primary btn-sm text-white" href="/akhlak-print/{{$userSelected}}/{{$akhlakSelected}}/{{$periode}}"><i class="menu-icon fa fa-download"></i> Download</a>
+                        <form method="POST" action="{{ route('akhlak.downloadPdf') }}" target="_blank" id="pdfForm">
+                            @csrf
+                            <input type="hidden" name="chartImage" id="chartImageInput">
+                            <input type="hidden" name="userId" id="userId" value="{{$userSelectedOpt}}">
+                            <input type="hidden" name="year" id="year" value="{{$yearSelected}}">
+                            <button id="downloadPdfButton" class="btn btn-primary btn-sm">Download PDF</button>
+                        </form>
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="row d-flex justify-content-start mb-3">
-                        <div class="col-md-12">
-                            <table class='table table-bordered table-sm mt-4 mb-4'>
-                                <thead>
-                                    <tr>
-                                        <th>User ID</th>
-                                        <th>Nilai Akhlak</th>
-                                        <th>Periode</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>{{ $userInfo->name }}</td>
-                                        <td>Kompeten</td>
-                                        <td>2022</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Judul Kegiatan</th>
-                                        <th>Score</th>
-                                        <th>Periode Start</th>
-                                        <th>Periode End</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($pencapaian as $item)
-                                    <tr>
-                                        <td>{{ $item->judul_kegiatan }}</td>
-                                        <td>{{ $item->score }} %</td>
-                                        <td>{{ $item->periode_start }}</td>
-                                        <td>{{ $item->periode_end }}</td>
-                                    </tr>
+                    <div class="col-md-12 d-flex justify-content-center">
+                        <table>
+                            <tr>
+                                <td style="border: none; padding-right: 10px;">
+                                    <img src="https://ccdjayaekspres.id/MTC.png" style="height: 130px; width: 130px;" alt="">
+                                </td>
+                                <td style="border: none;">
+                                    <address class="text-center">
+                                        <strong>Pertamina Maritime Training Center</strong><br>
+                                        Jl. Pemuda No.44, RT.2/RW.4, Jati, Kec. Pulo Gadung, <br>
+                                        Kota Jakarta Timur, DKI Jakarta 13220
+                                    </address>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <hr style="border-top: 3px solid rgb(197, 197, 197); margin-top:-1%;">
+                    <h2 class="text-center my-4 font-weight-bold">SUMMARY</h2>
+                    <div class="row">
+                        <div class="col-md-6">
+                            @if($userSelected)
+                            <section class="card shadow-none" style="border: 1px solid grey;">
+                                <div class="card-header bg-login alt mb-4 p-4" style="background-image: url('{{ asset('img/kilang-minyak.png') }}');">
+                                    <div class="media">
+                                        <a href="#">
+                                            <img class="align-self-center rounded-circle mr-3" style="width:85px; height:85px;" alt="" src="{{ asset($userSelected->users_detail->profile_pic) }}">
+                                        </a>
+                                        <div class="media-body">
+                                            <h3 class="text-white display-6 mt-1">{{ $userSelected->name }}</h3>
+                                            <p class="text-white">Nomor Pekerja : {{ $userSelected->users_detail->employee_id }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <ul class="ml-4 zoom90" style="padding-left: 1em; padding-bottom: 1em;">
+                                    @if($generalPencapaianResults->isNotEmpty())
+                                    @foreach ($generalPencapaianResults as $result)
+                                        <li>
+                                            <strong class="akhlak-indicator">
+                                            @if ($result->akhlak->indicator == 'Amanah')
+                                                <span class="akh">{{ substr($result->akhlak->indicator, 0, 1) }}</span><span>{{ substr($result->akhlak->indicator, 1) }}</span>
+                                                </strong>: {{ $result->nilai_description }}
+                                                <p>Memegang teguh kepercayaan yang diberikan.</p>
+                                            @elseif ($result->akhlak->indicator == 'Kompeten')
+                                                <span class="akh">{{ substr($result->akhlak->indicator, 0, 1) }}</span><span>{{ substr($result->akhlak->indicator, 1) }}</span>
+                                                </strong>: {{ $result->nilai_description }}
+                                                <p>Berupaya terus menerus meningkatkan kapabilitas dan memberikan hasil terbaik.</p>
+                                            @elseif ($result->akhlak->indicator == 'Harmonis')
+                                                <span class="akh">{{ substr($result->akhlak->indicator, 0, 1) }}</span><span>{{ substr($result->akhlak->indicator, 1) }}</span>
+                                                </strong>: {{ $result->nilai_description }}
+                                                <p>Menghargai perbedaan, saling peduli, dan membangun lingkungan kerja yang kondusif.</p>
+                                            @elseif ($result->akhlak->indicator == 'Loyal')
+                                                <span class="lak">{{ substr($result->akhlak->indicator, 0, 1) }}</span><span>{{ substr($result->akhlak->indicator, 1) }}</span>
+                                                </strong>: {{ $result->nilai_description }}
+                                                <p>Berdedikasi dan mengutamakan kepentingan Bangsa dan Negara.</p>
+                                            @elseif ($result->akhlak->indicator == 'Adaptif')
+                                                <span class="lak">{{ substr($result->akhlak->indicator, 0, 1) }}</span><span>{{ substr($result->akhlak->indicator, 1) }}</span>
+                                                </strong>: {{ $result->nilai_description }}
+                                                <p>Terus berinovasi dan antusias dalam menggerakkan atau menghadapi perubahan.</p>
+                                            @elseif ($result->akhlak->indicator == 'Kolaboratif')
+                                                <span class="lak">{{ substr($result->akhlak->indicator, 0, 1) }}</span><span>{{ substr($result->akhlak->indicator, 1) }}</span>
+                                                </strong>: {{ $result->nilai_description }}
+                                                <p>Membangun kerjasama yang sinergis.</p>
+                                            @endif
+                                        </li>
                                     @endforeach
-                                </tbody>
-                            </table>
-                            <table class="table table-borderless mt-4">
-                                <tbody>
-                                    <tr class="table-sm">
-                                        <td class="m-0" width="200px">
-                                            <div class="font-weight-bold">Average Nilai Akhlak</div>
-                                            <div>Avg. Amanah</div>
-                                            <div>Avg. Kompeten</div>
-                                            <div>Avg. Harmonis</div>
-                                            <div>Avg. Loyal</div>
-                                            <div>Avg. Adaptif</div>
-                                            <div>Avg. Kolaboratif</div>
-                                        </td>
-                                        <td>
-                                            <div>&nbsp;</div>
-                                            <div>: 33 %</div>
-                                            <div>: 50 %</div>
-                                            <div>: 78 %</div>
-                                            <div>: 90 %</div>
-                                            <div>: 45 %</div>
-                                            <div>: 0 %</div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                    @else
+                                    <li>No Data Available</li>
+                                    @endif
+                                </ul>
+                            </section>
+                            @endif
+                        </div>
+                        <div class="col-md-6" id="charts">
+                            <div class="card shadow-none">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="card-body d-flex justify-content-center align-items-center">
+                                            <canvas id="radarChart" style="max-width: 100%; height: 500px; margin: auto;"></canvas>
+                                        </div>
+                                    </div>
+                                </div> <!-- /.row -->
+                            </div>
                         </div>
                     </div>
+                    <h2 class="text-center my-4 font-weight-bold">ACTIVITY REPORT</h2>
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Core Value</th>
+                                <th>Nilai Akhlak</th>
+                                <th>Average Score (%)</th>
+                                <th>Quarter</th>
+                                <th>Periode</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($pencapaianResults as $item)
+                            <tr>
+                                <td>{{ $item->akhlak->indicator }}</td>
+                                <td>{{ $item->nilai_description }}</td>
+                                <td>{{ $item->average_score }} %</td>
+                                <td>{{ $item->quarter->quarter_name }}</td>
+                                <td>{{ $item->periode }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                    <h2 class="text-center my-4 font-weight-bold">DETAIL ACTIVITY</h2>
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Kegiatan</th>
+                                <th>Nilai Akhlak</th>
+                                <th>Score (%)</th>
+                                <th>Core Value</th>
+                                <th>Quarter</th>
+                                <th>Periode</th>
+                                <th>Evidence</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($allPencapaian as $item)
+                            <tr>
+                                <th>{{ $item->judul_kegiatan }}</th>
+                                <td>{{ $item->scores->description }}</td>
+                                <td>{{ $item->scores->score }} %</td>
+                                <td>{{ $item->akhlak->indicator }}</td>
+                                <td>{{ $item->quarter->quarter_name }}</td>
+                                <td>{{ $item->periode }}</td>
+                                <td class="text-center">
+                                    <a href="{{ $item->file->filepath }}" class="btn btn-outline-secondary btn-sm btn-details mr-2"><i class="fa fa-info-circle"></i> View</a>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 </div>
-@else
-<div class="animated fadeIn zoom90">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> Laporan Pencapaian <span style="color: #403D4D;">AKH</span><span style="color: #029195;">LAK</span></h6>
-                    <div class="text-right">
-                        {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-icon fa fa-download"></i> Download</a> --}}
-                    </div>
-                </div>
-                <div class="card-body">
-                    <p class="text-center">No Data Available, Generate Payment to show data!.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-@endif
+
 <script>
     const ctx = document.getElementById('radarChart').getContext('2d');
+
     const radarChart = new Chart(ctx, {
         type: 'radar',
         data: {
-            labels: ['Kompeten', 'Harmonis', 'Loyal', 'Adaptif', 'Kolaboratif', 'Amanah'],
+            labels: {!! $akhlakLabels !!},  // Akhlak descriptions (e.g., 'Kompeten', 'Harmonis', etc.)
             datasets: [{
-                label: 'Pencapaian AKHLAK',
-                data: [65, 59, 90, 81, 56, 55],
+                label: 'Pencapaian Rata-Rata AKHLAK @if ($userSelected) {{ $userSelected->name }} @else Overall MTC @endif',
+                data: {!! $averageScores !!},  // Average scores for each akhlak point
                 backgroundColor: 'rgba(153, 102, 255, 0.2)',
                 borderColor: 'rgba(153, 102, 255, 1)',
                 borderWidth: 1
@@ -253,52 +301,30 @@ font-weight-bold
         options: {
             scales: {
                 r: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    ticks: {
+                        min: 0,
+                        max: 5  // Adjust based on the scoring system (e.g., if max score is 5)
+                    }
                 }
             }
         }
     });
 </script>
-<div class="modal fade" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-        <div class="modal-header d-flex flex-row align-items-center justify-content-between">
-            <h5 class="modal-title" id="inputDataModalLabel">Input Data</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form method="post" action="#">
-                @csrf
-                <div class="modal-body">
-                    <div class="col-md-12 zoom90">
-                        <div class="form-group">
-                            <label for="position_name">KPI</label>
-                            <input type="text" class="form-control" id="position_name" name="position_name" placeholder="Average Test Score..." required>
-                        </div>
-                        <div class="form-group">
-                            <label for="position_name">Target <small class="text-danger"><i>(in percentage)</i></small></label>
-                            <input type="text" class="form-control" id="position_name" name="position_name" placeholder="85%" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="period">Periode</label>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <input type="date" class="form-control" id="period_start" name="period_start">
-                                </div>
-                                <div class="col-md-6">
-                                    <input type="date" class="form-control" id="period_end" name="period_end">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Submit Request</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('downloadPdfButton').addEventListener('click', function(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        html2canvas(document.querySelector("#charts")).then(function(canvas) {
+            let chartImage = canvas.toDataURL('image/png');
+            document.getElementById('chartImageInput').value = chartImage;
+
+            // Now submit the form
+            document.getElementById('pdfForm').submit();
+        });
+    });
+});
+</script>
 @endsection

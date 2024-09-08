@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Asset_condition;
 use App\Models\Inventory_room;
 use App\Models\Inventory_tools;
+use App\Models\Location;
 use App\Models\Tool_img;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -64,6 +66,37 @@ class InventoryToolController extends Controller
         }
 
         return redirect()->back()->with('success', 'Tool data and image uploaded successfully.');
+    }
+
+    public function preview_asset($id)
+    {
+        $data = Inventory_tools::with('img')->findOrFail($id);
+        $locations = Location::all();
+        $assetCondition = Asset_condition::all();
+        return view('operation.submenu.preview-tool', ['data' => $data, 'locations' => $locations, 'assetCondition' => $assetCondition]);
+    }
+
+    public function fetch_info($id)
+    {
+        $tool = Inventory_tools::with('img')->findOrFail($id);
+
+        // Prepare the data, including the image path if available
+        $toolData = [
+            'id' => $tool->id,
+            'asset_name' => $tool->asset_name,
+            'asset_id' => $tool->asset_id,
+            'asset_maker' => $tool->asset_maker,
+            'asset_condition' => $tool->condition->condition,
+            'initial_stock' => $tool->initial_stock,
+            'location' => $tool->location->description,
+            'used_amount' => $tool->used_amount,
+            'last_maintenance' => $tool->last_maintenance,
+            'next_maintenance' => $tool->next_maintenance,
+            'asset_guidance' => $tool->asset_guidance ? asset($tool->asset_guidance) : null, // Ensure the file path is correct
+            'tool_image' => $tool->img ? asset($tool->img->filepath) : null,
+        ];
+
+        return response()->json($toolData);
     }
 
     public function edit($id)
@@ -159,6 +192,63 @@ class InventoryToolController extends Controller
 
             // Update the tool with the new guide path
             $tool->asset_guidance = 'uploads/guides/' . $guideFilename;
+        }
+
+        $tool->save();
+
+        Session::flash('success', 'Success Updating Asset!');
+        return response()->json(['message' => 'Tool updated successfully']);
+    }
+
+    public function update_partially(Request $request, $id)
+    {
+        $tool = Inventory_tools::findOrFail($id);
+        $existingData = Inventory_tools::findOrFail($id);
+
+        $existingUsedAmount = $existingData->used_amount;
+
+        $usedAmount = $request->input('used_amount');
+        $existingUsedAmount = $usedAmount;
+
+        $initialStocks = $request->input('stock');
+        $stocks = $initialStocks;
+        if($usedAmount <= 0){
+            $stocks = $initialStocks;
+        } else {
+            $stocks -= $existingUsedAmount;
+        }
+
+        $tool->asset_condition_id = $request->input('condition');
+        $tool->initial_stock = $initialStocks;
+        $tool->used_amount = $existingUsedAmount;
+        $tool->asset_stock = $stocks;
+        $tool->last_maintenance = $request->input('last_maintenance');
+        $tool->next_maintenance = $request->input('next_maintenance');
+
+        // Handle the tool image update
+        if ($request->hasFile('tool_image')) {
+            // Delete the old image if it exists
+            if ($tool->img && $tool->img->filepath && file_exists(public_path($tool->img->filepath))) {
+                unlink(public_path($tool->img->filepath));
+            }
+
+            // Upload the new image
+            $image = $request->file('tool_image');
+            $filename = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('uploads/tools'), $filename);
+
+            // Update or create the related image record
+            if ($tool->img) {
+                $tool->img->update([
+                    'filepath' => 'uploads/tools/' . $filename,
+                    'filename' => $filename,
+                ]);
+            } else {
+                $tool->img()->create([
+                    'filepath' => 'uploads/tools/' . $filename,
+                    'filename' => $filename,
+                ]);
+            }
         }
 
         $tool->save();

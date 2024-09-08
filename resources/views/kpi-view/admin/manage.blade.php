@@ -75,7 +75,7 @@ font-weight-bold
                                 <td>{{ $no++ }}</td>
                                 <td>{{ $item->indicator }}</td>
                                 <td>{{ $item->goal }}</td>
-                                <td>{{ $item->target }}</td>
+                                <td>{{ number_format($item->target, 0, ',', '.') }}</td>
                                 <td>{{ $item->periode }}</td>
                                 <td class="text-center">
                                     {{-- <a href="{{ route('preview-kpi', ['id' => $item->id]) }}" class="btn btn-outline-secondary btn-sm mr-2"><i class="fa fa-edit"></i> Edit</a> --}}
@@ -118,7 +118,7 @@ font-weight-bold
                         </div>
                         <div class="form-group">
                             <label for="target">Target</label>
-                            <input type="text" class="form-control" id="target" name="target" placeholder="1000" required>
+                            <input type="text" class="form-control" id="target" name="target" oninput="formatAmount(this)" placeholder="Nominal Angka Tercapai..." required>
                         </div>
                         <div class="form-group">
                             <label for="periode">Periode</label>
@@ -158,6 +158,16 @@ function confirmDelete(itemId) {
             document.getElementById('delete-kpi-' + itemId).submit();
         }
     });
+}
+function formatAmount(input) {
+    // Remove non-numeric characters
+    let amount = input.value.replace(/[^0-9]/g, '');
+
+    // Add thousands separator (dots) using a regular expression
+    amount = amount.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+    // Set the formatted value back to the input
+    input.value = amount;
 }
 </script>
 @endsection

@@ -16,8 +16,8 @@ font-weight-bold
 @section('content')
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
-        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-users"></i> Manage Allowed Methods</h1>
-        <p class="mb-4">Managing Access based on roles.</a></p>
+        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-times-circle text-danger"></i> Manage Allowed Methods</h1>
+        <p class="mb-4">Roles action restriction.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
         {{-- <a class="btn btn-secondary btn-sm shadow-sm mr-2" href="/invoicing/list"><i class="fas fa-solid fa-backward fa-sm text-white-50"></i> Go Back</a> --}}
@@ -104,7 +104,8 @@ font-weight-bold
                                             <thead class="thead-light">
                                                 <tr>
                                                     <th>ID</th>
-                                                    <th>Page</th>
+                                                    <th>Method</th>
+                                                    <th>Description</th>
                                                     <th>Grant Access</th>
                                                     <th>Action</th>
                                                 </tr>
@@ -114,6 +115,7 @@ font-weight-bold
                                                     <tr>
                                                         <td style="width: 5%;">{{ $userAc['id'] }}</td>
                                                         <td>{{ $userAc['method'] }}</td>
+                                                        <td>{{ $userAc['method_description'] }}</td>
                                                         <td>{{ $userAc['grantTo'] }}</td>
                                                         <td class="text-center" style="width: 10%;">
                                                             <a class="btn btn-danger btn-sm" onclick='isconfirm();' href="{{ route('remove.method.access', $userAc['method_id']) }}"><i class='fas fa-fw fa-undo-alt'></i> Reset</a>

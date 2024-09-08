@@ -12,6 +12,7 @@ use App\Models\Penlat_batch;
 use App\Models\Penlat_certificate;
 use App\Models\Penlat_requirement;
 use App\Models\Penlat_utility_usage;
+use App\Models\Profit;
 use App\Models\Receivables_participant_certificate;
 use App\Models\Room;
 use App\Models\Tool_img;
@@ -413,6 +414,15 @@ class OperationController extends Controller
             } else {
                 // If the batch exists, fetch the existing Penlat_batch record
                 $penlatUtility = Penlat_batch::where('batch', $request->batch)->first();
+
+                // Check if usages for this batch already exist
+                $checkIfExist = Penlat_utility_usage::where('penlat_batch_id', $penlatUtility->id)->exists();
+
+                if ($checkIfExist) {
+                    // Redirect with a warning message if usages already exist
+                    DB::rollBack();
+                    return redirect()->route('utility')->with('warning', "Usages for batch $penlatUtility->batch already exist...");
+                }
                 // Update the necessary fields
                 if($imagePath){
                     $penlatUtility->filepath = $imagePath;  // Replace 'field_name' with the actual field and 'new_value' with the new value
@@ -421,27 +431,111 @@ class OperationController extends Controller
                 }
             }
 
-            // Loop through the tools and save the PenlatUtilityUsage entries
+            // Loop through the request
             foreach ($request->all() as $key => $value) {
                 if (strpos($key, 'qty_') === 0) {
                     $id = substr($key, 4); // Extract the tool id from the key
                     $quantity = $value;
 
+                    // Get the price and total inputs
+                    $priceKey = 'price_' . $id;
+                    $totalKey = 'total_' . $id;
+
+                    // Sanitize inputs by removing currency symbols and thousand separators
+                    $price = isset($request->$priceKey) ? preg_replace('/[^\d]/', '', preg_replace('/[^\d.,]/', '', $request->$priceKey)) : null;
+                    $total = isset($request->$totalKey) ? preg_replace('/[^\d]/', '', preg_replace('/[^\d.,]/', '', $request->$totalKey)) : null;
+
+                    // Convert to valid number format
+                    $price = str_replace('.', '', $price);  // Remove thousand separator
+                    $price = str_replace(',', '.', $price); // Convert decimal separator
+
+                    $total = str_replace('.', '', $total);  // Remove thousand separator
+                    $total = str_replace(',', '.', $total); // Convert decimal separator
+
                     // Only proceed if the quantity is not zero, null, or empty
                     if (!is_null($quantity) && $quantity !== '' && $quantity > 0) {
+
+                        // Update or create usage record
                         Penlat_utility_usage::updateOrCreate(
                             [
                                 'penlat_batch_id' => $penlatUtility->id,
-                                'utility_id' => $id, // Assuming you want to store the tool's id as utility_id
+                                'utility_id' => $id,
                             ],
                             [
                                 'amount' => $quantity,
+                                'price' => $price,   // Store the price
+                                'total' => $total,   // Store the total
                             ]
                         );
                     }
                 }
             }
 
+            $this->updateUsageCost($penlatUtility->id);
+            // Commit the transaction
+            DB::commit();
+
+            // Redirect back with a success message
+            return redirect()->back()->with('success', 'Penlat utility data saved successfully!');
+
+        } catch (Exception $e) {
+            // Rollback the transaction in case of an error
+            DB::rollBack();
+
+            // Log the error (optional)
+            Log::error('Error storing penlat utility data: ' . $e->getMessage());
+
+            // Redirect or return a response with an error message
+            return redirect()->back()->with('error', 'Failed to save penlat utility data. Please try again.');
+        }
+    }
+
+    public function utility_insert_new_item(Request $request, $batchId)
+    {
+        DB::beginTransaction();
+        $findBatch = Penlat_batch::find($batchId);
+
+        try {
+            // Loop through the request
+            foreach ($request->all() as $key => $value) {
+                if (strpos($key, 'qty_') === 0) {
+                    $id = substr($key, 4); // Extract the tool id from the key
+                    $quantity = $value;
+
+                    // Get the price and total inputs
+                    $priceKey = 'price_' . $id;
+                    $totalKey = 'total_' . $id;
+
+                    // Sanitize inputs by removing currency symbols and thousand separators
+                    $price = isset($request->$priceKey) ? preg_replace('/[^\d]/', '', preg_replace('/[^\d.,]/', '', $request->$priceKey)) : null;
+                    $total = isset($request->$totalKey) ? preg_replace('/[^\d]/', '', preg_replace('/[^\d.,]/', '', $request->$totalKey)) : null;
+
+                    // Convert to valid number format
+                    $price = str_replace('.', '', $price);  // Remove thousand separator
+                    $price = str_replace(',', '.', $price); // Convert decimal separator
+
+                    $total = str_replace('.', '', $total);  // Remove thousand separator
+                    $total = str_replace(',', '.', $total); // Convert decimal separator
+
+                    // Only proceed if the quantity is not zero, null, or empty
+                    if (!is_null($quantity) && $quantity !== '' && $quantity > 0) {
+
+                        // Update or create usage record
+                        Penlat_utility_usage::updateOrCreate(
+                            [
+                                'penlat_batch_id' => $findBatch->id,
+                                'utility_id' => $id,
+                            ],
+                            [
+                                'amount' => $quantity,
+                                'price' => $price,   // Store the price
+                                'total' => $total,   // Store the total
+                            ]
+                        );
+                    }
+                }
+            }
+            $this->updateUsageCost($findBatch->id);
             // Commit the transaction
             DB::commit();
 
@@ -472,6 +566,39 @@ class OperationController extends Controller
 
             $usages = Penlat_utility_usage::where('penlat_batch_id', $id);
             $usages->delete();
+
+            // Get the associated batch before deleting the record
+            $findBatch = Penlat_batch::find($id);
+
+            // Call the updateUsageCost function to update the profit based on remaining items
+            $this->updateUsageCost($findBatch->id);
+
+            return response()->json(['status' => 'success', 'message' => 'Penlat utility data deleted successfully!']);
+        } catch (\Exception $e) {
+            // Log the exception for debugging
+            Log::error('Failed to delete Penlat: ' . $e->getMessage());
+            return response()->json(['status' => 'failed', 'message' => 'Failed to delete record due to an unexpected error!']);
+        }
+    }
+
+    public function delete_item_usage($id)
+    {
+        try {
+            // Check if the Penlat is used in the Penlat_utility_usage table
+            $usage = Penlat_utility_usage::find($id);
+
+            if (!$usage) {
+                return response()->json(['status' => 'failed', 'message' => 'Cannot be deleted because it is not found!']);
+            }
+
+            // Get the associated batch before deleting the record
+            $findBatch = Penlat_batch::find($usage->penlat_batch_id);
+
+            // Delete the usage record
+            $usage->delete();
+
+            // Call the updateUsageCost function to update the profit based on remaining items
+            $this->updateUsageCost($findBatch->id);
 
             return response()->json(['status' => 'success', 'message' => 'Penlat utility data deleted successfully!']);
         } catch (\Exception $e) {
@@ -581,11 +708,6 @@ class OperationController extends Controller
         ]);
     }
 
-    public function tool_usage()
-    {
-        return view('operation.submenu.tool_usage');
-    }
-
     public function room_inventory(Request $request)
     {
         $assets = Inventory_tools::all();
@@ -668,7 +790,14 @@ class OperationController extends Controller
     public function preview_utility($id)
     {
         $utility = Penlat_batch::find($id);
-        return view('operation.submenu.preview-utility', ['data' => $utility]);
+        // Make sure to check if $utility exists to avoid errors
+        if ($utility) {
+            // Get utilities that are not used in the penlat_usage
+            $utilities = Utility::whereNotIn('id', $utility->penlat_usage->pluck('utility_id'))->get();
+        } else {
+            $utilities = collect(); // Return an empty collection if batch not found
+        }
+        return view('operation.submenu.preview-utility', ['data' => $utility, 'utilities' => $utilities]);
     }
 
     public function update_utility_usage(Request $request, $id)
@@ -676,16 +805,31 @@ class OperationController extends Controller
         // Retrieve the penlat_usage record by ID
         $penlatUsage = Penlat_utility_usage::findOrFail($id);
 
-        // Validate and update the amount
+        // Validate the input data
         $request->validate([
-            'amount' => 'required|numeric|min:0'
+            'amount' => 'required|numeric|min:0',
+            'price' => 'required',
+            'total' => 'required'
         ]);
 
+        // Sanitize and format the price and total to remove currency symbols and formatting
+        $price = preg_replace('/[^\d.,]/', '', $request->input('price')); // Remove currency symbols
+        $price = str_replace('.', '', $price);  // Remove thousand separator
+        $price = str_replace(',', '.', $price); // Convert decimal separator to dot
 
+        $total = preg_replace('/[^\d.,]/', '', $request->input('total')); // Remove currency symbols
+        $total = str_replace('.', '', $total);  // Remove thousand separator
+        $total = str_replace(',', '.', $total); // Convert decimal separator to dot
+
+        // Check if penlatUsage was found and proceed with update
         if ($penlatUsage) {
             $penlatUsage->amount = $request->input('amount');
+            $penlatUsage->price = $price;
+            $penlatUsage->total = $total;
             $penlatUsage->save();
 
+            $findBatch = Penlat_batch::find($penlatUsage->penlat_batch_id);
+            $this->updateUsageCost($findBatch->id);
             return response()->json(['message' => 'Utility usage updated successfully.'], 200);
         } else {
             return response()->json(['message' => 'Utility not found.'], 404);
@@ -852,5 +996,17 @@ class OperationController extends Controller
         $assets = Inventory_tools::all();
         $locations = Location::all();
         return view('operation.submenu.preview-room-inventory-user', ['assets' => $assets, 'data' => $data, 'locations' => $locations]);
+    }
+
+    public function updateUsageCost($penlatBatchId)
+    {
+        // Get the sum of all 'total' values from Penlat_utility_usage for the given batch
+        $totalUsageCost = Penlat_utility_usage::where('penlat_batch_id', $penlatBatchId)
+            ->sum('total');
+
+        $findBatch = Penlat_batch::find($penlatBatchId);
+        // Find the related Profit record and update the 'penlat_usage' column
+        Profit::where('pelaksanaan', $findBatch->batch)
+            ->update(['penlat_usage' => $totalUsageCost]);
     }
 }

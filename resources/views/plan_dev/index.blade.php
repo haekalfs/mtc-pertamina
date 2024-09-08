@@ -56,7 +56,7 @@ font-weight-bold
                             <div class="col mr-2">
                                 <div class="stat-heading mb-1 font-weight-bold">
                                     Instruktur</div>
-                                <div class="h6 mb-0 text-gray-800">{{ $instructorCount }} Orang</div>
+                                <div class="h6 mb-0 text-gray-800">{{ $instructorCount }} Instruktur</div>
                             </div>
                             <div class="col-auto">
                                 <i class="fa fa-male fa-2x text-success"></i>
@@ -381,7 +381,7 @@ window.onload = function () {
 
 function redirectToPage() {
     var selectedOption = document.getElementById("yearSelected").value;
-    var url = "{{ url('/planning-development') }}" + "/" + selectedOption;
+    var url = "{{ url('/planning-development-dashboard') }}" + "/" + selectedOption;
     window.location.href = url; // Redirect to the desired page
 }
 </script>

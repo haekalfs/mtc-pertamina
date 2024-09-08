@@ -188,23 +188,53 @@ font-weight-bold
                             </div>
                         </div>
                     </div>
+                    <div class="row d-flex justify-content-right mb-4">
+                        <div class="col-md-12">
+                            <div class="row align-items-center">
+                                <div class="col-md-11">
+                                    <div class="d-flex">
+                                        <div style="width: 140px;" class="mr-2">
+                                            <p style="margin: 0;">Utilities <span class="text-danger">*</span>:</p>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <select id="utilitiesSelect" class="form-control">
+                                                @foreach ($utilities as $alat)
+                                                    <option value="{{ $alat->id }}" data-name="{{ $alat->utility_name }}"
+                                                            data-unit="{{ $alat->utility_unit }}"
+                                                            data-img="{{ asset($alat->filepath) }}">
+                                                        {{ $alat->utility_name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-1 d-flex justify-content-center align-items-center">
+                                    <div class="form-group m-0">
+                                        <button type="button" class="btn btn-success" id="addUtilityBtn"><i class="fa fa-plus"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="table-responsive zoom90">
-                        <table class="table table-bordered mt-3">
+                        <table class="table table-bordered mt-3" id="utilitiesTable">
                             <thead class="thead-light">
                                 <tr>
                                     <th>Tool</th>
-                                    <th>Harga Satuan</th>
                                     <th>Quantity</th>
+                                    <th>Harga Satuan</th>
                                     <th>Total</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($utilities as $tool)
-                                <tr>
+                                <tr id="row_{{ $tool->id }}" style="display: none;">
                                     <td>
                                         <div class="row">
                                             <div class="col-md-4 text-left">
-                                                <img src="{{ asset($tool->filepath) }}" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow ">
+                                                <img src="{{ asset($tool->filepath) }}" style="height: 100px; width: 100px;" alt=""
+                                                     class="img-fluid d-none d-md-block rounded mb-2 shadow ">
                                             </div>
                                             <div class="col-md-8 text-left mt-sm-2">
                                                 <h5>{{ $tool->utility_name }}</h5>
@@ -212,14 +242,14 @@ font-weight-bold
                                             </div>
                                         </div>
                                     </td>
-                                    <td style="width:20%">
-                                        <input type="text" class="form-control form-control-md underline-input price-input" data-type="currency" name="price_{{ $tool->id }}" id="price_{{ $tool->id }}">
+                                    <td style="width:10%">
+                                        <input type="text" class="form-control form-control-md underline-input text-center qty-input" name="qty_{{ $tool->id }}" id="qty_{{ $tool->id }}" value="0" min="0">
                                     </td>
-                                    <td style="width:20%">
-                                        <input type="number" class="form-control form-control-md text-center underline-input qty-input" name="qty_{{ $tool->id }}" id="qty_{{ $tool->id }}" value="1" min="0">
+                                    <td style="width:25%">
+                                        <input type="text" class="form-control form-control-md underline-input price-input" name="price_{{ $tool->id }}" id="price_{{ $tool->id }}" value="0">
                                     </td>
-                                    <td style="width:20%">
-                                        <input type="text" class="form-control form-control-md underline-input total-input" name="total_{{ $tool->id }}" id="total_{{ $tool->id }}" readonly>
+                                    <td style="width:25%">
+                                        <input type="text" class="form-control form-control-md underline-input total-input" name="total_{{ $tool->id }}" id="total_{{ $tool->id }}" value="0">
                                     </td>
                                 </tr>
                                 @endforeach
@@ -327,73 +357,48 @@ $(document).ready(function() {
         }
     });
 });
-$(document).ready(function() {
-    // Listen for keyup and blur events on the price and quantity fields
-    $("input[data-type='currency'], .qty-input").on({
-        keyup: function() {
-            formatCurrency($(this));
-            updateTotal($(this).closest('tr'));  // Calculate total on keyup
-        }
+document.querySelectorAll('.price-input, .qty-input').forEach(function(input) {
+    input.addEventListener('input', function() {
+        calculateTotalForRow(this);
     });
-
-    // Function to calculate and update the total
-    function updateTotal(row) {
-        var priceInput = row.find('.price-input').val().replace(/[IDR,]/g, ''); // Remove IDR and commas
-        var qtyInput = row.find('.qty-input').val();
-
-        var price = parseFloat(priceInput) || 0;
-
-        // Calculate the total
-        var total = price * qtyInput;
-
-        // Format the total as currency and update the total input field
-        row.find('.total-input').val('IDR ' + formatNumber(total.toFixed(2)));
-    }
-
-    // Format number function (same as you had before)
-    function formatNumber(n) {
-        return n.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }
-
-    // Format currency function (same as you had before)
-    function formatCurrency(input, blur) {
-        var input_val = input.val();
-
-        if (input_val === "") { return; }
-
-        var original_len = input_val.length;
-        var caret_pos = input.prop("selectionStart");
-
-        if (input_val.indexOf(".") >= 0) {
-            var decimal_pos = input_val.indexOf(".");
-            var left_side = input_val.substring(0, decimal_pos);
-            var right_side = input_val.substring(decimal_pos);
-
-            left_side = formatNumber(left_side);
-            right_side = formatNumber(right_side);
-
-            if (blur === "blur") {
-                right_side += "00";
-            }
-
-            right_side = right_side.substring(0, 2);
-            input_val = "IDR " + left_side + "." + right_side;
-        } else {
-            input_val = formatNumber(input_val);
-            input_val = "IDR " + input_val;
-
-            if (blur === "blur") {
-                input_val += ".00";
-            }
-        }
-
-        input.val(input_val);
-
-        var updated_len = input_val.length;
-        caret_pos = updated_len - original_len + caret_pos;
-        input[0].setSelectionRange(caret_pos, caret_pos);
-    }
 });
+
+function calculateTotalForRow(element) {
+    const row = element.closest('tr');
+    const priceInput = row.querySelector('.price-input');
+    const qtyInput = row.querySelector('.qty-input');
+    const totalInput = row.querySelector('.total-input');
+
+    // Format the price as Rupiah
+    let priceValue = priceInput.value.replace(/[^0-9]/g, '');
+    priceValue = priceValue ? parseFloat(priceValue) : 0;
+    priceInput.value = formatRupiah(priceValue, 'IDR ');
+
+    const qty = parseFloat(qtyInput.value) || 0;
+
+    // Calculate total
+    const total = priceValue * qty;
+
+    // Format total as Rupiah
+    totalInput.value = formatRupiah(total, 'IDR ');
+}
+
+function formatRupiah(number, prefix) {
+    var number_string = number.toString().replace(/[^,\d]/g, ''),
+        split = number_string.split(','),
+        remainder = split[0].length % 3,
+        rupiah = split[0].substr(0, remainder),
+        thousands = split[0].substr(remainder).match(/\d{3}/gi);
+
+    if (thousands) {
+        var separator = remainder ? '.' : '';
+        rupiah += separator + thousands.join('.');
+    }
+
+    rupiah = split[1] !== undefined ? rupiah + ',' + split[1] : rupiah;
+    return prefix === undefined ? rupiah : (rupiah ? prefix + rupiah : '');
+}
+
 </script>
 <script>
     function previewImage(event) {
@@ -404,5 +409,28 @@ $(document).ready(function() {
         };
         reader.readAsDataURL(event.target.files[0]);
     }
+</script>
+<script>
+    $(document).ready(function() {
+        $('#addUtilityBtn').on('click', function() {
+            // Get the selected utility id from the dropdown
+            let selectedUtilityId = $('#utilitiesSelect').val();
+
+            // Escape special characters in the ID (replace slashes and other special characters)
+            let escapedUtilityId = selectedUtilityId.replace(/([!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~])/g, '\\$1');
+
+            // Show the corresponding row for the selected utility
+            let utilityRow = $('#row_' + escapedUtilityId);
+
+            // Check if the row is already visible
+            if (utilityRow.is(':visible')) {
+                alert('This utility is already added to the table.');
+                return;
+            }
+
+            // Make the row visible
+            utilityRow.show();
+        });
+    });
 </script>
 @endsection

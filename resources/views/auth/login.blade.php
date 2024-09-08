@@ -14,7 +14,7 @@
         </span>
 
         <div class="wrap-input100 validate-input" data-validate = "Valid email is required: ex@abc.xyz">
-            <input class="input100" id="email" placeholder="your email..." class="block mt-1 w-full" type="email" name="email"  value="{{ old('email') }}" required autofocus autocomplete="email" >
+            <input class="input100" id="email" placeholder="your email..." class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="email" >
             <span class="focus-input100"></span>
             <span class="symbol-input100">
                 <i class="fa fa-envelope" aria-hidden="true"></i>

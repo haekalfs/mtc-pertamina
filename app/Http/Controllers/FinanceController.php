@@ -126,19 +126,36 @@ class FinanceController extends Controller
         $dataPointsCurrentYear = array_values($dataPointsCurrentYear);
         $dataPointsPreviousYear = array_values($dataPointsPreviousYear);
 
-        $dataByDate = Profit::select('tgl_pelaksanaan', DB::raw('sum(profit) as total'))
-                    ->whereYear('tgl_pelaksanaan', $year)
-                    ->groupBy('tgl_pelaksanaan')
-                    ->get();
+        $dataByQuarter = Profit::select(
+            DB::raw('QUARTER(tgl_pelaksanaan) as quarter'),
+            DB::raw('YEAR(tgl_pelaksanaan) as year'),
+            DB::raw('sum(profit) as total')
+        )
+        ->whereYear('tgl_pelaksanaan', $year)
+        ->groupBy('year', 'quarter')
+        ->get();
 
         $dataPointsSpline = [];
-        foreach ($dataByDate as $row) {
+
+        foreach ($dataByQuarter as $row) {
+            // Generate label for each quarter and year
+            $label = "Q" . $row->quarter . " " . $row->year;
+
             $dataPointsSpline[] = [
-                "x" => Carbon::parse($row->tgl_pelaksanaan)->timestamp * 1000, // JavaScript timestamp
+                "label" => $label, // Use this for x-axis label
                 "y" => (float) $row->total // Ensure y-value is a float
             ];
         }
 
+        return response()->json([
+            'dataPointsCurrentYear' => $dataPointsCurrentYear,
+            'dataPointsPreviousYear' => $dataPointsPreviousYear,
+            'profitDataPoints' => $dataPointsSpline
+        ]);
+    }
+
+    public function getSummaryProfits($year)
+    {
         $data = Profit::whereYear('tgl_pelaksanaan', $year)->get();
 
         $totalCosts = $data->sum(function($item) {
@@ -149,6 +166,7 @@ class FinanceController extends Controller
                 (int) $item->penagihan_atk +
                 (int) $item->penagihan_snack +
                 (int) $item->penagihan_makan_siang +
+                (int) $item->penlat_usage +
                 (int) $item->penagihan_laundry;
         });
 
@@ -167,6 +185,7 @@ class FinanceController extends Controller
             'total_penagihan_snack' => $data->sum(fn($item) => (int) $item->penagihan_snack),
             'total_penagihan_makan_siang' => $data->sum(fn($item) => (int) $item->penagihan_makan_siang),
             'total_penagihan_laundry' => $data->sum(fn($item) => (int) $item->penagihan_laundry),
+            'total_penggunaan_alat' => $data->sum(fn($item) => (int) $item->penlat_usage),
             'total_peserta' => $data->sum(fn($item) => (int) $item->jumlah_peserta),
             'revenue' => $totalRevenue,
             'total_costs' => $totalCosts,
@@ -174,9 +193,6 @@ class FinanceController extends Controller
         ];
 
         return response()->json([
-            'dataPointsCurrentYear' => $dataPointsCurrentYear,
-            'dataPointsPreviousYear' => $dataPointsPreviousYear,
-            'profitDataPoints' => $dataPointsSpline,
             'array' => $array
         ]);
     }
@@ -252,6 +268,7 @@ class FinanceController extends Controller
                                     $safeSum('penagihan_atk') +
                                     $safeSum('penagihan_snack') +
                                     $safeSum('penagihan_makan_siang') +
+                                    $safeSum('penlat_usage') +
                                     $safeSum('penagihan_laundry');
 
                         return $totalCost;
@@ -424,6 +441,7 @@ class FinanceController extends Controller
                (int) $item->penagihan_atk +
                (int) $item->penagihan_snack +
                (int) $item->penagihan_makan_siang +
+               (int) $item->penlat_usage +
                (int) $item->penagihan_laundry;
     }
 
@@ -440,7 +458,9 @@ class FinanceController extends Controller
                     'utility_name' => $group->first()->utility->utility_name,
                     'filepath' => $group->first()->utility->filepath,
                     'utility_unit' => $group->first()->utility->utility_unit,
-                    'amount' => $group->sum('amount')
+                    'amount' => $group->sum('amount'),
+                    'price' => $group->sum('price'),
+                    'total' => $group->sum('total')
                 ];
             });
     }
@@ -467,6 +487,7 @@ class FinanceController extends Controller
             ['label' => 'Penagihan ATK', 'y' => (float) $item->penagihan_atk],
             ['label' => 'Penagihan Snack', 'y' => (float) $item->penagihan_snack],
             ['label' => 'Penagihan Makan Siang', 'y' => (float) $item->penagihan_makan_siang],
+            ['label' => 'Penggunaan Utilitas', 'y' => (float) $item->penlat_usage],
             ['label' => 'Penagihan Laundry', 'y' => (float) $item->penagihan_laundry],
         ];
         return view('finance.submenu.preview_costs', ['data' => $utility, 'item' => $item, 'dataPoints' => $dataPoints]);

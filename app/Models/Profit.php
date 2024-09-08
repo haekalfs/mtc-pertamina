@@ -24,6 +24,7 @@ class Profit extends Model
         'penagihan_snack',
         'penagihan_makan_siang',
         'penagihan_laundry',
+        'penlat_usage',
         'jumlah_biaya',
         'profit'
     ];

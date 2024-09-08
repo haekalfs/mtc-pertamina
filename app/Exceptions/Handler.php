@@ -38,4 +38,13 @@ class Handler extends ExceptionHandler
             //
         });
     }
+
+    public function render($request, Throwable $exception)
+    {
+        if ($exception instanceof \App\Exceptions\CustomError2029Exception) {
+            return $exception->render($request);
+        }
+
+        return parent::render($request, $exception);
+    }
 }

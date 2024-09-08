@@ -48,6 +48,12 @@ class LoginRequest extends FormRequest
                 'email' => trans('auth.failed'),
             ]);
         }
+        // Get the authenticated user
+        $user = Auth::user();
+
+        // Get the user's roles and store them in the session
+        $roles = $user->role_id->pluck('role_name')->toArray();
+        session()->put('allowed_roles', $roles);
 
         RateLimiter::clear($this->throttleKey());
     }

@@ -127,7 +127,7 @@ font-weight-bold
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-8">
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-secondary" id="judul">Overall Penggunaan Utilitas</h6>
@@ -139,8 +139,10 @@ font-weight-bold
                     <table id="docLetter" class="table table-bordered">
                         <thead class="thead-light">
                             <tr>
-                                <th style="width:60%">Tool</th>
-                                <th style="width:10%">Quantity</th>
+                                <th>Tool</th>
+                                <th>Quantity</th>
+                                <th>Harga Satuan</th>
+                                <th>Total</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -161,11 +163,17 @@ font-weight-bold
                                         <td class="text-center" style="width:7%">
                                             {{ $tool['amount'] }}
                                         </td>
+                                        <td class="text-center">
+                                            {{ $tool['price'] ? 'Rp ' . number_format($tool['price'], 0, ',', '.') : '-' }}
+                                        </td>
+                                        <td class="text-center">
+                                            {{ $tool['total'] ? 'Rp ' . number_format($tool['total'], 0, ',', '.') : '-' }}
+                                        </td>
                                     </tr>
                                 @endforeach
                             @else
                                 <tr class="text-center">
-                                    <td colspan="2">No Data Available</td>
+                                    <td colspan="4">No Data Available</td>
                                 </tr>
                             @endif
                         </tbody>
@@ -173,7 +181,7 @@ font-weight-bold
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="card mb-4">
                 <div class="card-header">
                     <span class="text-danger font-weight-bold">Summary</span>

@@ -170,7 +170,9 @@ font-weight-bold
                                     <td data-th="Product">
                                         <div class="row">
                                             <div class="col-md-4 d-flex justify-content-center align-items-start mt-2">
-                                                <img src="{{ asset($item->img->filepath) }}" style="height: 150px; width: 160px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
+                                                <a class="animateBox" href="{{ route('preview-asset', $item->id) }}">
+                                                    <img src="{{ asset($item->img->filepath) }}" style="height: 150px; width: 160px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
+                                                </a>
                                             </div>
                                             <div class="col-md-8 text-left mt-sm-2">
                                                 <h5 class="card-title font-weight-bold">{{ $item->asset_name }}</h5>
@@ -243,11 +245,11 @@ font-weight-bold
                                     </td>
                                     <td class="actions text-center" data-th="">
                                         <div>
-                                            <a data-id="{{ $item->id }}" href="#" class="btn btn-outline-secondary btn-md mb-2 mr-2 edit-tool">
+                                            <a data-id="{{ $item->id }}" href="#" class="btn btn-outline-secondary btn-md mr-2 edit-tool">
                                                 <i class="fa fa-edit"></i>
                                             </a>
-                                            <button data-id="{{ $item->id }}" class="btn btn-outline-danger btn-md mb-2">
-                                                <i class="fa fa-trash-o"></i>
+                                            <button data-id="{{ $item->id }}" class="btn btn-outline-secondary btn-md mr-2 view-tool">
+                                                <i class="fa fa-info-circle"></i>
                                             </button>
                                         </div>
                                     </td>
@@ -396,7 +398,7 @@ font-weight-bold
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form id="editToolForm" method="post" enctype="multipart/form-data">
+            <form id="editToolForm" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <input type="hidden" name="id" id="tool_id">
@@ -414,75 +416,28 @@ font-weight-bold
                             <div class="card-body text-secondary">
                                 <div class="row">
                                     <div class="col-md-12">
+                                        <input type="text" class="form-control" name="stock" id="edit_initial_stock" hidden>
                                         <div class="d-flex align-items-center mb-4">
                                             <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Asset Name :</p>
+                                                <p style="margin: 0;">Kondisi Alat :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <input type="text" class="form-control" name="asset_name" id="edit_asset_name" required>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Nomor Asset :</p>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <input type="text" class="form-control" name="asset_number" id="edit_asset_number">
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Maker :</p>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <input type="text" class="form-control" name="maker" id="edit_maker">
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Lokasi :</p>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <select class="form-control" id="edit_location" name="location">
-                                                    @foreach ($locations as $item)
-                                                        <option value="{{ $item->id }}">{{ $item->description }}</option>
+                                                <select name="condition" id="edit_condition" class="form-control">
+                                                    @foreach($assetCondition as $item)
+                                                    <option value="{{ $item->id }}">{{ $item->condition }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="d-flex align-items-center mb-4">
-                                                    <div style="width: 140px;" class="mr-2">
-                                                        <p style="margin: 0;">Kondisi Alat :</p>
-                                                    </div>
-                                                    <div class="flex-grow-1">
-                                                        <select name="condition" id="edit_condition" class="form-control">
-                                                            @foreach($assetCondition as $item)
-                                                            <option value="{{ $item->id }}">{{ $item->condition }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 225px;" class="mr-2">
+                                                <p style="margin: 0;">Used :</p>
                                             </div>
-                                            <div class="col-md-7">
-                                                <div class="d-flex align-items-center mb-4">
-                                                    <div style="width: 200px;" class="mr-2">
-                                                        <p style="margin: 0;">Initial Stock :</p>
-                                                    </div>
-                                                    <div class="flex-grow-1">
-                                                        <input type="text" class="form-control" name="stock" id="edit_initial_stock">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-5">
-                                                <div class="d-flex align-items-center mb-4">
-                                                    <div style="width: 140px;" class="mr-2">
-                                                        <p style="margin: 0;">Used :</p>
-                                                    </div>
-                                                    <div class="flex-grow-1">
-                                                        <input type="text" class="form-control" name="used_amount" id="edit_used_amount">
-                                                    </div>
+                                            <div class="flex-grow-1">
+                                                <div class="counter">
+                                                    <span class="down" onclick='decreaseCount(event, this)'><i class="fa fa-minus text-danger"></i></span>
+                                                    <input class="form-control" name="used_amount" id="edit_used_amount" type="text" style="border: 1px solid rgb(217, 217, 217); width: 300px;">
+                                                    <span class="up" onclick='increaseCount(event, this)'><i class="fa fa-plus text-success"></i></span>
                                                 </div>
                                             </div>
                                         </div>
@@ -502,13 +457,8 @@ font-weight-bold
                                                 <input type="date" class="form-control" name="next_maintenance" id="edit_next_maintenance">
                                             </div>
                                         </div>
-                                        <div class="d-flex align-items-center mb-2">
-                                            <div style="width: 250px;" class="mr-2">
-                                                <p style="margin: 0;">Update Panduan (Optional) :</p> <small id="existing-file"></small>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <input type="file" class="form-control" name="maintenance_guide" id="edit_maintenance_guide">
-                                            </div>
+                                        <div class="text-right">
+                                            <u><a id="advance_edit_asset_page"><i>Advance Options</i></a></u>
                                         </div>
                                     </div>
                                 </div>
@@ -524,7 +474,44 @@ font-weight-bold
         </div>
     </div>
 </div>
-
+<div class="modal fade zoom90" id="viewToolModal" tabindex="-1" role="dialog" aria-labelledby="viewToolModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" style="width: 600px;" role="document">
+        <div class="modal-content">
+            <div class="modal-header d-flex flex-row align-items-center justify-content-between">
+                <h5 class="modal-title" id="viewToolModalLabel">Asset Information</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body mr-2 ml-2">
+                <div class="row no-gutters">
+                    <div class="col-md-4 text-center mt-3">
+                        <img id="view-image-preview" src="https://via.placeholder.com/150x150/5fa9f8/ffffff"
+                             style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="Asset Image">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body text-secondary">
+                            <p><strong>Asset Name:</strong> <span id="view_asset_name"></span></p>
+                            <p><strong>Asset Number:</strong> <span id="view_asset_number"></span></p>
+                            <p><strong>Maker:</strong> <span id="view_maker"></span></p>
+                            <p><strong>Location:</strong> <span id="view_location"></span></p>
+                            <p><strong>Condition:</strong> <span id="view_condition"></span></p>
+                            <p><strong>Initial Stock:</strong> <span id="view_initial_stock"></span></p>
+                            <p><strong>Used:</strong> <span id="view_used_amount"></span></p>
+                            <p><strong>Last Maintenance:</strong> <span id="view_last_maintenance"></span></p>
+                            <p><strong>Next Maintenance:</strong> <span id="view_next_maintenance"></span></p>
+                            <p><strong>Guide:</strong> <span id="view_maintenance_guide"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-md btn-default" data-dismiss="modal">Close</button>
+                <a class="btn btn-primary btn-md" id="edit_asset_page">Edit Asset Page</a>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
     function displayFileName() {
         const input = document.getElementById('file');
@@ -546,9 +533,48 @@ font-weight-bold
     }
 </script>
 <script>
+    $(document).on('click', '.view-tool', function(e) {
+        e.preventDefault();
+        var toolId = $(this).data('id');
+
+        var routeUrl = "{{ route('preview-asset', ':id') }}";
+        routeUrl = routeUrl.replace(':id', toolId);
+
+        $.ajax({
+            url: '/inventory-tools-view-info/' + toolId,
+            method: 'GET',
+            success: function(response) {
+                // Populate the modal fields with the asset data
+                $('#view_asset_name').text(response.asset_name);
+                $('#view_asset_number').text(response.asset_id);
+                $('#view_maker').text(response.asset_maker);
+                $('#view_location').text(response.location);
+                $('#view_condition').text(response.asset_condition);
+                $('#view_initial_stock').text(response.initial_stock + ' Items');
+                $('#view_used_amount').text(response.used_amount ? response.used_amount + ' Items' : '0 Items');
+                $('#view_last_maintenance').text(response.last_maintenance);
+                $('#view_next_maintenance').text(response.next_maintenance);
+                $('#view-image-preview').attr('src', response.tool_image ? response.tool_image : 'https://via.placeholder.com/150x150');
+                $('#edit_asset_page').attr('href', routeUrl);
+
+                // Handle guide download link
+                if(response.asset_guidance) {
+                    $('#view_maintenance_guide').html(`<a href="${response.asset_guidance}" target="_blank">Download Guide</a>`);
+                } else {
+                    $('#view_maintenance_guide').text('No guide available');
+                }
+
+                // Show the modal
+                $('#viewToolModal').modal('show');
+            }
+        });
+    });
     $(document).on('click', '.edit-tool', function(e) {
         e.preventDefault();
         var toolId = $(this).data('id');
+
+        var routeUrl = "{{ route('preview-asset', ':id') }}";
+        routeUrl = routeUrl.replace(':id', toolId);
 
         $.ajax({
             url: '/inventory-tools/' + toolId + '/edit',
@@ -556,16 +582,13 @@ font-weight-bold
             success: function(response) {
                 // Populate the fields with the tool data
                 $('#tool_id').val(response.id);
-                $('#edit_asset_name').val(response.asset_name);
-                $('#edit_asset_number').val(response.asset_id);
-                $('#edit_maker').val(response.asset_maker);
                 $('#edit_condition').val(response.asset_condition_id);
                 $('#edit_initial_stock').val(response.initial_stock);
-                $('#edit_used_amount').val(response.used_amount);
-                $('#edit_location').val(response.location_id);
+                $('#edit_used_amount').val(response.used_amount ? response.used_amount : '0');
                 $('#edit_last_maintenance').val(response.last_maintenance);
                 $('#edit_next_maintenance').val(response.next_maintenance);
                 $('#edit-image-preview').attr('src', response.tool_image ? response.tool_image : 'https://via.placeholder.com/150x150');
+                $('#advance_edit_asset_page').attr('href', routeUrl);
 
                 // Handle the existing file
                 if(response.asset_guidance) {
@@ -586,8 +609,11 @@ font-weight-bold
         var toolId = $('#tool_id').val();
         var formData = new FormData(this);
 
+        var routeUrl = "{{ route('update.asset.partially', ':id') }}";
+        routeUrl = routeUrl.replace(':id', toolId);
+
         $.ajax({
-            url: '/inventory-tools/' + toolId,
+            url: routeUrl,
             method: 'POST', // Use POST since we're sending FormData with files
             data: formData,
             processData: false, // Prevent jQuery from processing the data
@@ -605,45 +631,23 @@ font-weight-bold
         });
     });
 
-    $(document).on('click', '.btn-outline-danger', function(e) {
-        e.preventDefault();
-        let id = $(this).data('id');
+function increaseCount(a, b) {
+  var input = b.previousElementSibling;
+  var value = parseInt(input.value, 10);
+  value = isNaN(value) ? 0 : value;
+  value++;
+  input.value = value;
+}
 
-        swal({
-            title: "Are you sure?",
-            text: "Once deleted, you will not be able to recover this record!",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true,
-        })
-        .then((willDelete) => {
-            if (willDelete) {
-                $.ajax({
-                    url: '{{ route("delete.asset", ":id") }}'.replace(':id', id),
-                    type: 'DELETE',
-                    data: {
-                        _token: '{{ csrf_token() }}'
-                    },
-                    success: function(result) {
-                        swal("Poof! Your record has been deleted!", {
-                            icon: "success",
-                        }).then(() => {
-                            location.reload(); // Reload the page after success
-                        });
-                    },
-                    error: function(xhr, status, error) {
-                        let errorMessage = xhr.responseJSON && xhr.responseJSON.error
-                            ? xhr.responseJSON.error
-                            : "Oops! Something went wrong!";
-
-                        swal("Error!", errorMessage, "error");
-                    }
-                });
-            } else {
-                swal("Your record is safe!");
-            }
-        });
-    });
+function decreaseCount(a, b) {
+  var input = b.nextElementSibling;
+  var value = parseInt(input.value, 10);
+  if (value > 1) {
+    value = isNaN(value) ? 0 : value;
+    value--;
+    input.value = value;
+  }
+}
 </script>
 @endsection
 

@@ -8,8 +8,9 @@ use App\Models\Quarter;
 use App\Models\User;
 use App\Models\User_pencapaian_akhlak;
 use App\Models\User_pencapaian_akhlak_files;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -17,197 +18,123 @@ class AkhlakController extends Controller
 {
     public function index(Request $request)
     {
-        $accessController = new AccessController();
-        $result = $accessController->usr_acc(106);
         // Determine the current year and generate the range of years
         $nowYear = date('Y');
         $yearsBefore = range($nowYear - 4, $nowYear);
 
-        // Validate the request inputs
-        $validator = Validator::make($request->all(), [
-            'userId' => 'required|integer',
-            'quarter' => 'required',
-            'periode' => 'required'
-        ]);
-
-        // Initialize variables
-        $userSelected = null;
-        $userSelectedOpt = null;
-
-        $pencapaianQuery = User_pencapaian_akhlak::query();
-        $pencapaianChart = User_pencapaian_akhlak::query();
-
-        // Extract period dates from the request
-        $quarter = $request->quarter;
-        $periode = $request->year;
-
-        // Set the selected year
-        $currentYear = $periode ?? 1;
-        $quarterSelected = $quarter ?? 99;
-
-        // If userId is not 1, find the user and filter pencapaian
-        if ($request->userId != 1) {
-            $userSelected = User::find($request->userId);
-            if ($userSelected) {
-                $userSelectedOpt = $userSelected->id;
-                $pencapaianQuery->where('user_id', $request->userId);
-                $pencapaianChart->where('user_id', $request->userId);
-
-                if ($periode != 1) {
-                    $pencapaianChart->where('periode', $currentYear);
-                    $pencapaianQuery->where('periode', $currentYear);
-                }
-
-                if ($quarter != 99) {
-                    $pencapaianChart->where('quarter_id', $quarter);
-                    $pencapaianQuery->where('quarter_id', $quarter);
-                }
-
-                $results = $pencapaianChart->selectRaw('akhlak_id, AVG(score) as average_score')
-                ->groupBy('akhlak_id')
-                ->get()
-                ->keyBy('akhlak_id')
-                ->toArray();
-            } else {
-                // Add whereBetween condition if both periode_start and periode_end exist
-
-                if ($periode != 1) {
-                    $pencapaianChart->where('periode', $currentYear);
-                    $pencapaianQuery->where('periode', $currentYear);
-                }
-
-                if ($quarter != 99) {
-                    $pencapaianChart->where('quarter_id', $quarter);
-                    $pencapaianQuery->where('quarter_id', $quarter);
-                }
-
-                $results = $pencapaianChart->selectRaw('akhlak_id, AVG(score) as average_score')
-                ->groupBy('akhlak_id')
-                ->get()
-                ->keyBy('akhlak_id')
-                ->toArray();
-            }
-        } else {
-
-            if ($periode != 1) {
-                $pencapaianChart->where('periode', $currentYear);
-                $pencapaianQuery->where('periode', $currentYear);
-            }
-
-            if ($quarter != 99) {
-                $pencapaianChart->where('quarter_id', $quarter);
-                $pencapaianQuery->where('quarter_id', $quarter);
-            }
-
-            $results = $pencapaianChart->selectRaw('akhlak_id, AVG(score) as average_score')
-            ->groupBy('akhlak_id')
-            ->get()
-            ->keyBy('akhlak_id')
-            ->toArray();
-        }
-
-        // Execute the query
-        $pencapaian = $pencapaianQuery->get();
-
-        // Get all users and akhlak points
-        $users = User::all();
-        $akhlakPoin = Akhlak::all();
-        $quarterList = Quarter::all();
-        $nilai = Nilai::all();
-
-        // Map data for the radar chart
-        $labels = ['Kompeten', 'Harmonis', 'Loyal', 'Adaptif', 'Kolaboratif', 'Amanah'];
-        $dataMap = [
-            1 => 'Amanah',
-            2 => 'Kompeten',
-            3 => 'Harmonis',
-            4 => 'Loyal',
-            5 => 'Adaptif',
-            6 => 'Kolaboratif'
-        ];
-        $data = array_fill(0, count($labels), 0);
-
-        foreach ($results as $akhlak_id => $result) {
-            $index = array_search($dataMap[$akhlak_id], $labels);
-            if ($index !== false) {
-                $data[$index] = $result['average_score'];
-            }
-        }
-
-        // Return the view with the necessary data
-        return view('akhlak-view.index', [
-            'akhlakPoin' => $akhlakPoin,
-            'pencapaian' => $pencapaian,
-            'users' => $users,
-            'quarterSelected' => $quarterSelected,
-            'quarterList' => $quarterList,
-            'yearsBefore' => $yearsBefore,
-            'yearSelected' => $currentYear,
-            'userSelected' => $userSelected,
-            'userSelectedOpt' => $userSelectedOpt,
-            'data' => $data,
-            'nilai' => $nilai,
-            'labels' => $labels
-        ]);
-    }
-
-    public function report(Request $request, $userId = 1, $akhlak = 7, $periode = 1)
-    {
-        // Determine the current year and generate the range of years
-        $nowYear = date('Y');
-        $yearsBefore = range($nowYear - 4, $nowYear);
-
-        // Set the selected year
-        $periode = $periode ?? $nowYear;
+        // Capture the filter inputs
+        $userId = $request->input('userId');
+        $quarter = $request->input('quarter');
+        $year = $request->input('year');
 
         // Validate the request inputs
         $validator = Validator::make($request->all(), [
             'userId' => 'required',
-            'nilai_akhlak' => 'required',
-            'periode' => 'required|date'
+            'quarter' => 'required',
+            'year' => 'required'
         ]);
 
-        // Extract period dates from the request
-        $userId = $request->userId;
-        $periode = $request->periode;
-        $akhlak = $request->nilai_akhlak;
+        // Query to get User Pencapaian Akhlak with filters
+        $pencapaianQuery = User_pencapaian_akhlak::selectRaw('akhlak_id, quarter_id, periode, AVG(nilai_akhlak.score) as average_score')
+            ->join('nilai_akhlak', 'user_pencapaian_akhlak.score', '=', 'nilai_akhlak.id')
+            ->with(['akhlak', 'user', 'quarter'])
+            ->groupBy('akhlak_id', 'quarter_id', 'periode');
 
-        $userInfo = User::find($userId);
+        $userSelected = User::find($userId);
+        // Apply filters
+        if ($userId != -1) {
+            $pencapaianQuery->where('user_pencapaian_akhlak.user_id', $userId);
+        }
 
-        // Get all users and akhlak points
+        if ($quarter != -1) {
+            $pencapaianQuery->where('quarter_id', $quarter);
+        }
+
+        if ($year != -1) {
+            $pencapaianQuery->where('periode', $year);
+        }
+
+        $pencapaianResults = $pencapaianQuery->get();
+
+        // Fetch all Nilai Akhlak ranges
+        $nilaiAkhlakRanges = Nilai::all();
+
+        foreach ($pencapaianResults as $result) {
+            $averageScore = $result->average_score;
+
+            // Find the corresponding nilai_akhlak description based on the average score
+            $nilai = $nilaiAkhlakRanges->filter(function ($range) use ($averageScore) {
+                return $averageScore >= $range->score;
+            })->first();
+
+            $result->nilai_description = $nilai ? $nilai->description : 'Unknown';
+        }
+
+        // Query to group by akhlak_id and periode for the general summary with filters
+        $generalPencapaianQuery = User_pencapaian_akhlak::selectRaw('akhlak_id, periode, AVG(nilai_akhlak.score) as average_score')
+            ->join('nilai_akhlak', 'user_pencapaian_akhlak.score', '=', 'nilai_akhlak.id')
+            ->with(['akhlak'])
+            ->groupBy('akhlak_id', 'periode');
+
+        // Apply filters to the general query
+        if ($userId != -1) {
+            $generalPencapaianQuery->where('user_pencapaian_akhlak.user_id', $userId);
+        }
+
+        if ($quarter != -1) {
+            $generalPencapaianQuery->where('quarter_id', $quarter);
+        }
+
+        if ($year != -1) {
+            $generalPencapaianQuery->where('periode', $year);
+        }
+
+        $generalPencapaianResults = $generalPencapaianQuery->get();
+
+        // Fetch all Nilai Akhlak ranges for general results
+        $nilaiAkhlakRangesGeneral = Nilai::all();
+
+        foreach ($generalPencapaianResults as $result) {
+            $averageScore = $result->average_score;
+
+            // Find the corresponding nilai_akhlak description based on the average score
+            $nilaiGeneral = $nilaiAkhlakRangesGeneral->filter(function ($range) use ($averageScore) {
+                return $averageScore >= $range->score;
+            })->first();
+
+            $result->nilai_description = $nilaiGeneral ? $nilaiGeneral->description : 'Unknown';
+        }
+
+        // Get all users and akhlak points for the form
         $users = User::all();
         $akhlakPoin = Akhlak::all();
+        $quarterList = Quarter::all();
+        $nilaiList = Nilai::all();
 
-        $pencapaianQuery = User_pencapaian_akhlak::query();
+        // Process generalPencapaianResults for radar chart
+        $akhlakLabels = [];
+        $averageScores = [];
 
-        if ($userId != 1) {
-            $userSelected = User::find($userId);
-            if ($userSelected) {
-                $pencapaianQuery->where('user_id', $userId);
-            }
+        foreach ($generalPencapaianResults as $result) {
+            $akhlakLabels[] = $result->akhlak->indicator;  // Assuming akhlak has a 'description' field for the label
+            $averageScores[] = $result->average_score;
         }
 
-        if ($periode != 1) {
-            $pencapaianQuery->where('periode', $periode);
-        }
-
-        if ($akhlak != 7) {
-            $pencapaianQuery->where('akhlak_id', $akhlak);
-        }
-
-        // Execute the query
-        $pencapaian = $pencapaianQuery->get();
-
-        return view('akhlak-view.admin.report', [
-            'yearsBefore' => $yearsBefore,
-            'pencapaian' => $pencapaian,
-            'periode' => $periode,
-            'akhlakSelected' => $akhlak,
+        // Return the view with the necessary data and the selected filters
+        return view('akhlak-view.index', [
             'akhlakPoin' => $akhlakPoin,
-            'userInfo' => $userInfo,
-            'userSelected' => $userId,
             'users' => $users,
-            'periode' => $periode
+            'nilaiList' => $nilaiList,
+            'pencapaianResults' => $pencapaianResults,
+            'generalPencapaianResults' => $generalPencapaianResults,
+            'yearsBefore' => $yearsBefore,
+            'userSelectedOpt' => $userId,
+            'quarterList' => $quarterList,
+            'userSelected' => $userSelected,
+            'quarterSelected' => $quarter,
+            'yearSelected' => $year,
+            'akhlakLabels' => json_encode($akhlakLabels),  // Pass data as JSON
+            'averageScores' => json_encode($averageScores)  // Pass data as JSON
         ]);
     }
 
@@ -217,18 +144,14 @@ class AkhlakController extends Controller
         $request->validate([
             'userId' => 'required',
             'activity_title' => 'required',
-            'akhlak_points' => 'required',
+            'akhlak_points' => 'required|array',
             'akhlak_points.*' => 'required',
-            'akhlak_value' => 'required|string|max:10',
-            'evidence' => 'required|file|mimes:pdf,doc,docx',
-            'period_start' => 'required|date',
-            'period_end' => 'required|date|after_or_equal:period_start',
+            'akhlak_value' => 'required|integer',
+            'evidence' => 'sometimes|file|mimes:pdf,doc,docx',
+            'quarter' => 'required|integer|min:1|max:4',
+            'year' => 'required|integer',
         ]);
 
-        // // Handle the file upload
-        // $evidenceFile = $request->file('evidence');
-        // $fileName = time() . '_' . $evidenceFile->getClientOriginalName();
-        // $filePath = $evidenceFile->storeAs('akhlak_evidences', $fileName, 'public');
         // Handle the file upload
         $evidenceFile = $request->file('evidence');
         $fileName = time() . '_' . $evidenceFile->getClientOriginalName();
@@ -244,8 +167,8 @@ class AkhlakController extends Controller
                 'judul_kegiatan' => $request->activity_title,
                 'akhlak_id' => $akhlakId,
                 'score' => $request->akhlak_value,
-                'periode_start' => $request->period_start,
-                'periode_end' => $request->period_end,
+                'quarter_id' => $request->quarter,
+                'periode' => $request->year,
             ]);
 
             // Save the file information in the User_pencapaian_akhlak_files model
@@ -259,44 +182,212 @@ class AkhlakController extends Controller
         return redirect()->back()->with('success', 'Data Pencapaian Akhlak has been successfully saved.');
     }
 
-    public function print($userId, $akhlak, $periode)
+    public function report(Request $request)
     {
-        // Set the default time zone to Jakarta
-        date_default_timezone_set("Asia/Jakarta");
+        // Determine the current year and generate the range of years
+        $nowYear = date('Y');
+        $yearsBefore = range($nowYear - 4, $nowYear);
 
-        $userInfo = User::find($userId);
-        $users = User::all();
-        $akhlakPoin = Akhlak::all();
+        // Capture the filter inputs
+        $userId = $request->input('userId');
+        $year = $request->input('year');
 
-        $pencapaianQuery = User_pencapaian_akhlak::query();
-
-        if ($userId != 1) {
-            $userSelected = User::find($userId);
-            if ($userSelected) {
-                $pencapaianQuery->where('user_id', $userId);
-            }
-        }
-
-        if ($periode != 1) {
-            $pencapaianQuery->whereYear('periode_start', $periode)->whereYear('periode_end', $periode);
-        }
-
-        if ($akhlak != 7) {
-            $pencapaianQuery->where('akhlak_id', $akhlak);
-        }
-
-        $pencapaian = $pencapaianQuery->get();
-
-        $pdf = Pdf::loadView('akhlak-view.laporan.pdf', [
-            'pencapaian' => $pencapaian,
-            'periode' => $periode,
-            'akhlakSelected' => $akhlak,
-            'akhlakPoin' => $akhlakPoin,
-            'userInfo' => $userInfo,
-            'userSelected' => $userId,
-            'users' => $users,
+        // Validate the request inputs
+        $validator = Validator::make($request->all(), [
+            'userId' => 'required',
+            'year' => 'required'
         ]);
 
-        return $pdf->download('laporan-akhlak.pdf');
+        // Query to get User Pencapaian Akhlak with filters
+        $pencapaianQuery = User_pencapaian_akhlak::selectRaw('akhlak_id, quarter_id, periode, AVG(nilai_akhlak.score) as average_score')
+            ->join('nilai_akhlak', 'user_pencapaian_akhlak.score', '=', 'nilai_akhlak.id')
+            ->with(['akhlak', 'user', 'quarter'])
+            ->groupBy('akhlak_id', 'quarter_id', 'periode');
+
+        $userSelected = User::find($userId);
+        // Apply filters
+        if ($userId != -1) {
+            $pencapaianQuery->where('user_pencapaian_akhlak.user_id', $userId);
+        }
+
+        if ($year != -1) {
+            $pencapaianQuery->where('periode', $year);
+        }
+
+        $pencapaianResults = $pencapaianQuery->get();
+
+        // Fetch all Nilai Akhlak ranges
+        $nilaiAkhlakRanges = Nilai::all();
+
+        foreach ($pencapaianResults as $result) {
+            $averageScore = $result->average_score;
+
+            // Find the corresponding nilai_akhlak description based on the average score
+            $nilai = $nilaiAkhlakRanges->filter(function ($range) use ($averageScore) {
+                return $averageScore >= $range->score;
+            })->first();
+
+            $result->nilai_description = $nilai ? $nilai->description : 'Unknown';
+        }
+
+        // Query to group by akhlak_id and periode for the general summary with filters
+        $generalPencapaianQuery = User_pencapaian_akhlak::selectRaw('akhlak_id, periode, AVG(nilai_akhlak.score) as average_score')
+            ->join('nilai_akhlak', 'user_pencapaian_akhlak.score', '=', 'nilai_akhlak.id')
+            ->with(['akhlak'])
+            ->groupBy('akhlak_id', 'periode');
+
+        // Apply filters to the general query
+        if ($userId != -1) {
+            $generalPencapaianQuery->where('user_pencapaian_akhlak.user_id', $userId);
+        }
+
+        if ($year != -1) {
+            $generalPencapaianQuery->where('periode', $year);
+        }
+
+        $generalPencapaianResults = $generalPencapaianQuery->get();
+
+        // Fetch all Nilai Akhlak ranges for general results
+        $nilaiAkhlakRangesGeneral = Nilai::all();
+
+        foreach ($generalPencapaianResults as $result) {
+            $averageScore = $result->average_score;
+
+            // Find the corresponding nilai_akhlak description based on the average score
+            $nilaiGeneral = $nilaiAkhlakRangesGeneral->filter(function ($range) use ($averageScore) {
+                return $averageScore >= $range->score;
+            })->first();
+
+            $result->nilai_description = $nilaiGeneral ? $nilaiGeneral->description : 'Unknown';
+        }
+
+        // Get all users and akhlak points for the form
+        $users = User::all();
+        $akhlakPoin = Akhlak::all();
+        $quarterList = Quarter::all();
+        $nilaiList = Nilai::all();
+
+        // Process generalPencapaianResults for radar chart
+        $akhlakLabels = [];
+        $averageScores = [];
+
+        foreach ($generalPencapaianResults as $result) {
+            $akhlakLabels[] = $result->akhlak->indicator;  // Assuming akhlak has a 'description' field for the label
+            $averageScores[] = $result->average_score;
+        }
+
+        $allPencapaian = User_pencapaian_akhlak::where('periode', $year)->where('user_id', $userId)->get();
+        // Return the view with the necessary data and the selected filters
+        return view('akhlak-view.admin.report', [
+            'akhlakPoin' => $akhlakPoin,
+            'users' => $users,
+            'nilaiList' => $nilaiList,
+            'pencapaianResults' => $pencapaianResults,
+            'generalPencapaianResults' => $generalPencapaianResults,
+            'yearsBefore' => $yearsBefore,
+            'userSelectedOpt' => $userId,
+            'quarterList' => $quarterList,
+            'userSelected' => $userSelected,
+            'yearSelected' => $year,
+            'allPencapaian' => $allPencapaian,
+            'akhlakLabels' => json_encode($akhlakLabels),  // Pass data as JSON
+            'averageScores' => json_encode($averageScores)  // Pass data as JSON
+        ]);
+    }
+
+    public function downloadPdf(Request $request)
+    {
+        // Determine the current year and generate the range of years
+        $nowYear = date('Y');
+        $yearsBefore = range($nowYear - 4, $nowYear);
+
+        // Capture the filter inputs
+        $userId = $request->input('userId') ?? '-1';
+        $year = $request->input('year') ?? $nowYear;
+
+        // Query to get User Pencapaian Akhlak with filters
+        $pencapaianQuery = User_pencapaian_akhlak::selectRaw('akhlak_id, quarter_id, periode, AVG(nilai_akhlak.score) as average_score')
+            ->join('nilai_akhlak', 'user_pencapaian_akhlak.score', '=', 'nilai_akhlak.id')
+            ->with(['akhlak', 'user', 'quarter'])
+            ->groupBy('akhlak_id', 'quarter_id', 'periode');
+
+        $userSelected = User::find($userId);
+
+        // Apply filters
+        if ($userId != -1) {
+            $pencapaianQuery->where('user_pencapaian_akhlak.user_id', $userId);
+        }
+
+        if ($year != -1) {
+            $pencapaianQuery->where('periode', $year);
+        }
+
+        $pencapaianResults = $pencapaianQuery->get();
+
+        $chartImage = $request->input('chartImage'); // Get the chart image data from the request
+        // Fetch all Nilai Akhlak ranges
+        $nilaiAkhlakRanges = Nilai::all();
+
+        foreach ($pencapaianResults as $result) {
+            $averageScore = $result->average_score;
+
+            // Find the corresponding nilai_akhlak description based on the average score
+            $nilai = $nilaiAkhlakRanges->filter(function ($range) use ($averageScore) {
+                return $averageScore >= $range->score;
+            })->first();
+
+            $result->nilai_description = $nilai ? $nilai->description : 'Unknown';
+        }
+
+        // Query to group by akhlak_id and periode for the general summary with filters
+        $generalPencapaianQuery = User_pencapaian_akhlak::selectRaw('akhlak_id, periode, AVG(nilai_akhlak.score) as average_score')
+            ->join('nilai_akhlak', 'user_pencapaian_akhlak.score', '=', 'nilai_akhlak.id')
+            ->with(['akhlak'])
+            ->groupBy('akhlak_id', 'periode');
+
+        // Apply filters to the general query
+        $generalPencapaianQuery->where('user_pencapaian_akhlak.user_id', 'haekals');
+        $generalPencapaianQuery->where('periode', '2024');
+
+        $generalPencapaianResults = $generalPencapaianQuery->get();
+
+        // Fetch all Nilai Akhlak ranges for general results
+        $nilaiAkhlakRangesGeneral = Nilai::all();
+
+        foreach ($generalPencapaianResults as $result) {
+            $averageScore = $result->average_score;
+
+            // Find the corresponding nilai_akhlak description based on the average score
+            $nilaiGeneral = $nilaiAkhlakRangesGeneral->filter(function ($range) use ($averageScore) {
+                return $averageScore >= $range->score;
+            })->first();
+
+            $result->nilai_description = $nilaiGeneral ? $nilaiGeneral->description : 'Unknown';
+        }
+
+        $allPencapaian = User_pencapaian_akhlak::where('periode', $year)->where('user_id', $userId)->get();
+        // Create a view for the PDF using compact
+        $pdfView = view('akhlak-view.laporan.pdf', compact(
+            'pencapaianResults',
+            'generalPencapaianResults',
+            'yearsBefore',
+            'userId',   // Rename 'userSelectedOpt' to 'userId' for compact
+            'userSelected',
+            'year',
+            'chartImage',
+            'allPencapaian'
+        ))->render();
+
+        // Set options and create the PDF
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isRemoteEnabled', true);
+
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml($pdfView);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        return $dompdf->stream('AKHLAK_Report.pdf');
     }
 }

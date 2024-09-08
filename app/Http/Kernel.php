@@ -67,5 +67,6 @@ class Kernel extends HttpKernel
         'checkForErrors' => \App\Http\Middleware\CheckForErrors::class,
         'checkUserAccess' => \App\Http\Middleware\CheckUserAccess::class,
         'suspicious' => \App\Http\Middleware\SuspiciousFileCheck::class,
+        'restrictRequestbyRole' => \App\Http\Middleware\RestrictRequestRole::class,
     ];
 }

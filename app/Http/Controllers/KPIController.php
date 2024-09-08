@@ -365,8 +365,8 @@ class KpiController extends Controller
 
         $kpi = new KPI();
         $kpi->indicator = $request->input('kpi');
-        $kpi->target = $request->input('target');
         $kpi->goal = $request->input('goal');
+        $kpi->target = preg_replace('/[^0-9]/', '', $request->input('target'));
         $kpi->periode = $request->input('periode');
         $kpi->save();
 
