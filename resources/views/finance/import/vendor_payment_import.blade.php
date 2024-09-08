@@ -85,6 +85,9 @@ font-weight-bold
             <div class="card mb-4">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <span class="text-danger font-weight-bold">Data Import Guidelines</span>
+                    <div class="text-right">
+                        <a class="btn btn-primary btn-sm text-white" download href="{{ asset('uploads/template/template_vendor_payment.xlsx') }}"><i class="menu-Logo fa fa-download"></i> Download Example</a>
+                    </div>
                 </div>
                 <div class="card-body" style="background-color: rgb(247, 247, 247);">
                     <h6 class="h6 mb-2 font-weight-bold text-gray-800">Import Rules</h6>

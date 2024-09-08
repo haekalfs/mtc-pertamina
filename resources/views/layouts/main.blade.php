@@ -216,14 +216,23 @@
                         <div class="dropdown for-notification">
                             <button class="btn btn-secondary dropdown-toggle" type="button" id="notification" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fa fa-bell"></i>
-                                <span class="count bg-danger">1</span>
+                                @if ($notifications->isEmpty() || $notificationsCount == 0)
+                                @else
+                                <span class="count bg-danger">
+                                    <span class="badge badge-danger badge-counter">
+                                        {{ $notificationsCount }}
+                                    </span>
+                                </span>
+                                @endif
                             </button>
                             <div class="dropdown-menu" aria-labelledby="notification">
-                                <p class="red">You have 1 Notification</p>
-                                <a class="dropdown-item media" href="#">
-                                    <i class="fa fa-check"></i>
-                                    <p>Your Notification goes here.</p>
-                                </a>
+                                <p class="red">You have {{ $notificationsCount }} Notification(s)</p>
+                                @foreach ($notifications as $notification)
+                                    <a class="dropdown-item media" href="#">
+                                        <i class="fa fa-check"></i>
+                                        <p>{{ $notification->description }}</p>
+                                    </a>
+                                @endforeach
                             </div>
                         </div>
 

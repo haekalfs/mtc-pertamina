@@ -252,7 +252,7 @@ Route::middleware('suspicious', 'auth')->group(function () {
         Route::get('/penlat/tool-requirement-penlat/preview-item/{id}', [PenlatController::class, 'preview_requirement'])->name('preview-requirement');
         Route::put('/penlat-requirement-update/{id}', [PenlatController::class, 'update_requirement'])->name('requirement.update');
         Route::delete('/penlat-requirement-delete/{id}', [PenlatController::class, 'delete_requirement'])->name('delete.requirement');
-        Route::get('/penlat-item-requirement-delete/{id}', [PenlatController::class, 'delete_item_requirement'])->name('delete.item.requirement');
+        Route::delete('/penlat-item-requirement-delete/{id}', [PenlatController::class, 'delete_item_requirement'])->name('delete.item.requirement');
 
         //batch penlat
         Route::get('/penlat/list-batch', [PenlatController::class, 'batch'])->name('batch-penlat');

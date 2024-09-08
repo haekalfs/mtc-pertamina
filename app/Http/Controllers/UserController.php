@@ -124,7 +124,7 @@ class UserController extends Controller
             'position' => 'required',
             'user_status' => 'required',
             'roles' => 'required',
-            'profile_picture' => 'sometimes|file|mimes:jpeg,png,jpg,gif|max:2048',
+            'profile_picture' => 'sometimes|file|mimes:jpeg,png,jpg,gif|max:5048',
         ]);
 
         if ($validator->fails()) {
@@ -138,7 +138,7 @@ class UserController extends Controller
 
         // Handle profile picture upload
         if ($request->hasFile('profile_picture')) {
-            // Delete old profile picture if exists
+            // Delete old profile picture if it exists
             if ($userDetail->profile_pic) {
                 $oldImagePath = public_path($userDetail->profile_pic);
                 if (file_exists($oldImagePath)) {
@@ -151,13 +151,15 @@ class UserController extends Controller
             $profile_picture_path = 'img/avatar/' . $profile_picture_name;
             $profile_picture->move(public_path('img/avatar/'), $profile_picture_name);
         } else {
-            $profile_picture_name = $userDetail->profile_pic; // Retain old profile picture
+            // If no new profile picture is uploaded, retain the old one
+            $profile_picture_path = $userDetail->profile_pic;
         }
 
         // Update user information
         $user->update([
             'name' => $request->full_name,
             'email' => $request->email,
+            // Only update password if it's provided
             'password' => $request->password ? Hash::make($request->password) : $user->password,
         ]);
 
@@ -167,7 +169,7 @@ class UserController extends Controller
             'department_id' => $request->department,
             'position_id' => $request->position,
             'employment_status' => $request->user_status,
-            'profile_pic' => $profile_picture_path,
+            'profile_pic' => $profile_picture_path, // Will be the new picture if uploaded, or the old one if not
         ]);
 
         // Update roles (first remove all roles, then add the selected ones)
@@ -231,6 +233,9 @@ class UserController extends Controller
     {
         // Find the instructor
         $user = User::findOrFail($userId);
+        if(Auth::id() == $userId){
+            return response()->json(['error' => 'Cannot delete your own account, must be deleted by someone else!'], 403);
+        }
 
         // Define the path to the instructor's directory in the public folder
         $userDir = public_path($user->users_detail->profile_pic);

@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Campaign;
 use App\Models\Infografis_peserta;
+use App\Models\Instructor;
+use App\Models\Inventory_tools;
+use App\Models\Penlat;
+use App\Models\Penlat_batch;
 use App\Models\Profit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -55,7 +59,30 @@ class DashboardController extends Controller
         '))
         ->value('average_score');
 
+        $getAssetCount = Inventory_tools::count();
+        $getAssetStock = Inventory_tools::sum('initial_stock');
+
+        // Count total instructors
+        $instructorCount = Instructor::count();
+
+        //Jumlah Pelatihan
+        $penlatCount = Penlat::count();
+
+        //Jumlah Batch
+        $batchCount = Penlat_batch::count();
+
         // Cache::forget('jobs_processing');
-        return view('dashboard', ['headline' => $headline, 'getPesertaCount' => $getPesertaCount, 'countCampaign' => $countCampaign, 'rawProfits' => $rawProfits, 'averageFeedbackScore' => $averageFeedbackScore]);
+        return view('dashboard', [
+            'headline' => $headline,
+            'getPesertaCount' => $getPesertaCount,
+            'countCampaign' => $countCampaign,
+            'rawProfits' => $rawProfits,
+            'averageFeedbackScore' => $averageFeedbackScore,
+            'getAssetCount' => $getAssetCount,
+            'getAssetStock' => $getAssetStock,
+            'instructorCount' => $instructorCount,
+            'penlatCount' => $penlatCount,
+            'batchCount' => $batchCount
+        ]);
     }
 }

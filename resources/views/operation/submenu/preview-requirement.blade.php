@@ -103,12 +103,12 @@ font-weight-bold
                 <div class="card-body">
                     <div class="table-responsive">
                         <table id="listUtilities" class="table table-bordered mt-4">
-                            <thead>
+                            <thead class="thead-light">
                                 <tr>
                                     <th>Tool</th>
                                     <th>Quantity</th>
                                     <th>Satuan</th>
-                                    <th>Action</th>
+                                    <th width="200px">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -116,7 +116,7 @@ font-weight-bold
                                     <tr>
                                         <td data-th="Product">
                                             <div class="row">
-                                                <div class="col-md-3 text-left">
+                                                <div class="col-md-4 text-center d-flex justify-content-center align-items-center">
                                                     <img src="{{ asset($tool->tools->img->filepath) }}" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow ">
                                                 </div>
                                                 <div class="col-md-8 text-left mt-sm-2">
@@ -126,7 +126,7 @@ font-weight-bold
                                             </div>
                                         </td>
                                         <td data-th="Quantity" style="width:10%">
-                                            <input type="number" class="form-control form-control-md text-center noline-input" name="amount_{{ $tool->id }}" value="{{ $tool->amount }}">
+                                            <input type="number" class="form-control form-control-md text-center underline-input" name="amount_{{ $tool->id }}" value="{{ $tool->amount }}">
                                         </td>
                                         <td data-th="Price" style="width:10%" class="text-center">
                                             Pcs
@@ -135,9 +135,13 @@ font-weight-bold
                                             <button class="btn btn-outline-secondary btn-sm mr-2 update-amount" data-id="{{ $tool->id }}">
                                                 <i class="fa fa-save"></i> Update
                                             </button>
-                                            <a href="{{ route('delete.item.requirement', $tool->id) }}" class="btn btn-outline-danger btn-sm text-danger">
+                                            <a href="javascript:void(0)" class="btn btn-outline-danger btn-sm text-danger" onclick="confirmDelete({{ $tool->id }})">
                                                 <i class="fa fa-trash-o"></i> Delete
                                             </a>
+                                            <form id="delete-form-{{ $tool->id }}" action="{{ route('delete.item.requirement', $tool->id) }}" method="POST" style="display: none;">
+                                                @csrf
+                                                @method('DELETE')
+                                            </form>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -282,6 +286,21 @@ font-weight-bold
             }
         });
     });
+
+    function confirmDelete(id) {
+        swal({
+            title: "Are you sure?",
+            text: "Once deleted, you will not be able to recover this item!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+        .then((willDelete) => {
+            if (willDelete) {
+                document.getElementById('delete-form-' + id).submit();
+            }
+        });
+    }
 </script>
 @endsection
 

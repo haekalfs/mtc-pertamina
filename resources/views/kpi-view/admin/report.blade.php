@@ -133,7 +133,7 @@ font-weight-bold
                         <thead class="text-white">
                             <tr>
                                 <th class="bg-secondary" rowspan="3" style="vertical-align: middle; text-align: center;">Indicator</th>
-                                <th class="text-center bg-secondary" colspan="8">2024</th>
+                                <th class="text-center bg-secondary" colspan="8">{{ $periode }}</th>
                             </tr>
                             <tr class="bg-secondary">
                                 <th class="text-center" colspan="2">Quarter 1</th>
@@ -153,15 +153,21 @@ font-weight-bold
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($data as $metric => $quarters)
-                                <tr>
-                                    <td>{{ $metric }} </td>
-                                    @foreach($quarters as $quarter)
-                                        <td>{{ number_format($quarter['Tercapai'], 0, ',', '.') }}</td>
-                                        <td>{{ number_format($quarter['%'], 1) }}%</td>
-                                    @endforeach
+                            @if(!$data)
+                                <tr class="text-center">
+                                    <td colspan="9">No Data Available</td> <!-- Use colspan to span across the entire row -->
                                 </tr>
-                            @endforeach
+                            @else
+                                @foreach($data as $metric => $quarters)
+                                    <tr>
+                                        <td>{{ $metric }}</td>
+                                        @foreach($quarters as $quarter)
+                                            <td>{{ number_format($quarter['Tercapai'], 0, ',', '.') }}</td>
+                                            <td>{{ number_format($quarter['%'], 1) }}%</td>
+                                        @endforeach
+                                    </tr>
+                                @endforeach
+                            @endif
                             <tr class="bg-secondary text-white">
                                 <td>Overall KPI</td>
                                 <th colspan="2">{{ number_format($overallKPI['Q1'], 1) }}%</th>

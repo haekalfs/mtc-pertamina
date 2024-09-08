@@ -165,6 +165,7 @@ return [
         Illuminate\View\ViewServiceProvider::class,
         App\Providers\FortifyServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
+        App\Providers\NotificationServiceProvider::class,
 
         /*
          * Package Service Providers...

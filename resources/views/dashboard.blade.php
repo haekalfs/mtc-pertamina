@@ -13,7 +13,7 @@ active font-weight-bold
     <!-- Widgets  -->
     <div class="row">
         <div class="col-lg-3 col-md-6 animateBox">
-            <a href="{{ route('participant-infographics') }}" class="clickable-card">
+            <a href="{{ route('operation') }}" class="clickable-card">
                 <div class="card">
                     <div class="card-body">
                         <div class="stat-widget-five">
@@ -33,7 +33,7 @@ active font-weight-bold
         </div>
 
         <div class="col-lg-3 col-md-6 animateBox">
-            <a href="{{ route('marketing-campaign') }}" class="clickable-card">
+            <a href="{{ route('marketing') }}" class="clickable-card">
                 <div class="card">
                     <div class="card-body">
                         <div class="stat-widget-five">
@@ -53,7 +53,7 @@ active font-weight-bold
         </div>
 
         <div class="col-lg-3 col-md-6 animateBox">
-            <a href="{{ route('feedback-report-main') }}" class="clickable-card">
+            <a href="{{ route('plan-dev') }}" class="clickable-card">
                 <div class="card">
                     <div class="card-body">
                         <div class="stat-widget-five">
@@ -73,7 +73,7 @@ active font-weight-bold
         </div>
 
         <div class="col-lg-3 col-md-6 animateBox">
-            <a href="{{ route('profits') }}" class="clickable-card">
+            <a href="{{ route('finance') }}" class="clickable-card">
                 <div class="card">
                     <div class="card-body">
                         <div class="stat-widget-five">
@@ -84,6 +84,84 @@ active font-weight-bold
                                 <div class="text-left dib">
                                     <div class="h6"><span>{{ number_format($rawProfits, 0, ',', '.') }}</span></div>
                                     <div class="stat-heading">Raw Profits MTC</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-lg-3 col-md-6 animateBox">
+            <a href="{{ route('tool-inventory') }}" class="clickable-card">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon dib flat-color-1">
+                                <i class="fa fa-fire-extinguisher"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="text-left dib">
+                                    <div class="h6">
+                                        <div class="h6 mb-0 text-gray-800"><span style="font-size: 14px;">{{ $getAssetCount }} Assets with Total {{ $getAssetStock }} Stocks</span></div>
+                                    </div>
+                                    <div class="stat-heading">Inventaris Alat</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-lg-3 col-md-6 animateBox">
+            <a href="{{ route('instructor') }}" class="clickable-card">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon dib flat-color-5">
+                                <i class="fa fa-male"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="text-left dib">
+                                    <div class="h6"><span>{{ $instructorCount }}</span></div>
+                                    <div class="stat-heading">Jumlah Instruktur</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-lg-3 col-md-6 animateBox">
+            <a href="{{ route('penlat') }}" class="clickable-card">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon dib flat-color-6">
+                                <i class="fa fa-list-alt"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="text-left dib">
+                                    <div class="h6"><span>{{ number_format($penlatCount, 0, ',', '.') }}</span></div>
+                                    <div class="stat-heading">Jumlah Pelatihan</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-lg-3 col-md-6 animateBox">
+            <a href="{{ route('batch-penlat') }}" class="clickable-card">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon dib flat-color-7">
+                                <i class="fa fa-folder"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="text-left dib">
+                                    <div class="h6"><span>{{ number_format($batchCount, 0, ',', '.') }}</span></div>
+                                    <div class="stat-heading">Jumlah Batches Pelatihan</div>
                                 </div>
                             </div>
                         </div>

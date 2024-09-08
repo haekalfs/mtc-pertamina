@@ -27,10 +27,16 @@
 @extends('layouts.login-layout')
 
 @section('content')
-<x-auth-session-status class="mb-4" :status="session('status')" />
-<div class="wrap-login100" style="zoom: 80%;">
+<x-auth-session-status class="mb-2" :status="session('status')" />
+<div class="wrap-login100" style="zoom: 80%; position: relative;">
+    <div class="red-background" style="position: absolute; top: 0; left: 0; background-color: #ff0000; width: 50%; height: 100px; border-bottom-right-radius: 50px; z-index: 1;">
+        <div class="ml-3" style="position: absolute; top: 10px; left: 10px; color: #fff; z-index: 2; font-family: Poppins-Bold;">
+            <h4 class="corner-text font-weight-bold mt-2">Sistem Informasi Manajemen MTC</h4>
+            <p class="text-white">Pertamina Maritime Training Center</p>
+        </div>
+    </div>
     <div class="login100-pic text-center js-tilt" data-tilt>
-        <img src="img/mtc-logo-1.png" style="zoom: 150%;" alt="IMG">
+        <img src="{{ asset('img/MTC.png') }}" style="zoom: 100%;" alt="IMG">
     </div>
 
     <form class="login100-form validate-form" method="POST" action="{{ route('password.email') }}">

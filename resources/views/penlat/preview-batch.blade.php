@@ -95,135 +95,131 @@ font-weight-bold
 <div class="animated fadeIn zoom90">
     <div class="row">
         <div class="col-md-6">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                            <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> Infografis Peserta</h6>
-                            <div class="text-right">
-                                {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Add Utilities</a> --}}
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <h5 class="card-title font-weight-bold">Realisasi Peserta</h5>
-                            <div class="ml-2">
-                                @if(!$data->infografis_peserta || !$data->infografis_peserta || $data->infografis_peserta->isEmpty())
-                                    No Data Available
-                                @else
-                                <ol class="ml-4" style="line-height:200%">
-                                    @foreach ($data->infografis_peserta as $item)
-                                        <li>{{ $item->nama_peserta }}</li>
-                                    @endforeach
-                                </ol>
-                                @endif
-                            </div>
-                        </div>
+            <div class="card">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> Infografis Peserta</h6>
+                    <div class="text-right">
+                        {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Add Utilities</a> --}}
                     </div>
                 </div>
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                            <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> List Costs</h6>
-                            <div class="text-right">
-                                {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Edit Data</a> --}}
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <h5 class="card-title font-weight-bold">Profits</h5>
-                            <div class="ml-2">
-                                <table class="table table-borderless table-sm">
-                                    @if(!$profits)
-                                        No Data Available
-                                    @else
-                                    <tr>
-                                        <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Jumlah Peserta</td>
-                                        <td style="text-align: start;">: &nbsp; {{ $profits->jumlah_peserta ? $profits->jumlah_peserta : '-' }} Peserta</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Biaya Pendaftaran</td>
-                                        <td style="text-align: start;">: &nbsp; {{ $profits->biaya_pendaftaran_peserta ? 'Rp ' . number_format($profits->biaya_pendaftaran_peserta, 0, ',', '.') : '-' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="width: 250px;" class="mb-2 font-weight-bold text-success"><i class="ti-minus mr-2"></i> Total Biaya Pendaftaran</td>
-                                        <td style="text-align: start;" class="font-weight-bold text-success">: &nbsp; {{ $profits->total_biaya_pendaftaran_peserta ? 'Rp ' . number_format($profits->total_biaya_pendaftaran_peserta, 0, ',', '.') : '-' }}</td>
-                                    </tr>
-                                    @endif
-                                </table>
-                            </div>
-                            <h5 class="card-title font-weight-bold">Loss</h5>
-                            <div class="ml-2">
-                                <table class="table table-borderless table-sm">
-
-                                    @if(!$profits)
-                                        No Data Available
-                                    @else
-                                    <tr>
-                                        <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Biaya Instruktur</td>
-                                        <td style="text-align: start;">: &nbsp; {{ $profits->biaya_instruktur ? 'Rp ' . number_format($profits->biaya_instruktur, 0, ',', '.') : '-' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Total PNBP</td>
-                                        <td style="text-align: start;">: &nbsp; {{ $profits->total_pnbp ? 'Rp ' . number_format($profits->total_pnbp, 0, ',', '.') : '-' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Honor + PNBP</td>
-                                        <td style="text-align: start;">: &nbsp; {{ $profits->total_pnbp ? 'Rp ' . number_format($profits->honor_pnbp, 0, ',', '.') : '-' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Biaya Transportasi/Hari</td>
-                                        <td style="text-align: start;">: &nbsp; {{ $profits->biaya_transportasi_hari ? 'Rp ' . number_format($profits->biaya_transportasi_hari, 0, ',', '.') : '-' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Penagihan Foto</td>
-                                        <td style="text-align: start;">: &nbsp; {{ $profits->penagihan_foto ? 'Rp ' . number_format($profits->penagihan_foto, 0, ',', '.') : '-' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Penagihan ATK</td>
-                                        <td style="text-align: start;">: &nbsp; {{ $profits->penagihan_atk ? 'Rp ' . number_format($profits->penagihan_atk, 0, ',', '.') : '-' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Penagihan Snacks</td>
-                                        <td style="text-align: start;">: &nbsp; {{ $profits->penagihan_snack ? 'Rp ' . number_format($profits->snack, 0, ',', '.') : '-' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Penagihan Makan Siang</td>
-                                        <td style="text-align: start;">: &nbsp; {{ $profits->penagihan_makan_siang ? 'Rp ' . number_format($profits->penagihan_makan_siang, 0, ',', '.') : '-' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Penagihan Laundry</td>
-                                        <td style="text-align: start;">: &nbsp; {{ $profits->penagihan_laundry ? 'Rp ' . number_format($profits->penagihan_laundry, 0, ',', '.') : '-' }}</td>
-                                    </tr>
-                                    @endif
-                                </table>
-                            </div>
-                            <hr>
-                            <h5 class="card-title font-weight-bold">Total Profits</h5>
-                            <div class="ml-2">
-                                <table class="table table-borderless table-sm">
-                                    @if(!$profits)
-                                        No Data Available
-                                    @else
-                                    <tr>
-                                        <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Total Biaya Pendaftaran</td>
-                                        <td style="text-align: start;" class="">: &nbsp; {{ $profits->total_biaya_pendaftaran_peserta ? 'Rp ' . number_format($profits->total_biaya_pendaftaran_peserta, 0, ',', '.') : '-' }} </td>
-                                    </tr>
-                                    <tr>
-                                        <td style="width: 250px;" class="mb-2 "><i class="ti-minus mr-2"></i> Jumlah Biaya (COST) </td>
-                                        <td style="text-align: start;" class="">: &nbsp; {{ $profits->jumlah_biaya ? 'Rp ' . number_format($profits->jumlah_biaya, 0, ',', '.') : '-' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="width: 250px;" class="mb-2 font-weight-bold text-success"><i class="ti-minus mr-2"></i> Total Profits</td>
-                                        <td style="text-align: start;" class="font-weight-bold text-success">: &nbsp; {{ $profits->profit ? 'Rp ' . number_format($profits->profit, 0, ',', '.') : '-' }} <i class="fa fa-plus"></i></td>
-                                    </tr>
-                                    @endif
-                                </table>
-                            </div>
-                        </div>
+                <div class="card-body">
+                    <h5 class="card-title font-weight-bold">Realisasi Peserta</h5>
+                    <div class="ml-2">
+                        @if(!$data->infografis_peserta || !$data->infografis_peserta || $data->infografis_peserta->isEmpty())
+                            No Data Available
+                        @else
+                        <ol class="ml-4" style="line-height:200%">
+                            @foreach ($data->infografis_peserta as $item)
+                                <li>{{ $item->nama_peserta }}</li>
+                            @endforeach
+                        </ol>
+                        @endif
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-6">
+            <div class="card">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> List Costs</h6>
+                    <div class="text-right">
+                        {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Edit Data</a> --}}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title font-weight-bold">Profits</h5>
+                    <div class="ml-2">
+                        <table class="table table-borderless table-sm">
+                            @if(!$profits)
+                                No Data Available
+                            @else
+                            <tr>
+                                <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Jumlah Peserta</td>
+                                <td style="text-align: start;">: &nbsp; {{ $profits->jumlah_peserta ? $profits->jumlah_peserta : '-' }} Peserta</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Biaya Pendaftaran</td>
+                                <td style="text-align: start;">: &nbsp; {{ $profits->biaya_pendaftaran_peserta ? 'Rp ' . number_format($profits->biaya_pendaftaran_peserta, 0, ',', '.') : '-' }}</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 250px;" class="mb-2 font-weight-bold text-success"><i class="ti-minus mr-2"></i> Total Biaya Pendaftaran</td>
+                                <td style="text-align: start;" class="font-weight-bold text-success">: &nbsp; {{ $profits->total_biaya_pendaftaran_peserta ? 'Rp ' . number_format($profits->total_biaya_pendaftaran_peserta, 0, ',', '.') : '-' }}</td>
+                            </tr>
+                            @endif
+                        </table>
+                    </div>
+                    <h5 class="card-title font-weight-bold">Loss</h5>
+                    <div class="ml-2">
+                        <table class="table table-borderless table-sm">
+
+                            @if(!$profits)
+                                No Data Available
+                            @else
+                            <tr>
+                                <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Biaya Instruktur</td>
+                                <td style="text-align: start;">: &nbsp; {{ $profits->biaya_instruktur ? 'Rp ' . number_format($profits->biaya_instruktur, 0, ',', '.') : '-' }}</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Total PNBP</td>
+                                <td style="text-align: start;">: &nbsp; {{ $profits->total_pnbp ? 'Rp ' . number_format($profits->total_pnbp, 0, ',', '.') : '-' }}</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Honor + PNBP</td>
+                                <td style="text-align: start;">: &nbsp; {{ $profits->total_pnbp ? 'Rp ' . number_format($profits->honor_pnbp, 0, ',', '.') : '-' }}</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Biaya Transportasi/Hari</td>
+                                <td style="text-align: start;">: &nbsp; {{ $profits->biaya_transportasi_hari ? 'Rp ' . number_format($profits->biaya_transportasi_hari, 0, ',', '.') : '-' }}</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Penagihan Foto</td>
+                                <td style="text-align: start;">: &nbsp; {{ $profits->penagihan_foto ? 'Rp ' . number_format($profits->penagihan_foto, 0, ',', '.') : '-' }}</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Penagihan ATK</td>
+                                <td style="text-align: start;">: &nbsp; {{ $profits->penagihan_atk ? 'Rp ' . number_format($profits->penagihan_atk, 0, ',', '.') : '-' }}</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Penagihan Snacks</td>
+                                <td style="text-align: start;">: &nbsp; {{ $profits->penagihan_snack ? 'Rp ' . number_format($profits->snack, 0, ',', '.') : '-' }}</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Penagihan Makan Siang</td>
+                                <td style="text-align: start;">: &nbsp; {{ $profits->penagihan_makan_siang ? 'Rp ' . number_format($profits->penagihan_makan_siang, 0, ',', '.') : '-' }}</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Penagihan Laundry</td>
+                                <td style="text-align: start;">: &nbsp; {{ $profits->penagihan_laundry ? 'Rp ' . number_format($profits->penagihan_laundry, 0, ',', '.') : '-' }}</td>
+                            </tr>
+                            @endif
+                        </table>
+                    </div>
+                    <hr>
+                    <h5 class="card-title font-weight-bold">Total Profits</h5>
+                    <div class="ml-2">
+                        <table class="table table-borderless table-sm">
+                            @if(!$profits)
+                                No Data Available
+                            @else
+                            <tr>
+                                <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Total Biaya Pendaftaran</td>
+                                <td style="text-align: start;" class="">: &nbsp; {{ $profits->total_biaya_pendaftaran_peserta ? 'Rp ' . number_format($profits->total_biaya_pendaftaran_peserta, 0, ',', '.') : '-' }} </td>
+                            </tr>
+                            <tr>
+                                <td style="width: 250px;" class="mb-2 "><i class="ti-minus mr-2"></i> Jumlah Biaya (COST) </td>
+                                <td style="text-align: start;" class="">: &nbsp; {{ $profits->jumlah_biaya ? 'Rp ' . number_format($profits->jumlah_biaya, 0, ',', '.') : '-' }}</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 250px;" class="mb-2 font-weight-bold text-success"><i class="ti-minus mr-2"></i> Total Profits</td>
+                                <td style="text-align: start;" class="font-weight-bold text-success">: &nbsp; {{ $profits->profit ? 'Rp ' . number_format($profits->profit, 0, ',', '.') : '-' }} <i class="fa fa-plus"></i></td>
+                            </tr>
+                            @endif
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> List Penggunaan Utilities</h6>
@@ -235,8 +231,10 @@ font-weight-bold
                     <table id="dataTable" class="table table-bordered mt-4">
                         <thead>
                             <tr>
-                                <th style="width:60%">Tool</th>
+                                <th>Tool</th>
                                 <th style="width:10%">Quantity</th>
+                                <th>Harga Satuan</th>
+                                <th>Total</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -256,6 +254,12 @@ font-weight-bold
                                         </td>
                                         <td class="text-center" style="width:7%">
                                             {{ $tool->amount }}
+                                        </td>
+                                        <td style="width:25%">
+                                            {{ $tool->price ? 'IDR ' . number_format($tool->price, 0, ',', '.') : '-' }}
+                                        </td>
+                                        <td style="width:25%">
+                                            {{ $tool->total ? 'IDR ' . number_format($tool->total, 0, ',', '.') : '-' }}
                                         </td>
                                     </tr>
                                 @endforeach

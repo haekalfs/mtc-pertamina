@@ -131,6 +131,7 @@ font-weight-bold
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> Laporan Pencapaian <span style="color: #403D4D;">AKH</span><span style="color: #029195;">LAK</span></h6>
                     <div class="text-right">
+                        @if($userSelected)
                         <form method="POST" action="{{ route('akhlak.downloadPdf') }}" target="_blank" id="pdfForm">
                             @csrf
                             <input type="hidden" name="chartImage" id="chartImageInput">
@@ -138,6 +139,7 @@ font-weight-bold
                             <input type="hidden" name="year" id="year" value="{{$yearSelected}}">
                             <button id="downloadPdfButton" class="btn btn-primary btn-sm">Download PDF</button>
                         </form>
+                        @endif
                     </div>
                 </div>
                 <div class="card-body">
@@ -211,6 +213,8 @@ font-weight-bold
                                     @endif
                                 </ul>
                             </section>
+                            @else
+                            <p>Please select data in search report section...</p>
                             @endif
                         </div>
                         <div class="col-md-6" id="charts">
@@ -237,6 +241,11 @@ font-weight-bold
                             </tr>
                         </thead>
                         <tbody>
+                            @if($pencapaianResults->isEmpty())
+                                <tr class="text-center">
+                                    <td colspan="5">No Data Available</td> <!-- Use colspan to span across the entire row -->
+                                </tr>
+                            @else
                             @foreach ($pencapaianResults as $item)
                             <tr>
                                 <td>{{ $item->akhlak->indicator }}</td>
@@ -246,6 +255,7 @@ font-weight-bold
                                 <td>{{ $item->periode }}</td>
                             </tr>
                             @endforeach
+                            @endif
                         </tbody>
                     </table>
                     <h2 class="text-center my-4 font-weight-bold">DETAIL ACTIVITY</h2>
@@ -262,6 +272,11 @@ font-weight-bold
                             </tr>
                         </thead>
                         <tbody>
+                            @if($allPencapaian->isEmpty())
+                                <tr class="text-center">
+                                    <td colspan="7">No Data Available</td> <!-- Use colspan to span across the entire row -->
+                                </tr>
+                            @else
                             @foreach ($allPencapaian as $item)
                             <tr>
                                 <th>{{ $item->judul_kegiatan }}</th>
@@ -275,6 +290,7 @@ font-weight-bold
                                 </td>
                             </tr>
                             @endforeach
+                            @endif
                         </tbody>
                     </table>
                 </div>

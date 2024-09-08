@@ -147,20 +147,20 @@ font-weight-bold
                                         </div>
                                     </div>
                                     <div class="d-flex align-items-start">
-                                        <div style="width: 180px;" class="mr-2">
+                                        <div style="width: 120px;" class="mr-2">
                                             <p style="margin: 0;">List Alat :</p>
                                         </div>
                                         <div class="flex-grow-1 textarea-container" id="documents-list-container">
                                             <div class="document-item mb-2">
                                                 <div class="row">
-                                                    <div class="col-md-10">
+                                                    <div class="col-md-9">
                                                         <select class="form-control mb-2" name="tool[]" required>
                                                             @foreach ($assets as $item)
                                                                 <option value="{{ $item->id }}">{{ $item->asset_name }}</option>
                                                             @endforeach
                                                         </select>
                                                     </div>
-                                                    <div class="col-md-2 p-0">
+                                                    <div class="col-md-3 p-0">
                                                         <input type="number" class="form-control" name="amount[]" placeholder="Pcs" required></input>
                                                     </div>
                                                 </div>

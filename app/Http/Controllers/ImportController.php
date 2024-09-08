@@ -18,6 +18,7 @@ use App\Jobs\ImportVendorPayment;
 use App\Jobs\ProfitsImport;
 use App\Models\Infografis_peserta;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
@@ -53,10 +54,11 @@ class ImportController extends Controller
         $file->move($destinationPath, $filename);
 
         $filePath = $destinationPath . '/' . $filename;
+        $userId = Auth::id();
 
         try {
             // Dispatch the job
-            Excel::queueImport(new InfografisImport, $filePath);
+            Excel::queueImport(new InfografisImport($filePath, $userId), $filePath);
 
             // Set a cache indicating the job is processing, if it doesn't already exist
             if (!Cache::has('jobs_processing')) {
@@ -93,10 +95,11 @@ class ImportController extends Controller
         $file->move($destinationPath, $filename);
 
         $filePath = $destinationPath . '/' . $filename;
+        $userId = Auth::id();
 
         try {
             // Dispatch the job
-            Excel::queueImport(new ImportProfits, $filePath);
+            Excel::queueImport(new ImportProfits($filePath, $userId), $filePath);
             // Set a cache indicating the job is processing, if it doesn't already exist
             if (!Cache::has('jobs_processing')) {
                 Cache::put('jobs_processing', true, now()->addMinutes(5)); // Cache for 10 minutes
@@ -132,9 +135,10 @@ class ImportController extends Controller
         $file->move($destinationPath, $filename);
 
         $filePath = $destinationPath . '/' . $filename;
+        $userId = Auth::id();
 
         try {
-            Excel::queueImport(new PenlatImport, $filePath);
+            Excel::queueImport(new PenlatImport($filePath, $userId), $filePath);
             if (!Cache::has('jobs_processing')) {
                 Cache::put('jobs_processing', true, now()->addMinutes(5));
             }
@@ -170,10 +174,11 @@ class ImportController extends Controller
         $file->move($destinationPath, $filename);
 
         $filePath = $destinationPath . '/' . $filename;
+        $userId = Auth::id();
 
         try {
             // Dispatch the job
-            Excel::queueImport(new FeedbackImport, $filePath);
+            Excel::queueImport(new FeedbackImport($filePath, $userId), $filePath);
             // Set a cache indicating the job is processing, if it doesn't already exist
             if (!Cache::has('jobs_processing')) {
                 Cache::put('jobs_processing', true, now()->addMinutes(5)); // Cache for 10 minutes
@@ -210,10 +215,11 @@ class ImportController extends Controller
         $file->move($destinationPath, $filename);
 
         $filePath = $destinationPath . '/' . $filename;
+        $userId = Auth::id();
 
         try {
             // Dispatch the job
-            Excel::queueImport(new VendorPaymentImport, $filePath);
+            Excel::queueImport(new VendorPaymentImport($filePath, $userId), $filePath);
             // Set a cache indicating the job is processing, if it doesn't already exist
             if (!Cache::has('jobs_processing')) {
                 Cache::put('jobs_processing', true, now()->addMinutes(5)); // Cache for 10 minutes
@@ -250,10 +256,11 @@ class ImportController extends Controller
         $file->move($destinationPath, $filename);
 
         $filePath = $destinationPath . '/' . $filename;
+        $userId = Auth::id();
 
         try {
             // Dispatch the job
-            Excel::queueImport(new FeedbackMTCImport, $filePath);
+            Excel::queueImport(new FeedbackMTCImport($filePath, $userId), $filePath);
             // Set a cache indicating the job is processing, if it doesn't already exist
             if (!Cache::has('jobs_processing')) {
                 Cache::put('jobs_processing', true, now()->addMinutes(5)); // Cache for 10 minutes

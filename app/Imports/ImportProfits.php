@@ -2,6 +2,7 @@
 
 namespace App\Imports;
 
+use App\Models\Notification;
 use App\Models\Penlat;
 use App\Models\Penlat_batch;
 use App\Models\Penlat_utility_usage;
@@ -16,11 +17,21 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\WithCalculatedFormulas;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithStartRow;
+use Maatwebsite\Excel\Events\AfterImport;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
-class ImportProfits implements ToCollection, WithBatchInserts, WithChunkReading, ShouldQueue, WithStartRow, WithCalculatedFormulas
+class ImportProfits implements ToCollection, WithBatchInserts, WithChunkReading, ShouldQueue, WithStartRow, WithCalculatedFormulas, WithEvents
 {
+    protected $filePath;
+    protected $userId;
+
+    public function __construct($filePath, String $userId)
+    {
+        $this->filePath = $filePath;
+        $this->userId = $userId;
+    }
     /**
     * @param Collection $collection
     */
@@ -98,12 +109,9 @@ class ImportProfits implements ToCollection, WithBatchInserts, WithChunkReading,
 
             DB::commit();
 
-            Cache::forget('jobs_processing');
         } catch (\Exception $e) {
             DB::rollBack();
 
-            Cache::forget('jobs_processing');
-            // Log or handle the exception as needed
             Log::error('Error processing the file: ' . $e->getMessage());
         }
     }
@@ -148,5 +156,31 @@ class ImportProfits implements ToCollection, WithBatchInserts, WithChunkReading,
             // Handle exception if date format is invalid
             return null; // Or handle as needed (e.g., return a default date or throw an error)
         }
+    }
+
+    /**
+     * Register the events.
+     *
+     * @return array
+     */
+    public function registerEvents(): array
+    {
+        return [
+            AfterImport::class => function(AfterImport $event) {
+                // Clear the cache after the import process
+                Cache::forget('jobs_processing');
+
+                // Create Notification
+                Notification::create([
+                    'description' => 'Profits has been imported successfully',
+                    'readStat' => 0,
+                    'user_id' => $this->userId,
+                ]);
+                // Delete the file from the file system
+                if (file_exists($this->filePath)) {
+                    unlink($this->filePath);
+                }
+            },
+        ];
     }
 }

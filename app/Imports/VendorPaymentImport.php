@@ -12,10 +12,21 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\WithCalculatedFormulas;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithStartRow;
+use Maatwebsite\Excel\Events\AfterImport;
+use App\Models\Notification;
 
-class VendorPaymentImport implements ToCollection, WithBatchInserts, WithChunkReading, ShouldQueue, WithStartRow, WithCalculatedFormulas
+class VendorPaymentImport implements ToCollection, WithBatchInserts, WithChunkReading, ShouldQueue, WithStartRow, WithCalculatedFormulas, WithEvents
 {
+    protected $filePath;
+    protected $userId;
+
+    public function __construct($filePath, String $userId)
+    {
+        $this->filePath = $filePath;
+        $this->userId = $userId;
+    }
     /**
     * @param Collection $collection
     */
@@ -90,5 +101,31 @@ class VendorPaymentImport implements ToCollection, WithBatchInserts, WithChunkRe
     public function startRow(): int
     {
         return 3;
+    }
+
+    /**
+     * Register the events.
+     *
+     * @return array
+     */
+    public function registerEvents(): array
+    {
+        return [
+            AfterImport::class => function(AfterImport $event) {
+                // Clear the cache after the import process
+                Cache::forget('jobs_processing');
+
+                // Create Notification
+                Notification::create([
+                    'description' => 'Vendor Payments has been imported successfully',
+                    'readStat' => 0,
+                    'user_id' => $this->userId,
+                ]);
+                // Delete the file from the file system
+                if (file_exists($this->filePath)) {
+                    unlink($this->filePath);
+                }
+            },
+        ];
     }
 }
