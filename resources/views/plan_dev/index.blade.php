@@ -147,7 +147,7 @@ font-weight-bold
                     <ul class="">
                         @foreach($regulations as $regulation)
                         <li>
-                            <a href="#">
+                            <a href="{{ route('preview-regulation', $regulation->id) }}">
                                 <div>
                                     <h3><i class="fa fa-info-circle mr-2"></i> {{ $regulation->description }}</h3>
                                     @php
