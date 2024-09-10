@@ -49,7 +49,7 @@ Route::middleware(['checkForErrors'])->group(function () {
 
 });
 
-Route::middleware('suspicious', 'auth')->group(function () {
+Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
     //Import data
     Route::post('/clear-toast-session', function () {
         Session::forget('loading-import');

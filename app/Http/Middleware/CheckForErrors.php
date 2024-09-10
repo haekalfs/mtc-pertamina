@@ -37,7 +37,7 @@ class CheckForErrors
                 DB::rollBack();
 
                 // Redirect back with the specific error message
-                return redirect()->back()->withInput()->withErrors(Session::get('failed'));
+                // return redirect()->back()->withInput()->withErrors(Session::get('failed'));
             } else {
                 // Commit the transaction
                 DB::commit();
@@ -57,7 +57,7 @@ class CheckForErrors
             Session::flash('failed', $exceptionMessage);
 
             // Redirect back with the exception message
-            return redirect()->back()->withInput()->withErrors($exceptionMessage);
+            // return redirect()->back()->withInput()->withErrors($exceptionMessage);
         }
     }
 }

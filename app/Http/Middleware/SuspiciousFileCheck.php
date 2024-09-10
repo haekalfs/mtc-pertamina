@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Exceptions\SuspiciousFileException;
 use Closure;
 use Illuminate\Http\Request;
 
@@ -31,7 +32,7 @@ class SuspiciousFileCheck
                     }
                 } else {
                     if ($this->isSuspicious($fileInput)) {
-                        abort(403, 'Suspicious file detected.');
+                        throw new SuspiciousFileException("YOU'RE NOT AUTHORIZED TO ACCESS THIS PAGE!");
                     }
                 }
             }
