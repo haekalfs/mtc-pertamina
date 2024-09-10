@@ -167,7 +167,8 @@
                     <li class="menu-item-has-children dropdown @yield('active-akhlak') @yield('show-akhlak')">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-star-half-empty"></i>Akhlak</a>
                         <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-akhlak')">
-                            <li><i class="menu-icon fa fa-tachometer"></i><a href="{{ route('akhlak.achievements') }}" class="@yield('akhlak')">Dashboard</a></li>
+                            <li><i class="ti-signal"></i><a href="{{ route('morning-briefing') }}" class="@yield('morning-briefing')">Morning Briefing</a></li>
+                            <li><i class="ti-stats-up"></i><a href="{{ route('akhlak.achievements') }}" class="@yield('akhlak')">Pencapaian AKHLAK</a></li>
                             <li><i class="fa fa-file"></i><a href="{{ route('report-akhlak') }}" class="@yield('report-akhlak')">Laporan</a></li>
                         </ul>
                     </li>

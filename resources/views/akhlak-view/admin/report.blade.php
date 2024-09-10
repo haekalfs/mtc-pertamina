@@ -53,23 +53,6 @@ font-weight-bold
     <strong>{{ $message }}</strong>
 </div>
 @endif
-<style>
-/* Form Labels */
-.modal-body label {
-    font-weight: bold;
-}
-
-/* Form Inputs */
-.modal-body input[type="text"], .modal-body input[type="date"] {
-    margin-bottom: 10px;
-}
-
-/* Radio Buttons */
-.radio-inline {
-    margin-right: 50px;
-}
-
-</style>
 <div class="animated fadeIn zoom90">
     <div class="row">
         <div class="col-md-12">
@@ -160,15 +143,21 @@ font-weight-bold
                         </table>
                     </div>
                     <hr style="border-top: 3px solid rgb(197, 197, 197); margin-top:-1%;">
-                    <h2 class="text-center my-4 font-weight-bold">SUMMARY</h2>
-                    <div class="row">
+                    <h3 class="text-center my-4 font-weight-bold">Summary Akhlak Report</h3>
+                    <ul class="ml-4">
+                        <li>Review the overall and specific user charts to ensure alignment with Akhlak BUMN values.</li>
+                        <li>Ensure that all user data is presented accurately and reflects the principles of integrity and professionalism.</li>
+                        <li>Unauthorized changes to user performance data or charts are not permitted to maintain data accuracy.</li>
+                        <li>Thoroughly verify all data visualizations for accuracy and completeness before finalizing any reports or updates.</li>
+                    </ul>
+                    <div class="row pt-4">
                         <div class="col-md-6">
                             @if($userSelected)
                             <section class="card shadow-none" style="border: 1px solid grey;">
                                 <div class="card-header bg-login alt mb-4 p-4" style="background-image: url('{{ asset('img/kilang-minyak.png') }}');">
                                     <div class="media">
                                         <a href="#">
-                                            <img class="align-self-center rounded-circle mr-3" style="width:85px; height:85px;" alt="" src="{{ asset($userSelected->users_detail->profile_pic) }}">
+                                            <img class="align-self-center rounded-circle mr-3" style="width:85px; height:85px;" alt="" src="{{ url($userSelected->users_detail->profile_pic) }}">
                                         </a>
                                         <div class="media-body">
                                             <h3 class="text-white display-6 mt-1">{{ $userSelected->name }}</h3>
@@ -217,10 +206,10 @@ font-weight-bold
                             <p>Please select data in search report section...</p>
                             @endif
                         </div>
-                        <div class="col-md-6" id="charts">
+                        <div class="col-md-6">
                             <div class="card shadow-none">
                                 <div class="row">
-                                    <div class="col-lg-12">
+                                    <div class="col-lg-12" id="charts">
                                         <div class="card-body d-flex justify-content-center align-items-center">
                                             <canvas id="radarChart" style="max-width: 100%; height: 500px; margin: auto;"></canvas>
                                         </div>
@@ -229,42 +218,45 @@ font-weight-bold
                             </div>
                         </div>
                     </div>
-                    <h2 class="text-center my-4 font-weight-bold">ACTIVITY REPORT</h2>
-                    <table class="table table-bordered">
-                        <thead class="thead-light">
-                            <tr>
-                                <th>Core Value</th>
-                                <th>Nilai Akhlak</th>
-                                <th>Average Score (%)</th>
-                                <th>Quarter</th>
-                                <th>Periode</th>
+                    <h3 class="text-center my-4 font-weight-bold">Average Score (Quarterly)</h3>
+                    <table class="table table-bordered mb-4">
+                        <thead class="text-white">
+                            <tr class="thead-light">
+                                <th class="" rowspan="2" style="vertical-align: middle; text-align: center;">Core Values</th>
+                                <th class="text-center" colspan="4">{{ $yearSelected ? $yearSelected : 'Periode' }}</th>
+                            </tr>
+                            <tr class="thead-light">
+                                <th class="text-center">Quarter 1</th>
+                                <th class="text-center">Quarter 2</th>
+                                <th class="text-center">Quarter 3</th>
+                                <th class="text-center">Quarter 4</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @if($pencapaianResults->isEmpty())
+                            @if(!$pencapaianByAkhlak || $pencapaianByAkhlak->isEmpty())
                                 <tr class="text-center">
-                                    <td colspan="5">No Data Available</td> <!-- Use colspan to span across the entire row -->
+                                    <td colspan="5">No Data Available</td>
                                 </tr>
                             @else
-                            @foreach ($pencapaianResults as $item)
-                            <tr>
-                                <td>{{ $item->akhlak->indicator }}</td>
-                                <td>{{ $item->nilai_description }}</td>
-                                <td>{{ $item->average_score }} %</td>
-                                <td>{{ $item->quarter->quarter_name }}</td>
-                                <td>{{ $item->periode }}</td>
-                            </tr>
-                            @endforeach
+                                @foreach($pencapaianByAkhlak as $akhlakId => $quarters)
+                                    <tr>
+                                        <td class="font-weight-bold">{{ $quarters->first()->akhlak->indicator }}</td>
+                                        <td>{{ $quarters->firstWhere('quarter_id', 1)->nilai_description ?? '-' }}</td>
+                                        <td>{{ $quarters->firstWhere('quarter_id', 2)->nilai_description ?? '-' }}</td>
+                                        <td>{{ $quarters->firstWhere('quarter_id', 3)->nilai_description ?? '-' }}</td>
+                                        <td>{{ $quarters->firstWhere('quarter_id', 4)->nilai_description ?? '-' }}</td>
+                                    </tr>
+                                @endforeach
                             @endif
                         </tbody>
                     </table>
-                    <h2 class="text-center my-4 font-weight-bold">DETAIL ACTIVITY</h2>
+                    <h3 class="text-center my-4 font-weight-bold">Detail Activities</h3>
                     <table class="table table-bordered">
                         <thead class="thead-light">
                             <tr>
                                 <th>Kegiatan</th>
                                 <th>Nilai Akhlak</th>
-                                <th>Score (%)</th>
+                                <th>Score</th>
                                 <th>Core Value</th>
                                 <th>Quarter</th>
                                 <th>Periode</th>
@@ -281,7 +273,7 @@ font-weight-bold
                             <tr>
                                 <th>{{ $item->judul_kegiatan }}</th>
                                 <td>{{ $item->scores->description }}</td>
-                                <td>{{ $item->scores->score }} %</td>
+                                <td>{{ $item->scores->score }}</td>
                                 <td>{{ $item->akhlak->indicator }}</td>
                                 <td>{{ $item->quarter->quarter_name }}</td>
                                 <td>{{ $item->periode }}</td>

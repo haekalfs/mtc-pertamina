@@ -421,11 +421,6 @@ class PDController extends Controller
         ]);
     }
 
-    public function upload_certificate()
-    {
-        return view('plan_dev.submenu.upload_certificate');
-    }
-
     public function regulation_store(Request $request)
     {
         // Validate the input

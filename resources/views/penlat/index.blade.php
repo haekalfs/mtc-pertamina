@@ -134,7 +134,7 @@ font-weight-bold
                     <div class="row no-gutters">
                         <div class="col-md-3 d-flex align-items-top justify-content-center text-center">
                             <label for="file-upload" style="cursor: pointer;">
-                                <img id="image-preview" src="https://via.placeholder.com/50x50/5fa9f8/ffffff" style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
+                                <img id="image-preview" src="{{ asset('img/default-img.png') }}" style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
                                      <small style="font-size: 10px;"><i><u>Click above to upload image!</u></i></small>
                             </label>
                             <input id="file-upload" type="file" name="display" style="display: none;" accept="image/*" onchange="previewImage(event)">
@@ -206,7 +206,7 @@ font-weight-bold
                     <div class="row no-gutters">
                         <div class="col-md-3 d-flex align-items-top justify-content-center text-center">
                             <label for="edit-file-upload" style="cursor: pointer;">
-                                <img id="edit-image-preview" src="https://via.placeholder.com/50x50/5fa9f8/ffffff" style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
+                                <img id="edit-image-preview" src="{{ asset('img/default-img.png') }}" style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
                                      <small style="font-size: 10px;"><i><u>Click above to upload image!</u></i></small>
                             </label>
                             <input id="edit-file-upload" type="file" name="display" style="display: none;" accept="image/*" onchange="previewEditImage(event)">

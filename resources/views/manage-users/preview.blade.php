@@ -54,7 +54,7 @@ font-weight-bold
                     <div class="media ml-4">
                         <a href="#">
                             @if($data->users_detail->profile_pic)
-                            <img class="align-self-center rounded-circle mr-3" style="width:85px; height:85px;" alt="" src="{{ $data->users_detail->profile_pic ? asset($data->users_detail->profile_pic) : 'https://via.placeholder.com/150x150/5fa9f8/ffffff' }}">
+                            <img class="align-self-center rounded-circle mr-3" style="width:85px; height:85px;" alt="" src="{{ $data->users_detail->profile_pic ? asset($data->users_detail->profile_pic) : asset('img/default-img.png') }}">
                             @else
                             <div class="align-self-center rounded-circle mr-3"><i class="no-image-text">No Image Available</i></div>
                             @endif

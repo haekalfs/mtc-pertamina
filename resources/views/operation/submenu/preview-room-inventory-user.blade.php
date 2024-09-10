@@ -61,7 +61,7 @@ font-weight-bold
                 <div class="col-md-12 mb-3">
                     <div class="row">
                         <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding-left: 1em;">
-                            <img src="{{ $data->filepath ? asset($data->filepath) : 'https://via.placeholder.com/50x50/5fa9f8/ffffff' }}" style="height: 150px; width: 200px; border-radius: 15px;" class="card-img" alt="...">
+                            <img src="{{ $data->filepath ? asset($data->filepath) : asset('img/default-img.png') }}" style="height: 150px; width: 200px; border-radius: 15px;" class="card-img" alt="...">
                         </div>
                         <div class="col-md-8">
                             <table class="table table-borderless table-sm">

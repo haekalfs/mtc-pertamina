@@ -26,8 +26,8 @@ class InstructorController extends Controller
             'pendukung'         => 'sometimes',
             'working_hour'      => 'required',
             'ijazah'            => 'required',
-            'certificates'      => 'required',
-            'certificates.*'    => 'required',
+            'certificates'      => 'sometimes',
+            'certificates.*'    => 'sometimes',
         ]);
 
         // Create the instructor
@@ -113,8 +113,8 @@ class InstructorController extends Controller
             'ijazahFilepath'    => 'nullable|mimes:pdf,doc,docx', // Adjust according to allowed Ijazah formats
             'documentPendukungFilepath' => 'sometimes',
             'working_hour'      => 'required',
-            'certificates'      => 'required|array',
-            'certificates.*'    => 'required|integer',
+            'certificates'      => 'sometimes|array',
+            'certificates.*'    => 'sometimes|integer',
         ]);
 
         // Find the instructor by ID

@@ -65,7 +65,7 @@ font-weight-bold
         <div class="col-md-12">
             <div class="card shadow">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> List Data</h6>
+                    <h6 class="m-0 font-weight-bold text-secondary" id="judul">List Data</h6>
                     <div class="text-right">
                         <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Register Regulation</a>
                     </div>
@@ -81,17 +81,17 @@ font-weight-bold
                             <tbody class="mt-2">
                                 @foreach($data as $item)
                                 <tr>
-                                    <td>
-                                        <div class="card mb-3 shadow">
-                                            <div class="card-body custom-card">
+                                    <td class="">
+                                        <div class="card mb-3">
+                                            <div class="card-body custom-card" style="position: relative;">
+                                                <a href="{{ route('preview-regulation', $item->id) }}" class="position-absolute" style="top: 10px; right: 10px; z-index: 10;">
+                                                    <i class="fa fa-edit fa-lg text-secondary"></i>
+                                                </a>
                                                 <div class="row no-gutters">
-                                                    <div class="col-md-10 mt-2">
+                                                    <div class="col-md-12 mt-2">
                                                         <h5 class="card-title text-secondary font-weight-bold">{{ $item->description }}</h5>
                                                         <p>Status : <span class="badge {{ $item->statuses->badge }}">{{ $item->statuses->description }}</span></p>
                                                         <a href="{{ asset($item->filepath) }}" class="card-text"><u>Lampiran Dokumen</u> <i class="fa fa-external-link fa-sm"></i> <small>{{ $item->filesize }} Kb</small></a>
-                                                    </div>
-                                                    <div class="col-md-2 d-flex align-items-center justify-content-end pr-3 zoom90">
-                                                        <a class="btn btn-outline-secondary btn-sm" href="{{ route('preview-regulation', $item->id) }}"><i class="menu-Logo fa fa-eye"></i> View Detail</a>
                                                     </div>
                                                 </div>
                                             </div>

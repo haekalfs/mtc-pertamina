@@ -79,8 +79,36 @@ class FinanceController extends Controller
 
     public function getChartDataProfits($year)
     {
+        $dataByQuarter = Profit::select(
+            DB::raw('QUARTER(tgl_pelaksanaan) as quarter'),
+            DB::raw('YEAR(tgl_pelaksanaan) as year'),
+            DB::raw('sum(profit) as total')
+        )
+        ->whereYear('tgl_pelaksanaan', $year)
+        ->groupBy('year', 'quarter')
+        ->get();
+
+        $dataPointsSpline = [];
+
+        foreach ($dataByQuarter as $row) {
+            // Generate label for each quarter and year
+            $label = "Q" . $row->quarter . " " . $row->year;
+
+            $dataPointsSpline[] = [
+                "label" => $label, // Use this for x-axis label
+                "y" => (float) $row->total // Ensure y-value is a float
+            ];
+        }
+
+        return response()->json([
+            'profitDataPoints' => $dataPointsSpline
+        ]);
+    }
+
+    public function getComparisonChartData($year, $secondYear)
+    {
         $currentYear = $year;
-        $previousYear = $year - 1;
+        $previousYear = $secondYear;
 
         // Initialize an array of month names
         $months = [
@@ -126,31 +154,9 @@ class FinanceController extends Controller
         $dataPointsCurrentYear = array_values($dataPointsCurrentYear);
         $dataPointsPreviousYear = array_values($dataPointsPreviousYear);
 
-        $dataByQuarter = Profit::select(
-            DB::raw('QUARTER(tgl_pelaksanaan) as quarter'),
-            DB::raw('YEAR(tgl_pelaksanaan) as year'),
-            DB::raw('sum(profit) as total')
-        )
-        ->whereYear('tgl_pelaksanaan', $year)
-        ->groupBy('year', 'quarter')
-        ->get();
-
-        $dataPointsSpline = [];
-
-        foreach ($dataByQuarter as $row) {
-            // Generate label for each quarter and year
-            $label = "Q" . $row->quarter . " " . $row->year;
-
-            $dataPointsSpline[] = [
-                "label" => $label, // Use this for x-axis label
-                "y" => (float) $row->total // Ensure y-value is a float
-            ];
-        }
-
         return response()->json([
             'dataPointsCurrentYear' => $dataPointsCurrentYear,
-            'dataPointsPreviousYear' => $dataPointsPreviousYear,
-            'profitDataPoints' => $dataPointsSpline
+            'dataPointsPreviousYear' => $dataPointsPreviousYear
         ]);
     }
 
@@ -450,7 +456,8 @@ class FinanceController extends Controller
      */
     protected function getUtilityUsageData($dataBatch)
     {
-        return Penlat_utility_usage::whereIn('penlat_batch_id', $dataBatch)
+        // Fetch all utility usage data based on the batch
+        $utilityData = Penlat_utility_usage::whereIn('penlat_batch_id', $dataBatch)
             ->get()
             ->groupBy('utility_id')
             ->map(function ($group) {
@@ -463,6 +470,15 @@ class FinanceController extends Controller
                     'total' => $group->sum('total')
                 ];
             });
+
+        // Calculate the grandTotal across all items
+        $grandTotal = Penlat_utility_usage::whereIn('penlat_batch_id', $dataBatch)->sum('total');
+
+        // Return the utility data with the grand total
+        return [
+            'utilityData' => $utilityData,
+            'grandTotal' => $grandTotal
+        ];
     }
 
     public function profits_import()
@@ -478,18 +494,23 @@ class FinanceController extends Controller
         }
         $item = Profit::where('pelaksanaan', $utility->batch)->first();
 
+        // Profits value
+        $profits = (float) $item->profit;
+
         $dataPoints = [
-            ['label' => 'Profits', 'y' => (float) $item->profit],
-            ['label' => 'Biaya Instruktur', 'y' => (float) $item->biaya_instruktur],
-            ['label' => 'Total PNBP', 'y' => (float) $item->total_pnbp],
-            ['label' => 'Biaya Transportasi', 'y' => (float) $item->biaya_transportasi_hari],
-            ['label' => 'Penagihan Foto', 'y' => (float) $item->penagihan_foto],
-            ['label' => 'Penagihan ATK', 'y' => (float) $item->penagihan_atk],
-            ['label' => 'Penagihan Snack', 'y' => (float) $item->penagihan_snack],
-            ['label' => 'Penagihan Makan Siang', 'y' => (float) $item->penagihan_makan_siang],
-            ['label' => 'Penggunaan Utilitas', 'y' => (float) $item->penlat_usage],
-            ['label' => 'Penagihan Laundry', 'y' => (float) $item->penagihan_laundry],
+            ['label' => 'Biaya Instruktur', 'y' => ((float) $item->biaya_instruktur / $profits) * 100],
+            ['label' => 'Total PNBP', 'y' => ((float) $item->total_pnbp / $profits) * 100],
+            ['label' => 'Biaya Transportasi', 'y' => ((float) $item->biaya_transportasi_hari / $profits) * 100],
+            ['label' => 'Penagihan Foto', 'y' => ((float) $item->penagihan_foto / $profits) * 100],
+            ['label' => 'Penagihan ATK', 'y' => ((float) $item->penagihan_atk / $profits) * 100],
+            ['label' => 'Penagihan Snack', 'y' => ((float) $item->penagihan_snack / $profits) * 100],
+            ['label' => 'Penagihan Makan Siang', 'y' => ((float) $item->penagihan_makan_siang / $profits) * 100],
+            ['label' => 'Penggunaan Utilitas', 'y' => ((float) $item->penlat_usage / $profits) * 100],
+            ['label' => 'Penagihan Laundry', 'y' => ((float) $item->penagihan_laundry / $profits) * 100],
         ];
-        return view('finance.submenu.preview_costs', ['data' => $utility, 'item' => $item, 'dataPoints' => $dataPoints]);
+
+        // Profits value to display below the chart
+        $profitsValue = $profits;
+        return view('finance.submenu.preview_costs', ['data' => $utility, 'item' => $item, 'dataPoints' => $dataPoints, 'profitsValue' => $profitsValue]);
     }
 }

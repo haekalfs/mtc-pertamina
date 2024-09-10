@@ -64,7 +64,7 @@ class AkhlakController extends Controller
 
             // Find the corresponding nilai_akhlak description based on the average score
             $nilai = $nilaiAkhlakRanges->filter(function ($range) use ($averageScore) {
-                return $averageScore >= $range->score;
+                return $averageScore <= $range->score;
             })->first();
 
             $result->nilai_description = $nilai ? $nilai->description : 'Unknown';
@@ -99,7 +99,7 @@ class AkhlakController extends Controller
 
             // Find the corresponding nilai_akhlak description based on the average score
             $nilaiGeneral = $nilaiAkhlakRangesGeneral->filter(function ($range) use ($averageScore) {
-                return $averageScore >= $range->score;
+                return $averageScore <= $range->score;
             })->first();
 
             $result->nilai_description = $nilaiGeneral ? $nilaiGeneral->description : 'Unknown';
@@ -200,18 +200,19 @@ class AkhlakController extends Controller
 
         // Query to get User Pencapaian Akhlak with filters
         $pencapaianQuery = User_pencapaian_akhlak::selectRaw('akhlak_id, quarter_id, periode, AVG(nilai_akhlak.score) as average_score')
-            ->join('nilai_akhlak', 'user_pencapaian_akhlak.score', '=', 'nilai_akhlak.id')
-            ->with(['akhlak', 'user', 'quarter'])
-            ->groupBy('akhlak_id', 'quarter_id', 'periode');
+        ->join('nilai_akhlak', 'user_pencapaian_akhlak.score', '=', 'nilai_akhlak.id')
+        ->with(['akhlak', 'user', 'quarter'])
+        ->groupBy('akhlak_id', 'quarter_id', 'periode');
 
         $userSelected = User::find($userId);
+
         // Apply filters
         if ($userId != -1) {
-            $pencapaianQuery->where('user_pencapaian_akhlak.user_id', $userId);
+        $pencapaianQuery->where('user_pencapaian_akhlak.user_id', $userId);
         }
 
         if ($year != -1) {
-            $pencapaianQuery->where('periode', $year);
+        $pencapaianQuery->where('periode', $year);
         }
 
         $pencapaianResults = $pencapaianQuery->get();
@@ -220,15 +221,18 @@ class AkhlakController extends Controller
         $nilaiAkhlakRanges = Nilai::all();
 
         foreach ($pencapaianResults as $result) {
-            $averageScore = $result->average_score;
+        $averageScore = $result->average_score;
 
-            // Find the corresponding nilai_akhlak description based on the average score
-            $nilai = $nilaiAkhlakRanges->filter(function ($range) use ($averageScore) {
-                return $averageScore >= $range->score;
-            })->first();
+        // Find the corresponding nilai_akhlak description based on the average score
+        $nilai = $nilaiAkhlakRanges->filter(function ($range) use ($averageScore) {
+            return $averageScore <= $range->score;
+        })->first();
 
-            $result->nilai_description = $nilai ? $nilai->description : 'Unknown';
+        $result->nilai_description = $nilai ? $nilai->description : 'Unknown';
         }
+
+        // Group by Akhlak to avoid duplicating the Indicator
+        $pencapaianByAkhlak = $pencapaianResults->groupBy('akhlak_id');
 
         // Query to group by akhlak_id and periode for the general summary with filters
         $generalPencapaianQuery = User_pencapaian_akhlak::selectRaw('akhlak_id, periode, AVG(nilai_akhlak.score) as average_score')
@@ -255,7 +259,7 @@ class AkhlakController extends Controller
 
             // Find the corresponding nilai_akhlak description based on the average score
             $nilaiGeneral = $nilaiAkhlakRangesGeneral->filter(function ($range) use ($averageScore) {
-                return $averageScore >= $range->score;
+                return $averageScore <= $range->score;
             })->first();
 
             $result->nilai_description = $nilaiGeneral ? $nilaiGeneral->description : 'Unknown';
@@ -282,7 +286,7 @@ class AkhlakController extends Controller
             'akhlakPoin' => $akhlakPoin,
             'users' => $users,
             'nilaiList' => $nilaiList,
-            'pencapaianResults' => $pencapaianResults,
+            'pencapaianByAkhlak' => $pencapaianByAkhlak,
             'generalPencapaianResults' => $generalPencapaianResults,
             'yearsBefore' => $yearsBefore,
             'userSelectedOpt' => $userId,
@@ -304,40 +308,43 @@ class AkhlakController extends Controller
         // Capture the filter inputs
         $userId = $request->input('userId') ?? '-1';
         $year = $request->input('year') ?? $nowYear;
+        $chartImage = $request->input('chartImage'); // Get the chart image data from the request
 
         // Query to get User Pencapaian Akhlak with filters
         $pencapaianQuery = User_pencapaian_akhlak::selectRaw('akhlak_id, quarter_id, periode, AVG(nilai_akhlak.score) as average_score')
-            ->join('nilai_akhlak', 'user_pencapaian_akhlak.score', '=', 'nilai_akhlak.id')
-            ->with(['akhlak', 'user', 'quarter'])
-            ->groupBy('akhlak_id', 'quarter_id', 'periode');
+        ->join('nilai_akhlak', 'user_pencapaian_akhlak.score', '=', 'nilai_akhlak.id')
+        ->with(['akhlak', 'user', 'quarter'])
+        ->groupBy('akhlak_id', 'quarter_id', 'periode');
 
         $userSelected = User::find($userId);
 
         // Apply filters
         if ($userId != -1) {
-            $pencapaianQuery->where('user_pencapaian_akhlak.user_id', $userId);
+        $pencapaianQuery->where('user_pencapaian_akhlak.user_id', $userId);
         }
 
         if ($year != -1) {
-            $pencapaianQuery->where('periode', $year);
+        $pencapaianQuery->where('periode', $year);
         }
 
         $pencapaianResults = $pencapaianQuery->get();
 
-        $chartImage = $request->input('chartImage'); // Get the chart image data from the request
         // Fetch all Nilai Akhlak ranges
         $nilaiAkhlakRanges = Nilai::all();
 
         foreach ($pencapaianResults as $result) {
-            $averageScore = $result->average_score;
+        $averageScore = $result->average_score;
 
-            // Find the corresponding nilai_akhlak description based on the average score
-            $nilai = $nilaiAkhlakRanges->filter(function ($range) use ($averageScore) {
-                return $averageScore >= $range->score;
-            })->first();
+        // Find the corresponding nilai_akhlak description based on the average score
+        $nilai = $nilaiAkhlakRanges->filter(function ($range) use ($averageScore) {
+            return $averageScore >= $range->score;
+        })->first();
 
-            $result->nilai_description = $nilai ? $nilai->description : 'Unknown';
+        $result->nilai_description = $nilai ? $nilai->description : 'Unknown';
         }
+
+        // Group by Akhlak to avoid duplicating the Indicator
+        $pencapaianByAkhlak = $pencapaianResults->groupBy('akhlak_id');
 
         // Query to group by akhlak_id and periode for the general summary with filters
         $generalPencapaianQuery = User_pencapaian_akhlak::selectRaw('akhlak_id, periode, AVG(nilai_akhlak.score) as average_score')
@@ -366,16 +373,26 @@ class AkhlakController extends Controller
         }
 
         $allPencapaian = User_pencapaian_akhlak::where('periode', $year)->where('user_id', $userId)->get();
+        $userProfilePic = public_path($userSelected->users_detail->profile_pic);
+
+        if (file_exists($userProfilePic)) {
+            $userProfilePicBase64 = base64_encode(file_get_contents($userProfilePic));
+            $mime = mime_content_type($userProfilePic);
+            $imageSrc = 'data:' . $mime . ';base64,' . $userProfilePicBase64;
+        } else {
+            $imageSrc = '';  // Handle cases where the image file doesn't exist
+        }
         // Create a view for the PDF using compact
         $pdfView = view('akhlak-view.laporan.pdf', compact(
-            'pencapaianResults',
+            'pencapaianByAkhlak',
             'generalPencapaianResults',
             'yearsBefore',
             'userId',   // Rename 'userSelectedOpt' to 'userId' for compact
             'userSelected',
             'year',
             'chartImage',
-            'allPencapaian'
+            'allPencapaian',
+            'imageSrc'
         ))->render();
 
         // Set options and create the PDF

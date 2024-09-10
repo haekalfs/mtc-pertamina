@@ -172,7 +172,62 @@ active font-weight-bold
     </div>
     <!-- /Widgets -->
     <!--  Traffic  -->
+
     <div class="row">
+        <div class="col-xl-4 col-md-4 zoom90">
+            <div class="card">
+                <div class="col-md-12 sidebar-two">
+                    <h2>Regulations</h2>
+                    <ul class="">
+                        @foreach($regulations as $regulation)
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <h3><i class="fa fa-info-circle mr-2"></i> {{ $regulation->description }}</h3>
+                                    @php
+                                        $created_at = \Carbon\Carbon::parse($regulation->created_at);
+                                        $now = \Carbon\Carbon::now();
+                                        $diffInDays = $created_at->diffInDays($now);
+                                    @endphp
+                                    <span>
+                                        @if($diffInDays < 7)
+                                            {{ $created_at->diffForHumans() }}
+                                        @else
+                                            a long time ago
+                                        @endif
+                                    </span>
+                                </div>
+                            </a>
+                        </li>
+                        @endforeach
+                    </ul>
+                </div>
+                <!-- Fix "Show More" to the right corner -->
+                <div class="text-right">
+                    <a class="btn btn-sm btn-default" href="{{ route('regulation') }}">
+                        <small>Show More...</small>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8 content card">
+            @if(!$morningBriefing || $morningBriefing->isEmpty())
+            <div class="desc mt-4">
+                <h1>No Data Available</h1>
+            </div>
+            @else
+            @foreach($morningBriefing->chunk(3) as $index => $chunk)
+                @foreach($chunk as $briefing)
+                <img style="width: 100%; height: 300px;" src="{{ asset($briefing->img_filepath) }}" alt="Main Image">
+                <div class="desc mt-4">
+                    <h1>{{ $briefing->briefing_name }}</h1>
+                    <p>{!! Str::limit($briefing->briefing_result, 1000, '...') !!}</p>
+                    <a class="mb-2 pt-0" href="{{ route('preview-briefing', $briefing->id) }}">Read more</a>
+                </div>
+                @endforeach
+            @endforeach
+            @endif
+        </div>
         <div class="col-xl-12 col-md-12 zoom90 mb-3">
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
@@ -194,12 +249,26 @@ active font-weight-bold
                                         <div class="row">
                                             @foreach($chunk as $hl)
                                             <div class="col-md-4 mb-1">
-                                                <div class="card" style=" border: 1px solid #e1e1e1;">
+                                                <div class="card" style="border: 1px solid #e1e1e1;">
                                                     <img class="img-fluid" alt="100%x280" style="max-height: 200px;" src="{{ asset($hl->img_filepath) }}">
+                                                    @php
+                                                        $created_athl = \Carbon\Carbon::parse($hl->created_at);
+                                                        $nowhl = \Carbon\Carbon::now();
+                                                        $diffInDayshl = $created_athl->diffInDays($nowhl);
+                                                    @endphp
                                                     <div class="card-body">
                                                         <h4 class="card-title">{{ $hl->campaign_name }}</h4>
                                                         <div class="card-text short-news mb-3">{!! Str::limit($hl->campaign_result, 300, '...') !!}</div>
-                                                        <a class="btn btn-secondary btn-sm read-more-button" href="{{ route('preview-campaign', $hl->id) }}">Read More</a>
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            <span>
+                                                                @if($diffInDayshl < 7)
+                                                                    {{ $created_athl->diffForHumans() }}
+                                                                @else
+                                                                    a long time ago
+                                                                @endif
+                                                            </span>
+                                                            <a class="btn btn-secondary btn-sm read-more-button" href="{{ route('preview-campaign', $hl->id) }}">Read More</a>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>

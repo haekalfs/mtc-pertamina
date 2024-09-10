@@ -146,8 +146,8 @@ font-weight-bold
                             </tr>
                         </thead>
                         <tbody>
-                            @if($listUtilities->isNotEmpty())
-                                @foreach($listUtilities as $tool)
+                            @if(!empty($listUtilities['utilityData']) && $listUtilities['utilityData']->isNotEmpty())
+                                @foreach($listUtilities['utilityData'] as $tool)
                                     <tr>
                                         <td data-th="Product">
                                             <div class="row">
@@ -178,6 +178,9 @@ font-weight-bold
                             @endif
                         </tbody>
                     </table>
+                    <div class="text-right mt-3">
+                        <p>Total : {{ $listUtilities['grandTotal'] ? 'Rp ' . number_format($listUtilities['grandTotal'], 0, ',', '.') : '-' }}</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -215,7 +218,7 @@ font-weight-bold
                     <div class="row no-gutters mb-3">
                         <div class="col-md-3 d-flex align-items-top justify-content-center text-center">
                             <label for="file-upload" style="cursor: pointer;">
-                                <img id="image-preview" src="https://via.placeholder.com/50x50/5fa9f8/ffffff"
+                                <img id="image-preview" src="{{ asset('img/default-img.png') }}"
                                      style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
                                      <small style="font-size: 10px;"><i><u>Click above to upload image!</u></i></small>
                             </label>

@@ -245,31 +245,6 @@ font-weight-bold
                 </div>
             </div>
         </div>
-        <div class="col-md-12">
-            <div class="card">
-                <div class="row">
-                    <div class="col-lg-12 d-flex justify-content-end align-items-end">
-                        <select class="form-control mt-3 mr-4 zoom90" id="chartPeriode" name="chartPeriode" style="width: 150px;">
-                            <option value="-1" selected disabled>Select Periode...</option>
-                        </select>
-                    </div>
-                    <div class="col-lg-12">
-                        <div class="card-body d-flex justify-content-center align-items-center">
-                            <div id="chartContainerSpline" style="height: 370px; width: 100%;"></div>
-                        </div>
-                    </div>
-                </div> <!-- /.row -->
-            </div>
-            <div class="card">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="card-body d-flex justify-content-center align-items-center">
-                            <div id="stackedArea" style="height: 370px; width: 100%;"></div>
-                        </div>
-                    </div>
-                </div> <!-- /.row -->
-            </div>
-        </div>
     </div>
 </div>
 <script>
@@ -279,116 +254,25 @@ window.onload = function () {
 
     // Populate the dropdowns with the current year as default
     var summaryPeriodeDropdown = document.getElementById("summaryPeriode");
-    var chartPeriodeDropdown = document.getElementById("chartPeriode");
 
     // Populate both dropdowns with options from current year and previous years
     for (var year = currentYear; year >= currentYear - 4; year--) {
         var summaryOption = new Option(year, year);
-        var chartOption = new Option(year, year);
         summaryPeriodeDropdown.add(summaryOption);
-        chartPeriodeDropdown.add(chartOption);
     }
 
     // Set default selected value to current year
     summaryPeriodeDropdown.value = currentYear;
-    chartPeriodeDropdown.value = currentYear;
 
     // Auto-load summary and chart data based on the default selected year
     loadSummaryData(currentYear);
-    loadChartData(currentYear);
 
     // Add event listener to dropdowns for future changes
     summaryPeriodeDropdown.addEventListener("change", function() {
         var selectedOption = summaryPeriodeDropdown.value;
         loadSummaryData(selectedOption);
     });
-
-    chartPeriodeDropdown.addEventListener("change", function() {
-        var selectedOption = chartPeriodeDropdown.value;
-        loadChartData(selectedOption); // Load chart data whenever the dropdown changes
-    });
 };
-function loadChartData(value) {
-    var selectedOption = value;
-    if(selectedOption != '-1'){
-        var selectedYear = selectedOption;
-    } else {
-        var selectedYear = '';
-    }
-    fetch('/api/chart-data-profits/' + selectedOption)
-        .then(response => response.json())
-        .then(data => {
-            var chart = new CanvasJS.Chart("stackedArea", {
-                animationEnabled: true,
-                title: {
-                    text: "Comparison of Profits: " + selectedYear + " vs Previous Year"
-                },
-                axisX: {
-                    interval: 1,
-                    labelFormatter: function(e) {
-                        return e.label; // Use the label provided in the data points
-                    }
-                },
-                axisY: {
-                    includeZero: true,
-                    title: "Profits",
-                    prefix: "Rp",
-                    labelFormatter: function(e) {
-                        return CanvasJS.formatNumber(e.value, "#,##0");
-                    }
-                },
-                toolTip: {
-                    shared: true
-                },
-                legend: {
-                    cursor: "pointer",
-                    itemclick: toggleDataSeries
-                },
-                data: [
-                    {
-                        type: "stackedArea",
-                        name: "Current Year",
-                        showInLegend: true,
-                        yValueFormatString: "#,##0 Rupiah",
-                        dataPoints: data.dataPointsCurrentYear
-                    },
-                    {
-                        type: "stackedArea",
-                        name: "Previous Year",
-                        showInLegend: true,
-                        yValueFormatString: "#,##0 Rupiah",
-                        dataPoints: data.dataPointsPreviousYear
-                    }
-                ]
-            });
-            chart.render();
-
-            var chartProfit = new CanvasJS.Chart("chartContainerSpline", {
-                animationEnabled: true,
-                zoomEnabled: true,
-                theme: "light2",
-                title: { text: "Data Profits (Quarterly)" },
-                axisX: {
-                    interval: 1, // Ensure one label per point
-                    labelAngle: -45 // Rotate labels if necessary to fit
-                },
-                axisY: {
-                    includeZero: true
-                },
-                data: [{
-                    type: "column",
-                    color: "#6599FF",
-                    yValueFormatString: "#,##0 Rupiah",
-                    dataPoints: data.profitDataPoints // Use the updated data points with label and y values
-                }]
-            });
-            chartProfit.render();
-        });
-    function toggleDataSeries(e) {
-        e.dataSeries.visible = typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible;
-        chart.render();
-    }
-}
 
 function loadSummaryData(value) {
     var selectedOption = value;

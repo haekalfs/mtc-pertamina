@@ -99,6 +99,9 @@ class CampaignController extends Controller
 
         // Check if the campaign exists
         if ($campaign) {
+            if ($campaign->img_filepath && file_exists(public_path($campaign->img_filepath))) {
+                unlink(public_path($campaign->img_filepath));
+            }
             // Delete the campaign
             $campaign->delete();
 

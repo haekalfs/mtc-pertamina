@@ -106,10 +106,24 @@ font-weight-bold
                                             <div class="col-md-4 mb-1">
                                                 <div class="card" style=" border: 1px solid #e1e1e1;">
                                                     <img class="img-fluid" alt="100%x280" style="max-height: 200px;" src="{{ asset($hl->img_filepath) }}">
+                                                    @php
+                                                        $created_athl = \Carbon\Carbon::parse($hl->created_at);
+                                                        $nowhl = \Carbon\Carbon::now();
+                                                        $diffInDayshl = $created_athl->diffInDays($nowhl);
+                                                    @endphp
                                                     <div class="card-body">
                                                         <h4 class="card-title">{{ $hl->campaign_name }}</h4>
                                                         <div class="card-text short-news mb-3">{!! Str::limit($hl->campaign_result, 300, '...') !!}</div>
-                                                        <a class="btn btn-secondary btn-sm read-more-button" href="{{ route('preview-campaign', $hl->id) }}">Read More</a>
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            <span>
+                                                                @if($diffInDayshl < 7)
+                                                                    {{ $created_athl->diffForHumans() }}
+                                                                @else
+                                                                    a long time ago
+                                                                @endif
+                                                            </span>
+                                                            <a class="btn btn-secondary btn-sm read-more-button" href="{{ route('preview-campaign', $hl->id) }}">Read More</a>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>

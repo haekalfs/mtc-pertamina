@@ -82,7 +82,7 @@ class PenlatController extends Controller
 
             return DataTables::of($dataBatch)
                 ->addColumn('display', function($item) {
-                    $imageUrl = $item->filepath ? asset($item->filepath) : 'https://via.placeholder.com/50x50/5fa9f8/ffffff';
+                    $imageUrl = $item->filepath ? asset($item->filepath) : asset('img/default-img.png');
                     return '<a href="' . route('preview-batch', $item->id) . '"><img src="' . $imageUrl . '" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow animateBox"></a>';
                 })
                 ->addColumn('nama_pelatihan', function($item) {
@@ -367,7 +367,7 @@ class PenlatController extends Controller
 
             return DataTables::of($data)
                 ->addColumn('display', function($item) {
-                    $imageUrl = $item->filepath ? asset($item->filepath) : 'https://via.placeholder.com/50x50/5fa9f8/ffffff';
+                    $imageUrl = $item->filepath ? asset($item->filepath) : asset('img/default-img.png');
                     return '<a href="' . route('preview-batch', $item->id) . '"><img src="' . $imageUrl . '" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow animateBox"></a>';
                 })
                 ->addColumn('nama_pelatihan', function($item) {

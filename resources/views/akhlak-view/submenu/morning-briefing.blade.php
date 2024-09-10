@@ -1,22 +1,22 @@
 @extends('layouts.main')
 
-@section('active-marketing')
+@section('active-akhlak')
 active font-weight-bold
 @endsection
 
-@section('show-marketing')
+@section('show-akhlak')
 show
 @endsection
 
-@section('marketing-campaign')
+@section('morning-briefing')
 font-weight-bold
 @endsection
 
 @section('content')
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
-        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-bullhorn"></i> Marketing Campaign</h1>
-        <p class="mb-4">Kegiatan Marketing MTC.</a></p>
+        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="ti-signal"></i> Morning Briefing</h1>
+        <p class="mb-4">Kegiatan Briefing MTC.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
     </div>
@@ -77,7 +77,7 @@ font-weight-bold
                     </div>
                 </div>
                 <div class="card-body">
-                    <form method="GET" action="{{ route('marketing-campaign') }}">
+                    <form method="GET" action="{{ route('morning-briefing') }}">
                         @csrf
                         <div class="row d-flex justify-content-right mb-4">
                             <div class="col-md-12">
@@ -123,19 +123,17 @@ font-weight-bold
                         <table id="dataTable" class="table table-borderless mt-4">
                             <thead class="text-center" style="display: none;">
                                 <tr>
-                                    <th>Kegiatan Marketing</th>
+                                    <th>Kegiatan Briefing</th>
                                 </tr>
                             </thead>
                             <tbody class="mt-4 zoom90">
                                 @foreach($data as $item)
                                 <tr>
                                     <td>
-                                        <div class="card custom-card mb-3 bg-white" style="position: relative;">
-                                            <!-- Edit Icon in the Top Right Corner -->
-                                            <a href="{{ route('preview-campaign', $item->id) }}" class="position-absolute" style="top: 12px; right: 12px; z-index: 12; font-size: 20px;"">
+                                        <div class="card custom-card mb-3 bg-white shadow" style="position: relative;">
+                                            <a href="{{ route('preview-briefing', $item->id) }}" class="position-absolute" style="top: 12px; right: 12px; z-index: 12; font-size: 20px;">
                                                 <i class="fa fa-edit fa-lg text-secondary"></i>
                                             </a>
-
                                             <div class="row no-gutters">
                                                 <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding: 2em;">
                                                     <img src="{{ asset($item->img_filepath ? $item->img_filepath : 'img/default-img.png') }}" style="height: 150px; width: 250px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
@@ -143,14 +141,14 @@ font-weight-bold
                                                 <div class="col-md-9 mt-2">
                                                     <div class="card-body text-secondary">
                                                         <div>
-                                                            <h4 class="card-title font-weight-bold">{{ $item->campaign_name }}</h4>
+                                                            <h4 class="card-title font-weight-bold">{{ $item->briefing_name }}</h4>
                                                             <ul class="ml-3">
-                                                                <li class="card-text"><span class="font-weight-bold">Informasi Kegiatan</span> : {{ $item->campaign_details }}</li>
+                                                                <li class="card-text"><span class="font-weight-bold">Informasi Kegiatan</span> : {{ $item->briefing_details }}</li>
                                                                 <li class="card-text"><span class="font-weight-bold">PIC</span> : {{ $item->user_id }}</li>
                                                                 <li class="card-text"><span class="font-weight-bold">Tgl Pelaksanaan</span> : {{ $item->date }}</li>
                                                                 <li class="card-text">
                                                                     <span class="font-weight-bold">Hasil Kegiatan</span> : <br>
-                                                                    {!! Str::limit($item->campaign_result, 400, '...') !!}
+                                                                    {!! Str::limit($item->briefing_result, 400, '...') !!}
                                                                 </li>
                                                             </ul>
                                                         </div>
@@ -179,7 +177,7 @@ font-weight-bold
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="post" enctype="multipart/form-data" action="{{ route('campaign.store') }}">
+            <form method="post" enctype="multipart/form-data" action="{{ route('briefing.store') }}">
                 @csrf
                 <div class="modal-body mr-2 ml-2">
                     <div class="row no-gutters">

@@ -13,6 +13,7 @@ use App\Http\Controllers\InventoryToolController;
 use App\Http\Controllers\KpiController;
 use App\Http\Controllers\ManageAccessController;
 use App\Http\Controllers\MarketingController;
+use App\Http\Controllers\MorningBriefingController;
 use App\Http\Controllers\MyProfileController;
 use App\Http\Controllers\OperationController;
 use App\Http\Controllers\PDController;
@@ -59,6 +60,7 @@ Route::middleware('suspicious', 'auth')->group(function () {
     Route::middleware(['throttle:chart-data'])->group(function () {
         Route::get('/api/chart-data/{year}', [OperationController::class, 'getChartData']);
         Route::get('/api/chart-data-profits/{year}', [FinanceController::class, 'getChartDataProfits']);
+        Route::get('/api/comparison-chart-data-profits/{year}/{secondYear}', [FinanceController::class, 'getComparisonChartData']);
         Route::get('/api/summary-data-profits/{year}', [FinanceController::class, 'getSummaryProfits']);
         Route::get('/feedback-chart-data/{year}', [PDController::class, 'getFeedbackChartData']);
         Route::get('/check-user-id/{userId}', [UserController::class, 'checkUserId']);
@@ -100,6 +102,13 @@ Route::middleware('suspicious', 'auth')->group(function () {
             Route::get('/akhlak-report', [AkhlakController::class, 'report'])->name('report-akhlak');
             Route::post('/akhlak-store', [AkhlakController::class, 'store'])->name('akhlak.store');
             Route::post('/akhlak/downloadPdf', [AkhlakController::class, 'downloadPdf'])->name('akhlak.downloadPdf');
+
+            Route::get('/akhlak/morning-briefing', [MorningBriefingController::class, 'index'])->name('morning-briefing');
+            Route::get('/akhlak/morning-briefing/preview/{id}', [MorningBriefingController::class, 'preview_briefing'])->name('preview-briefing');
+            Route::post('/store-briefing', [MorningBriefingController::class, 'store'])->name('briefing.store');
+            Route::get('/fetch-briefing-data/{itemId}', [MorningBriefingController::class, 'show'])->name('briefing.show');
+            Route::put('/update-briefing/{itemId}', [MorningBriefingController::class, 'update'])->name('briefing.update');
+            Route::delete('/marketing-briefing/delete-item/{id}', [MorningBriefingController::class, 'delete_briefing'])->name('delete-briefing');
         });
 
         //penlat
@@ -220,8 +229,6 @@ Route::middleware('suspicious', 'auth')->group(function () {
             Route::delete('/delete-item-training-reference/{id}', [PDController::class, 'destroy_reference'])->name('training-reference.destroy');
             Route::get('/fetch-penlat-references/{penlatId}', [PDController::class, 'fetch_reference_data'])->name('references.data');
             Route::post('/update-penlat-references', [PDController::class, 'update_references'])->name('references.update');
-
-            Route::get('/planning-development/instructor/upload-certificate', [PDController::class, 'upload_certificate'])->name('upload-certificate');
         });
 
         // Marketing

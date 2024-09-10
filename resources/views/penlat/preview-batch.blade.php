@@ -54,7 +54,7 @@ font-weight-bold
     <div class="col-xl-12 col-lg-12">
         <div class="card">
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> List Data</h6>
+                <h6 class="m-0 font-weight-bold text-secondary" id="judul">List Data</h6>
                 <div class="text-right">
                     {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Update Data</a> --}}
                 </div>
@@ -63,7 +63,7 @@ font-weight-bold
                 <div class="col-md-12 mb-3">
                     <div class="row">
                         <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding-left: 1em;">
-                            <img src="{{ $data->filepath ? asset($data->filepath) : 'https://via.placeholder.com/50x50/5fa9f8/ffffff' }}" style="height: 150px; width: 200px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
+                            <img src="{{ $data->filepath ? asset($data->filepath) : asset('img/default-img.png') }}" style="height: 150px; width: 200px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
                         </div>
                         <div class="col-md-9">
                             <table class="table table-borderless table-sm">
@@ -97,7 +97,7 @@ font-weight-bold
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> Infografis Peserta</h6>
+                    <h6 class="m-0 font-weight-bold text-secondary" id="judul">Infografis Peserta : {{ $data->batch }}</h6>
                     <div class="text-right">
                         {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Add Utilities</a> --}}
                     </div>
@@ -105,14 +105,25 @@ font-weight-bold
                 <div class="card-body">
                     <h5 class="card-title font-weight-bold">Realisasi Peserta</h5>
                     <div class="ml-2">
-                        @if(!$data->infografis_peserta || !$data->infografis_peserta || $data->infografis_peserta->isEmpty())
+                        @if(!$data->infografis_peserta || $data->infografis_peserta->isEmpty())
                             No Data Available
                         @else
-                        <ol class="ml-4" style="line-height:200%">
-                            @foreach ($data->infografis_peserta as $item)
-                                <li>{{ $item->nama_peserta }}</li>
-                            @endforeach
-                        </ol>
+                        <table class="table" id="docLetter" style="line-height:200%">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Nama Peserta</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($data->infografis_peserta as $index => $item)
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ $item->nama_peserta }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                         @endif
                     </div>
                 </div>
@@ -121,7 +132,7 @@ font-weight-bold
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> List Costs</h6>
+                    <h6 class="m-0 font-weight-bold text-secondary" id="judul">List Costs : {{ $data->batch }}</h6>
                     <div class="text-right">
                         {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Edit Data</a> --}}
                     </div>
@@ -222,7 +233,7 @@ font-weight-bold
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> List Penggunaan Utilities</h6>
+                    <h6 class="m-0 font-weight-bold text-secondary" id="judul">List Penggunaan Utilities : {{ $data->batch }}</h6>
                     <div class="text-right">
                         {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Add Utilities</a> --}}
                     </div>

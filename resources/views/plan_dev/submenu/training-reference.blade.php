@@ -111,7 +111,7 @@ font-weight-bold
                                     <div class="row">
                                         <div class="col-md-3 d-flex justify-content-center align-items-start text-center">
                                             <a href="{{ route('preview-training-reference', $item->id) }}">
-                                                <img src="{{ $item->filepath ? asset($item->filepath) : 'https://via.placeholder.com/150x150/5fa9f8/ffffff' }}" style="height: 150px; width: 200px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow animateBox">
+                                                <img src="{{ $item->filepath ? asset($item->filepath) : asset('img/default-img.png') }}" style="height: 150px; width: 200px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow animateBox">
                                             </a>
                                         </div>
                                         <div class="col-md-9 text-left mt-sm-2">

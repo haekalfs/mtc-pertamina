@@ -138,7 +138,7 @@ font-weight-bold
                     <div class="row no-gutters mb-3">
                         <div class="col-md-3 d-flex align-items-top justify-content-center text-center">
                             <label for="file-upload" style="cursor: pointer;">
-                                <img id="image-preview" src="https://via.placeholder.com/150x150/5fa9f8/ffffff"
+                                <img id="image-preview" src="{{ asset('img/default-img.png') }}"
                                      style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
                                      <small style="font-size: 12px;" class="text-secondary"><i><u>Uploading Image is Optional!</u></i></small>
                             </label>

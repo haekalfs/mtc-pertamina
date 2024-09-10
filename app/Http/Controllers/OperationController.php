@@ -752,7 +752,7 @@ class OperationController extends Controller
 
             return DataTables::of($query)
                 ->addColumn('image', function($item) {
-                    $imageUrl = $item->filepath ? asset($item->filepath) : 'https://via.placeholder.com/50x50/5fa9f8/ffffff';
+                    $imageUrl = $item->filepath ? asset($item->filepath) : asset('img/default-img.png');
                     return '<a href="'.route('preview-utility', $item->id).'"><img src="'.$imageUrl.'" style="height: 100px; width: 100px;" alt="" class="img-fluid rounded mb-2 shadow animateBox"></a>';
                 })
                 ->addColumn('description', function($item) {

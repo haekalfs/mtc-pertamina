@@ -89,9 +89,9 @@ font-weight-bold
     </div>
     <div class="row">
 
-        <div class="col-lg-6 mb-2">
+        <div class="col-lg-8 mb-2">
             <div class="card-leaderboard">
-                <div class="card-header-leaderboard bg-secondary">
+                <div class="card-header-leaderboard bg-white text-secondary" style="border-bottom: 1px solid rgb(205, 205, 205);">
                     <i class="fa fa-trophy"></i>
                     <span class="title">Top Rated Instructors</span>
                     <span class="subtitle">LEADERBOARD</span>
@@ -107,7 +107,7 @@ font-weight-bold
                                 <tr class="text-secondary">
                                     <td>
                                         <a href="{{ route('preview-instructor', ['id' => $instructor->id, 'penlatId' => '-1']) }}">
-                                            <div class="d-flex align-items-center animateBox">
+                                            <div class="d-flex align-items-center">
                                                 {{ $no++ }}. &nbsp;&nbsp;<img src="{{ asset($instructor->imgFilepath) }}" alt="" class="rounded mr-2 shadow" style="width:50px; height:60px; border: 0.5px solid rgb(211, 211, 211);">
                                                 <span class="instructor-name zoom90 mt-2">{{ $instructor->instructor_name }}<br>{{ \Carbon\Carbon::parse($instructor->instructor_dob)->age }} Tahun</span>
                                             </div>
@@ -140,38 +140,39 @@ font-weight-bold
                 </div>
             </div>
         </div>
-        <div class="col-lg-6 mb-2">
+        <div class="col-lg-4 mb-2">
             <div class="card">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-secondary" id="judul">Newest Regulations</h6>
+                <div class="col-md-12 sidebar-two">
+                    <h2>Regulations</h2>
+                    <ul class="">
+                        @foreach($regulations as $regulation)
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <h3><i class="fa fa-info-circle mr-2"></i> {{ $regulation->description }}</h3>
+                                    @php
+                                        $created_at = \Carbon\Carbon::parse($regulation->created_at);
+                                        $now = \Carbon\Carbon::now();
+                                        $diffInDays = $created_at->diffInDays($now);
+                                    @endphp
+                                    <span>
+                                        @if($diffInDays < 7)
+                                            {{ $created_at->diffForHumans() }}
+                                        @else
+                                            a long time ago
+                                        @endif
+                                    </span>
+                                </div>
+                            </a>
+                        </li>
+                        @endforeach
+                    </ul>
                 </div>
-                <div class="card-body">
-                    <table class="table table-borderless">
-                        <tbody>
-                            @if(!$regulations || $regulations->isEmpty())
-                                No Data Available
-                            @else
-                            @foreach($regulations as $item)
-                            <tr class="text-secondary">
-                                <td class="d-flex align-items-center animateBox">
-                                    <a href="{{ route('preview-regulation', $item->id) }}">
-                                        <div>
-                                            <i class="fa fa-info-circle mr-2"></i> <span>{{ $item->description }}</span>
-                                        </div>
-                                    </a>
-                                </td>
-                            </tr>
-                            @endforeach
-                            <tr class="text-secondary">
-                                <td class="text-right">
-                                    <a href="{{ route('regulation') }}">
-                                        <small>Show More...</small>
-                                    </a>
-                                </td>
-                            </tr>
-                            @endif
-                        </tbody>
-                    </table>
+                <!-- Fix "Show More" to the right corner -->
+                <div class="text-right">
+                    <a class="btn btn-sm btn-default" href="{{ route('regulation') }}">
+                        <small>Show More...</small>
+                    </a>
                 </div>
             </div>
         </div>

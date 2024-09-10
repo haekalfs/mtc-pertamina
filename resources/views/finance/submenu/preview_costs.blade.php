@@ -71,7 +71,7 @@ font-weight-bold
                 <div class="col-md-12 mb-3">
                     <div class="row">
                         <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding-left: 1em;">
-                            <img src="{{ $data->filepath ? asset($data->filepath) : 'https://via.placeholder.com/50x50/5fa9f8/ffffff' }}" style="height: 150px; width: 200px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
+                            <img src="{{ $data->filepath ? asset($data->filepath) : asset('img/default-img.png') }}" style="height: 150px; width: 200px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
                         </div>
                         <div class="col-md-9">
                             <table class="table table-borderless table-sm">
@@ -286,6 +286,7 @@ font-weight-bold
                 </div>
                 <div class="card-body">
                     <div id="chartContainer" style="height: 370px; width: 100%;"></div>
+                    <div id="profitContainer" style="margin-top: 10px;"></div>
                 </div>
             </div>
         </div>
@@ -295,20 +296,24 @@ font-weight-bold
 <script>
     window.onload = function() {
 
-        var chart = new CanvasJS.Chart("chartContainer", {
-            animationEnabled: true,
-            title: {
-                text: "Perbanding Profit & Loss"
-            },
-            data: [{
-                type: "pie",
-                yValueFormatString: "Rp #,##0",
-                indexLabel: "{label} ({y})",
-                dataPoints: @json($dataPoints)
-            }]
-        });
-        chart.render();
+    var chart = new CanvasJS.Chart("chartContainer", {
+        animationEnabled: true,
+        title: {
+            text: "Profit Consumption by Cost (in Percentage)"
+        },
+        data: [{
+            type: "pie",
+            yValueFormatString: "#,##0.##\"%\"",
+            indexLabel: "{label} ({y}%)",
+            dataPoints: @json($dataPoints)
+        }]
+    });
+    chart.render();
 
+    // Display profits below the chart
+    var profitDisplay = document.createElement('div');
+        profitDisplay.innerHTML = "<strong>Profits: Rp " + @json($profitsValue) + "</strong>";
+        document.getElementById("profitContainer").appendChild(profitDisplay);
     }
 </script>
 @endsection

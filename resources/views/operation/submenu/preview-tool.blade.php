@@ -64,7 +64,7 @@ font-weight-bold
                 <div class="col-md-12 mb-3">
                     <div class="row">
                         <div class="col-md-12 d-flex align-items-center justify-content-center" style="padding-left: 1em;">
-                            <img src="{{ $data->img->filepath ? asset($data->img->filepath) : 'https://via.placeholder.com/50x50/5fa9f8/ffffff' }}" style="height: 150px; width: 200px; border: 1px solid rgb(202, 202, 202);" class="img-fluid d-none d-md-block rounded mb-2 shadow ">
+                            <img src="{{ $data->img->filepath ? asset($data->img->filepath) : asset('img/default-img.png') }}" style="height: 150px; width: 200px; border: 1px solid rgb(202, 202, 202);" class="img-fluid d-none d-md-block rounded mb-2 shadow ">
                         </div>
                         <div class="col-md-12 mt-4">
                             <table class="table table-borderless table-sm">

@@ -19,7 +19,6 @@ font-weight-bold
         <p class="mb-4">Menu Instruktur.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
-        {{-- <a href="{{ route('upload-certificate') }}" class="btn btn-sm btn-primary shadow-sm text-white"><i class="fa fa-file-text fa-sm"></i> Import Cerficate</a> --}}
     </div>
 </div>
 <div class="overlay overlay-mid" style="display: none;"></div>
@@ -154,7 +153,7 @@ font-weight-bold
                                         <div class="row">
                                             <div class="col-md-3 d-flex justify-content-center align-items-center text-center">
                                                 <a href="{{ route('preview-instructor', ['id' => $item->id, 'penlatId' => $penlatId]) }}">
-                                                    <img src="{{ $item->imgFilepath ? asset($item->imgFilepath) : 'https://via.placeholder.com/150x150/5fa9f8/ffffff' }}" style="height: 150px; width: 120px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow animateBox">
+                                                    <img src="{{ $item->imgFilepath ? asset($item->imgFilepath) : asset('img/default-img.png') }}" style="height: 150px; width: 120px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow animateBox">
                                                 </a>
                                             </div>
                                             <div class="col-md-9 text-left mt-sm-2">

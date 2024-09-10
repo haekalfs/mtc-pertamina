@@ -6,9 +6,12 @@ use App\Models\Campaign;
 use App\Models\Infografis_peserta;
 use App\Models\Instructor;
 use App\Models\Inventory_tools;
+use App\Models\MorningBriefing;
 use App\Models\Penlat;
 use App\Models\Penlat_batch;
 use App\Models\Profit;
+use App\Models\Regulation;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -70,9 +73,13 @@ class DashboardController extends Controller
 
         //Jumlah Batch
         $batchCount = Penlat_batch::count();
+        $regulations = Regulation::orderBy('created_at', 'desc')->take(6)->get();
+        $morningBriefing = MorningBriefing::orderBy('updated_at', 'desc')->take(1)->get();
 
         // Cache::forget('jobs_processing');
         return view('dashboard', [
+            'morningBriefing' => $morningBriefing,
+            'regulations' => $regulations,
             'headline' => $headline,
             'getPesertaCount' => $getPesertaCount,
             'countCampaign' => $countCampaign,

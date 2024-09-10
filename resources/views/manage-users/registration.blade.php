@@ -40,7 +40,7 @@ font-weight-bold
                                     <div class="col-md-12">
                                         <div class="d-flex align-items-top justify-content-center text-center">
                                             <label for="file-upload" style="cursor: pointer;">
-                                                <img id="image-preview" src="https://via.placeholder.com/150x150/5fa9f8/ffffff" style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
+                                                <img id="image-preview" src="{{ asset('img/default-img.png') }}" style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
                                                      <small style="font-size: 10px;"><i><u>Click above to upload image!</u></i></small>
                                             </label>
                                             <input id="file-upload" type="file" name="profile_picture" style="display: none;" accept="image/*" onchange="previewImage(event)">

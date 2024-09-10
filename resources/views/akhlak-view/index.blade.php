@@ -275,7 +275,7 @@ font-weight-bold
         <div class="col-md-12 zoom90">
             <div class="card shadow">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-secondary" id="judul">Pencapaian AKHLAK - @if ($userSelected) {{ $userSelected->name }} @else Overall @endif</h6>
+                    <h6 class="m-0 font-weight-bold text-secondary" id="judul">Average Pencapaian AKHLAK - @if ($userSelected) {{ $userSelected->name }} @else Overall @endif</h6>
                     <div class="text-right">
                         <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-icon fa fa-plus"></i> Insert Pencapaian</a>
                     </div>

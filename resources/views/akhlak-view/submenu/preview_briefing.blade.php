@@ -1,25 +1,25 @@
 @extends('layouts.main')
 
-@section('active-marketing')
+@section('active-akhlak')
 active font-weight-bold
 @endsection
 
-@section('show-marketing')
+@section('show-akhlak')
 show
 @endsection
 
-@section('marketing-campaign')
+@section('morning-briefing')
 font-weight-bold
 @endsection
 
 @section('content')
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
-        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-bullhorn"></i> {{ $data->campaign_name }}</h1>
-        <p class="mb-3">Kegiatan Marketing MTC.</a></p>
+        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="ti-signal"></i> Morning Briefing</h1>
+        <p class="mb-4">Kegiatan Briefing MTC.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
-        <a href="{{ route('marketing-campaign') }}" class="btn btn-sm btn-secondary shadow-sm text-white"><i class="fa fa-backward"></i> Go Back</a>
+        <a href="{{ route('morning-briefing') }}" class="btn btn-sm btn-secondary shadow-sm text-white"><i class="fa fa-backward"></i> Go Back</a>
     </div>
 </div>
 <div class="overlay overlay-mid" style="display: none;"></div>
@@ -54,13 +54,13 @@ font-weight-bold
     <div class="col-xl-12 col-lg-12">
         <div class="card">
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-bullhorn"></i> Campaign</h6>
+                <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="ti-signal"></i> Briefing</h6>
                 <div class="text-right">
                     {{-- @mtd_acc(4) --}}
-                    <a href="#" class="btn btn-danger btn-sm text-white delete-campaign mr-2" data-id="{{ $data->id }}"><i class="menu-Logo fa fa-trash-o"></i> Delete</a>
+                    <a href="#" class="btn btn-danger btn-sm text-white delete-briefing mr-2" data-id="{{ $data->id }}"><i class="menu-Logo fa fa-trash-o"></i> Delete</a>
                     {{-- @endmtd_acc
                     @mtd_acc(3) --}}
-                    <a href="#" class="btn btn-secondary btn-sm text-white edit-campaign" data-id="{{ $data->id }}"><i class="menu-Logo fa fa-edit"></i> Update Data</a>
+                    <a href="#" class="btn btn-secondary btn-sm text-white edit-briefing" data-id="{{ $data->id }}"><i class="menu-Logo fa fa-edit"></i> Update Data</a>
                     {{-- @endmtd_acc --}}
                 </div>
             </div>
@@ -74,11 +74,11 @@ font-weight-bold
                             <table class="table table-borderless table-sm">
                                 <tr>
                                     <th style="width: 200px;">Judul Kegiatan</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $data->campaign_name }}</td>
+                                    <td style="text-align: start; font-weight:500">: {{ $data->briefing_name }}</td>
                                 </tr>
                                 <tr>
                                     <th>Informasi Kegiatan</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $data->campaign_details }}</td>
+                                    <td style="text-align: start; font-weight:500">: {{ $data->briefing_details }}</td>
                                 </tr>
                                 <tr>
                                     <th>PIC</th>
@@ -102,13 +102,13 @@ font-weight-bold
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-bullhorn"></i> Hasil Campaign</h6>
+                    <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="ti-signal"></i> Resume Info</h6>
                     <div class="text-right">
                         {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Add Utilities</a> --}}
                     </div>
                 </div>
                 <div class="card-body">
-                    {!! $data->campaign_result !!}
+                    {!! $data->briefing_result !!}
                 </div>
             </div>
         </div>
@@ -118,7 +118,7 @@ font-weight-bold
     <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 900px;" role="document">
         <div class="modal-content">
             <div class="modal-header d-flex flex-row align-items-center justify-content-between">
-                <h5 class="modal-title" id="editCampaignModalLabel">Edit Campaign</h5>
+                <h5 class="modal-title" id="editCampaignModalLabel">Edit Data</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -202,13 +202,13 @@ font-weight-bold
 </div>
 <script>
 $(document).ready(function() {
-    $('.delete-campaign').click(function(e) {
+    $('.delete-briefing').click(function(e) {
         e.preventDefault();
         let id = $(this).data('id');
 
         swal({
             title: "Are you sure?",
-            text: "Once deleted, you will not be able to recover this campaign!",
+            text: "Once deleted, you will not be able to recover this briefing!",
             icon: "warning",
             buttons: true,
             dangerMode: true,
@@ -217,7 +217,7 @@ $(document).ready(function() {
             if (willDelete) {
                 // Make AJAX request to delete the instructor
                 $.ajax({
-                    url: '{{ route("delete-campaign", ":id") }}'.replace(':id', id),
+                    url: '{{ route("delete-briefing", ":id") }}'.replace(':id', id),
                     method: 'DELETE',
                     data: {
                         _token: '{{ csrf_token() }}', // Include the CSRF token
@@ -226,7 +226,7 @@ $(document).ready(function() {
                         swal("Success! The account has been deleted!", {
                             icon: "success",
                         }).then(() => {
-                            window.location.href = '{{ route("marketing-campaign") }}'; // Redirect after deletion
+                            window.location.href = '{{ route("morning-briefing") }}'; // Redirect after deletion
                         });
                     },
                     error: function(xhr) {
@@ -244,22 +244,22 @@ $(document).ready(function() {
         });
     });
 });
-document.querySelectorAll('.edit-campaign').forEach(function(button) {
+document.querySelectorAll('.edit-briefing').forEach(function(button) {
     button.addEventListener('click', function(event) {
         event.preventDefault();
         const id = this.getAttribute('data-id');
-        const url = "{{ route('campaign.show', ':id') }}".replace(':id', id);
+        const url = "{{ route('briefing.show', ':id') }}".replace(':id', id);
 
         fetch(url)
             .then(response => response.json())
             .then(data => {
                 // Populate the modal fields
-                document.querySelector('#editCampaignForm').setAttribute('action', "{{ route('campaign.update', ':id') }}".replace(':id', id));
-                document.querySelector('input[name="activity_name"]').value = data.campaign_name;
-                document.querySelector('input[name="activity_info"]').value = data.campaign_details;
+                document.querySelector('#editCampaignForm').setAttribute('action', "{{ route('briefing.update', ':id') }}".replace(':id', id));
+                document.querySelector('input[name="activity_name"]').value = data.briefing_name;
+                document.querySelector('input[name="activity_info"]').value = data.briefing_details;
                 document.querySelector('input[name="activity_date"]').value = data.date;
                 // Prefill Summernote
-                $('#summernote').summernote('code', data.campaign_result);
+                $('#summernote').summernote('code', data.briefing_result);
                 document.querySelector('#image-preview').src = data.img_filepath ? `/${data.img_filepath}` : 'https://via.placeholder.com/50x50/5fa9f8/ffffff';
 
                 // Handle select field for 'PIC'
