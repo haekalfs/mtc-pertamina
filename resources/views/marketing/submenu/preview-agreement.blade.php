@@ -56,12 +56,11 @@ font-weight-bold
         <div class="card">
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> List Data</h6>
-                <div class="text-right">
-                    <a href="#" class="btn btn-danger btn-sm text-white delete-agreement mr-2" data-id="{{ $data->id }}"><i class="menu-Logo fa fa-trash-o"></i> Delete</a>
-                    <a href="#" class="btn btn-secondary btn-sm text-white edit-agreement" data-id="{{ $data->id }}"><i class="menu-Logo fa fa-edit"></i> Update Data</a>
-                </div>
             </div>
-            <div class="card-body">
+            <div class="card-body" style="position: relative;">
+                <a href="#" data-id="{{ $data->id }}" class="position-absolute edit-agreement" style="top: 10px; right: 15px; z-index: 10;">
+                    <i class="fa fa-edit fa-lg ml-2" style="color: rgb(181, 181, 181);"></i>
+                </a>
                 <div class="col-md-12 mb-3">
                     <div class="row">
                         <div class="col-md-3 d-flex align-items-start justify-content-center">
@@ -230,7 +229,7 @@ font-weight-bold
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <a href="#" class="btn btn-danger text-white delete-agreement" data-id="{{ $data->id }}"><i class="menu-Logo fa fa-trash-o"></i> Delete</a>
                     <button type="submit" class="btn btn-primary">Update Agreement</button>
                 </div>
             </form>

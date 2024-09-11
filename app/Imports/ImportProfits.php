@@ -84,23 +84,24 @@ class ImportProfits implements ToCollection, WithBatchInserts, WithChunkReading,
                         [
                             'tgl_pelaksanaan' => $currentDate,
                             'pelaksanaan' => $row[0],
-                            'jumlah_peserta' => $row[2],
-                            'biaya_instruktur' => preg_replace('/[^0-9]/', '', $row[4]),
-                            'total_pnbp' => preg_replace('/[^0-9]/', '', $row[5]),
-                            'biaya_transportasi_hari' => preg_replace('/[^0-9]/', '', $row[6]),
-                            'honor_pnbp' => preg_replace('/[^0-9]/', '', $row[7]),
-                            'biaya_pendaftaran_peserta' => preg_replace('/[^0-9]/', '', $row[8]),
-                            'total_biaya_pendaftaran_peserta' => preg_replace('/[^0-9]/', '', $row[9]),
-                            'penagihan_foto' => preg_replace('/[^0-9]/', '', $row[10]),
-                            'penagihan_atk' => preg_replace('/[^0-9]/', '', $row[11]),
-                            'penagihan_snack' => preg_replace('/[^0-9]/', '', $row[12]),
-                            'penagihan_makan_siang' => preg_replace('/[^0-9]/', '', $row[13]),
-                            'penagihan_laundry' => preg_replace('/[^0-9]/', '', $row[14]),
-                            'penlat_usage' => preg_replace('/[^0-9]/', '', $totalUsageCost),
-                            'jumlah_biaya' => preg_replace('/[^0-9]/', '', str_replace(',00', '', $row[15])),
-                            'profit' => preg_replace('/[^0-9]/', '', $row[16]),
+                            'jumlah_peserta' => $row[2]
                         ],
-                        []
+                        [
+                        'biaya_instruktur' => preg_replace('/[^0-9]/', '', $row[4]),
+                        'total_pnbp' => preg_replace('/[^0-9]/', '', $row[5]),
+                        'biaya_transportasi_hari' => preg_replace('/[^0-9]/', '', $row[6]),
+                        'honor_pnbp' => preg_replace('/[^0-9]/', '', $row[7]),
+                        'biaya_pendaftaran_peserta' => preg_replace('/[^0-9]/', '', $row[8]),
+                        'total_biaya_pendaftaran_peserta' => preg_replace('/[^0-9]/', '', $row[9]),
+                        'penagihan_foto' => preg_replace('/[^0-9]/', '', $row[10]),
+                        'penagihan_atk' => preg_replace('/[^0-9]/', '', $row[11]),
+                        'penagihan_snack' => preg_replace('/[^0-9]/', '', $row[12]),
+                        'penagihan_makan_siang' => preg_replace('/[^0-9]/', '', $row[13]),
+                        'penagihan_laundry' => preg_replace('/[^0-9]/', '', $row[14]),
+                        'penlat_usage' => preg_replace('/[^0-9]/', '', $totalUsageCost),
+                        'jumlah_biaya' => preg_replace('/[^0-9]/', '', str_replace(',00', '', $row[15])),
+                        'profit' => preg_replace('/[^0-9]/', '', $row[16])
+                        ]
                     );
                 } else {
                     Log::warning('Skipped row due to missing or invalid date:');

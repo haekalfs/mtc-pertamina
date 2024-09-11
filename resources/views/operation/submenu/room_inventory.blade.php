@@ -102,7 +102,7 @@ font-weight-bold
                                     <div class="row">
                                         <div class="col-md-4 d-flex justify-content-center align-items-start mt-2">
                                             <a href="{{ route('preview-room-user', $item->id) }}" class="animateBox">
-                                                <img src="{{ asset($item->filepath) }}" style="height: 150px; width: 200px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
+                                                <img src="{{ $item->filepath ? asset($item->filepath) : asset('img/default-img.png') }}" style="height: 150px; width: 200px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
                                             </a>
                                         </div>
                                         <div class="col-md-8 text-left mt-sm-2">

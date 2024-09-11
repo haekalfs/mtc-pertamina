@@ -56,11 +56,11 @@ font-weight-bold
         <div class="card">
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-building-o"></i> Detail Ruangan</h6>
-                <div class="text-right">
-                    <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#editDataModal"><i class="menu-Logo fa fa-plus"></i> Update Data</a>
-                </div>
             </div>
-            <div class="card-body">
+            <div class="card-body" style="position: relative;">
+                <a class="position-absolute" href="#" data-toggle="modal" data-target="#editDataModal" style="top: 10px; right: 15px; z-index: 10;">
+                    <i class="fa fa-edit fa-lg ml-2" style="color: rgb(181, 181, 181);"></i>
+                </a>
                 <div class="col-md-12 mb-3">
                     <div class="row">
                         <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding-left: 1em;">
@@ -227,7 +227,7 @@ font-weight-bold
                     <div class="row no-gutters">
                         <div class="col-md-3 d-flex align-items-top justify-content-center text-center">
                             <label for="file-upload" style="cursor: pointer;">
-                                <img id="image-preview" src="{{ asset($data->filepath) }}" style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
+                                <img id="image-preview" src="{{ $data->filepath ? asset($data->filepath) : asset('img/default-img.png') }}" style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
                                      <small style="font-size: 10px;"><i><u>Click above to upload image!</u></i></small>
                             </label>
                             <input id="file-upload" type="file" name="room_image" style="display: none;" accept="image/*" onchange="previewImage(event)">

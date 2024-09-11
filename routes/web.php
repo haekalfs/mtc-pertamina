@@ -13,6 +13,7 @@ use App\Http\Controllers\InventoryToolController;
 use App\Http\Controllers\KpiController;
 use App\Http\Controllers\ManageAccessController;
 use App\Http\Controllers\MarketingController;
+use App\Http\Controllers\MonitoringApprovalController;
 use App\Http\Controllers\MorningBriefingController;
 use App\Http\Controllers\MyProfileController;
 use App\Http\Controllers\OperationController;
@@ -194,6 +195,11 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
             Route::delete('/delete-regulation/{id}', [PDController::class, 'delete_regulation'])->name('regulation.destroy');
             Route::put('/update-regulation', [PDController::class, 'update_regulation'])->name('regulation.update');
 
+            Route::get('/planning-development/monitoring-approval', [MonitoringApprovalController::class, 'index'])->name('monitoring-approval');
+            Route::post('/store-monitoring-approval', [MonitoringApprovalController::class, 'store'])->name('monitoring-approval.store');
+            Route::get('/planning-development/monitoring-approval-view/{itemId}', [MonitoringApprovalController::class, 'preview'])->name('preview-monitoring-approval');
+            Route::delete('/delete-monitoring-approval/{id}', [MonitoringApprovalController::class, 'delete'])->name('monitoring-approval.destroy');
+            Route::put('/update-monitoring-approval', [MonitoringApprovalController::class, 'update'])->name('monitoring-approval.update');
 
 
             Route::get('/planning-development/certification', [PDController::class, 'main_certificate'])->name('certificate-main');

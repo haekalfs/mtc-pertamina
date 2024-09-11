@@ -202,6 +202,10 @@ font-weight-bold
                                 <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Penagihan Laundry</td>
                                 <td style="text-align: start;">: &nbsp; {{ $profits->penagihan_laundry ? 'Rp ' . number_format($profits->penagihan_laundry, 0, ',', '.') : '-' }}</td>
                             </tr>
+                            <tr>
+                                <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Penggunaan Alat</td>
+                                <td style="text-align: start;">: &nbsp; {{ $profits->penlat_usage ? 'Rp ' . number_format($profits->penlat_usage, 0, ',', '.') : '-' }}</td>
+                            </tr>
                             @endif
                         </table>
                     </div>
@@ -213,16 +217,17 @@ font-weight-bold
                                 No Data Available
                             @else
                             <tr>
-                                <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Total Biaya Pendaftaran</td>
-                                <td style="text-align: start;" class="">: &nbsp; {{ $profits->total_biaya_pendaftaran_peserta ? 'Rp ' . number_format($profits->total_biaya_pendaftaran_peserta, 0, ',', '.') : '-' }} </td>
+                                <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Total Keuntungan</td>
+                                <td style="text-align: start;" class="">: &nbsp; {{ $profits->total_biaya_pendaftaran_peserta ? 'Rp ' . number_format($profits->total_biaya_pendaftaran_peserta, 0, ',', '.') : '-' }} &nbsp;<i class="fa fa-plus text-success"></i></td>
                             </tr>
+                            @php $totalBiaya = $profits->jumlah_biaya + $profits->penlat_usage; @endphp
                             <tr>
-                                <td style="width: 250px;" class="mb-2 "><i class="ti-minus mr-2"></i> Jumlah Biaya (COST) </td>
-                                <td style="text-align: start;" class="">: &nbsp; {{ $profits->jumlah_biaya ? 'Rp ' . number_format($profits->jumlah_biaya, 0, ',', '.') : '-' }}</td>
+                                <td style="width: 250px;" class="mb-2 "><i class="ti-minus mr-2"></i> Jumlah Biaya </td>
+                                <td style="text-align: start;" class="">: &nbsp; {{ $totalBiaya ? 'Rp ' . number_format($totalBiaya, 0, ',', '.') : '-' }} &nbsp;<i class="fa fa-minus text-danger"></i></td>
                             </tr>
                             <tr>
                                 <td style="width: 250px;" class="mb-2 font-weight-bold text-success"><i class="ti-minus mr-2"></i> Total Profits</td>
-                                <td style="text-align: start;" class="font-weight-bold text-success">: &nbsp; {{ $profits->profit ? 'Rp ' . number_format($profits->profit, 0, ',', '.') : '-' }} <i class="fa fa-plus"></i></td>
+                                <td style="text-align: start;" class="font-weight-bold text-success">: &nbsp; {{ $profits->profit ? 'Rp ' . number_format($profits->profit - $totalBiaya, 0, ',', '.') : '-' }} <i class="fa fa-plus"></i></td>
                             </tr>
                             @endif
                         </table>
@@ -276,7 +281,7 @@ font-weight-bold
                                 @endforeach
                             @else
                                 <tr class="text-center">
-                                    <td colspan="2">No Data Available</td>
+                                    <td colspan="4">No Data Available</td>
                                 </tr>
                             @endif
                         </tbody>

@@ -306,6 +306,8 @@ class FinanceController extends Controller
                                     $safeSum('penagihan_atk') +
                                     $safeSum('penagihan_snack') +
                                     $safeSum('penagihan_makan_siang') +
+                                    $safeSum('penlat_usage') +
+                                    $safeSum('penlat_usage') +
                                     $safeSum('penagihan_laundry');
 
                         // Summing up the cost-related field safely
@@ -495,7 +497,7 @@ class FinanceController extends Controller
         $item = Profit::where('pelaksanaan', $utility->batch)->first();
 
         // Profits value
-        $profits = (float) $item->profit;
+        $profits = (float) $item->total_biaya_pendaftaran_peserta;
 
         $dataPoints = [
             ['label' => 'Biaya Instruktur', 'y' => ((float) $item->biaya_instruktur / $profits) * 100],
@@ -510,7 +512,7 @@ class FinanceController extends Controller
         ];
 
         // Profits value to display below the chart
-        $profitsValue = $profits;
+        $profitsValue = number_format($profits, 0, ',', '.');
         return view('finance.submenu.preview_costs', ['data' => $utility, 'item' => $item, 'dataPoints' => $dataPoints, 'profitsValue' => $profitsValue]);
     }
 }

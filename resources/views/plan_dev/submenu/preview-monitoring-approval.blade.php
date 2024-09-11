@@ -8,18 +8,25 @@ active font-weight-bold
 show
 @endsection
 
-@section('regulation')
+@section('monitoring-approval')
 font-weight-bold
 @endsection
 
 @section('content')
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
-        <h1 class="h4 mb-2 font-weight-bold text-secondary"><i class="fa fa-warning"></i> {{ $data->description }}</h1>
-        <p class="mb-4">Status : <span class="badge {{ $data->statuses->badge }}">{{ $data->statuses->description }}</span></a></p>
+        <h1 class="h4 mb-2 font-weight-bold text-secondary"><i class="fa fa-file-text"></i> {{ $data->description }}</h1>
+        <p class="mb-4">
+            Status :
+            @if($statusBadge)
+                <span class="badge badge-danger">{{ $statusBadge }}</span>
+            @else
+                {{ $data->approval_date }}
+            @endif
+        </p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
-        <a href="{{ route('regulation') }}" class="btn btn-sm btn-secondary shadow-sm text-white"><i class="fa fa-backward"></i> Go Back</a>
+        <a href="{{ route('monitoring-approval') }}" class="btn btn-sm btn-secondary shadow-sm text-white"><i class="fa fa-backward"></i> Go Back</a>
     </div>
 </div>
 <div class="overlay overlay-mid" style="display: none;"></div>
@@ -54,13 +61,13 @@ font-weight-bold
     <div class="col-xl-12 col-lg-12">
         <div class="card" style="min-height: 500px;">
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> List Data</h6>
+                <h6 class="m-0 font-weight-bold text-secondary" id="judul">Document Preview</h6>
                 <div class="text-right">
                     @mtd_acc(3)
-                    <a class="btn btn-secondary btn-sm text-white mr-2 edit-regulation" data-id="{{ $data->id }}" data-name="{{ $data->description }}" data-status="{{ $data->statuses->id }}" data-filepath="{{ $data->filepath }}"><i class="menu-Logo fa fa-edit"></i> Update</a>
+                    <a class="btn btn-secondary btn-sm text-white mr-2 edit-monitoring-approval" data-id="{{ $data->id }}" data-name="{{ $data->description }}" data-type="{{ $data->type }}" data-date="{{ $data->approval_date }}" data-filepath="{{ $data->filepath }}"><i class="menu-Logo fa fa-edit"></i> Update</a>
                     @endmtd_acc
                     @mtd_acc(4)
-                    <a href="#" class="btn btn-danger btn-sm text-white delete-regulation mr-2" data-id="{{ $data->id }}"><i class="menu-Logo fa fa-trash-o"></i> Delete</a>
+                    <a href="#" class="btn btn-danger btn-sm text-white mr-2 delete-monitoring-approval" data-id="{{ $data->id }}"><i class="menu-Logo fa fa-trash-o"></i> Delete</a>
                     @endmtd_acc
                     @if($fileExists)
                         <a class="btn btn-primary btn-sm text-white" href="{{ asset($data->filepath) }}" download><i class="menu-Logo fa fa-download"></i> Download</a>
@@ -92,10 +99,10 @@ font-weight-bold
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="post" enctype="multipart/form-data" action="{{ route('regulation.update') }}">
+            <form method="post" enctype="multipart/form-data" action="{{ route('monitoring-approval.update') }}">
                 @csrf
                 @method('PUT')
-                <input type="hidden" name="regulation_id" id="editRegulationId">
+                <input type="hidden" name="document_id" id="editDocumentId">
                 <div class="modal-body mr-2 ml-2">
                     <div class="row no-gutters">
                         <div class="col-md-12">
@@ -104,22 +111,26 @@ font-weight-bold
                                     <div class="col-md-12">
                                         <div class="d-flex align-items-start mb-4">
                                             <div style="width: 160px;" class="mr-2">
-                                                <p style="margin: 0;">Nama Regulation :</p>
+                                                <p style="margin: 0;">Nama Document :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <textarea class="form-control" rows="3" name="regulation_name" id="editRegulationName"></textarea>
+                                                <textarea class="form-control" rows="3" name="document_name" id="editDocumentName"></textarea>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-4">
                                             <div style="width: 160px;" class="mr-2">
-                                                <p style="margin: 0;">Status :</p>
+                                                <p style="margin: 0;">Document Type :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <select class="custom-select" name="status" id="editStatus">
-                                                    @foreach($statuses as $status)
-                                                    <option value="{{ $status->id }}">{{ $status->description }}</option>
-                                                    @endforeach
-                                                </select>
+                                                <input type="text" class="form-control" id="type" name="type" required>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 160px;" class="mr-2">
+                                                <p style="margin: 0;">Approved Date :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="date" class="form-control" id="approved_date" name="approved_date" required>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-4">
@@ -148,9 +159,9 @@ font-weight-bold
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    $('.delete-regulation').on('click', function (e) {
+    $('.delete-monitoring-approval').on('click', function (e) {
         e.preventDefault();
-        var regulationId = $(this).data('id');
+        var documentId = $(this).data('id');
 
         swal({
             title: "Are you sure?",
@@ -162,7 +173,7 @@ document.addEventListener('DOMContentLoaded', function () {
         .then((willDelete) => {
             if (willDelete) {
                 $.ajax({
-                    url: "{{ route('regulation.destroy', '') }}/" + regulationId,
+                    url: "{{ route('monitoring-approval.destroy', '') }}/" + documentId,
                     type: 'DELETE',
                     data: {
                         _token: '{{ csrf_token() }}'
@@ -171,7 +182,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         swal("Poof! Your file has been deleted!", {
                             icon: "success",
                         }).then(() => {
-                            window.location.href = "{{ route('regulation') }}";
+                            window.location.href = "{{ route('monitoring-approval') }}";
                         });
                     },
                     error: function (xhr) {
@@ -186,16 +197,18 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    $('.edit-regulation').on('click', function () {
-        var regulationId = $(this).data('id');
-        var regulationName = $(this).data('name');
-        var statusId = $(this).data('status');
+    $('.edit-monitoring-approval').on('click', function () {
+        var documentId = $(this).data('id');
+        var documentName = $(this).data('name');
+        var approvedDate = $(this).data('date');
+        var documentType = $(this).data('type');
         var filePath = $(this).data('filepath');
 
         // Prefill the modal fields
-        $('#editRegulationId').val(regulationId);
-        $('#editRegulationName').val(regulationName);
-        $('#editStatus').val(statusId);
+        $('#editDocumentId').val(documentId);
+        $('#editDocumentName').val(documentName);
+        $('#approved_date').val(approvedDate);
+        $('#type').val(documentType);
 
         if (filePath) {
             $('#currentFile').text('Current file: ' + filePath);

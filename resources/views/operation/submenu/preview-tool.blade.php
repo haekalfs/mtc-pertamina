@@ -119,7 +119,7 @@ font-weight-bold
     <div class="col-md-4">
         <div class="card mb-4 shadow">
             <div class="card-header">
-                <span class="text-danger font-weight-bold">Delete Account</span>
+                <span class="text-danger font-weight-bold">Delete Asset</span>
             </div>
             <div class="card-body">
                 <div class="mb-4">

@@ -128,6 +128,7 @@
                             {{-- <li><i class="fa fa-cog"></i><a href="#">Monitoring Approval</a></li> --}}
                             <li><i class="fa fa-male"></i><a href="{{ route('instructor') }}" class="@yield('instructor')">Instruktur</a></li>
                             <li><i class="fa fa-certificate"></i><a href="{{ route('certificate-main') }}" class="@yield('certificate')">Certification</a></li>
+                            <li><i class="fa fa-file-text"></i><a href="{{ route('monitoring-approval') }}" class="@yield('monitoring-approval')">Monitoring Approvals</a></li>
                             <li><i class="fa fa-warning"></i><a href="{{ route('regulation') }}" class="@yield('regulation')">Regulasi</a></li>
                         </ul>
                     </li>

@@ -57,14 +57,17 @@ font-weight-bold
                 <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-bullhorn"></i> Campaign</h6>
                 <div class="text-right">
                     {{-- @mtd_acc(4) --}}
-                    <a href="#" class="btn btn-danger btn-sm text-white delete-campaign mr-2" data-id="{{ $data->id }}"><i class="menu-Logo fa fa-trash-o"></i> Delete</a>
+                    {{-- <a href="#" class="btn btn-danger btn-sm text-white delete-campaign mr-2" data-id="{{ $data->id }}"><i class="menu-Logo fa fa-trash-o"></i> Delete</a> --}}
                     {{-- @endmtd_acc
                     @mtd_acc(3) --}}
-                    <a href="#" class="btn btn-secondary btn-sm text-white edit-campaign" data-id="{{ $data->id }}"><i class="menu-Logo fa fa-edit"></i> Update Data</a>
+                    {{-- <a href="#" class="btn btn-secondary btn-sm text-white edit-campaign" data-id="{{ $data->id }}"><i class="menu-Logo fa fa-edit"></i> Update Data</a> --}}
                     {{-- @endmtd_acc --}}
                 </div>
             </div>
-            <div class="card-body">
+            <div class="card-body" style="position: relative;">
+                <a href="#" data-id="{{ $data->id }}" class="position-absolute edit-campaign" style="top: 10px; right: 15px; z-index: 10;">
+                    <i class="fa fa-edit fa-lg ml-2" style="color: rgb(181, 181, 181);"></i>
+                </a>
                 <div class="col-md-12 mb-3">
                     <div class="row">
                         <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding-left: 1em;">
@@ -193,7 +196,7 @@ font-weight-bold
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <a href="#" class="btn btn-danger text-white delete-campaign" data-id="{{ $data->id }}"><i class="menu-Logo fa fa-trash-o"></i> Delete</a>
                     <button type="submit" class="btn btn-primary">Update Data</button>
                 </div>
             </form>
