@@ -51,6 +51,6 @@ class SuspiciousFileCheck
     {
         // Implement your file checking logic here
         $extension = $file->getClientOriginalExtension();
-        return in_array($extension, ['exe', 'php', 'js']);
+        return in_array($extension, ['exe', 'php', 'js', 'sh', 'bat', 'cmd', 'jar', 'py', 'pl', 'cgi', 'asp', 'aspx', 'jsp', 'html', 'htm', 'dll', 'scr', 'vbs', 'vb', 'ps1', 'phtml', 'pht', 'shtml', 'shtm', 'rb', 'htaccess', 'wsf', 'svg', 'xhtml']);
     }
 }

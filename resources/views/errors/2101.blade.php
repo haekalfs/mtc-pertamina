@@ -30,7 +30,7 @@
             </h2>
             <h3 class="h2 mb-2">Suspicious File Detected!</h3>
             <p>Suspicous file has detected by system, some file type has been restricted to prevent unwanted access.</p>
-            <p class="mb-5">Please do not upload file like [php, js, exe]. Please contact the administrator if you believe this is an error.</p>
+            <p class="mb-5">Please do not upload file like ['exe', 'php', 'js', 'sh', 'bat', 'cmd', 'jar', 'py', 'pl', 'cgi', 'asp', 'aspx', 'jsp', 'html', 'htm', 'dll', 'scr', 'vbs', 'vb', 'ps1', 'phtml', 'pht', 'shtml', 'shtm', 'rb', 'htaccess', 'wsf', 'svg', 'xhtml']. Please contact the administrator if you believe this is an error.</p>
             <a class="btn bsb-btn-5xl btn-dark rounded-pill px-5 fs-6 m-0" href="{{ route('dashboard') }}" role="button">Back to Home</a>
           </div>
         </div>
