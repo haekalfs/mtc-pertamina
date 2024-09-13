@@ -120,7 +120,7 @@ font-weight-bold
 
                                                             <!-- Stack Type and Status vertically -->
                                                             <p class="mb-1">Type : {{ $item->type }}</p>
-                                                            <p class="mb-2">Status : {{ $item->approval_date }}</p>
+                                                            <p class="mb-2">Approved Date : {{ $approvalDate->format('d-M-Y') }}</p>
 
                                                             <a href="{{ asset($item->filepath) }}" class="card-text"><u>Lampiran Dokumen</u> <i class="fa fa-external-link fa-sm"></i> <small>{{ $item->filesize }} Kb</small></a>
                                                         </div>

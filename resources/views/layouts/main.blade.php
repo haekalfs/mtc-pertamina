@@ -139,7 +139,7 @@
                         <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-marketing')">
                             <li><i class="menu-icon fa fa-tachometer"></i><a href="{{ route('marketing') }}" class="@yield('marketing')">Dashboard</a></li>
                             <li><i class="fa fa-bullhorn"></i><a href="{{ route('marketing-campaign') }}" class="@yield('marketing-campaign')">Marketing Campaign</a></li>
-                            {{-- <li><i class="ti-instagram"></i><a href="#" class="@yield('socmed')">Social Media Enggagement</a></li> --}}
+                            <li><i class="fa fa-instagram"></i><a href="{{ route('insight-socmed') }}" class="@yield('socmed')">Social Media Enggagement</a></li>
                             <li><i class="fa fa-sitemap"></i><a href="{{ route('company-agreement') }}" class="@yield('company-agreement')">Company Agreement</a></li>
                         </ul>
                     </li>

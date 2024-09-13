@@ -94,7 +94,6 @@ font-weight-bold
                           </table>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -184,13 +183,10 @@ font-weight-bold
                             </div>
                         </div>
                         <div class="col-md-12">
-                            <div class="d-flex align-items-start mb-4">
-                                <div style="width: 140px;" class="mr-2">
-                                    <p style="margin: 0;">Hasil Kegiatan :</p>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <textarea id="summernote" name="activity_result"></textarea>
-                                </div>
+                            <div class="form-group has-success">
+                                <p for="summernote" class="control-label mb-2">Hasil Kegiatan :</p>
+                                <textarea id="summernote" name="activity_result"></textarea>
+                                <span class="help-block field-validation-valid" data-valmsg-for="cc-name" data-valmsg-replace="true"></span>
                             </div>
                         </div>
                     </div>

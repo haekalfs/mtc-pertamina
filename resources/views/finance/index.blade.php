@@ -165,28 +165,7 @@ font-weight-bold
                 </div>
             </div>
         </div>
-        <div class="col-md-6 zoom90">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <span class="text-danger font-weight-bold">User Manual</span>
-                </div>
-                <div class="card-body" style="background-color: rgb(247, 247, 247);">
-                    <h6 class="h6 mb-2 font-weight-bold text-gray-800">General Guidelines</h6>
-                    <ul class="ml-4" style="line-height:200%">
-                        <li>Table diatas adalah List Pelatihan beserta Revenue, Cost & Nett Income.</li>
-                        <li>Nominal dari table diatas, diambil dari semua batch yang dimiliki oleh pelatihan tersebut.</li>
-                        <li>List Pelatihan adalah Induk Data dari Penlat, yang mana 1 Pelatihan bisa memiliki banyak batch.</li>
-                        <li>Data di samping adalah summary dari semua revenue, cost & nett income data pelatihan.</li>
-                        <li class="text-danger font-weight-bold">Untuk menampilkan summary & grafik, anda perlu memilih periode tahun.</li>
-                    </ul>
-                    <div class="alert alert-warning alert-block">
-                        <button type="button" class="close" data-dismiss="alert">×</button>
-                        <strong>Jika Import data berhasil namun data tidak muncul, artinya list pelatihan tidak ada/belum diimport.</strong>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-12">
+        <div class="col-md-6">
             <div class="card">
                 <div class="row">
                     <div class="col-lg-12 d-flex justify-content-end align-items-end">
@@ -201,6 +180,26 @@ font-weight-bold
                         <div class="card-body d-flex justify-content-center align-items-center">
                             <!-- <canvas id="TrafficChart"></canvas>   -->
                             <div id="chartContainerSpline" style="height: 370px; width: 100%;"></div>
+                        </div>
+                    </div>
+                </div> <!-- /.row -->
+            </div>
+        </div>
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="row">
+                    <div class="col-lg-12 d-flex justify-content-end align-items-end">
+                        <select class="form-control mt-3 mr-4 zoom90" id="revenueChartPeriode" name="revenueChartPeriode" style="width: 150px;">
+                            <option value="-1" selected disabled>Select Periode...</option>
+                            @foreach(range(date('Y'), date('Y') - 5) as $year)
+                                <option value="{{ $year }}" @if ($year == $currentYear) selected @endif>{{ $year }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="card-body d-flex justify-content-center align-items-center">
+                            <!-- <canvas id="TrafficChart"></canvas>   -->
+                            <div id="trendRevenueChart" style="height: 370px; width: 100%;"></div>
                         </div>
                     </div>
                 </div> <!-- /.row -->
@@ -239,6 +238,12 @@ window.onload = function () {
         loadChartData(); // Load chart data whenever the dropdown changes
     });
     loadSummaryData();
+
+    var revenueChartPeriode = document.getElementById("revenueChartPeriode");
+    loadTrendChartData();
+    revenueChartPeriode.addEventListener("change", function() {
+        loadTrendChartData();
+    });
 
     loadComparisonChartData();
     var firstDataset = document.getElementById("firstDataset");
@@ -297,7 +302,8 @@ function loadChartData() {
                 animationEnabled: true,
                 zoomEnabled: true,
                 theme: "light2",
-                title: { text: "Data Profits (Quarterly)" },
+                title: { text: "Data Profits (Quarterly)",
+                margin: 50 },
                 axisX: {
                     interval: 1, // Ensure one label per point
                     labelAngle: -45 // Rotate labels if necessary to fit
@@ -319,7 +325,6 @@ function loadChartData() {
         chart.render();
     }
 }
-
 
 function loadComparisonChartData() {
     var firstDataset = document.getElementById("firstDataset").value;
@@ -376,6 +381,38 @@ function loadComparisonChartData() {
         e.dataSeries.visible = typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible;
         chart.render();
     }
+}
+
+function loadTrendChartData() {
+    var selectedYear = document.getElementById("revenueChartPeriode").value;
+
+    fetch('/api/chart-data-trend-revenue/' + selectedYear)
+        .then(response => response.json())
+        .then(data => {
+            var chartData = data.map(item => ({
+                label: item.description, // Use nama_pelatihan as label
+                y: parseInt(item.total_biaya)
+            }));
+
+            var chart = new CanvasJS.Chart("trendRevenueChart", {
+                animationEnabled: true,
+                theme: "light2",
+                title: {
+                    text: "Trend Revenue by Pelatihan (" + selectedYear + ")",
+                    margin: 20
+                },
+                axisY: {
+                    title: "Trend Revenue by Pelatihan (in currency)"
+                },
+                data: [{
+                    type: "column",
+                    dataPoints: chartData
+                }]
+            });
+
+            chart.render();
+        })
+        .catch(error => console.error('Error fetching data:', error));
 }
 
 function redirectToPage() {

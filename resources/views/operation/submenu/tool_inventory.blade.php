@@ -183,8 +183,8 @@ font-weight-bold
                                                             <td style="text-align: start;">: {{ $item->asset_id }}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td style="width: 200px;" class="mb-2"><i class="fa fa-chevron-right mr-2"></i> Maker</td>
-                                                            <td style="text-align: start;">: {{ $item->asset_maker }}</td>
+                                                            <td style="width: 200px;" class="mb-2"><i class="fa fa-chevron-right mr-2"></i> Location</td>
+                                                            <td style="text-align: start;">: {{ $item->location->description }}</td>
                                                         </tr>
                                                         <tr>
                                                             <td style="width: 200px;" class="mb-2"><i class="fa fa-chevron-right mr-2"></i> Running Hour</td>
@@ -196,18 +196,18 @@ font-weight-bold
 
                                                             <td style="text-align: start;">: {{ $hoursDifference }} hours</td>
                                                         </tr>
+                                                        {{-- <tr>
+                                                            <td style="width: 200px;" class="mb-2"><i class="fa fa-chevron-right mr-2"></i> Last Maintenance</td>
+                                                            <td style="text-align: start;">: {{ \Carbon\Carbon::parse($item->last_maintenance)->format('d-M-Y') }}</td>
+                                                        </tr> --}}
                                                         <tr>
                                                             <td style="width: 200px;" class="mb-2"><i class="fa fa-chevron-right mr-2"></i> Next Maintenance</td>
                                                             <td style="text-align: start;">: {{ \Carbon\Carbon::parse($item->next_maintenance)->format('d-M-Y') }}</td>
                                                         </tr>
-                                                        <tr>
-                                                            <td style="width: 200px;" class="mb-2"><i class="fa fa-chevron-right mr-2"></i> Last Maintenance</td>
-                                                            <td style="text-align: start;">: {{ \Carbon\Carbon::parse($item->last_maintenance)->format('d-M-Y') }}</td>
-                                                        </tr>
-                                                        <tr>
+                                                        {{-- <tr>
                                                             <td style="width: 200px;" class="mb-2"><i class="fa fa-chevron-right mr-2"></i> Panduan Maintenance</td>
                                                             <td style="text-align: start;">: &nbsp; <a href="{{ asset($item->asset_guidance) }}" target="_blank" class="text-secondary"><i class="fa fa-external-link fa-sm"></i> <u>View</u></a></td>
-                                                        </tr>
+                                                        </tr> --}}
                                                     </table>
                                                 </div>
                                             </div>
@@ -390,7 +390,7 @@ font-weight-bold
     </div>
 </div>
 <div class="modal fade zoom90" id="editToolModal" tabindex="-1" role="dialog" aria-labelledby="editToolModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 800px;" role="document">
         <div class="modal-content">
             <div class="modal-header d-flex flex-row align-items-center justify-content-between">
                 <h5 class="modal-title" id="editToolModalLabel">Edit Tool</h5>
@@ -418,6 +418,18 @@ font-weight-bold
                                     <div class="col-md-12">
                                         <input type="text" class="form-control" name="stock" id="edit_initial_stock" hidden>
                                         <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 250px;" class="mr-2">
+                                                <p style="margin: 0;">Used :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="counter">
+                                                    <span class="down" onclick='decreaseCount(event, this)'><i class="fa fa-minus text-danger"></i></span>
+                                                    <input name="used_amount" id="edit_used_amount" type="text" min="0" style="border: 1px solid rgb(217, 217, 217); width: 1200px;">
+                                                    <span class="up" onclick='increaseCount(event, this)'><i class="fa fa-plus text-success"></i></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
                                             <div style="width: 140px;" class="mr-2">
                                                 <p style="margin: 0;">Kondisi Alat :</p>
                                             </div>
@@ -427,18 +439,6 @@ font-weight-bold
                                                     <option value="{{ $item->id }}">{{ $item->condition }}</option>
                                                     @endforeach
                                                 </select>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 225px;" class="mr-2">
-                                                <p style="margin: 0;">Used :</p>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <div class="counter">
-                                                    <span class="down" onclick='decreaseCount(event, this)'><i class="fa fa-minus text-danger"></i></span>
-                                                    <input class="form-control" name="used_amount" id="edit_used_amount" type="text" style="border: 1px solid rgb(217, 217, 217); width: 300px;">
-                                                    <span class="up" onclick='increaseCount(event, this)'><i class="fa fa-plus text-success"></i></span>
-                                                </div>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-4">
@@ -475,7 +475,7 @@ font-weight-bold
     </div>
 </div>
 <div class="modal fade zoom90" id="viewToolModal" tabindex="-1" role="dialog" aria-labelledby="viewToolModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" style="width: 600px;" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header d-flex flex-row align-items-center justify-content-between">
                 <h5 class="modal-title" id="viewToolModalLabel">Asset Information</h5>
@@ -484,30 +484,27 @@ font-weight-bold
                 </button>
             </div>
             <div class="modal-body mr-2 ml-2">
-                <div class="row no-gutters">
-                    <div class="col-md-4 text-center mt-3">
-                        <img id="view-image-preview" src="https://via.placeholder.com/150x150/5fa9f8/ffffff"
-                             style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="Asset Image">
+                <div class="row">
+                    <div class="col-md-6 product_img">
+                        <img id="view-image-preview" src="" class="img-responsive">
                     </div>
-                    <div class="col-md-8">
-                        <div class="card-body text-secondary">
-                            <p><strong>Asset Name:</strong> <span id="view_asset_name"></span></p>
-                            <p><strong>Asset Number:</strong> <span id="view_asset_number"></span></p>
-                            <p><strong>Maker:</strong> <span id="view_maker"></span></p>
-                            <p><strong>Location:</strong> <span id="view_location"></span></p>
-                            <p><strong>Condition:</strong> <span id="view_condition"></span></p>
-                            <p><strong>Initial Stock:</strong> <span id="view_initial_stock"></span></p>
-                            <p><strong>Used:</strong> <span id="view_used_amount"></span></p>
-                            <p><strong>Last Maintenance:</strong> <span id="view_last_maintenance"></span></p>
-                            <p><strong>Next Maintenance:</strong> <span id="view_next_maintenance"></span></p>
-                            <p><strong>Guide:</strong> <span id="view_maintenance_guide"></span></p>
+                    <div class="col-md-6 product_content">
+                        <p><strong>Asset ID:</strong> <span id="view_asset_number"></span></p>
+                        <p><strong>Asset Name:</strong> <span id="view_asset_name"></span></p>
+                        <p><strong>Maker:</strong> <span id="view_maker"></span></p>
+                        <p><strong>Location:</strong> <span id="view_location"></span></p>
+                        <p><strong>Condition:</strong> <span id="view_condition"></span></p>
+                        <p><strong>Stock:</strong> <span id="view_stock"></span></p>
+                        <p><strong>Used:</strong> <span id="view_used_amount"></span></p>
+                        <p><strong>Last Maintenance:</strong> <span id="view_last_maintenance"></span></p>
+                        <p><strong>Next Maintenance:</strong> <span id="view_next_maintenance"></span></p>
+                        <p><strong>Guide:</strong> <span id="view_maintenance_guide"></span></p>
+                        <div class="space-ten"></div>
+                        <div class="btn-ground text-right">
+                            <a class="btn btn-primary btn-md" id="edit_asset_page">Edit Asset Page</a>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-md btn-default" data-dismiss="modal">Close</button>
-                <a class="btn btn-primary btn-md" id="edit_asset_page">Edit Asset Page</a>
             </div>
         </div>
     </div>
@@ -550,7 +547,7 @@ font-weight-bold
                 $('#view_maker').text(response.asset_maker);
                 $('#view_location').text(response.location);
                 $('#view_condition').text(response.asset_condition);
-                $('#view_initial_stock').text(response.initial_stock + ' Items');
+                $('#view_stock').text(response.asset_stock + ' Items out of ' + response.initial_stock);
                 $('#view_used_amount').text(response.used_amount ? response.used_amount + ' Items' : '0 Items');
                 $('#view_last_maintenance').text(response.last_maintenance);
                 $('#view_next_maintenance').text(response.next_maintenance);

@@ -52,66 +52,73 @@ font-weight-bold
 @endif
 
 <div class="row zoom90">
-    <div class="col-xl-8 col-lg-8">
+    <div class="col-xl-12 col-lg-12">
         <div class="card">
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-fire-extinguisher"></i> Detail Asset</h6>
-                <div class="text-right">
-                    <a data-id="{{ $data->id }}" href="#" class="btn btn-outline-secondary btn-sm edit-tool"><i class="menu-Logo fa fa-edit"></i> Update Data</a>
-                </div>
             </div>
-            <div class="card-body">
-                <div class="col-md-12 mb-3">
-                    <div class="row">
-                        <div class="col-md-12 d-flex align-items-center justify-content-center" style="padding-left: 1em;">
-                            <img src="{{ $data->img->filepath ? asset($data->img->filepath) : asset('img/default-img.png') }}" style="height: 150px; width: 200px; border: 1px solid rgb(202, 202, 202);" class="img-fluid d-none d-md-block rounded mb-2 shadow ">
-                        </div>
-                        <div class="col-md-12 mt-4">
-                            <table class="table table-borderless table-sm">
-                                <tr>
-                                    <th style="width: 200px;">Asset Name</th>
-                                    <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $data->asset_name }}</span></td>
-                                </tr>
-                                <tr>
-                                    <th style="width: 200px;">Asset ID</th>
-                                    <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $data->asset_id }}</span></td>
-                                </tr>
-                                <tr>
-                                    <th>Maker</th>
-                                    <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $data->asset_maker }}</span></td>
-                                </tr>
-                                <tr>
-                                    <th>Location</th>
-                                    <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $data->location->description }}</span></td>
-                                </tr>
-                                <tr>
-                                    <th>Condition</th>
-                                    <td style="text-align: start; font-weight:500">: <span class="ml-3">{!! $data->condition->badge !!}</span></td>
-                                </tr>
-                                <tr>
-                                    <th>Initial Stock</th>
-                                    <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $data->initial_stock }}</span></td>
-                                </tr>
-                                <tr>
-                                    <th>Used</th>
-                                    <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $data->used_amount ? $data->used_amount : '0' }}</span></td>
-                                </tr>
-                                <tr>
-                                    <th>Last Maintenance At</th>
-                                    <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $data->last_maintenance }}</span></td>
-                                </tr>
-                                <tr>
-                                    <th>Next Maintenance At</th>
-                                    <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $data->next_maintenance }}</span></td>
-                                </tr>
-                                <tr>
-                                    <th>Guide</th>
-                                    <td style="text-align: start; font-weight:500">: <a href="{{ asset($data->asset_guidance) }}"><span class="ml-3">{{ $data->asset_guidance }}</span></a></td>
-                                </tr>
-                            </table>
-                        </div>
+            <div class="card-body" style="position: relative;">
+                <a href="#" data-id="{{ $data->id }}" class="position-absolute edit-tool" style="top: 10px; right: 15px; z-index: 10;">
+                    <i class="fa fa-edit fa-lg ml-2" style="color: rgb(181, 181, 181);"></i>
+                </a>
+                <div class="row">
+                    <div class="col-md-4 product_img">
+                        <img src="{{ $data->img->filepath ? asset($data->img->filepath) : asset('img/default-img.png') }}" class="img-responsive">
                     </div>
+                    <div class="col-md-8 product_content">
+                        <table class="table table-borderless table-sm">
+                            <tr>
+                                <th style="width: 200px;">Asset Name</th>
+                                <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $data->asset_name }}</span></td>
+                            </tr>
+                            <tr>
+                                <th style="width: 200px;">Asset ID</th>
+                                <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $data->asset_id }}</span></td>
+                            </tr>
+                            <tr>
+                                <th>Maker</th>
+                                <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $data->asset_maker }}</span></td>
+                            </tr>
+                            <tr>
+                                <th>Location</th>
+                                <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $data->location->description }}</span></td>
+                            </tr>
+                            <tr>
+                                <th>Condition</th>
+                                <td style="text-align: start; font-weight:500">: <span class="ml-3">{!! $data->condition->badge !!}</span></td>
+                            </tr>
+                            <tr>
+                                <th>Stock</th>
+                                <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $data->asset_stock }} <small class="ml-2">(Initial Stock : {{ $data->initial_stock }})</small></span></td>
+                            </tr>
+                            <tr>
+                                <th>Used</th>
+                                <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $data->used_amount ? $data->used_amount : '0' }}</span></td>
+                            </tr>
+                            <tr>
+                                <th>Last Maintenance At</th>
+                                <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $data->last_maintenance }}</span></td>
+                            </tr>
+                            <tr>
+                                <th>Next Maintenance At</th>
+                                <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $data->next_maintenance }}</span></td>
+                            </tr>
+                            <tr>
+                                <th style="width: 200px;">Running Hours</th>
+                                @php
+                                    $purchaseDate = \Carbon\Carbon::parse($data->last_maintenance);
+                                    $currentDate = \Carbon\Carbon::now();
+                                    $hoursDifference = $currentDate->diffInHours($purchaseDate);
+                                @endphp
 
+                                <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $hoursDifference }} hours</span></td>
+                            </tr>
+                            <tr>
+                                <th>Guide</th>
+                                <td style="text-align: start; font-weight:500">: <a href="{{ asset($data->asset_guidance) }}"><span class="ml-3">{{ $data->asset_guidance }}</span></a></td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -128,6 +135,28 @@ font-weight-bold
                 <div>
                     <a data-id="{{ $data->id }}" class="btn btn-outline-danger btn-md text-danger">I Understand, delete the asset</a>
                 </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <span class="text-primary font-weight-bold">Asset Management Guidelines</span>
+            </div>
+            <div class="card-body" style="background-color: rgb(247, 247, 247);">
+                <h6 class="h6 mb-2 font-weight-bold text-gray-800">Overview</h6>
+                <p>The Asset Management menu provides essential sub-menus for viewing and editing assets within the system:</p>
+                <ul class="ml-4">
+                    <li><strong>View Assets</strong>: This menu allows authorized personnel to access a detailed overview of all assets in the system. It includes current stock, asset status, and other relevant information for effective management.</li>
+                    <li><strong>Edit Assets</strong>: This menu enables authorized users to make modifications to asset details, such as stock levels, asset descriptions, and status updates. Ensuring accurate and up-to-date information is crucial for effective asset management.</li>
+                </ul>
+                <h6 class="h6 mb-2 font-weight-bold text-gray-800">Key Points</h6>
+                <ul class="ml-4">
+                    <li>Access to both viewing and editing menus is restricted to authorized personnel only to maintain data integrity and security.</li>
+                    <li>All edits made to asset details should be carefully reviewed to ensure accuracy and reflect the most current status.</li>
+                    <li>Regularly update asset information to ensure it aligns with actual stock levels, conditions, and availability.</li>
+                    <li>Ensure that asset data is backed up and audited regularly to maintain accuracy and compliance with organizational policies.</li>
+                </ul>
             </div>
         </div>
     </div>

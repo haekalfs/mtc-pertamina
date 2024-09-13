@@ -159,9 +159,8 @@ font-weight-bold
                     <div class="row no-gutters">
                         <div class="col-md-3 d-flex align-items-top justify-content-center text-center">
                             <label for="file-upload" style="cursor: pointer;">
-                                <img id="image-preview" src="{{ asset('img/default-img.png') }}"
-                                     style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
-                                     <small style="font-size: 10px;"><i><u>Click above to upload image!</u></i></small>
+                                <img id="image-preview" src="{{ asset('img/default-img.png') }}" style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
+                                <small style="font-size: 10px;"><i><u>Click above to upload image!</u></i></small>
                             </label>
                             <input id="file-upload" type="file" name="room_image" style="display: none;" accept="image/*" onchange="previewImage(event)">
                         </div>
@@ -189,7 +188,7 @@ font-weight-bold
                                         </div>
                                     </div>
                                     <div class="d-flex align-items-start">
-                                        <div style="width: 180px;" class="mr-2">
+                                        <div style="width: 140px;" class="mr-2">
                                             <p style="margin: 0;">List Alat :</p>
                                         </div>
                                         <div class="flex-grow-1 textarea-container" id="documents-list-container">

@@ -31,8 +31,7 @@ class Profit extends Model
 
     public function batch(){
         return $this->belongsTo('App\Models\Penlat_batch', 'pelaksanaan', 'batch')->withDefault(function ($batch) {
-            // Set default attributes for the default instance
-            $batch->id = 1; // Set the default primary key value (or other relevant attributes)
+            $batch->id = -1; // Sett it to notfound
         });
     }
 }

@@ -68,5 +68,7 @@ class Kernel extends HttpKernel
         'checkUserAccess' => \App\Http\Middleware\CheckUserAccess::class,
         'suspicious' => \App\Http\Middleware\SuspiciousFileCheck::class,
         'restrictRequestbyRole' => \App\Http\Middleware\RestrictRequestRole::class,
+        'encrypt.params' => \App\Http\Middleware\EncryptParams::class,
+        'decrypt.params' => \App\Http\Middleware\DecryptParams::class,
     ];
 }

@@ -210,23 +210,25 @@ active font-weight-bold
                 </div>
             </div>
         </div>
-        <div class="col-md-8 content card">
-            @if(!$morningBriefing || $morningBriefing->isEmpty())
-            <div class="desc mt-4">
-                <h1>No Data Available</h1>
-            </div>
-            @else
-            @foreach($morningBriefing->chunk(3) as $index => $chunk)
-                @foreach($chunk as $briefing)
-                <img style="width: 100%; height: 300px;" src="{{ asset($briefing->img_filepath) }}" alt="Main Image">
+        <div class="col-xl-8 col-md-8">
+            <div class="content card">
+                @if(!$morningBriefing || $morningBriefing->isEmpty())
                 <div class="desc mt-4">
-                    <h1>{{ $briefing->briefing_name }}</h1>
-                    <p>{!! Str::limit($briefing->briefing_result, 1000, '...') !!}</p>
-                    <a class="mb-2 pt-0" href="{{ route('preview-briefing', $briefing->id) }}">Read more</a>
+                    <h1>No Data Available</h1>
                 </div>
+                @else
+                @foreach($morningBriefing->chunk(3) as $index => $chunk)
+                    @foreach($chunk as $briefing)
+                    <img style="width: 100%; height: 300px;" src="{{ asset($briefing->img_filepath) }}" alt="Main Image">
+                    <div class="desc mt-4">
+                        <h1>{{ $briefing->briefing_name }}</h1>
+                        <p>{!! Str::limit($briefing->briefing_result, 1000, '...') !!}</p>
+                        <a class="mb-2 pt-0" href="{{ route('preview-briefing', $briefing->id) }}">Read more</a>
+                    </div>
+                    @endforeach
                 @endforeach
-            @endforeach
-            @endif
+                @endif
+            </div>
         </div>
         <div class="col-xl-12 col-md-12 zoom90 mb-3">
             <div class="card shadow mb-4">
@@ -298,7 +300,6 @@ active font-weight-bold
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="card-body d-flex justify-content-center align-items-center">
-                            <div id="chartContainerSpline" style="height: 370px; width: 100%;"></div>
                             <canvas id="lineChart"></canvas>
                         </div>
                         <div class="text-center mb-3">
@@ -322,7 +323,6 @@ active font-weight-bold
         </div>
     </div>
 </div>
-
 <script>
 window.onload = function() {
     loadChartData();

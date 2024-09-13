@@ -3528,3 +3528,6 @@ a.spam-button:link {
   .share ul li a:hover {
     color: #007bff;
   }
+  .product_view .modal-dialog{max-width: 800px; width: 100%;}
+  .pre-cost{text-decoration: line-through; color: #a5a5a5;}
+  .space-ten{padding: 10px 0;}

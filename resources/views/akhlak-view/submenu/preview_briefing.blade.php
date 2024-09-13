@@ -56,15 +56,14 @@ font-weight-bold
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="ti-signal"></i> Briefing</h6>
                 <div class="text-right">
-                    {{-- @mtd_acc(4) --}}
-                    <a href="#" class="btn btn-danger btn-sm text-white delete-briefing mr-2" data-id="{{ $data->id }}"><i class="menu-Logo fa fa-trash-o"></i> Delete</a>
-                    {{-- @endmtd_acc
-                    @mtd_acc(3) --}}
-                    <a href="#" class="btn btn-secondary btn-sm text-white edit-briefing" data-id="{{ $data->id }}"><i class="menu-Logo fa fa-edit"></i> Update Data</a>
-                    {{-- @endmtd_acc --}}
+                    {{-- <a href="#" class="btn btn-danger btn-sm text-white delete-briefing mr-2" data-id="{{ $data->id }}"><i class="menu-Logo fa fa-trash-o"></i> Delete</a>
+                    <a href="#" class="btn btn-secondary btn-sm text-white edit-briefing" data-id="{{ $data->id }}"><i class="menu-Logo fa fa-edit"></i> Update Data</a> --}}
                 </div>
             </div>
-            <div class="card-body">
+            <div class="card-body" style="position: relative;">
+                <a href="#" data-id="{{ $data->id }}" class="position-absolute edit-briefing" style="top: 10px; right: 15px; z-index: 10;">
+                    <i class="fa fa-edit fa-lg ml-2" style="color: rgb(181, 181, 181);"></i>
+                </a>
                 <div class="col-md-12 mb-3">
                     <div class="row">
                         <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding-left: 1em;">
@@ -181,19 +180,16 @@ font-weight-bold
                             </div>
                         </div>
                         <div class="col-md-12">
-                            <div class="d-flex align-items-start mb-4">
-                                <div style="width: 140px;" class="mr-2">
-                                    <p style="margin: 0;">Hasil Kegiatan :</p>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <textarea id="summernote" name="activity_result"></textarea>
-                                </div>
+                            <div class="form-group has-success">
+                                <p for="summernote" class="control-label mb-2">Hasil Kegiatan :</p>
+                                <textarea id="summernote" name="activity_result"></textarea>
+                                <span class="help-block field-validation-valid" data-valmsg-for="cc-name" data-valmsg-replace="true"></span>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <a href="#" class="btn btn-danger text-white delete-briefing mr-2" data-id="{{ $data->id }}"><i class="menu-Logo fa fa-trash-o"></i> Delete</a>
                     <button type="submit" class="btn btn-primary">Update Data</button>
                 </div>
             </form>

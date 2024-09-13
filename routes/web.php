@@ -21,6 +21,7 @@ use App\Http\Controllers\PDController;
 use App\Http\Controllers\PenlatController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\RolesController;
+use App\Http\Controllers\SocialMediaController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Route;
@@ -61,6 +62,7 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
     Route::middleware(['throttle:chart-data'])->group(function () {
         Route::get('/api/chart-data/{year}', [OperationController::class, 'getChartData']);
         Route::get('/api/chart-data-profits/{year}', [FinanceController::class, 'getChartDataProfits']);
+        Route::get('/api/chart-data-trend-revenue/{year}', [FinanceController::class, 'getTrendChartData']);
         Route::get('/api/comparison-chart-data-profits/{year}/{secondYear}', [FinanceController::class, 'getComparisonChartData']);
         Route::get('/api/summary-data-profits/{year}', [FinanceController::class, 'getSummaryProfits']);
         Route::get('/feedback-chart-data/{year}', [PDController::class, 'getFeedbackChartData']);
@@ -111,16 +113,6 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
             Route::put('/update-briefing/{itemId}', [MorningBriefingController::class, 'update'])->name('briefing.update');
             Route::delete('/marketing-briefing/delete-item/{id}', [MorningBriefingController::class, 'delete_briefing'])->name('delete-briefing');
         });
-
-        //penlat
-        Route::get('/penlat/list-pelatihan', [PenlatController::class, 'index'])->name('penlat');
-        Route::get('/penlat/pelatihan-preview/{penlatId}', [PenlatController::class, 'preview_penlat'])->name('preview-penlat');
-        Route::get('/penlat/list-pelatihan/import-data', [PenlatController::class, 'penlat_import'])->name('penlat-import');
-        Route::post('/import-list-penlat', [ImportController::class, 'import_penlat'])->name('penlat.import');
-        Route::post('/store-penlat', [PenlatController::class, 'store'])->name('penlat.store');
-        Route::get('/penlat/{id}/edit', [PenlatController::class, 'edit'])->name('penlat.edit');
-        Route::put('/penlat-update/{id}', [PenlatController::class, 'update'])->name('penlat.update');
-        Route::delete('/penlat-delete/{id}', [PenlatController::class, 'delete'])->name('delete.penlat');
 
         Route::middleware(['checkUserAccess:101'])->group(function () {
             //Operation
@@ -248,6 +240,13 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
             Route::put('/update-campaign/{itemId}', [CampaignController::class, 'update'])->name('campaign.update');
             Route::delete('/marketing-campaign/delete-item/{id}', [CampaignController::class, 'delete_campaign'])->name('delete-campaign');
 
+            //Insights
+            Route::get('/marketing/social-media/insight', [SocialMediaController::class, 'index'])->name('insight-socmed');
+            Route::get('/marketing/social-media/getTotalPostFacebook', [SocialMediaController::class, 'getTotalPostFacebook'])->name('getTotalPostFacebook');
+            Route::get('/marketing/social-media/getTotalLikesFacebook', [SocialMediaController::class, 'getTotalLikesFacebook'])->name('getTotalLikesFacebook');
+            Route::get('/marketing/social-media/getTotalCommentsFacebook', [SocialMediaController::class, 'getTotalCommentsFacebook'])->name('getTotalCommentsFacebook');
+            Route::get('/marketing/social-media/getTotalVisitorsFacebook', [SocialMediaController::class, 'getTotalVisitorsFacebook'])->name('getTotalVisitorsFacebook');
+
             //Company Agreement
             Route::get('/marketing/company-agreement', [MarketingController::class, 'company_agreement'])->name('company-agreement');
             Route::post('/store-agreement', [AgreementController::class, 'store'])->name('agreement.store');
@@ -256,7 +255,6 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
             Route::put('/update-agreement/{itemId}', [AgreementController::class, 'update'])->name('agreement.update');
             Route::delete('/marketing-agreement/delete-item/{id}', [AgreementController::class, 'delete_agreement'])->name('delete-agreement');
         });
-
 
         //Penlat Requirement
         Route::get('/penlat/tool-requirement-penlat', [PenlatController::class, 'tool_requirement_penlat'])->name('tool-requirement-penlat');
@@ -267,6 +265,16 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
         Route::delete('/penlat-requirement-delete/{id}', [PenlatController::class, 'delete_requirement'])->name('delete.requirement');
         Route::delete('/penlat-item-requirement-delete/{id}', [PenlatController::class, 'delete_item_requirement'])->name('delete.item.requirement');
 
+        //penlat
+        Route::get('/penlat/list-pelatihan', [PenlatController::class, 'index'])->name('penlat');
+        Route::get('/penlat/pelatihan-preview/{penlatId}', [PenlatController::class, 'preview_penlat'])->name('preview-penlat');
+        Route::get('/penlat/list-pelatihan/import-data', [PenlatController::class, 'penlat_import'])->name('penlat-import');
+        Route::post('/import-list-penlat', [ImportController::class, 'import_penlat'])->name('penlat.import');
+        Route::post('/store-penlat', [PenlatController::class, 'store'])->name('penlat.store');
+        Route::get('/penlat/{id}/edit', [PenlatController::class, 'edit'])->name('penlat.edit');
+        Route::put('/penlat-update/{id}', [PenlatController::class, 'update'])->name('penlat.update');
+        Route::delete('/penlat-delete/{id}', [PenlatController::class, 'delete'])->name('delete.penlat');
+
         //batch penlat
         Route::get('/penlat/list-batch', [PenlatController::class, 'batch'])->name('batch-penlat');
         Route::get('/penlat/list-batch/preview-batch/{id}', [PenlatController::class, 'preview_batch'])->name('preview-batch');
@@ -274,7 +282,6 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
         Route::get('/penlat-batch/{id}/edit', [PenlatController::class, 'fetch_batch'])->name('batch.data');
         Route::put('/penlat-batch-update/{id}', [PenlatController::class, 'update_batch'])->name('batch.update');
         Route::delete('/penlat-batch-delete/{id}', [PenlatController::class, 'delete_batch'])->name('delete.batch');
-
 
         //Finance
         Route::middleware(['checkUserAccess:102'])->group(function () {

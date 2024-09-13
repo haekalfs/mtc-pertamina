@@ -88,6 +88,7 @@ class InventoryToolController extends Controller
             'asset_maker' => $tool->asset_maker,
             'asset_condition' => $tool->condition->condition,
             'initial_stock' => $tool->initial_stock,
+            'asset_stock' => $tool->asset_stock,
             'location' => $tool->location->description,
             'used_amount' => $tool->used_amount,
             'last_maintenance' => $tool->last_maintenance,
