@@ -65,15 +65,21 @@ class AgreementController extends Controller
         $isPdf = false;
         $filePath = null;
 
-        if ($data && file_exists(public_path($data->spk_filepath))) {
+        // Check if SPK file path exists and is not null or empty
+        if ($data && !empty($data->spk_filepath) && file_exists(public_path($data->spk_filepath))) {
             $fileExists = true;
             $filePath = public_path($data->spk_filepath);
             $isPdf = pathinfo($filePath, PATHINFO_EXTENSION) === 'pdf';
         }
 
-        return view('marketing.submenu.preview-agreement', ['data' => $data, 'statuses' => $statuses, 'fileExists' => $fileExists, 'isPdf' => $isPdf, 'filePath' => $filePath]);
+        return view('marketing.submenu.preview-agreement', [
+            'data' => $data,
+            'statuses' => $statuses,
+            'fileExists' => $fileExists,
+            'isPdf' => $isPdf,
+            'filePath' => $filePath
+        ]);
     }
-
 
     public function show($id)
     {
@@ -89,9 +95,9 @@ class AgreementController extends Controller
             'company_details' => 'required',
             'status' => 'nullable|string',
             'agreement_date' => 'required',
-            'spk_file' => 'sometimes',
-            'non_spk_details' => 'sometimes',
-            'img' => 'sometimes',
+            'spk_file' => 'sometimes|file',
+            'non_spk_details' => 'sometimes|string|nullable',
+            'img' => 'sometimes|image',
         ]);
 
         // Find the agreement by id
@@ -101,20 +107,35 @@ class AgreementController extends Controller
         $agreement->status = $request->input('status');
         $agreement->date = $request->input('agreement_date');
 
-        // Handle file uploads for SPK and image
-        if ($request->hasFile('spk_file')) {
-            // Delete the old SPK file if it exists
+        // Check if the agreement is being updated to SPK or Non-SPK
+        if ($request->input('spk_type') == 'SPK') {
+            // If SPK is selected, handle the SPK file and set non_spk to null
+            if ($request->hasFile('spk_file')) {
+                // Delete the old SPK file if it exists
+                if ($agreement->spk_filepath && file_exists(public_path($agreement->spk_filepath))) {
+                    unlink(public_path($agreement->spk_filepath));
+                }
+
+                // Store the new SPK file
+                $spkFile = $request->file('spk_file');
+                $spkFilename = time() . '_' . $spkFile->getClientOriginalName();
+                $spkFile->move(public_path('uploads/agreement/spk'), $spkFilename);
+                $agreement->spk_filepath = 'uploads/agreement/spk/' . $spkFilename;
+            }
+
+            // Ensure non_spk is null since it's an SPK agreement
+            $agreement->non_spk = null;
+        } else {
+            // If Non-SPK is selected, set spk_filepath to null and handle non_spk_details
+            if (!empty($request->input('non_spk_details'))) {
+                $agreement->non_spk = $request->input('non_spk_details');
+            }
+
+            // Set SPK file path to null since it's Non-SPK
             if ($agreement->spk_filepath && file_exists(public_path($agreement->spk_filepath))) {
                 unlink(public_path($agreement->spk_filepath));
             }
-            // Store the new SPK file in the same way as the store function
-            $image = $request->file('spk_file');
-            $filename = time() . '_' . $image->getClientOriginalName();
-            $image->move(public_path('uploads/agreement/spk'), $filename);
-            $agreement->spk_filepath = 'uploads/agreement/spk/' . $filename;
-        } else {
-            // Update non-SPK details if no SPK file is uploaded
-            $agreement->non_spk = $request->input('non_spk_details');
+            $agreement->spk_filepath = null;
         }
 
         // Handle image upload
@@ -123,7 +144,8 @@ class AgreementController extends Controller
             if ($agreement->img_filepath && file_exists(public_path($agreement->img_filepath))) {
                 unlink(public_path($agreement->img_filepath));
             }
-            // Store the new image file in the same way as the store function
+
+            // Store the new image file
             $image = $request->file('img');
             $filename = time() . '_' . $image->getClientOriginalName();
             $image->move(public_path('uploads/agreement'), $filename);
@@ -134,7 +156,7 @@ class AgreementController extends Controller
         $agreement->save();
 
         // Redirect back with a success message
-        return redirect()->route('company-agreement')->with('success', 'Agreement updated successfully');
+        return redirect()->route('preview-company', $id)->with('success', 'Agreement updated successfully');
     }
     /**
      * Delete a specific campaign by its ID.

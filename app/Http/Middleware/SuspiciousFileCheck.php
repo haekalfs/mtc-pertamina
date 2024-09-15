@@ -27,7 +27,7 @@ class SuspiciousFileCheck
                 if (is_array($fileInput)) {
                     foreach ($fileInput as $file) {
                         if ($this->isSuspicious($file)) {
-                            abort(403, 'Suspicious file detected.');
+                            throw new SuspiciousFileException("YOU'RE NOT AUTHORIZED TO ACCESS THIS PAGE!");
                         }
                     }
                 } else {

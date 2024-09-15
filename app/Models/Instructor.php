@@ -9,7 +9,7 @@ class Instructor extends Model
 {
     use HasFactory;
     protected $table = "instructors";
-    protected $fillable = ["id", "instructor_name", 'instructor_email', 'working_hour', 'status', 'instructor_dob', 'imgFilepath', 'instructor_address', 'cvFilepath', 'ijazahFilepath', 'documentPendukungFilepath',"created_at", "updated_at"];
+    protected $fillable = ["id", "instructor_name", 'instructor_email', 'instructor_gender', 'working_hour', 'status', 'instructor_dob', 'imgFilepath', 'instructor_address', 'cvFilepath', 'ijazahFilepath', 'documentPendukungFilepath',"created_at", "updated_at"];
 
 
     public function certificates()

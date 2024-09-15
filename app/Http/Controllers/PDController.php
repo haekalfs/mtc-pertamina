@@ -309,15 +309,36 @@ class PDController extends Controller
         return redirect()->back()->with('success', 'Program data updated successfully.');
     }
 
-    public function certificate_instructor()
+    public function certificate_instructor(Request $request)
     {
+        // Eager load relationships to optimize queries
         $penlatList = Penlat::all();
-        //filtering list
         $listBatch = Penlat_batch::all();
 
-        $data = Certificates_catalog::all();
+        // Get the penlat filter value from the request, default to "-1" (Show All)
+        $penlatFilter = $request->input('penlat', -1);
 
-        return view('plan_dev.submenu.instructor-certificate', ['data' => $data, 'penlatList' => $penlatList, 'listBatch' => $listBatch]);
+        // Apply filtering based on the selected penlat
+        $dataQuery = Certificates_catalog::query();
+
+        if ($penlatFilter != -1) {
+            // Directly filter Certificates_catalog using a relationship (or use whereHas if necessary)
+            $dataQuery->whereIn('id', function ($query) use ($penlatFilter) {
+                $query->select('certificates_catalog_id')
+                      ->from('certificates_to_penlats')
+                      ->where('penlat_id', $penlatFilter);
+            });
+        }
+
+        // Get the filtered or all data
+        $data = $dataQuery->get();
+
+        // Return view with filtered data
+        return view('plan_dev.submenu.instructor-certificate', [
+            'data' => $data,
+            'penlatList' => $penlatList,
+            'listBatch' => $listBatch
+        ]);
     }
 
     public function instructor(Request $request, $penlatId = '-1', $statusId = '-1')
@@ -399,11 +420,11 @@ class PDController extends Controller
         $query = Penlat::query();
 
         // Apply filters only if they are selected
-        if ($request->has('namaPenlat') && $request->namaPenlat != '-1') {
+        if ($request->filled('namaPenlat') && $request->namaPenlat != '-1') {
             $query->where('id', $request->namaPenlat);
         }
 
-        if ($request->has('stcw') && $request->stcw != '-1') {
+        if ($request->filled('stcw') && $request->stcw != '-1') {
             $query->where('kategori_pelatihan', $request->stcw);
         }
 
@@ -417,7 +438,9 @@ class PDController extends Controller
         // Return view with data and penlatList
         return view('plan_dev.submenu.training-reference', [
             'penlatList' => $penlatList,
-            'data' => $data
+            'data' => $data,
+            'selectedNamaPenlat' => $request->namaPenlat,
+            'selectedStcw' => $request->stcw,
         ]);
     }
 
@@ -891,6 +914,8 @@ class PDController extends Controller
         // If all statuses are true, update the Penlat_certificate status
         if (!$hasIncompleteStatus) {
             Penlat_certificate::where('id', $penlatCertificateId)->update(['status' => 'Issued']);
+        }else {
+            Penlat_certificate::where('id', $penlatCertificateId)->update(['status' => 'On Process']);
         }
 
         return response()->json(['status' => 'success']);
@@ -906,13 +931,39 @@ class PDController extends Controller
 
     public function saveAllReceivables(Request $request)
     {
+        // Retrieve participants data from the request
         $participants = $request->input('participants');
+        if (empty($participants)) {
+            return response()->json(['status' => 'error', 'message' => 'No participants provided.'], 400);
+        }
 
+        // Loop through the participants and update each participant's status and date_received
         foreach ($participants as $participantData) {
-            $participant = Receivables_participant_certificate::find($participantData['id']);
-            $participant->date_received = $participantData['date_received'];
-            $participant->status = $participantData['status'];
-            $participant->save();
+            $participant = Receivables_participant_certificate::findOrFail($participantData['id']);
+            $participant->update([
+                'date_received' => $participantData['date_received'],
+                'status' => $participantData['status']
+            ]);
+
+            // Capture penlatCertificateId from the last participant (assuming all participants have the same penlat_certificate_id)
+            $penlatCertificateId = $participant->penlat_certificate_id;
+        }
+
+        // If penlatCertificateId is found, check if all participants have a true status
+        if (isset($penlatCertificateId)) {
+            // Check if there are any participants with status NULL or 'false'
+            $hasIncompleteStatus = Receivables_participant_certificate::where('penlat_certificate_id', $penlatCertificateId)
+                ->where(function($query) {
+                    $query->whereNull('status')
+                        ->orWhere('status', 'false');
+                })->exists();
+
+            // If no incomplete statuses exist, update the Penlat_certificate status to 'Issued'
+            if (!$hasIncompleteStatus) {
+                Penlat_certificate::where('id', $penlatCertificateId)->update(['status' => 'Issued']);
+            }else {
+                Penlat_certificate::where('id', $penlatCertificateId)->update(['status' => 'On Process']);
+            }
         }
 
         return response()->json(['status' => 'success']);

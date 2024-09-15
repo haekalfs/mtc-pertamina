@@ -242,6 +242,7 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
 
             //Insights
             Route::get('/marketing/social-media/insight', [SocialMediaController::class, 'index'])->name('insight-socmed');
+            Route::post('/social-media/update-facebook-token/{id}', [SocialMediaController::class, 'updateFacebookToken']);
             Route::get('/marketing/social-media/getTotalPostFacebook', [SocialMediaController::class, 'getTotalPostFacebook'])->name('getTotalPostFacebook');
             Route::get('/marketing/social-media/getTotalLikesFacebook', [SocialMediaController::class, 'getTotalLikesFacebook'])->name('getTotalLikesFacebook');
             Route::get('/marketing/social-media/getTotalCommentsFacebook', [SocialMediaController::class, 'getTotalCommentsFacebook'])->name('getTotalCommentsFacebook');

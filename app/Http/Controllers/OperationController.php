@@ -40,7 +40,6 @@ class OperationController extends Controller
         $getPesertaCount = Infografis_peserta::whereYear('tgl_pelaksanaan', $yearSelected)->count();
         $getKebutuhanCount = Penlat_requirement::count();
         $getAssetCount = Inventory_tools::count();
-        $getAssetStock = Inventory_tools::sum('initial_stock');
 
         // Get count of assets that are out of stock
         $OutOfStockCount = Inventory_tools::where('asset_stock', '=', 0)->count();
@@ -55,7 +54,6 @@ class OperationController extends Controller
             'totalAttention',
             'getKebutuhanCount',
             'getAssetCount',
-            'getAssetStock',
             'yearsBefore',
             'yearSelected',
             'OutOfStockCount',

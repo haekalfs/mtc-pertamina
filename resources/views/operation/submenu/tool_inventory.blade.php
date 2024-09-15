@@ -393,7 +393,7 @@ font-weight-bold
     <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 800px;" role="document">
         <div class="modal-content">
             <div class="modal-header d-flex flex-row align-items-center justify-content-between">
-                <h5 class="modal-title" id="editToolModalLabel">Edit Tool</h5>
+                <h5 class="modal-title" id="editToolModalLabel">Quick Edit Tool</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>

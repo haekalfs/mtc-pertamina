@@ -68,8 +68,11 @@ font-weight-bold
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="email">Periode :</label>
-                                            <select class="custom-select" id="namaPenlat" name="namaPenlat">
-                                                <option value="1" selected>Show All</option>
+                                            <select class="custom-select" id="periode" name="periode">
+                                                <option value="-1" {{ request('periode') == '-1' ? 'selected' : '' }}>Show All</option>
+                                                @foreach(range(date('Y'), date('Y') - 5) as $year)
+                                                    <option value="{{ $year }}" {{ request('periode') == $year ? 'selected' : '' }}>{{ $year }}</option>
+                                                @endforeach
                                             </select>
                                         </div>
                                     </div>

@@ -63,7 +63,6 @@ class DashboardController extends Controller
         ->value('average_score');
 
         $getAssetCount = Inventory_tools::count();
-        $getAssetStock = Inventory_tools::sum('initial_stock');
 
         // Count total instructors
         $instructorCount = Instructor::count();
@@ -86,7 +85,6 @@ class DashboardController extends Controller
             'rawProfits' => $rawProfits,
             'averageFeedbackScore' => $averageFeedbackScore,
             'getAssetCount' => $getAssetCount,
-            'getAssetStock' => $getAssetStock,
             'instructorCount' => $instructorCount,
             'penlatCount' => $penlatCount,
             'batchCount' => $batchCount

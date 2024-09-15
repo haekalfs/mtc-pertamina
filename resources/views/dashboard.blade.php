@@ -102,7 +102,7 @@ active font-weight-bold
                             <div class="stat-content">
                                 <div class="text-left dib">
                                     <div class="h6">
-                                        <div class="h6 mb-0 text-gray-800"><span style="font-size: 14px;">{{ $getAssetCount }} Assets with Total {{ $getAssetStock }} Stocks</span></div>
+                                        <div class="h6 mb-0 text-gray-800"><span style="font-size: 14px;">{{ $getAssetCount }} Assets Registered</span></div>
                                     </div>
                                     <div class="stat-heading">Inventaris Alat</div>
                                 </div>

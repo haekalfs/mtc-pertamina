@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Agreement;
 use App\Models\Campaign;
+use App\Models\SocialsInsights;
 use App\Models\Status;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -24,8 +25,10 @@ class MarketingController extends Controller
         ->groupBy('date')
         ->get();
 
+        $visitorsInsight = SocialsInsights::sum('visitors_count');
 
-        return view('marketing.index', ['headline' => $headline, 'countAgreement' => $countAgreement, 'getAgreements' => $getAgreements, 'campaignChart' => $campaignChart, 'countCampaign' => $countCampaign]);
+
+        return view('marketing.index', ['headline' => $headline, 'countAgreement' => $countAgreement, 'getAgreements' => $getAgreements, 'campaignChart' => $campaignChart, 'countCampaign' => $countCampaign, 'visitors' => $visitorsInsight]);
     }
 
     public function campaign(Request $request)
@@ -60,9 +63,19 @@ class MarketingController extends Controller
 
     public function company_agreement(Request $request)
     {
-        $data = Agreement::all();
+        // Fetch the selected period (year)
+        $periode = $request->input('periode');
+
+        // Get all agreements, apply filtering if a specific year is selected
+        if ($periode && $periode != -1) {
+            $data = Agreement::whereYear('date', $periode)->get();
+        } else {
+            $data = Agreement::all();
+        }
+
+        // Get all statuses
         $statuses = Status::all();
 
-        return view('marketing.submenu.agreement', ['data' => $data, 'statuses' => $statuses]);
+        return view('marketing.submenu.agreement', ['data' => $data, 'statuses' => $statuses, 'selectedPeriode' => $periode]);
     }
 }

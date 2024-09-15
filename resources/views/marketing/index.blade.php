@@ -30,8 +30,7 @@ font-weight-bold
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="stat-heading mb-1 font-weight-bold">
-                                    Marketing Campaign</div>
+                                <div class="stat-heading mb-1 font-weight-bold">Marketing Campaign</div>
                                 <div class="h6 mb-0 text-gray-800">{{ $countCampaign }} Events</div>
                             </div>
                             <div class="col-auto">
@@ -45,13 +44,13 @@ font-weight-bold
 
         <!-- Earnings (Monthly) Card Example -->
         <div class="col-xl-4 col-md-6 animateBox">
-            <a href="" class="clickable-card">
+            <a href="{{ route('insight-socmed') }}" class="clickable-card">
                 <div class="card border-left-success shadow py-2">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="stat-heading mb-1 font-weight-bold">
-                                    Enggagement Social Media</div>
+                                <div class="stat-heading mb-1 font-weight-bold">Enggagement Social Media</div>
+                                <div class="h6 mb-0 text-gray-800">{{ $visitors }} Visitors...</div>
                             </div>
                             <div class="col-auto">
                                 <i class="ti-instagram fa-2x text-success"></i>
@@ -69,8 +68,7 @@ font-weight-bold
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="stat-heading mb-1 font-weight-bold">
-                                    Company Agreement</div>
+                                <div class="stat-heading mb-1 font-weight-bold">Company Agreement</div>
                                 <div class="h6 mb-0 text-gray-800">{{ $countAgreement }} Documents</div>
                             </div>
                             <div class="col-auto">

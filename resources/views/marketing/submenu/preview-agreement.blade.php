@@ -202,11 +202,11 @@ font-weight-bold
                                             </div>
                                             <div class="flex-grow-1">
                                                 <label class="col-md-4">
-                                                    <input class="form-radio-input" type="radio" name="type_reimburse" id="projectRadioEdit" value="Project" checked>
+                                                    <input class="form-radio-input" type="radio" name="spk_type" id="spkRadioEdit" value="SPK" checked>
                                                     <span class="form-radio-sign">SPK</span>
                                                 </label>
                                                 <label class="col-md-4">
-                                                    <input class="form-radio-input" type="radio" name="type_reimburse" id="othersRadioEdit" value="Others">
+                                                    <input class="form-radio-input" type="radio" name="spk_type" id="othersRadioEdit" value="NONSPK">
                                                     <span class="form-radio-sign">NON-SPK</span>
                                                 </label>
                                             </div>
@@ -281,6 +281,7 @@ $(document).ready(function() {
         });
     });
 });
+// When the modal is opened for editing
 document.querySelectorAll('.edit-agreement').forEach(function(button) {
     button.addEventListener('click', function(event) {
         event.preventDefault();
@@ -300,24 +301,45 @@ document.querySelectorAll('.edit-agreement').forEach(function(button) {
 
                 // Handle SPK / Non-SPK radio buttons
                 if (data.spk_filepath) {
-                    document.getElementById('projectRadioEdit').checked = true;
-                    document.getElementById('spkFileInputEdit').style.display = 'block';
-                    document.getElementById('nonSpkTextareaEdit').style.display = 'none';
+                    document.getElementById('spkRadioEdit').checked = true;
+                    toggleSpkFields('SPK');
                     document.getElementById('currentFile').textContent = 'Current file: ' + data.spk_filepath;
                 } else {
                     document.getElementById('othersRadioEdit').checked = true;
-                    document.getElementById('spkFileInputEdit').style.display = 'none';
-                    document.getElementById('nonSpkTextareaEdit').style.display = 'block';
+                    toggleSpkFields('NON-SPK');
                     document.getElementById('currentFile').textContent = 'No file uploaded';
                 }
 
                 // Handle image preview
-                document.querySelector('#image-preview-edit').src = data.img_filepath ? `/${data.img_filepath}` : 'https://via.placeholder.com/50x50/5fa9f8/ffffff';
+                document.querySelector('#image-preview-edit').src = data.img_filepath ? `/${data.img_filepath}` : '{{ asset("img/default-img.png") }}';
 
                 // Open the modal
                 $('#editAgreementModal').modal('show');
             });
     });
+});
+
+// Function to toggle between SPK and Non-SPK fields
+function toggleSpkFields(type) {
+    if (type === 'SPK') {
+        document.getElementById('spkFileInputEdit').style.display = 'block';
+        document.getElementById('nonSpkTextareaEdit').style.display = 'none';
+    } else if (type === 'NON-SPK') {
+        document.getElementById('spkFileInputEdit').style.display = 'none';
+        document.getElementById('nonSpkTextareaEdit').style.display = 'block';
+    }
+}
+
+// Listen for changes to SPK/Non-SPK radio buttons
+document.getElementById('spkRadioEdit').addEventListener('change', function() {
+    if (this.checked) {
+        toggleSpkFields('SPK');
+    }
+});
+document.getElementById('othersRadioEdit').addEventListener('change', function() {
+    if (this.checked) {
+        toggleSpkFields('NON-SPK');
+    }
 });
 
 function previewImageEdit(event) {

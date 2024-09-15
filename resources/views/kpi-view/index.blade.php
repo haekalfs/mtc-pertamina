@@ -142,7 +142,7 @@ font-weight-bold
                         <div class="col-md-9">
                             <h6 class="h6 mb-2 font-weight-bold text-gray-800">Guidelines for KPI Realization</h6>
                             <ul class="ml-4">
-                                <li><strong>KPI Realization Overview:</strong> This section provides an overview of the Key Performance Indicators (KPIs) realization for Pertamina MTC. It focuses on evaluating the performance and achievements of various KPIs such as {{ $indicators }} highlighting areas of success and identifying opportunities for improvement. The goal is to assess how well the targets have been met and to provide insights for strategic planning and decision-making within the organization.</li>
+                                <li><strong>KPI Realization Overview:</strong> This section provides an overview of the Key Performance Indicators (KPIs) realization for Pertamina MTC. It focuses on evaluating the performance and achievements of various KPIs such as {{ $indicators }} highlighting areas of success and identifying opportunities for improvement.</li>
                             </ul>
                         </div>
                     </div>

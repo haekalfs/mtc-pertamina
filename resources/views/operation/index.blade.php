@@ -65,7 +65,7 @@ font-weight-bold
                                         <span class="badge out-of-stock">{{ $requiredMaintenanceCount }} Assets Require Maintenance</span> --}}
                                     </span>
                                     @else
-                                    <div class="h6 mb-0 text-gray-800"><span style="font-size: 14px;">{{ $getAssetCount }} Assets with Total {{ $getAssetStock }} Stocks</span></div>
+                                    <div class="h6 mb-0 text-gray-800"><span style="font-size: 14px;">{{ $getAssetCount }} Assets Registered</span></div>
                                     @endif
                                 </div>
                             </div>

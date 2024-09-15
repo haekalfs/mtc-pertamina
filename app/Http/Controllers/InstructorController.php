@@ -20,6 +20,7 @@ class InstructorController extends Controller
             'email'             => 'required',
             'dob'               => 'required',
             'address'           => 'required',
+            'gender'            => 'required',
             'user_status'       => 'required',
             'profile_picture'   => 'required|mimes:jpeg,png,jpg,gif,svg',
             'cv'                => 'required',
@@ -35,6 +36,7 @@ class InstructorController extends Controller
             'instructor_name'   => $validatedData['full_name'],
             'instructor_email'       => $validatedData['email'],
             'instructor_dob'         => $validatedData['dob'],
+            'instructor_gender'         => $validatedData['gender'],
             'instructor_address'     => $validatedData['address'],
             'working_hours'       => $validatedData['working_hour'],
             'status' => $validatedData['user_status'],
@@ -106,6 +108,7 @@ class InstructorController extends Controller
             'full_name'         => 'required',
             'email'             => 'required',
             'dob'               => 'required',
+            'gender'            => 'required',
             'address'           => 'required',
             'status'            => 'required', // Updated key from 'user_status' to 'status'
             'profile_picture'   => 'nullable|mimes:jpeg,png,jpg,gif,svg',
@@ -124,6 +127,7 @@ class InstructorController extends Controller
         $instructor->instructor_name = $validatedData['full_name'];
         $instructor->instructor_email = $validatedData['email'];
         $instructor->instructor_dob = $validatedData['dob'];
+        $instructor->instructor_gender = $validatedData['gender'];
         $instructor->instructor_address = $validatedData['address'];
         $instructor->working_hours = $validatedData['working_hour'];
         $instructor->status = $validatedData['status'];
@@ -211,7 +215,7 @@ class InstructorController extends Controller
         $instructor->save();
 
         // Redirect or return response
-        return redirect()->route('instructor')->with('success', 'Instructor updated successfully.');
+        return redirect()->route('preview-instructor', ['id' => $instructorId, 'penlatId' => -1])->with('success', 'Instructor updated successfully.');
     }
 
     public function deleteInstructor($instructorId)

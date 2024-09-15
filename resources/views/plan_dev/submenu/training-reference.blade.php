@@ -67,22 +67,22 @@ font-weight-bold
                                 <div class="row align-items-center">
                                     <div class="col-md-5">
                                         <div class="form-group">
-                                            <label for="email">Nama Pelatihan :</label>
+                                            <label for="namaPenlat">Nama Pelatihan :</label>
                                             <select class="custom-select" id="namaPenlat" name="namaPenlat">
-                                                <option value="-1" selected>Show All</option>
+                                                <option value="-1" {{ $selectedNamaPenlat == '-1' ? 'selected' : '' }}>Show All</option>
                                                 @foreach ($penlatList as $item)
-                                                <option value="{{ $item->id }}">{{ $item->description }}</option>
+                                                    <option value="{{ $item->id }}" {{ $item->id == $selectedNamaPenlat ? 'selected' : '' }}>{{ $item->description }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-group">
-                                            <label for="email">Kategori Pelatihan :</label>
+                                            <label for="stcw">Kategori Pelatihan :</label>
                                             <select class="custom-select" id="stcw" name="stcw">
-                                                <option value="-1" selected>Show All</option>
-                                                <option value="STCW">STCW</option>
-                                                <option value="NON STCW">NON STCW</option>
+                                                <option value="-1" {{ $selectedStcw == '-1' ? 'selected' : '' }}>Show All</option>
+                                                <option value="STCW" {{ $selectedStcw == 'STCW' ? 'selected' : '' }}>STCW</option>
+                                                <option value="NON STCW" {{ $selectedStcw == 'NON STCW' ? 'selected' : '' }}>NON STCW</option>
                                             </select>
                                         </div>
                                     </div>

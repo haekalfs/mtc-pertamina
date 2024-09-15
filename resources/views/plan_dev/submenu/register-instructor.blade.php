@@ -42,9 +42,8 @@ font-weight-bold
                                             <div class="col-md-12">
                                                 <div class="d-flex align-items-top justify-content-center text-center">
                                                     <label for="file-upload" style="cursor: pointer;">
-                                                        <img id="image-preview" src="https://via.placeholder.com/150x150/5fa9f8/ffffff"
-                                                             style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
-                                                             <small style="font-size: 10px;"><i><u>Click above to upload image!</u></i></small>
+                                                        <img id="image-preview" src="{{ asset('img/default-img.png') }}" style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
+                                                        <small style="font-size: 10px;"><i><u>Click above to upload image!</u></i></small>
                                                     </label>
                                                     <input id="file-upload" type="file" name="profile_picture" style="display: none;" accept="image/*" onchange="previewImage(event)">
                                                 </div>
@@ -90,6 +89,16 @@ font-weight-bold
                         <div class="row form-group">
                             <div class="col col-md-3"><label for="dob" class=" form-control-label">Date of Birth</label></div>
                             <div class="col-12 col-md-9"><input type="date" id="dob" name="dob" class="form-control"></div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col col-md-3"><label for="gender" class=" form-control-label">Instructor Gender</label></div>
+                            <div class="col-12 col-md-9">
+                                <select name="gender" id="gender" class="form-control">
+                                    <option disabled>Please select</option>
+                                    <option value="Pria">Pria</option>
+                                    <option value="Wanita">Wanita</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="row form-group">
                             <div class="col col-md-3"><label for="address" class=" form-control-label">Address</label></div>

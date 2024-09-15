@@ -63,18 +63,20 @@ font-weight-bold
                     </div>
                 </div>
                 <div class="card-body zoom90 p-4">
-                    <form method="GET" action="">
+                    <form method="GET" action="{{ route('certificate-instructor') }}">
                         @csrf
                         <div class="row d-flex justify-content-start mb-4">
                             <div class="col-md-12">
                                 <div class="row align-items-center">
                                     <div class="col-md-5">
                                         <div class="form-group">
-                                            <label for="email">Nama Pelatihan :</label>
-                                            <select class="form-control form-control" name="penlat">
-                                                <option value="1">Show All</option>
+                                            <label for="penlat">Nama Pelatihan:</label>
+                                            <select class="form-control" name="penlat" id="penlat">
+                                                <option value="-1" {{ request('penlat') == -1 ? 'selected' : '' }}>Show All</option>
                                                 @foreach ($penlatList as $item)
-                                                <option value="{{ $item->id }}">{{ $item->description }}</option>
+                                                    <option value="{{ $item->id }}" {{ request('penlat') == $item->id ? 'selected' : '' }}>
+                                                        {{ $item->description }}
+                                                    </option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -82,7 +84,9 @@ font-weight-bold
                                     <div class="col-md-1 d-flex align-self-end justify-content-start">
                                         <div class="form-group">
                                             <div class="align-self-center">
-                                                <button type="submit" class="btn btn-primary" style="padding-left: 1.2em; padding-right: 1.2em;"><i class="ti-search"></i></button>
+                                                <button type="submit" class="btn btn-primary" style="padding-left: 1.2em; padding-right: 1.2em;">
+                                                    <i class="ti-search"></i>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>

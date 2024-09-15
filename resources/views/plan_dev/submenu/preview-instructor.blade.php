@@ -135,6 +135,14 @@ font-weight-bold
                     </div>
                     <div class="row">
                         <div class="col-md-5">
+                            <label>Gender</label>
+                        </div>
+                        <div class="col-md-7">
+                            <p>: {{ $data->instructor_gender }}</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-5">
                             <label>Address</label>
                         </div>
                         <div class="col-md-7">

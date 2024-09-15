@@ -91,6 +91,16 @@ font-weight-bold
                             <div class="col-12 col-md-9"><input type="date" id="dob" name="dob" class="form-control" value="{{ $data->instructor_dob }}"></div>
                         </div>
                         <div class="row form-group">
+                            <div class="col col-md-3"><label for="gender" class=" form-control-label">Instructor Gender</label></div>
+                            <div class="col-12 col-md-9">
+                                <select name="gender" id="gender" class="form-control">
+                                    <option disabled {{ is_null($data->instructor_gender) ? 'selected' : '' }}>Please select</option>
+                                    <option value="Pria" {{ $data->instructor_gender == 'Pria' ? 'selected' : '' }}>Pria</option>
+                                    <option value="Wanita" {{ $data->instructor_gender == 'Wanita' ? 'selected' : '' }}>Wanita</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row form-group">
                             <div class="col col-md-3"><label for="address" class=" form-control-label">Address</label></div>
                             <div class="col-12 col-md-9"><textarea name="address" rows="3" class="form-control">{{ $data->instructor_address }}</textarea></div>
                         </div>

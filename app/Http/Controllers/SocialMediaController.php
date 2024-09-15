@@ -2,16 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Social_token;
 use App\Models\SocialsInsights;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
 class SocialMediaController extends Controller
 {
     public function index()
     {
-        $pageId = '115601096554270';  // Your Page ID
-        $accessToken = 'EAAOluXLpDksBOZCUyLjdG42fmDZBXZA7sSIJpSwp6rfOmWMGqd63mvZAVZA5SPs8GR3nWSb8XmC1kzaZASEDpnVOf1KADx0QWhm6xiIyLMVBTTc2rcaZCdT8zpAPcqmGxsILhAL6mSB06JIblGESVetSUk0KLXmHW9RUYl0OVVVx5BfCfsw0gNgDEvinEkmKYgZD';  // Your long-lived Page Access Token
+        $socialMedia = Social_token::find(1);
+        $socialMediaInstagram = Social_token::find(2);
+        $pageId = $socialMedia->page_id;  // Your Page ID
+        $accessToken = $socialMedia->token;  // Your long-lived Page Access Token
 
         // Define the time range (last 30 days)
         $since = strtotime('-30 days');  // 30 days ago
@@ -19,66 +23,69 @@ class SocialMediaController extends Controller
 
         // Define the Facebook Graph API URL with the time range
         $url = "https://graph.facebook.com/v20.0/{$pageId}/insights/page_impressions_unique?access_token={$accessToken}&since={$since}&until={$until}";
-
-        // Function to fetch paginated data with a limit
-        function fetchLimitedData($url, $limit = 3) {
-            $allData = [
-                'day' => null,  // Initialize for daily data
-                'week' => null, // Initialize for weekly data
-                'days_28' => null  // Initialize for 28-day data
-            ];
-
-            // Fetch the initial URL and limit the pagination
-            $urlsToFetch = [$url];
-            $requestCount = 0;  // Track the number of requests
-
-            while (!empty($urlsToFetch) && $requestCount < $limit) {
-                $currentUrl = array_shift($urlsToFetch);
-                $response = Http::get($currentUrl);
-                $json = $response->json();
-
-                // Merge the current data into the main array
-                if (isset($json['data'])) {
-                    foreach ($json['data'] as $insight) {
-                        $name = $insight['name'];
-                        $period = $insight['period'];
-
-                        // Check if the period data exists and merge
-                        if (!isset($allData[$period])) {
-                            $allData[$period] = $insight; // Initialize the array
-                        } else {
-                            // Append values to existing data
-                            $allData[$period]['values'] = array_merge($allData[$period]['values'], $insight['values']);
-                        }
-                    }
-                }
-
-                // Check pagination and only add "next" and "previous" if under the limit
-                if (isset($json['paging']['next']) && $requestCount < $limit) {
-                    $urlsToFetch[] = $json['paging']['next'];
-                }
-                if (isset($json['paging']['previous']) && $requestCount < $limit) {
-                    $urlsToFetch[] = $json['paging']['previous'];
-                }
-
-                $requestCount++;  // Increment the request counter
-            }
-
-            return array_filter($allData);  // Remove any empty data arrays
-        }
-
-        // Fetch limited paginated data (with max 3 requests)
-        $insights = fetchLimitedData($url, 3);  // Fetch up to 3 pages of data
+        // Cache::forget('facebook_insights');
+        // $this->getTotalVisitorsFacebook();
+        // Fetch the cached data or fetch from the API if cache is empty
+        $insights = Cache::remember('facebook_insights', now()->addDay(), function () use ($url) {
+            return $this->fetchLimitedData($url, 20);  // Fetch API data and cache it for 1 day
+        });
 
         $getFacebookInsights = SocialsInsights::where('social_id', 1)->first();
 
-        return view('marketing.insight.index', ['insights' => $insights, 'getFacebookInsights' => $getFacebookInsights]);
+        return view('marketing.insight.index', ['insights' => $insights, 'getFacebookInsights' => $getFacebookInsights, 'socialMedia' => $socialMedia, 'socialMediaInstagram' => $socialMediaInstagram]);
     }
 
+    // Function to fetch paginated data with a limit
+    private function fetchLimitedData($url, $limit = 3) {
+        $allData = [
+            'day' => null,  // Initialize for daily data
+            'week' => null, // Initialize for weekly data
+            'days_28' => null  // Initialize for 28-day data
+        ];
+
+        // Fetch the initial URL and limit the pagination
+        $urlsToFetch = [$url];
+        $requestCount = 0;  // Track the number of requests
+
+        while (!empty($urlsToFetch) && $requestCount < $limit) {
+            $currentUrl = array_shift($urlsToFetch);
+            $response = Http::get($currentUrl);
+            $json = $response->json();
+
+            // Merge the current data into the main array
+            if (isset($json['data'])) {
+                foreach ($json['data'] as $insight) {
+                    $name = $insight['name'];
+                    $period = $insight['period'];
+
+                    // Check if the period data exists and merge
+                    if (!isset($allData[$period])) {
+                        $allData[$period] = $insight; // Initialize the array
+                    } else {
+                        // Append values to existing data
+                        $allData[$period]['values'] = array_merge($allData[$period]['values'], $insight['values']);
+                    }
+                }
+            }
+
+            // Check pagination and only add "next" and "previous" if under the limit
+            if (isset($json['paging']['next']) && $requestCount < $limit) {
+                $urlsToFetch[] = $json['paging']['next'];
+            }
+            if (isset($json['paging']['previous']) && $requestCount < $limit) {
+                $urlsToFetch[] = $json['paging']['previous'];
+            }
+
+            $requestCount++;  // Increment the request counter
+        }
+
+        return array_filter($allData);  // Remove any empty data arrays
+    }
 
     public function getTotalPostFacebook()
     {
-        $accessToken = 'EAAOluXLpDksBOZCUyLjdG42fmDZBXZA7sSIJpSwp6rfOmWMGqd63mvZAVZA5SPs8GR3nWSb8XmC1kzaZASEDpnVOf1KADx0QWhm6xiIyLMVBTTc2rcaZCdT8zpAPcqmGxsILhAL6mSB06JIblGESVetSUk0KLXmHW9RUYl0OVVVx5BfCfsw0gNgDEvinEkmKYgZD';
+        $socialMedia = Social_token::find(1);
+        $accessToken = $socialMedia->token;  // Your long-lived Page Access Token
         $url = "https://graph.facebook.com/115601096554270/posts?access_token={$accessToken}";
 
         $totalPosts = 0;
@@ -110,7 +117,10 @@ class SocialMediaController extends Controller
 
     public function getTotalLikesFacebook()
     {
-        $url = "https://graph.facebook.com/115601096554270/posts?fields=likes.summary(true)&access_token=EAAOluXLpDksBOZCUyLjdG42fmDZBXZA7sSIJpSwp6rfOmWMGqd63mvZAVZA5SPs8GR3nWSb8XmC1kzaZASEDpnVOf1KADx0QWhm6xiIyLMVBTTc2rcaZCdT8zpAPcqmGxsILhAL6mSB06JIblGESVetSUk0KLXmHW9RUYl0OVVVx5BfCfsw0gNgDEvinEkmKYgZD";
+        $socialMedia = Social_token::find(1);
+        $pageId = $socialMedia->page_id;  // Your Page ID
+        $accessToken = $socialMedia->token;  // Your long-lived Page Access Token
+        $url = "https://graph.facebook.com/{$pageId}/posts?fields=likes.summary(true)&access_token={$accessToken}";
 
         $totalLikes = 0;
         do {
@@ -137,7 +147,10 @@ class SocialMediaController extends Controller
 
     public function getTotalCommentsFacebook()
     {
-        $url = "https://graph.facebook.com/115601096554270/posts?fields=comments.summary(true)&access_token=EAAOluXLpDksBOZCUyLjdG42fmDZBXZA7sSIJpSwp6rfOmWMGqd63mvZAVZA5SPs8GR3nWSb8XmC1kzaZASEDpnVOf1KADx0QWhm6xiIyLMVBTTc2rcaZCdT8zpAPcqmGxsILhAL6mSB06JIblGESVetSUk0KLXmHW9RUYl0OVVVx5BfCfsw0gNgDEvinEkmKYgZD";
+        $socialMedia = Social_token::find(1);
+        $pageId = $socialMedia->page_id;  // Your Page ID
+        $accessToken = $socialMedia->token;  // Your long-lived Page Access Token
+        $url = "https://graph.facebook.com/{$pageId}/posts?fields=comments.summary(true)&access_token={$accessToken}";
 
         $totalComments = 0;
         do {
@@ -164,8 +177,9 @@ class SocialMediaController extends Controller
 
     public function getTotalVisitorsFacebook()
     {
-        $pageId = '115601096554270';  // Your Page ID
-        $accessToken = 'EAAOluXLpDksBOZCUyLjdG42fmDZBXZA7sSIJpSwp6rfOmWMGqd63mvZAVZA5SPs8GR3nWSb8XmC1kzaZASEDpnVOf1KADx0QWhm6xiIyLMVBTTc2rcaZCdT8zpAPcqmGxsILhAL6mSB06JIblGESVetSUk0KLXmHW9RUYl0OVVVx5BfCfsw0gNgDEvinEkmKYgZD';  // Your long-lived Page Access Token
+        $socialMedia = Social_token::find(1);
+        $pageId = $socialMedia->page_id;  // Your Page ID
+        $accessToken = $socialMedia->token;  // Your long-lived Page Access Token
 
         // Define the time range (last 30 days)
         $since = strtotime('-30 days');  // 30 days ago
@@ -208,7 +222,7 @@ class SocialMediaController extends Controller
         }
 
         // Fetch paginated visitor data (with max 3 requests)
-        $totalVisitors = fetchPaginatedVisitorsData($url, 3);
+        $totalVisitors = fetchPaginatedVisitorsData($url, 20);
 
         // Update or create the database record for visitors count
         SocialsInsights::updateOrCreate(
@@ -217,5 +231,35 @@ class SocialMediaController extends Controller
         );
 
         return $totalVisitors;
+    }
+
+    public function updateFacebookToken(Request $request, $id)
+    {
+        // Validate the token
+        $request->validate([
+            'token' => 'required|string'
+        ]);
+
+        // Fetch the account details from Facebook
+        $url = 'https://graph.facebook.com/me?fields=id,name&access_token=' . $request->token;
+        $response = Http::get($url);
+
+        if ($response->ok()) {
+            // Get account details
+            $data = $response->json();
+            $accountId = $data['id'];
+            $accountName = $data['name'];
+
+            // Update the social media token in the database
+            $socialToken = Social_token::find($id);
+            $socialToken->token = $request->token;
+            $socialToken->account_name = $accountName;
+            $socialToken->page_id = $accountId;
+            $socialToken->save();
+
+            return response()->json(['success' => true, 'message' => 'Token updated successfully!']);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Invalid token or unable to fetch data from Facebook'], 400);
+        }
     }
 }
