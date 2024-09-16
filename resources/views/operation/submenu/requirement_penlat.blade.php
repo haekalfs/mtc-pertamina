@@ -220,7 +220,7 @@ font-weight-bold
             var clonedDocumentItem = $(".document-item:first").clone();
 
             // Create a new container for the cloned document-item div
-            var clonedContainer = $("<div class='document-item'></div>").append(clonedDocumentItem.html());
+            var clonedContainer = $("<div class='document-item mb-3'></div>").append(clonedDocumentItem.html());
 
             // Append the new container to the container
             $("#documents-list-container").append(clonedContainer);
