@@ -261,12 +261,6 @@ font-weight-bold
     </div>
 </div>
 <script>
-    document.getElementById('penlatSelect').addEventListener('change', function() {
-        var selectedOption = this.options[this.selectedIndex].text;
-        document.getElementById('programInput').value = selectedOption;
-    });
-</script>
-<script>
 $(document).ready(function() {
     $('#listUsages').DataTable({
         processing: true,
@@ -381,17 +375,31 @@ function initSelect2WithAjax(elementId, ajaxUrl, placeholderText, penlatId = nul
     });
 
     $('#' + elementId).on('select2:select', function (e) {
+        // Check if the selected option is a new tag
         if (e.params.data.newTag) {
             var newOption = new Option(e.params.data.text, e.params.data.id, true, true);
             $(this).append(newOption).trigger('change');
+            // For new tags, skip updating the image preview since there's no associated filepath
+            $('#image-preview').attr('src', '{{ asset('img/default-img.png') }}');
+            $('input[name="date"]').val(''); // Clear the date input for new tags
+            $('#file-upload').val(''); // Clear the file input field as well
+            return; // Exit early for new tags
         }
 
-        // Check if the selected batch has a valid filepath and update image preview
+        // Proceed with regular batch processing for options fetched via AJAX
         const selectedBatch = e.params.data;
+
+        // Clear the file input whenever a new batch is selected to avoid confusion
+        $('#file-upload').val(''); // Reset the file input field
+        $('#image-preview').attr('src', '');
+
+        // Check if the selected batch has a valid filepath and update image preview
         if (selectedBatch.filepath && selectedBatch.filepath !== '') {
+            $('#file-upload').val(''); // Reset the file input field
             $('#image-preview').attr('src', '{{ asset('') }}' + selectedBatch.filepath);
         } else {
             $('#image-preview').attr('src', '{{ asset('img/default-img.png') }}');
+            $('#file-upload').val(''); // Reset the file input field
         }
 
         // Check if the selected batch has a valid date and prefill the date input
@@ -402,14 +410,20 @@ function initSelect2WithAjax(elementId, ajaxUrl, placeholderText, penlatId = nul
         }
     });
 }
-
 // Image file input preview function
 function previewImage(event) {
     const reader = new FileReader();
-    reader.onload = function(){
+
+    // Clear the current image preview immediately
+    $('#image-preview').attr('src', '');
+
+    reader.onload = function() {
+        // Once the file is read, update the image preview with the new file
         const output = document.getElementById('image-preview');
         output.src = reader.result;
     };
+
+    // Read the new file to trigger the onload event
     reader.readAsDataURL(event.target.files[0]);
 }
 
