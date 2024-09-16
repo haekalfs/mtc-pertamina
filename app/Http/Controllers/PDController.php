@@ -579,6 +579,15 @@ class PDController extends Controller
             } else {
                 // If the batch exists, fetch the existing Penlat_batch record
                 $penlatBatch = Penlat_batch::where('batch', $validated['batch'])->first();
+
+                // Check if usages for this batch already exist
+                $checkIfExist = Penlat_certificate::where('penlat_batch_id', $penlatBatch->id)->exists();
+
+                if ($checkIfExist) {
+                    // Redirect with a warning message if usages already exist
+                    DB::rollBack();
+                    return redirect()->route('certificate')->with('warning', "Certificate for batch $penlatBatch->batch already exist...");
+                }
             }
 
             // Retrieve all participants for the specified batch

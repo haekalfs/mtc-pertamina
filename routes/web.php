@@ -283,6 +283,7 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
         Route::get('/penlat-batch/{id}/edit', [PenlatController::class, 'fetch_batch'])->name('batch.data');
         Route::put('/penlat-batch-update/{id}', [PenlatController::class, 'update_batch'])->name('batch.update');
         Route::delete('/penlat-batch-delete/{id}', [PenlatController::class, 'delete_batch'])->name('delete.batch');
+        Route::get('/fetch-penlat-batches', [PenlatController::class, 'fetchBatches'])->name('batches.fetch');
 
         //Finance
         Route::middleware(['checkUserAccess:102'])->group(function () {

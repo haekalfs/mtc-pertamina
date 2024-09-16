@@ -22,14 +22,14 @@ class CheckForErrors
                     case 419: // CSRF token mismatch
                         Session::flash('failed', 'Your session has expired. Please try again.');
                         break;
-                    case 500: // Internal server error
+                    // case 500: // Internal server error
                     case 501: // Not implemented
                     case 502: // Bad gateway
                     case 503: // Service unavailable
                         Session::flash('failed', 'Server error occurred. Please try again later.');
                         break;
                     default: // Other client and server errors
-                        Session::flash('failed', 'An error occurred while processing your request.');
+                        // Session::flash('failed', 'An error occurred while processing your request.');
                         break;
                 }
 

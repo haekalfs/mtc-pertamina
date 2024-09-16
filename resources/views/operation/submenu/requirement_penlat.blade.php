@@ -146,32 +146,38 @@ font-weight-bold
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="d-flex align-items-start">
-                                        <div style="width: 120px;" class="mr-2">
-                                            <p style="margin: 0;">List Alat :</p>
-                                        </div>
-                                        <div class="flex-grow-1 textarea-container" id="documents-list-container">
-                                            <div class="document-item mb-2">
-                                                <div class="row">
-                                                    <div class="col-md-9">
-                                                        <select class="form-control mb-2" name="tool[]" required>
-                                                            @foreach ($assets as $item)
-                                                                <option value="{{ $item->id }}">{{ $item->asset_name }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-md-3 p-0">
-                                                        <input type="number" class="form-control" name="amount[]" placeholder="Pcs" required></input>
-                                                    </div>
-                                                </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 mt-3">
+                            <div class="form-group has-success">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <!-- Label aligned with buttons -->
+                                    <p class="control-label mb-3" style="margin-bottom: 0;">List Kebutuhan Alat:</p>
+                                    <div class="mb-3">
+                                        <a class="btn shadow-sm btn-sm mr-2 btn-danger delete-document-list text-white" style="display: none;">
+                                            <i class="fa fa-trash-alt"></i> Delete Item
+                                        </a>
+                                        <button type="button" class="btn btn-success shadow-sm btn-sm add-document-list">
+                                            <i class="fa fa-plus"></i> Add More
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="flex-grow-1 textarea-container mt-2" id="documents-list-container">
+                                    <div class="document-item mb-3">
+                                        <div class="row">
+                                            <div class="col-md-10 pr-0">
+                                                <!-- Ensure long text is truncated -->
+                                                <select class="form-control mb-2 select-tool underline-input" name="tool[]" style="width: 98%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" required>
+                                                    <option disabled selected>Choose item...</option>
+                                                    @foreach ($assets as $item)
+                                                        <option value="{{ $item->id }}">{{ $item->asset_name }}</option>
+                                                    @endforeach
+                                                </select>
                                             </div>
-                                        </div>
-                                        <div class="ml-4 text-white">
-                                            <div class="col-md-12">
-                                                <button type="button" class="btn btn-success mb-2 shadow-sm btn-sm add-document-list"><i class="fa fa-plus"></i> Add More &nbsp;&nbsp;</button>
-                                            </div>
-                                            <div class="col-md-12">
-                                                <a class="btn shadow-sm btn-sm btn-danger delete-document-list" style="display: none;"><i class="fa fa-trash-alt"></i> Delete Item</a>
+                                            <div class="col-md-2 pl-0">
+                                                <input type="number" class="form-control underline-input" name="amount[]" placeholder="Amount" style="width: 100%;" required></input>
                                             </div>
                                         </div>
                                     </div>

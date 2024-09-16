@@ -138,9 +138,8 @@ font-weight-bold
                     <div class="row no-gutters mb-3">
                         <div class="col-md-3 d-flex align-items-top justify-content-center text-center">
                             <label for="file-upload" style="cursor: pointer;">
-                                <img id="image-preview" src="{{ asset('img/default-img.png') }}"
-                                     style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
-                                     <small style="font-size: 12px;" class="text-secondary"><i><u>Uploading Image is Optional!</u></i></small>
+                                <img id="image-preview" src="{{ asset('img/default-img.png') }}" style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
+                                <small style="font-size: 12px;" class="text-secondary"><i><u>Uploading Image is Optional!</u></i></small>
                             </label>
                             <input id="file-upload" type="file" name="image" style="display: none;" accept="image/*" onchange="previewImage(event)">
                         </div>
@@ -171,11 +170,7 @@ font-weight-bold
                                     <p style="margin: 0;">Batch <span class="text-danger">*</span>:</p>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <select id="mySelect2" class="form-control" name="batch">
-                                        @foreach ($batchList as $item)
-                                            <option value="{{ $item->batch }}">{{ $item->batch }}</option>
-                                        @endforeach
-                                    </select>
+                                    <select id="mySelect2" class="form-control" name="batch"></select>
                                 </div>
                             </div>
                             <div class="d-flex align-items-center mb-4">
@@ -300,7 +295,7 @@ $(document).ready(function() {
 });
 
 $(document).ready(function() {
-    // Initialize Select2
+    // Initialize Select2 for Penlat
     $('#penlatSelect').select2({
         dropdownParent: $('#inputDataModal'),
         theme: "classic",
@@ -309,21 +304,57 @@ $(document).ready(function() {
         tags: true,
     });
 
-    // Event listener for change event
+    // Update hidden input on Penlat change
     $('#penlatSelect').on('change', function() {
         var selectedOption = $(this).find('option:selected').text();
         $('#programInput').val(selectedOption);
+
+        // Reinitialize the batch select dropdown, passing the selected penlat_id
+        initSelect2WithAjax('mySelect2', '{{ route('batches.fetch') }}', 'Select or add a Batch', $(this).val());
     });
+
+    // Initialize Select2 with AJAX for the batch dropdown (default initialization)
+    initSelect2WithAjax('mySelect2', '{{ route('batches.fetch') }}', 'Select or add a Batch', null);
 });
 
-$(document).ready(function() {
-    $('#mySelect2').select2({
+function initSelect2WithAjax(elementId, ajaxUrl, placeholderText, penlatId = null) {
+    $('#' + elementId).select2({
+        ajax: {
+            url: ajaxUrl,
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    q: params.term, // search term
+                    page: params.page || 1, // pagination
+                    penlat_id: penlatId // pass penlat_id for filtering, if provided
+                };
+            },
+            processResults: function (data, params) {
+                params.page = params.page || 1;
+                return {
+                    results: $.map(data.items, function (item) {
+                        return {
+                            id: item.batch, // Use the 'batch' column for the option value
+                            text: item.batch, // Use the 'batch' column for the option label
+                            filepath: item.filepath, // Include filepath to use for image preview
+                            date: item.date // Include date to prefill the date input
+                        };
+                    }),
+                    pagination: {
+                        more: data.total_count > (params.page * 10) // Check if more results are available
+                    }
+                };
+            },
+            cache: true
+        },
+        placeholder: placeholderText,
+        minimumInputLength: 1, // Start searching after 1 character
         dropdownParent: $('#inputDataModal'),
-        theme: "classic",
-        placeholder: "Select or add a Batch",
+        theme: 'classic',
         width: '100%',
-        tags: true,
-        createTag: function(params) {
+        tags: true, // Allow adding new tags
+        createTag: function (params) {
             var term = $.trim(params.term);
             if (term === '') {
                 return null;
@@ -331,32 +362,53 @@ $(document).ready(function() {
             return {
                 id: term,
                 text: term,
-                newTag: true // Mark this as a new tag
+                newTag: true // Mark as a new tag
             };
         },
-        templateResult: function(data) {
-            // Only show the "Add new" label if it's a new tag
+        templateResult: function (data) {
             if (data.newTag) {
                 return $('<span><em>Add new: "' + data.text + '"</em></span>');
             }
             return data.text;
         },
-        templateSelection: function(data) {
-            // Show only the text for the selected item
+        templateSelection: function (data) {
             return data.text;
         }
     });
 
-    $('#mySelect2').on('select2:select', function(e) {
+    $('#' + elementId).on('select2:select', function (e) {
         if (e.params.data.newTag) {
-            // Show a notification that a new record is added
-
-            // After the new option is added, remove the "newTag" property
             var newOption = new Option(e.params.data.text, e.params.data.id, true, true);
             $(this).append(newOption).trigger('change');
         }
+
+        // Check if the selected batch has a valid filepath and update image preview
+        const selectedBatch = e.params.data;
+        if (selectedBatch.filepath && selectedBatch.filepath !== '') {
+            $('#image-preview').attr('src', '{{ asset('') }}' + selectedBatch.filepath);
+        } else {
+            $('#image-preview').attr('src', '{{ asset('img/default-img.png') }}');
+        }
+
+        // Check if the selected batch has a valid date and prefill the date input
+        if (selectedBatch.date) {
+            $('input[name="date"]').val(selectedBatch.date);
+        } else {
+            $('input[name="date"]').val(''); // Clear the input if no date is provided
+        }
     });
-});
+}
+
+// Image file input preview function
+function previewImage(event) {
+    const reader = new FileReader();
+    reader.onload = function(){
+        const output = document.getElementById('image-preview');
+        output.src = reader.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+}
+
 document.querySelectorAll('.price-input, .qty-input').forEach(function(input) {
     input.addEventListener('input', function() {
         calculateTotalForRow(this);
@@ -399,16 +451,6 @@ function formatRupiah(number, prefix) {
     return prefix === undefined ? rupiah : (rupiah ? prefix + rupiah : '');
 }
 
-</script>
-<script>
-    function previewImage(event) {
-        const reader = new FileReader();
-        reader.onload = function(){
-            const output = document.getElementById('image-preview');
-            output.src = reader.result;
-        };
-        reader.readAsDataURL(event.target.files[0]);
-    }
 </script>
 <script>
     $(document).ready(function() {

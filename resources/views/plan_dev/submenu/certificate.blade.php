@@ -158,11 +158,7 @@ font-weight-bold
                             <p style="margin: 0;">Batch :</p>
                         </div>
                         <div class="flex-grow-1">
-                            <select id="mySelect2" class="form-control" name="batch">
-                                @foreach ($listBatch as $item)
-                                    <option value="{{ $item->batch }}">{{ $item->batch }}</option>
-                                @endforeach
-                            </select>
+                            <select id="mySelect2" class="form-control" name="batch"></select>
                         </div>
                     </div>
                     <div class="d-flex align-items-center mb-4">
@@ -260,47 +256,10 @@ $(document).ready(function() {
             }
         });
     });
-    // Initialize Select2 for Batch with custom tagging
-    $('#mySelect2').select2({
-        dropdownParent: $('#inputDataModal'),
-        theme: "classic",
-        placeholder: "Select or add a Batch Penlat",
-        width: '100%',
-        tags: true,
-        createTag: function(params) {
-            var term = $.trim(params.term);
-            if (term === '') {
-                return null;
-            }
-            return {
-                id: term,
-                text: term,
-                newTag: true // Mark this as a new tag
-            };
-        },
-        templateResult: function(data) {
-            // Only show the "Add new" label if it's a new tag
-            if (data.newTag) {
-                return $('<span><em>Add new: "' + data.text + '"</em></span>');
-            }
-            return data.text;
-        },
-        templateSelection: function(data) {
-            // Show only the text for the selected item
-            return data.text;
-        }
-    });
+});
 
-    // Handle the selection of new tags
-    $('#mySelect2').on('select2:select', function(e) {
-        if (e.params.data.newTag) {
-            // Create and select the new option
-            var newOption = new Option(e.params.data.text, e.params.data.id, true, true);
-            $(this).append(newOption).trigger('change');
-        }
-    });
-
-    // Initialize Select2 for Pelatihan
+$(document).ready(function() {
+    // Initialize Select2 for Penlat
     $('#penlatSelect').select2({
         dropdownParent: $('#inputDataModal'),
         theme: "classic",
@@ -309,12 +268,90 @@ $(document).ready(function() {
         tags: true,
     });
 
-    // Event listener to update the program input when Pelatihan is selected
+    // Update hidden input on Penlat change
     $('#penlatSelect').on('change', function() {
         var selectedOption = $(this).find('option:selected').text();
         $('#programInput').val(selectedOption);
+
+        // Reinitialize the batch select dropdown, passing the selected penlat_id
+        initSelect2WithAjax('mySelect2', '{{ route('batches.fetch') }}', 'Select or add a Batch', $(this).val());
     });
+
+    // Initialize Select2 with AJAX for the batch dropdown (default initialization)
+    initSelect2WithAjax('mySelect2', '{{ route('batches.fetch') }}', 'Select or add a Batch', null);
 });
 
+function initSelect2WithAjax(elementId, ajaxUrl, placeholderText, penlatId = null) {
+    $('#' + elementId).select2({
+        ajax: {
+            url: ajaxUrl,
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    q: params.term, // search term
+                    page: params.page || 1, // pagination
+                    penlat_id: penlatId // pass penlat_id for filtering, if provided
+                };
+            },
+            processResults: function (data, params) {
+                params.page = params.page || 1;
+                return {
+                    results: $.map(data.items, function (item) {
+                        return {
+                            id: item.batch, // Use the 'batch' column for the option value
+                            text: item.batch, // Use the 'batch' column for the option label
+                            date: item.date // Include date to prefill the date input
+                        };
+                    }),
+                    pagination: {
+                        more: data.total_count > (params.page * 10) // Check if more results are available
+                    }
+                };
+            },
+            cache: true
+        },
+        placeholder: placeholderText,
+        minimumInputLength: 1, // Start searching after 1 character
+        dropdownParent: $('#inputDataModal'),
+        theme: 'classic',
+        width: '100%',
+        tags: true, // Allow adding new tags
+        createTag: function (params) {
+            var term = $.trim(params.term);
+            if (term === '') {
+                return null;
+            }
+            return {
+                id: term,
+                text: term,
+                newTag: true // Mark as a new tag
+            };
+        },
+        templateResult: function (data) {
+            if (data.newTag) {
+                return $('<span><em>Add new: "' + data.text + '"</em></span>');
+            }
+            return data.text;
+        },
+        templateSelection: function (data) {
+            return data.text;
+        }
+    });
+
+    $('#' + elementId).on('select2:select', function (e) {
+        if (e.params.data.newTag) {
+            var newOption = new Option(e.params.data.text, e.params.data.id, true, true);
+            $(this).append(newOption).trigger('change');
+        }
+
+        // Check if the selected batch has a valid date and prefill the date input
+        if (selectedBatch.date) {
+            $('input[name="date"]').val(selectedBatch.date);
+        } else {
+            $('input[name="date"]').val(''); // Clear the input if no date is provided
+        }
+    });
+}
 </script>
 @endsection

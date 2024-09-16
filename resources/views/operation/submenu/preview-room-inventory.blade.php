@@ -129,7 +129,7 @@ font-weight-bold
                                             </div>
                                         </td>
                                         <td data-th="Quantity" style="width:10%">
-                                            <input type="number" class="form-control form-control-md text-center noline-input" name="amount_{{ $tool->id }}" value="{{ $tool->amount }}">
+                                            <input type="number" class="form-control form-control-md text-center underline-input" name="amount_{{ $tool->id }}" value="{{ $tool->amount }}">
                                         </td>
                                         <td data-th="Price" style="width:10%" class="text-center">
                                             Pcs

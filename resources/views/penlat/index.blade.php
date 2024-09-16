@@ -115,6 +115,21 @@ font-weight-bold
                     </table>
                 </div>
             </div>
+            <div class="card mb-4">
+                <div class="card-header">
+                    <span class="text-danger font-weight-bold">Notes</span>
+                </div>
+                <div class="card-body" style="background-color: rgb(247, 247, 247);">
+                    <h6 class="h6 mb-2 font-weight-bold text-gray-800">General Guidelines</h6>
+                    <ul class="ml-4">
+                        <li>Penlat can be registered in two ways: through <span class="text-danger">Excel import</span> or <span class="text-danger">manual registration</span>.</li>
+                        <li>Ensure that you select the appropriate method for batch registration based on your training data needs.</li>
+                        <li>Users <span class="text-danger">should not delete Penlat carelessly</span> if they are already linked with other functions such as Training Reference, Penlat Requirements, or the Batch Program menu.</li>
+                        <li>Penlat that are linked to Batches Menu will impact related data in the system, so be cautious before proceeding with deletion.</li>
+                        <li>You can view detailed information for each batch by clicking on it, which will display more in-depth details, including the list of associated costs.</li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 </div>

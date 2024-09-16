@@ -309,14 +309,20 @@ class PenlatController extends Controller
     public function delete($id)
     {
         try {
-            // Check if the Penlat is used in the Penlat_batch table
-            $isPenlatAssigned = Penlat_batch::where('penlat_id', $id)->exists();
+            // Find the Penlat record
+            $penlat = Penlat::findOrFail($id);
 
-            if ($isPenlatAssigned) {
-                return response()->json(['error' => 'Penlat cannot be deleted because it is assigned to a batch!'], 400);
+            // Check if the Penlat is associated with Penlat_batch, Penlat_requirement, or Training_reference
+            $isPenlatAssignedToBatch = $penlat->batch()->exists();
+            $hasRequirements = $penlat->requirement()->exists();
+            $hasReferences = $penlat->references()->exists();
+
+            // If any of the relationships have associated records, prevent deletion
+            if ($isPenlatAssignedToBatch || $hasRequirements || $hasReferences) {
+                return response()->json(['error' => 'Penlat cannot be deleted because it has related records in other tables!'], 400);
             }
 
-            $penlat = Penlat::findOrFail($id);
+            // If no related records exist, proceed with deletion
             $penlat->delete();
 
             return response()->json(['success' => 'Record deleted successfully.'], 200);
@@ -504,27 +510,32 @@ class PenlatController extends Controller
     public function delete_batch($id)
     {
         try {
-            // Check if the Penlat is used in the Penlat_batch table
-            $isPenlatAssigned = Penlat_utility_usage::where('penlat_batch_id', $id)->exists();
-            $isCertificatesExist = Penlat_certificate::where('penlat_batch_id', $id)->exists();
+            // Find the Penlat_batch by ID
+            $batch = Penlat_batch::findOrFail($id);
 
-            if ($isPenlatAssigned || $isCertificatesExist) {
-                return response()->json(['error' => 'Batch cannot be deleted because it is assigned to a functions!'], 400);
-            } else {
-                $penlat = Penlat_batch::findOrFail($id);
-                $penlat->delete();
+            // Check if there are related records in the hasMany or hasOne relationships
+            $isPenlatAssigned = $batch->penlat_usage()->exists();
+            $isCertificatesExist = $batch->certificate()->exists();
+            $isBatchHasParticipants = $batch->infografis_peserta()->exists();
+            $isProfitsExist = $batch->profits()->exists();
+
+            // If any related records exist, prevent deletion
+            if ($isPenlatAssigned || $isCertificatesExist || $isBatchHasParticipants || $isProfitsExist) {
+                return response()->json(['error' => 'Batch cannot be deleted because it has related records in other tables.'], 400);
             }
+
+            // If no related records exist, proceed with deletion
+            $batch->delete();
 
             return response()->json(['success' => 'Record deleted successfully.'], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json(['error' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             // Log the exception for debugging
-            Log::error('Failed to delete Penlat: ' . $e->getMessage());
+            Log::error('Failed to delete Penlat batch: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to delete record due to an unexpected error.'], 500);
         }
     }
-
     public function preview_batch($id)
     {
         $data = Penlat_batch::find($id);
@@ -537,5 +548,36 @@ class PenlatController extends Controller
     public function penlat_import()
     {
         return view('penlat.import-page');
+    }
+
+    public function fetchBatches(Request $request)
+    {
+        // Get the search query (if any) and the pagination page
+        $search = $request->input('q');
+        $penlat_id = $request->input('penlat_id'); // Get the selected penlat_id
+        $page = $request->input('page', 1);
+        $perPage = 10;
+
+        // Query to get the batches, filtered by the search term and penlat_id if provided
+        $query = Penlat_batch::query();
+
+        if ($penlat_id) {
+            // Filter by penlat_id if selected
+            $query->where('penlat_id', $penlat_id);
+        }
+
+        if ($search) {
+            // Search by batch name
+            $query->where('batch', 'like', '%' . $search . '%');
+        }
+
+        // Paginate the results
+        $batches = $query->paginate($perPage, ['*'], 'page', $page);
+
+        // Return the results in the format expected by Select2
+        return response()->json([
+            'items' => $batches->items(),
+            'total_count' => $batches->total()
+        ]);
     }
 }

@@ -72,10 +72,6 @@ font-weight-bold
                                     <td style="text-align: start; font-weight:500">: {{ $data->batch->penlat->description }}</td>
                                 </tr>
                                 <tr>
-                                    <th style="width: 200px;">Nama Program</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $data->batch->nama_program }}</td>
-                                </tr>
-                                <tr>
                                     <th>Batch</th>
                                     <td style="text-align: start; font-weight:500">: {{ $data->batch->batch }}</td>
                                 </tr>
@@ -117,7 +113,7 @@ font-weight-bold
                 </div>
                 <div class="card-body">
                     <table id="listParticipant" class="table table-bordered mt-4">
-                        <thead>
+                        <thead class="thead-light">
                             <tr>
                                 <th>Nama Peserta</th>
                                 <th>Status</th>
