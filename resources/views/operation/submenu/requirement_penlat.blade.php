@@ -203,14 +203,11 @@ font-weight-bold
             theme: "classic",
             placeholder: "Select Pelatihan...",
             width: '100%',
-            tags: true,
-        });
-        $('#editpenlatSelect').select2({
-            dropdownParent: $('#editDataModal'),
-            theme: "classic",
-            placeholder: "Select Pelatihan...",
-            width: '100%',
-            tags: true,
+            language: {
+                noResults: function() {
+                    return "No result match your request... Create new in Master Data Menu!"; // Customize this message as needed
+                }
+            }
         });
     });
     $(document).ready(function () {

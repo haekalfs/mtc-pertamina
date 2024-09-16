@@ -265,7 +265,11 @@ $(document).ready(function() {
         theme: "classic",
         placeholder: "Select Pelatihan...",
         width: '100%',
-        tags: true,
+        language: {
+            noResults: function() {
+                return "No result match your request... Create new in Master Data Menu!"; // Customize this message as needed
+            }
+        }
     });
 
     // Update hidden input on Penlat change
