@@ -188,31 +188,38 @@ font-weight-bold
                                         </div>
                                     </div>
                                     <div class="d-flex align-items-start">
-                                        <div style="width: 140px;" class="mr-2">
+                                        <div style="width: 170px;" class="mr-2">
                                             <p style="margin: 0;">List Alat :</p>
                                         </div>
                                         <div class="flex-grow-1 textarea-container" id="documents-list-container">
                                             <div class="document-item mb-2">
                                                 <div class="row">
-                                                    <div class="col-md-10">
-                                                        <select class="form-control mb-2" name="tool[]" required>
+                                                    <!-- Set the select element width relative to the parent -->
+                                                    <div class="col-md-10" style="flex-basis: 75%;">
+                                                        <select class="form-control mb-2" name="tool[]" style="width: 100%;" required>
+                                                            <option disabled selected>Choose item...</option>
                                                             @foreach ($assets as $item)
                                                                 <option value="{{ $item->id }}">{{ $item->asset_name }}</option>
                                                             @endforeach
                                                         </select>
                                                     </div>
-                                                    <div class="col-md-2 p-0">
-                                                        <input type="number" class="form-control" name="amount[]" placeholder="Pcs" required></input>
+                                                    <!-- Set the amount input field width relative to the parent -->
+                                                    <div class="col-md-2 p-0" style="flex-basis: 25%;">
+                                                        <input type="number" class="form-control" name="amount[]" placeholder="Pcs" style="width: 100%;" required></input>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="ml-4 text-white">
                                             <div class="col-md-12">
-                                                <button type="button" class="btn btn-success mb-2 shadow-sm btn-sm add-document-list"><i class="fa fa-plus"></i> Add More &nbsp;&nbsp;</button>
+                                                <button type="button" class="btn btn-success mb-2 shadow-sm btn-sm add-document-list">
+                                                    <i class="fa fa-plus"></i> Add More &nbsp;&nbsp;
+                                                </button>
                                             </div>
                                             <div class="col-md-12">
-                                                <a class="btn shadow-sm btn-sm btn-danger delete-document-list" style="display: none;"><i class="fa fa-trash-alt"></i> Delete Item</a>
+                                                <a class="btn shadow-sm btn-sm btn-danger delete-document-list" style="display: none;">
+                                                    <i class="fa fa-trash-alt"></i> Delete Item
+                                                </a>
                                             </div>
                                         </div>
                                     </div>

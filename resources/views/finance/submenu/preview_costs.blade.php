@@ -106,9 +106,9 @@ font-weight-bold
     </div>
 </div>
 
-<div class="animated fadeIn zoom90">
+<div class="animated fadeIn">
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-8 zoom90">
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-secondary" id="judul">Pemakaian Utilitas : {{ $data->batch }}</h6>
@@ -165,7 +165,7 @@ font-weight-bold
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4 zoom90">
             <div class="card mb-4">
                 <div class="card-header">
                     <span class="text-danger font-weight-bold">Summary</span>
@@ -182,7 +182,7 @@ font-weight-bold
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6 zoom90">
             <div class="row">
                 <div class="col-md-12">
                     <div class="card">
@@ -281,7 +281,7 @@ font-weight-bold
         </div>
         <div class="col-md-6">
             <div class="card">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between zoom90">
                     <h6 class="m-0 font-weight-bold text-secondary" id="judul">Grafik : {{ $data->batch }}</h6>
                 </div>
                 <div class="card-body">
@@ -299,7 +299,7 @@ font-weight-bold
     var chart = new CanvasJS.Chart("chartContainer", {
         animationEnabled: true,
         title: {
-            text: "Profit Consumption by Cost (in Percentage)"
+            text: "Revenue Consumption by Cost (in Percentage)"
         },
         data: [{
             type: "pie",
@@ -312,7 +312,7 @@ font-weight-bold
 
     // Display profits below the chart
     var profitDisplay = document.createElement('div');
-        profitDisplay.innerHTML = "<strong>Profits: Rp " + @json($profitsValue) + "</strong>";
+        profitDisplay.innerHTML = "<strong>Revenue : Rp " + @json($profitsValue) + "</strong>";
         document.getElementById("profitContainer").appendChild(profitDisplay);
     }
 </script>

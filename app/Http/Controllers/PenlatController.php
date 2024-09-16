@@ -510,10 +510,10 @@ class PenlatController extends Controller
 
             if ($isPenlatAssigned || $isCertificatesExist) {
                 return response()->json(['error' => 'Batch cannot be deleted because it is assigned to a functions!'], 400);
+            } else {
+                $penlat = Penlat_batch::findOrFail($id);
+                $penlat->delete();
             }
-
-            $penlat = Penlat_batch::findOrFail($id);
-            $penlat->delete();
 
             return response()->json(['success' => 'Record deleted successfully.'], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
