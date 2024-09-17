@@ -70,7 +70,7 @@ font-weight-bold
                 </a>
                 <div class="col-md-12 mb-3">
                     <div class="row">
-                        <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding-left: 1em;">
+                        <div class="col-md-4 d-flex align-items-center justify-content-center" style="padding-left: 1em;">
                             <img src="{{ asset($data->img_filepath) }}" style="height: 150px; width: 250px; border-radius: 15px;" class="card-img" alt="...">
                         </div>
                         <div class="col-md-8">
@@ -80,16 +80,23 @@ font-weight-bold
                                     <td style="text-align: start; font-weight:500">: {{ $data->campaign_name }}</td>
                                 </tr>
                                 <tr>
+                                    <th>Jenis Kegiatan</th>
+                                    <td style="text-align: start; font-weight:500">: {{ $data->jenis->description }}</td>
+                                </tr>
+                                <tr>
                                     <th>Informasi Kegiatan</th>
                                     <td style="text-align: start; font-weight:500">: {{ $data->campaign_details }}</td>
                                 </tr>
                                 <tr>
-                                    <th>PIC</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $data->user_id }}</td>
+                                    <th>Person in Charge</th>
+                                    <td style="text-align: start; font-weight:500">: {{ $data->user->name }}</td>
                                 </tr>
+                                @php
+                                    $date = \Carbon\Carbon::parse($data->date);
+                                @endphp
                                 <tr>
                                     <th>Tanggal Pelaksanaan</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $data->date }}</td>
+                                    <td style="text-align: start; font-weight:500">: {{ $date->format('d-M-Y') }}</td>
                                 </tr>
                           </table>
                         </div>
@@ -147,7 +154,19 @@ font-weight-bold
                                                 <p style="margin: 0;">Nama Kegiatan :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <input type="text" class="form-control" name="activity_name" required>
+                                                <input type="text" class="form-control underline-input" name="activity_name" required>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div style="width: 160px;" class="mr-2">
+                                                <p style="margin: 0;">Jenis Kegiatan :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <select class="custom-select underline-input" id="jenisKegiatan" name="jenisKegiatan">
+                                                    @foreach($campaignType as $type)
+                                                        <option value="{{ $type->id }}">{{ $type->description }}</option>
+                                                    @endforeach
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-3">
@@ -155,7 +174,7 @@ font-weight-bold
                                                 <p style="margin: 0;">Informasi Kegiatan :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <input type="text" class="form-control" name="activity_info">
+                                                <input type="text" class="form-control underline-input" name="activity_info">
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-3">
@@ -163,9 +182,9 @@ font-weight-bold
                                                 <p style="margin: 0;">PIC :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <select class="custom-select" id="namaPenlat" name="namaPenlat">
+                                                <select class="custom-select underline-input" id="person_in_charge" name="person_in_charge">
                                                     @foreach($users as $user)
-                                                    <option value="{{ $user->id }}" selected>{{ $user->name }}</option>
+                                                        <option value="{{ $user->id }}">{{ $user->name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -175,7 +194,7 @@ font-weight-bold
                                                 <p style="margin: 0;">Tanggal :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <input type="date" class="form-control" name="activity_date">
+                                                <input type="date" class="form-control underline-input" name="activity_date">
                                             </div>
                                         </div>
                                     </div>
@@ -262,8 +281,11 @@ document.querySelectorAll('.edit-campaign').forEach(function(button) {
                 document.querySelector('#image-preview').src = data.img_filepath ? `/${data.img_filepath}` : 'https://via.placeholder.com/50x50/5fa9f8/ffffff';
 
                 // Handle select field for 'PIC'
-                let select = document.querySelector('select[name="namaPenlat"]');
+                let select = document.querySelector('select[name="person_in_charge"]');
                 select.value = data.user_id;
+
+                let selectJenis = document.querySelector('select[name="jenisKegiatan"]');
+                selectJenis.value = data.campaign_type_id;
 
                 // Open the modal
                 $('#editCampaignModal').modal('show');

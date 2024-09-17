@@ -130,28 +130,51 @@ font-weight-bold
                                 @foreach($data as $item)
                                 <tr>
                                     <td>
-                                        <div class="card custom-card mb-3 bg-white shadow" style="position: relative;">
-                                            <a href="{{ route('preview-briefing', $item->id) }}" class="position-absolute" style="top: 12px; right: 12px; z-index: 12; font-size: 20px;">
-                                                <i class="fa fa-edit fa-lg text-secondary"></i>
-                                            </a>
-                                            <div class="row no-gutters">
-                                                <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding: 2em;">
-                                                    <img src="{{ asset($item->img_filepath ? $item->img_filepath : 'img/default-img.png') }}" style="height: 150px; width: 250px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
-                                                </div>
-                                                <div class="col-md-9 mt-2">
-                                                    <div class="card-body text-secondary">
-                                                        <div>
-                                                            <h4 class="card-title font-weight-bold">{{ $item->briefing_name }}</h4>
-                                                            <ul class="ml-3">
-                                                                <li class="card-text"><span class="font-weight-bold">Informasi Kegiatan</span> : {{ $item->briefing_details }}</li>
-                                                                <li class="card-text"><span class="font-weight-bold">PIC</span> : {{ $item->user_id }}</li>
-                                                                <li class="card-text"><span class="font-weight-bold">Tgl Pelaksanaan</span> : {{ $item->date }}</li>
-                                                                <li class="card-text">
-                                                                    <span class="font-weight-bold">Hasil Kegiatan</span> : <br>
-                                                                    {!! Str::limit($item->briefing_result, 400, '...') !!}
-                                                                </li>
-                                                            </ul>
+                                        <div class="row">
+                                            <div class="col-12 mt-3">
+                                                <div class="card" style="position: relative;">
+                                                    <!-- Edit Icon in the Top Right Corner -->
+                                                    <a href="{{ route('preview-briefing', $item->id) }}" class="position-absolute" style="top: 12px; right: 12px; z-index: 12; font-size: 20px;">
+                                                        <i class="fa fa-edit fa-lg" style="color: rgb(181, 181, 181);"></i>
+                                                    </a>
+                                                    <div class="card-horizontal" style="display: flex; flex: 1 1 auto;">
+                                                        <div class="img-square-wrapper">
+                                                            <a href="{{ route('preview-briefing', $item->id) }}">
+                                                                <img class="animateBox" src="{{ asset($item->img_filepath ? $item->img_filepath : 'img/default-img.png') }}" style="height: 100%; width: 500px;" alt="Card image cap">
+                                                            </a>
                                                         </div>
+                                                        <div class="card-body">
+                                                            <h4 class="card-title">{{ $item->briefing_name }}</h4>
+                                                            <div class="ml-3">
+                                                                <div class="card-text mb-1">
+                                                                    <span class="font-weight-bold"><i class="fa fa-arrow-right"></i>&nbsp; Briefing Detail</span> : {{ $item->briefing_details }}
+                                                                </div>
+                                                                <div class="card-text mb-1">
+                                                                    @php
+                                                                        $date = \Carbon\Carbon::parse($item->date);
+                                                                    @endphp
+                                                                    <span class="font-weight-bold"><i class="fa fa-arrow-right"></i>&nbsp; Tgl Pelaksanaan</span> : {{ $date->format('d-M-Y') }}
+                                                                </div>
+                                                                <div class="card-text">
+                                                                    <span class="font-weight-bold"><i class="fa fa-arrow-right"></i>&nbsp; Hasil Kegiatan</span> :
+                                                                    {!! Str::limit($item->briefing_result, 750, '...') !!}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    @php
+                                                        $created_at = \Carbon\Carbon::parse($item->updated_at);
+                                                        $now = \Carbon\Carbon::now();
+                                                        $diffInDays = $created_at->diffInDays($now);
+                                                    @endphp
+                                                    <div class="card-footer">
+                                                        <small class="text-muted">Last updated
+                                                            @if($diffInDays < 7)
+                                                                {{ $created_at->diffForHumans() }}
+                                                            @else
+                                                                a long time ago
+                                                            @endif
+                                                        </small>
                                                     </div>
                                                 </div>
                                             </div>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Agreement;
 use App\Models\Campaign;
+use App\Models\Campaign_type;
 use App\Models\SocialsInsights;
 use App\Models\Status;
 use App\Models\User;
@@ -37,6 +38,7 @@ class MarketingController extends Controller
         $currentYear = now()->year;
         $yearSelected = $request->input('year', 'all');  // Default to 'all' if not provided
         $monthSelected = $request->input('month', 'all'); // Default to 'all' if not provided
+        $typeSelected = $request->input('typeSelected', '-1'); // Default to 'all' if not provided
 
         // Query to filter data based on year and month
         $query = Campaign::query();
@@ -49,15 +51,22 @@ class MarketingController extends Controller
             $query->whereMonth('created_at', $monthSelected);
         }
 
+        if ($typeSelected !== '-1') {
+            $query->where('campaign_type_id', $typeSelected);
+        }
+
         $data = $query->get();
         $users = User::all();
+        $campaignType = Campaign_type::all();
 
         return view('marketing.submenu.campaign', [
             'data' => $data,
             'users' => $users,
             'yearSelected' => $yearSelected,
             'monthSelected' => $monthSelected,
-            'currentYear' => $currentYear
+            'typeSelected' => $typeSelected,
+            'currentYear' => $currentYear,
+            'campaignType' => $campaignType
         ]);
     }
 

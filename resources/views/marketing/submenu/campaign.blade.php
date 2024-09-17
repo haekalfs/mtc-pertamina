@@ -84,12 +84,12 @@ font-weight-bold
                                 <div class="row align-items-center">
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label for="year">Year:</label>
-                                            <select class="custom-select" id="year" name="year">
-                                                <option value="all" @if ($yearSelected == 'all') selected @endif>Show All</option>
-                                                @for ($i = $currentYear; $i >= $currentYear - 5; $i--)
-                                                    <option value="{{ $i }}" @if ($yearSelected == $i) selected @endif>{{ $i }}</option>
-                                                @endfor
+                                            <label for="typeSelected">Jenis Kegiatan:</label>
+                                            <select class="custom-select" id="typeSelected" name="typeSelected">
+                                                <option value="-1" @if ($typeSelected == '-1') selected @endif>Show All</option>
+                                                @foreach($campaignType as $type)
+                                                    <option value="{{ $type->id }}" @if ($typeSelected == $type->id) selected @endif>{{ $type->description }}</option>
+                                                @endforeach
                                             </select>
                                         </div>
                                     </div>
@@ -104,6 +104,18 @@ font-weight-bold
                                                     <option value="{{ $m }}" @if ($monthSelected == $m) selected @endif>
                                                         {{ \Carbon\Carbon::create()->month($m)->format('F') }}
                                                     </option>
+                                                @endfor
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="year">Year:</label>
+                                            <select class="custom-select" id="year" name="year">
+                                                <option value="all" @if ($yearSelected == 'all') selected @endif>Show All</option>
+                                                @for ($i = $currentYear; $i >= $currentYear - 5; $i--)
+                                                    <option value="{{ $i }}" @if ($yearSelected == $i) selected @endif>{{ $i }}</option>
                                                 @endfor
                                             </select>
                                         </div>
@@ -130,30 +142,51 @@ font-weight-bold
                                 @foreach($data as $item)
                                 <tr>
                                     <td>
-                                        <div class="card custom-card mb-3 bg-white" style="position: relative;">
-                                            <!-- Edit Icon in the Top Right Corner -->
-                                            <a href="{{ route('preview-campaign', $item->id) }}" class="position-absolute" style="top: 12px; right: 12px; z-index: 12; font-size: 20px;"">
-                                                <i class="fa fa-edit fa-lg text-secondary"></i>
-                                            </a>
-
-                                            <div class="row no-gutters">
-                                                <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding: 2em;">
-                                                    <img src="{{ asset($item->img_filepath ? $item->img_filepath : 'img/default-img.png') }}" style="height: 150px; width: 250px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
-                                                </div>
-                                                <div class="col-md-9 mt-2">
-                                                    <div class="card-body text-secondary">
-                                                        <div>
-                                                            <h4 class="card-title font-weight-bold">{{ $item->campaign_name }}</h4>
-                                                            <ul class="ml-3">
-                                                                <li class="card-text"><span class="font-weight-bold">Informasi Kegiatan</span> : {{ $item->campaign_details }}</li>
-                                                                <li class="card-text"><span class="font-weight-bold">PIC</span> : {{ $item->user_id }}</li>
-                                                                <li class="card-text"><span class="font-weight-bold">Tgl Pelaksanaan</span> : {{ $item->date }}</li>
-                                                                <li class="card-text">
-                                                                    <span class="font-weight-bold">Hasil Kegiatan</span> : <br>
-                                                                    {!! Str::limit($item->campaign_result, 400, '...') !!}
-                                                                </li>
-                                                            </ul>
+                                        <div class="row">
+                                            <div class="col-12 mt-3">
+                                                <div class="card" style="position: relative;">
+                                                    <!-- Edit Icon in the Top Right Corner -->
+                                                    <a href="{{ route('preview-campaign', $item->id) }}" class="position-absolute" style="top: 12px; right: 12px; z-index: 12; font-size: 20px;">
+                                                        <i class="fa fa-edit fa-lg" style="color: rgb(181, 181, 181);"></i>
+                                                    </a>
+                                                    <div class="card-horizontal" style="display: flex; flex: 1 1 auto;">
+                                                        <div class="img-square-wrapper">
+                                                            <a href="{{ route('preview-campaign', $item->id) }}">
+                                                                <img class="animateBox" src="{{ asset($item->img_filepath ? $item->img_filepath : 'img/default-img.png') }}" style="height: 100%; width: 500px;" alt="Card image cap">
+                                                            </a>
                                                         </div>
+                                                        <div class="card-body">
+                                                            <h4 class="card-title">{{ $item->campaign_name }}</h4>
+                                                            <div class="ml-3">
+                                                                <div class="card-text mb-1">
+                                                                    <span class="font-weight-bold"><i class="fa fa-arrow-right"></i>&nbsp; Jenis Kegiatan</span> : {{ $item->jenis->description }}
+                                                                </div>
+                                                                <div class="card-text mb-1">
+                                                                    @php
+                                                                        $date = \Carbon\Carbon::parse($item->date);
+                                                                    @endphp
+                                                                    <span class="font-weight-bold"><i class="fa fa-arrow-right"></i>&nbsp; Tgl Pelaksanaan</span> : {{ $date->format('d-M-Y') }}
+                                                                </div>
+                                                                <div class="card-text">
+                                                                    <span class="font-weight-bold"><i class="fa fa-arrow-right"></i>&nbsp; Hasil Kegiatan</span> :
+                                                                    {!! Str::limit($item->campaign_result, 650, '...') !!}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    @php
+                                                        $created_at = \Carbon\Carbon::parse($item->updated_at);
+                                                        $now = \Carbon\Carbon::now();
+                                                        $diffInDays = $created_at->diffInDays($now);
+                                                    @endphp
+                                                    <div class="card-footer">
+                                                        <small class="text-muted">Last updated
+                                                            @if($diffInDays < 7)
+                                                                {{ $created_at->diffForHumans() }}
+                                                            @else
+                                                                a long time ago
+                                                            @endif
+                                                        </small>
                                                     </div>
                                                 </div>
                                             </div>
@@ -194,13 +227,25 @@ font-weight-bold
                         <div class="col-md-9">
                             <div class="card-body text-secondary">
                                 <div class="row">
-                                    <div class="col-md-12">
+                                    <div class="col-md-12 ml-2">
                                         <div class="d-flex align-items-center mb-3">
                                             <div style="width: 160px;" class="mr-2">
                                                 <p style="margin: 0;">Nama Kegiatan :</p>
                                             </div>
                                             <div class="flex-grow-1">
                                                 <input type="text" class="form-control underline-input" name="activity_name" required>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div style="width: 160px;" class="mr-2">
+                                                <p style="margin: 0;">Jenis Kegiatan :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <select class="custom-select underline-input" id="jenisKegiatan" name="jenisKegiatan">
+                                                    @foreach($campaignType as $type)
+                                                        <option value="{{ $type->id }}">{{ $type->description }}</option>
+                                                    @endforeach
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-3">
@@ -216,9 +261,9 @@ font-weight-bold
                                                 <p style="margin: 0;">PIC :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <select class="custom-select underline-input" id="namaPenlat" name="namaPenlat">
+                                                <select class="custom-select underline-input" id="person_in_charge" name="person_in_charge">
                                                     @foreach($users as $user)
-                                                    <option value="{{ $user->id }}" selected>{{ $user->name }}</option>
+                                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
