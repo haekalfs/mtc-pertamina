@@ -160,7 +160,7 @@ font-weight-bold
                                                 <p style="margin: 0;">PIC :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <select class="custom-select" id="namaPenlat" name="namaPenlat">
+                                                <select class="custom-select" id="person_in_charge" name="person_in_charge">
                                                     @foreach($users as $user)
                                                     <option value="{{ $user->id }}" selected>{{ $user->name }}</option>
                                                     @endforeach
@@ -259,7 +259,7 @@ document.querySelectorAll('.edit-briefing').forEach(function(button) {
                 document.querySelector('#image-preview').src = data.img_filepath ? `/${data.img_filepath}` : 'https://via.placeholder.com/50x50/5fa9f8/ffffff';
 
                 // Handle select field for 'PIC'
-                let select = document.querySelector('select[name="namaPenlat"]');
+                let select = document.querySelector('select[name="person_in_charge"]');
                 select.value = data.user_id;
 
                 // Open the modal

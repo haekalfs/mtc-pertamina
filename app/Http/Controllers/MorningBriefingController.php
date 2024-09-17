@@ -55,7 +55,7 @@ class MorningBriefingController extends Controller
         $briefing->briefing_name = $request->input('activity_name');
         $briefing->briefing_details = $request->input('activity_info');
         $briefing->briefing_result = $request->input('activity_result');
-        $briefing->user_id = auth()->user()->id; // assuming the user is authenticated
+        $briefing->user_id = $request->input('person_in_charge');
         $briefing->date = $request->input('activity_date');
         // If an image was uploaded, store it in the related ToolImg table
         if ($request->hasFile('img')) {
@@ -101,7 +101,7 @@ class MorningBriefingController extends Controller
         $briefing->briefing_name = $request->input('activity_name');
         $briefing->briefing_details = $request->input('activity_info');
         $briefing->briefing_result = $request->input('activity_result');
-        $briefing->user_id = auth()->user()->id;
+        $briefing->user_id = $request->input('person_in_charge');
         $briefing->date = $request->input('activity_date');
 
         if ($request->hasFile('img')) {

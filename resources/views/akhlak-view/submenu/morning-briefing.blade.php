@@ -237,9 +237,9 @@ font-weight-bold
                                                 <p style="margin: 0;">PIC :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <select class="custom-select underline-input" id="namaPenlat" name="namaPenlat">
+                                                <select class="custom-select underline-input" id="person_in_charge" name="person_in_charge">
                                                     @foreach($users as $user)
-                                                    <option value="{{ $user->id }}" selected>{{ $user->name }}</option>
+                                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
