@@ -246,14 +246,14 @@ class UserController extends Controller
         }
 
         // Delete related certificates
-        $user->users_detail()->role_id()->delete();
         $user->users_detail()->delete();
+        $user->role_id()->delete();
 
         // Delete the instructor
         $user->delete();
 
         // Return a success response
-        return response()->json(['success' => 'Instructor, related certificates, and files deleted successfully.']);
+        return response()->json(['success' => 'User and files deleted successfully.']);
     }
 
     public function checkUserId($userId)

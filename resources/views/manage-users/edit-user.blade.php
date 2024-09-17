@@ -53,7 +53,7 @@ font-weight-bold
                             <span>Deleting your account is a permanent action and cannot be undone. If you are sure you want to delete your account, select the button below.</span>
                         </div>
                         <div>
-                            <a data-id="{{ $data->id }}" class="btn btn-outline-danger delete-user text-danger">I Understand, delete the account</a>
+                            <button data-id="{{ $data->id }}" class="btn btn-outline-danger delete-user text-danger">I Understand, delete the account</button>
                         </div>
                     </div>
                 </div>
