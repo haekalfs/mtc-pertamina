@@ -16,6 +16,6 @@ class Campaign extends Model
     }
 
     public function jenis(){
-    	return $this->belongsTo('App\Models\Campaign_type', 'campaign_type_id', 'id');
+    	return $this->belongsTo('App\Models\Campaign_type', 'campaign_type_id', 'id')->withDefault();
     }
 }
