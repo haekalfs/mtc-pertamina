@@ -1015,13 +1015,29 @@ class OperationController extends Controller
 
     public function updateUsageCost($penlatBatchId)
     {
-        // Get the sum of all 'total' values from Penlat_utility_usage for the given batch
-        $totalUsageCost = Penlat_utility_usage::where('penlat_batch_id', $penlatBatchId)
-            ->sum('total');
+        try {
+            // Get the sum of all 'total' values from Penlat_utility_usage for the given batch
+            $totalUsageCost = Penlat_utility_usage::where('penlat_batch_id', $penlatBatchId)
+                ->sum('total');
 
-        $findBatch = Penlat_batch::find($penlatBatchId);
-        // Find the related Profit record and update the 'penlat_usage' column
-        Profit::where('pelaksanaan', $findBatch->batch)
-            ->update(['penlat_usage' => $totalUsageCost]);
+            // Find the batch
+            $findBatch = Penlat_batch::find($penlatBatchId);
+            if (!$findBatch) {
+                throw new \Exception("Batch not found.");
+            }
+
+            // Find the related Profit record based on the batch
+            $profit = Profit::where('pelaksanaan', $findBatch->batch)->first();
+
+            // If Profit exists, update the 'penlat_usage' column
+            if ($profit) {
+                $profit->update(['penlat_usage' => $totalUsageCost]);
+            } else {
+                throw new \Exception("Profit record not found for batch: " . $findBatch->batch);
+            }
+        } catch (\Exception $e) {
+            // Log the exception or handle the error
+            Log::error('Error updating usage cost: ' . $e->getMessage());
+        }
     }
 }
