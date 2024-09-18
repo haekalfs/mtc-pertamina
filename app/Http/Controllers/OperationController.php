@@ -376,14 +376,14 @@ class OperationController extends Controller
         $validator = Validator::make($request->all(), [
             'penlat' => [
                 'required',
-                'min:2', // Ensure at least 2 characters in length
+                'min:1', // Ensure at least 2 characters in length
             ],
             'batch' => [
                 'required',
-                'min:2', // Ensure at least 2 characters in length
+                'min:1', // Ensure at least 2 characters in length
             ],
-            'date' => 'required|date', // Ensure valid date format
-            'image' => 'sometimes|image', // Ensure file is an image if present
+            'date' => 'sometimes', // Ensure valid date format
+            'image' => 'sometimes', // Ensure file is an image if present
             'program' => 'sometimes' // Optional field
         ], [
             // Custom error messages for min length validation
