@@ -192,7 +192,8 @@ font-weight-bold
                                 <div class="flex-grow-1 textarea-container" id="documents-list-container">
                                     <div class="document-item">
                                         <textarea type="text" class="form-control mb-2" rows="2" name="documents[]" required></textarea>
-                                        <input type="file" class="form-control-file mb-3" name="attachments[]" multiple>
+                                        <input type="file" class="form-control-file" name="attachments[]" multiple required>
+                                        <div class="mb-4"><small class="text-danger"><i>pdf,docx,xlsx,xls,jpeg,png,jpg,gif</i></small></div>
                                     </div>
                                 </div>
                                 <div class="ml-2">

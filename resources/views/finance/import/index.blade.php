@@ -30,6 +30,11 @@ font-weight-bold
 <div class="alert alert-success alert-success-saving-mid" role="alert" style="display: none;">
     Your entry has been saved successfully.
 </div>
+
+<div class="alert alert-warning alert-block">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>Importing Profits & Loss will also generate new batches in it along with the profits data.</strong>
+</div>
 @if ($message = Session::get('success'))
 <div class="alert alert-success alert-block">
     <button type="button" class="close" data-dismiss="alert">×</button>

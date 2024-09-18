@@ -22,7 +22,7 @@ font-weight-bold
         {{-- <a class="btn btn-secondary btn-sm shadow-sm mr-2" href="/invoicing/list"><i class="fas fa-solid fa-backward fa-sm text-white-50"></i> Go Back</a> --}}
     </div>
 </div>
-<form action="{{ route('register.user') }}" method="post" enctype="multipart/form-data" class="form-horizontal">
+<form action="{{ route('register.user') }}" method="post" enctype="multipart/form-data" class="form-horizontal" onsubmit="return validateForm('png,jpeg,jpg,svg,gif', 'file-upload')">
     @csrf
     <div class="animated fadeIn zoom90">
         <div class="row">
@@ -41,7 +41,7 @@ font-weight-bold
                                         <div class="d-flex align-items-top justify-content-center text-center">
                                             <label for="file-upload" style="cursor: pointer;">
                                                 <img id="image-preview" src="{{ asset('img/default-img.png') }}" style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
-                                                     <small style="font-size: 10px;"><i><u>Click above to upload image!</u></i></small>
+                                                <small style="font-size: 10px;"><i><u>Click above to upload image!</u></i></small>
                                             </label>
                                             <input id="file-upload" type="file" name="profile_picture" style="display: none;" accept="image/*" onchange="previewImage(event)">
                                         </div>
@@ -273,6 +273,29 @@ font-weight-bold
             .catch(error => {
                 console.error('Error:', error);
             });
+    }
+
+    function validateForm(allowedExtensions, ...fileInputIds) {
+        const allowedExtArray = allowedExtensions.split(',');
+
+        for (let i = 0; i < fileInputIds.length; i++) {
+            const fileInput = document.getElementById(fileInputIds[i]);
+
+            if (!fileInput || fileInput.files.length === 0) {
+                alert(`Please upload an image for ${fileInputIds[i]} before submitting.`);
+                return false; // Prevent form submission if no file is selected
+            }
+
+            const fileName = fileInput.files[0].name;
+            const fileExtension = fileName.split('.').pop().toLowerCase();
+
+            if (!allowedExtArray.includes(fileExtension)) {
+                alert(`Invalid file type for ${fileInputIds[i]}. Allowed file types are: ${allowedExtensions}`);
+                return false; // Prevent form submission if file type is invalid
+            }
+        }
+
+        return true; // Allow form submission if all file inputs have valid files
     }
 </script>
 @endsection

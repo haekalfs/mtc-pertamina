@@ -165,7 +165,7 @@ font-weight-bold
                                                 <textarea class="form-control" rows="3" name="document_name"></textarea>
                                             </div>
                                         </div>
-                                        <div class="d-flex align-items-center mb-4">
+                                        <div class="d-flex align-items-start mb-4">
                                             <div style="width: 160px;" class="mr-2">
                                                 <p style="margin: 0;">Document Type :</p>
                                             </div>
@@ -173,7 +173,7 @@ font-weight-bold
                                                 <input type="text" class="form-control" name="type" required>
                                             </div>
                                         </div>
-                                        <div class="d-flex align-items-center mb-4">
+                                        <div class="d-flex align-items-start mb-4">
                                             <div style="width: 160px;" class="mr-2">
                                                 <p style="margin: 0;">Approved Date :</p>
                                             </div>
@@ -181,12 +181,13 @@ font-weight-bold
                                                 <input type="date" class="form-control" name="approved_date" required>
                                             </div>
                                         </div>
-                                        <div class="d-flex align-items-center mb-4">
+                                        <div class="d-flex align-items-start mb-4">
                                             <div style="width: 160px;" class="mr-2">
                                                 <p style="margin: 0;">Dokumen :</p>
                                             </div>
                                             <div class="flex-grow-1">
                                                 <input type="file" class="form-control" name="file" required>
+                                                <small class="text-danger"><i>pdf,doc,docx,xls,xlsx,ppt,pptx,txt,odt,ods,odp,rtf</i></small>
                                             </div>
                                         </div>
                                     </div>

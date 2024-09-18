@@ -273,17 +273,16 @@ font-weight-bold
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="post" enctype="multipart/form-data" action="{{ route('asset.store') }}">
+            <form method="post" enctype="multipart/form-data" action="{{ route('asset.store') }}" onsubmit="return validateForm('file-upload')">
                 @csrf
                 <div class="modal-body mr-2 ml-2">
                     <div class="row no-gutters">
                         <div class="col-md-3 d-flex align-items-top justify-content-center text-center">
                             <label for="file-upload" style="cursor: pointer;">
-                                <img id="image-preview" src="{{ asset('img/default-img.png') }}"
-                                     style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
-                                     <small style="font-size: 10px;"><i><u>Click above to upload image!</u></i></small>
+                                <img id="image-preview" src="{{ asset('img/default-img.png') }}" style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
+                                <small style="font-size: 10px;"><i><u>Click above to upload image!</u></i></small>
                             </label>
-                            <input id="file-upload" type="file" name="tool_image" style="display: none;" accept="image/*" onchange="previewImage(event)" required>
+                            <input id="file-upload" type="file" name="tool_image" style="display: none;" accept="image/*" onchange="previewImage(event)">
                         </div>
                         <div class="col-md-9">
                             <div class="card-body text-secondary">
@@ -356,7 +355,7 @@ font-weight-bold
                                                 <p style="margin: 0;">Last Maintenance :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <input type="date" class="form-control" name="last_maintenance" required>
+                                                <input type="date" class="form-control" name="last_maintenance" value="{{ date('Y-m-d') }}" required>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-4">
@@ -406,9 +405,8 @@ font-weight-bold
                     <div class="row no-gutters">
                         <div class="col-md-3 d-flex align-items-top justify-content-center text-center">
                             <label for="edit-file-upload" style="cursor: pointer;">
-                                <img id="edit-image-preview" src="https://via.placeholder.com/50x50/5fa9f8/ffffff"
-                                     style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
-                                     <small style="font-size: 10px;"><i><u>Click above to upload image!</u></i></small>
+                                <img id="edit-image-preview" src="https://via.placeholder.com/50x50/5fa9f8/ffffff" style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
+                                <small style="font-size: 10px;"><i><u>Editing image is Optional!</u></i></small>
                             </label>
                             <input id="edit-file-upload" type="file" name="tool_image" style="display: none;" accept="image/*" onchange="previewImage(event)">
                         </div>
@@ -645,6 +643,17 @@ function decreaseCount(a, b) {
     input.value = value;
   }
 }
+function validateForm(...fileInputIds) {
+    for (let i = 0; i < fileInputIds.length; i++) {
+        const fileInput = document.getElementById(fileInputIds[i]);
+        if (!fileInput || fileInput.files.length === 0) {
+            alert(`Please upload an image for ${fileInputIds[i]} before submitting. Only JPEG, JPG, PNG & SVG Allowed!`);
+            return false; // Prevent form submission
+        }
+    }
+    return true; // Allow form submission if all file inputs have files
+}
+
 </script>
 @endsection
 

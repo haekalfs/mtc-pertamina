@@ -45,8 +45,8 @@ class UserController extends Controller
         ]);
 
         if ($validator->fails()) {
-            Session::flash('failed',"Error Database has Occured! Failed to create request! You need to fill all the required fields");
-            return redirect('/manage-users');
+            Session::flash('failed',"Failed to create request! You need to fill all the required fields");
+            return redirect('/manage-users/registration');
         }
 
         // Check if the User ID exists in the database

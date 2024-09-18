@@ -355,7 +355,7 @@ font-weight-bold
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="evidence">Evidence <small class="text-danger"><i>(only document allowed!)</i></small></label>
+                            <label for="evidence">Evidence <small class="text-danger"><i>(pdf,docx,xlsx,xls,jpeg,png,jpg,gif)</i></small></label>
                             <div class="custom-file">
                                 <input type="file" class="custom-file-input" id="evidence" name="evidence" onchange="changeFileName('evidence', 'evidence-label')">
                                 <label class="custom-file-label" for="evidence" id="evidence-label">Choose file</label>

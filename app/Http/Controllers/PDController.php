@@ -450,7 +450,7 @@ class PDController extends Controller
         $request->validate([
             'regulation_name' => 'required',
             'status' => 'required',
-            'file' => 'required|mimes:pdf,docx,doc'
+            'file' => 'required|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,txt,odt,ods,odp,rtf'
         ]);
 
         // Create new regulation

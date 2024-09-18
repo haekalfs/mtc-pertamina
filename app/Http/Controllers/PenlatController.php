@@ -413,7 +413,7 @@ class PenlatController extends Controller
             'penlat' => 'required',
             'batch' => 'required',
             'date' => 'required',
-            'image' => 'required',
+            'image' => 'sometimes',
             'program' => 'sometimes',
         ]);
 

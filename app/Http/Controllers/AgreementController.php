@@ -20,7 +20,7 @@ class AgreementController extends Controller
             'agreement_date' => 'required',
             'spk_file' => 'sometimes',
             'non_spk_details' => 'sometimes',
-            'img' => 'required',
+            'img' => 'sometimes',
         ]);
 
         // Create new agreement

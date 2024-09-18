@@ -22,7 +22,7 @@ font-weight-bold
         <a href="{{ route('instructor') }}" class="btn btn-sm btn-secondary shadow-sm text-white"><i class="fa fa-backward"></i> Go Back</a>
     </div>
 </div>
-<form action="{{ route ('instructor.store') }}" method="post" enctype="multipart/form-data" class="form-horizontal">
+<form action="{{ route ('instructor.store') }}" method="post" enctype="multipart/form-data" class="form-horizontal" onsubmit="return validateForm('file-upload')">
     @csrf
     <div class="animated fadeIn zoom90">
         <div class="row">
@@ -106,7 +106,7 @@ font-weight-bold
                         </div>
                         <div class="row form-group">
                             <div class="col col-md-3"><label for="working_hour" class=" form-control-label">Jam Mengajar</label></div>
-                            <div class="col-12 col-md-9"><input type="number" id="working_hour" name="working_hour" placeholder="Jam Mengajar" class="form-control"></div>
+                            <div class="col-12 col-md-9"><input type="number" id="working_hour" name="working_hour" placeholder="Jam Mengajar" class="form-control" min="1"></div>
                         </div>
                         <div class="row form-group">
                             <div class="col col-md-3"><label for="user_status" class=" form-control-label">Instructor Status</label></div>
@@ -158,13 +158,23 @@ font-weight-bold
 </form>
 <script>
 
-    function previewImage(event) {
-        const reader = new FileReader();
-        reader.onload = function(){
-            const output = document.getElementById('image-preview');
-            output.src = reader.result;
-        };
-        reader.readAsDataURL(event.target.files[0]);
+function validateForm(...fileInputIds) {
+    for (let i = 0; i < fileInputIds.length; i++) {
+        const fileInput = document.getElementById(fileInputIds[i]);
+        if (!fileInput || fileInput.files.length === 0) {
+            alert(`Please upload an image for ${fileInputIds[i]} before submitting. Only JPEG, JPG, PNG & SVG Allowed!`);
+            return false; // Prevent form submission
+        }
     }
+    return true; // Allow form submission if all file inputs have files
+}
+function previewImage(event) {
+    const reader = new FileReader();
+    reader.onload = function(){
+        const output = document.getElementById('image-preview');
+        output.src = reader.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+}
 </script>
 @endsection

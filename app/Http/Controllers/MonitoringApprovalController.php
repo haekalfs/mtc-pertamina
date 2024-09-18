@@ -22,7 +22,7 @@ class MonitoringApprovalController extends Controller
             'document_name' => 'required',
             'approved_date' => 'required',
             'type' => 'required',
-            'file' => 'required|mimes:pdf,docx,doc'
+            'file' => 'required|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,txt,odt,ods,odp,rtf'
         ]);
 
         // Create new document

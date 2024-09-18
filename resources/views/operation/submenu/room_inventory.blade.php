@@ -153,7 +153,7 @@ font-weight-bold
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="post" enctype="multipart/form-data" action="{{ route('room.store') }}">
+            <form method="post" enctype="multipart/form-data" action="{{ route('room.store') }}" onsubmit="return validateForm('file-upload')">
                 @csrf
                 <div class="modal-body mr-2 ml-2">
                     <div class="row no-gutters">
@@ -218,7 +218,7 @@ font-weight-bold
                                                 </select>
                                             </div>
                                             <div class="col-md-2 pl-0">
-                                                <input type="number" class="form-control underline-input" name="amount[]" placeholder="Amount" style="width: 100%;" required></input>
+                                                <input type="number" class="form-control underline-input" name="amount[]" placeholder="Amount" style="width: 100%;" min="1" required></input>
                                             </div>
                                         </div>
                                     </div>
@@ -321,6 +321,17 @@ font-weight-bold
         if (file) {
             label.textContent = file.name;
         }
+    }
+
+    function validateForm(...fileInputIds) {
+        for (let i = 0; i < fileInputIds.length; i++) {
+            const fileInput = document.getElementById(fileInputIds[i]);
+            if (!fileInput || fileInput.files.length === 0) {
+                alert(`Please upload an image for ${fileInputIds[i]} before submitting. Only JPEG, JPG, PNG & SVG Allowed!`);
+                return false; // Prevent form submission
+            }
+        }
+        return true; // Allow form submission if all file inputs have files
     }
 </script>
 @endsection

@@ -147,7 +147,7 @@ class AkhlakController extends Controller
             'akhlak_points' => 'required|array',
             'akhlak_points.*' => 'required',
             'akhlak_value' => 'required|integer',
-            'evidence' => 'sometimes|file|mimes:pdf,doc,docx',
+            'evidence' => 'sometimes|file|mimes:pdf,docx,xlsx,xls,jpeg,png,jpg,gif',
             'quarter' => 'required|integer|min:1|max:4',
             'year' => 'required|integer',
         ]);
