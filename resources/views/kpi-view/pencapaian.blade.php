@@ -55,8 +55,8 @@ font-weight-bold
         <div class="col-md-3 zoom90">
             <section>
                 <div class="indicators">
-                    <div class="indicator">
-                        <div class="indicator__name bg-primary text-white">{{ $kpiItem->indicator }}</div>
+                    <div class="indicator" style="border-radius: 5%;">
+                        <div class="indicator__name bg-dark text-white">{{ $kpiItem->indicator }}</div>
                         <div class="indicator__data">
                             <div class="data__entry">
                                 <div class="mb-1 @if($target <= $kpiItem->pencapaian->sum('score')) text-success @else text-danger @endif">Target :</div>
@@ -73,7 +73,7 @@ font-weight-bold
             </section>
         </div>
         <div class="col-md-9 zoom90">
-            <div class="card">
+            <div class="card" style="border: 1px solid rgb(220, 219, 219);">
                 <div class="card-body">
                     <div class="progress-box-modified progress-1" style="font-size: 20px;">
                         <h4 class="por-title">Realisasi Pencapaian {{ $kpiItem->indicator }}</h4>
@@ -97,7 +97,7 @@ font-weight-bold
             </div>
         </div>
         <div class="col-lg-12">
-            <div class="card">
+            <div class="card" style="border: 1px solid grey;">
                 <div class="card-body card-body-modified" id="cardBody2024">
                     <div id="chartContainer" style="height: 300px; width: 100%; margin-bottom: 20px;"></div>
                 </div>
@@ -124,6 +124,7 @@ font-weight-bold
                                 <th>Tercapai</th>
                                 <th>KPI</th>
                                 <th>Periode</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody> @php $no = 1; @endphp
@@ -135,6 +136,9 @@ font-weight-bold
                                 <td>{{ number_format($item->score, 0, ',', '.') }}</td>
                                 <td>{{ $item->indicator->indicator }}</td>
                                 <td>{{ \Carbon\Carbon::parse($item->periode_start)->format('d/m/y') }} - {{ \Carbon\Carbon::parse($item->periode_end)->format('d/m/y') }}</td>
+                                <td>
+                                    <a class="btn btn-outline-secondary btn-sm btn-update" data-id="{{ $item->id }}"><i class="fa fa-edit"></i> Update</a>
+                                </td>
                             </tr>
                         @endforeach
                         </tbody>
@@ -179,6 +183,41 @@ font-weight-bold
         </div>
     </div>
 </div>
+<div class="modal fade" id="kpiModal" tabindex="-1" role="dialog" aria-labelledby="kpiModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header d-flex flex-row align-items-center justify-content-between">
+                <h5 class="modal-title" id="kpiModalLabel">Update KPI Achievement</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" action="" id="kpiForm">
+                @csrf
+                <div class="modal-body zoom90 ml-2 mr-2">
+                    <div class="form-group">
+                        <label for="daterange">Periode</label>
+                        <input type="text" class="form-control" id="edit_daterange" name="edit_daterange" placeholder="Select date range" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pencapaian">Pencapaian</label>
+                        <input type="text" class="form-control" id="edit_pencapaian" name="edit_pencapaian" placeholder="Enter achievement" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="score">Score</label>
+                        <input type="text" oninput="formatAmount(this)" class="form-control" id="edit_score" name="edit_score" placeholder="Enter score" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="deleteButton">Delete</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <script type="text/javascript">
 $(function() {
     var startDate = moment('{{ $startDate }}'); // Using startDate from the controller
@@ -187,6 +226,14 @@ $(function() {
     $('input[name="daterange"]').daterangepicker({
         "startDate": startDate,
         "endDate": endDate,
+        "opens": "right",
+        "minDate": startDate,
+        "maxDate": endDate
+    }, function(start, end, label) {
+        console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
+    });
+
+    $('input[name="edit_daterange"]').daterangepicker({
         "opens": "right",
         "minDate": startDate,
         "maxDate": endDate
@@ -241,6 +288,81 @@ window.onload = function () {
             }
         });
     }
+
+    // Update KPI Modal Trigger
+    $(document).on('click', '.btn-update', function() {
+        var id = $(this).data('id');
+
+        // Fetch existing KPI data using AJAX
+        $.ajax({
+            url: '/pencapaian-kpi/edit/' + id,
+            method: 'GET',
+            success: function(data) {
+                // Prefill the modal with the fetched data
+                $('#edit_pencapaian').val(data.pencapaian);
+
+                // Properly format the score
+                var formattedScore = data.score.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                $('#edit_score').val(formattedScore);
+
+                // Set the date range in the daterangepicker
+                var startDate = moment(data.periode_start);
+                var endDate = moment(data.periode_end);
+                $('input[name="edit_daterange"]').data('daterangepicker').setStartDate(startDate);
+                $('input[name="edit_daterange"]').data('daterangepicker').setEndDate(endDate);
+
+                // Update the form action using Laravel route helper in Blade
+                var updateRoute = '{{ route("pencapaian.update", ":id") }}';
+                updateRoute = updateRoute.replace(':id', id);
+                $('#kpiForm').attr('action', updateRoute);
+
+                // Assign the ID to the delete button dynamically
+                $('#deleteButton').data('id', id); // Attach the KPI ID to the delete button
+
+                // Show the modal
+                $('#kpiModal').modal('show');
+            }
+        });
+    });
+
+    // Handle the delete button click event with SweetAlert
+    $(document).on('click', '#deleteButton', function() {
+        var id = $(this).data('id'); // Fetch the ID of the KPI to be deleted
+
+        // Show SweetAlert confirmation dialog
+        swal({
+            title: "Are you sure?",
+            text: "Once deleted, you will not be able to recover this KPI data!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+        .then((willDelete) => {
+            if (willDelete) {
+                // Send delete request via AJAX if confirmed
+                $.ajax({
+                    url: '/pencapaian-kpi/delete/' + id, // Delete route
+                    method: 'DELETE',
+                    data: {
+                        _token: '{{ csrf_token() }}' // Ensure CSRF token is included
+                    },
+                    success: function(response) {
+                        swal("Success!", "The KPI data has been deleted.", "success")
+                        .then(() => {
+                            // Optionally close the modal and refresh the page or table
+                            $('#kpiModal').modal('hide');
+                            location.reload(); // Refresh the page to reflect the deletion
+                        });
+                    },
+                    error: function(xhr) {
+                        swal("Error", "There was an issue deleting the KPI data.", "error");
+                    }
+                });
+            } else {
+                swal("Your KPI data is safe!");
+            }
+        });
+    });
 
     function formatAmount(input) {
         // Remove non-numeric characters

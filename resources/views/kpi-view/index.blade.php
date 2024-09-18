@@ -81,17 +81,17 @@ font-weight-bold
         }
         @endphp
         <a href="{{ route('pencapaian-kpi', [$kpi->id, $selectedQuarter, $yearSelected]) }}">
-            <div class="indicator">
-                <div class="indicator__name bg-primary text-white">{{ $kpi->indicator }}</div>
+            <div class="indicator" style="border-radius: 5%;">
+                <div class="indicator__name bg-dark text-white">{{ Str::limit($kpi->indicator, 20, '...') }}</div>
                 <div class="indicator__data">
                     <div class="data__entry">
                         <div class="mb-1 @if($target <= $kpi->pencapaian->sum('score')) text-success @else text-danger @endif">Target :</div>
-                        <div class="data__description">{{ $kpi->goal }}</div>
-                        <div class="data__amount">{{ number_format($target, 0, ',', '.') }}</div>
+                        <div class="data__description">{{ Str::limit($kpi->goal, 20, '...') }}</div>
+                        <div class="data__amount">{{ Str::limit(number_format($target, 0, ',', '.'), 14, '...') }}</div>
                     </div>
                     <div class="data__entry">
                         <div class="data__description">Tercapai :</div>
-                        <div class="data__spend">{{ number_format($kpi->pencapaian->sum('score'), 0, ',', '.') }}</div>
+                        <div class="data__spend">{{ Str::limit(number_format($kpi->pencapaian->sum('score'), 0, ',', '.'), 20, '...') }}</div>
                     </div>
                 </div>
             </div>
@@ -150,8 +150,8 @@ font-weight-bold
             </div>
         </div>
         @foreach($kpiChartsData as $index => $chartData)
-        <div class="@if($index == 0) col-lg-8 @elseif($index == 1) col-lg-4 @elseif($index == 4) col-lg-12 @else col-lg-6 @endif">
-            <div class="card">
+        <div class="col-md-6">
+            <div class="card" style="border: 1px solid grey;">
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="card-body d-flex justify-content-center align-items-center">

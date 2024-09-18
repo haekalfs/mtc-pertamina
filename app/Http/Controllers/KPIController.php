@@ -404,6 +404,57 @@ class KpiController extends Controller
         return redirect()->back()->with('success', 'Pencapaian KPI berhasil ditambahkan!');
     }
 
+    public function update_pencapaian(Request $request, $id)
+    {
+        // Validate the request data
+        $request->validate([
+            'edit_pencapaian' => 'required|string|max:255',
+            'edit_score' => 'required',
+            'edit_daterange' => 'required',
+        ]);
+
+        // Split the daterange into start and end dates
+        $daterange = explode(' - ', $request->edit_daterange);
+        $periode_start = Carbon::createFromFormat('m/d/Y', trim($daterange[0]))->format('Y-m-d');
+        $periode_end = Carbon::createFromFormat('m/d/Y', trim($daterange[1]))->format('Y-m-d');
+
+        $Quarter = $this->getQuarter($periode_start);
+
+        // Find the existing KPI achievement record by its ID and update it
+        $pencapaianKPI = PencapaianKPI::findOrFail($id);
+        $pencapaianKPI->update([
+            'pencapaian' => $request->edit_pencapaian,
+            'score' => preg_replace('/[^0-9]/', '', $request->edit_score),
+            'periode_start' => $periode_start,
+            'periode_end' => $periode_end,
+            'quarter_id' => $Quarter,
+            'user_id' => auth()->id(), // assuming the user is authenticated
+        ]);
+
+        // Redirect back with a success message
+        return redirect()->back()->with('success', 'Pencapaian KPI berhasil diperbarui!');
+    }
+
+    public function edit_pencapaian($id)
+    {
+        $pencapaian = PencapaianKPI::findOrFail($id);
+        return response()->json($pencapaian);
+    }
+
+    // Delete KPI function
+    public function delete_pencapaian($id)
+    {
+        $kpi = PencapaianKPI::find($id);
+
+        if (!$kpi) {
+            return response()->json(['message' => 'KPI not found'], 404);
+        }
+
+        $kpi->delete();
+
+        return response()->json(['message' => 'KPI deleted successfully'], 200);
+    }
+
     private function getQuarter($date)
     {
         $month = Carbon::parse($date)->month;

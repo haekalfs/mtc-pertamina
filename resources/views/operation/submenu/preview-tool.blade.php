@@ -115,7 +115,7 @@ font-weight-bold
                             </tr>
                             <tr>
                                 <th>Guide</th>
-                                <td style="text-align: start; font-weight:500">: <a href="{{ asset($data->asset_guidance) }}"><span class="ml-3">{{ $data->asset_guidance }}</span></a></td>
+                                <td style="text-align: start; font-weight:500">: <a href="{{ asset($data->asset_guidance) }}" target="_blank"><span class="ml-3 btn btn-sm btn-outline-secondary">Download Existing File <i class="fa fa-download"></i></span></a></td>
                             </tr>
                         </table>
                     </div>

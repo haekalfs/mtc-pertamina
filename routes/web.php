@@ -87,6 +87,9 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
             Route::get('/key-performance-indicators/index/{quarterSelected?}/{yearSelected?}', [KpiController::class, 'index'])->name('kpi');
             Route::post('/kpi-store', [KpiController::class, 'store'])->name('kpis.store');
             Route::post('/pencapaian-kpi/store/{kpi}', [KpiController::class, 'store_pencapaian'])->name('pencapaian.kpi.store');
+            Route::get('/pencapaian-kpi/edit/{id}', [KpiController::class, 'edit_pencapaian'])->name('pencapaian.kpi.edit');
+            Route::delete('/pencapaian-kpi/delete/{id}', [KpiController::class, 'delete_pencapaian'])->name('pencapaian.kpi.delete');
+            Route::post('/pencapaian-kpi/update/{id}', [KPIController::class, 'update_pencapaian'])->name('pencapaian.update');
             Route::get('/key-performance-indicators/achievements/{id}/{quarter}/{year}', [KpiController::class, 'pencapaian'])->name('pencapaian-kpi');
             Route::delete('/delete-kpi/{id}', [KpiController::class, 'destroy'])->name('kpi.destroy');
             Route::delete('/delete-pencapaian-kpi/{id}', [KpiController::class, 'destroy_pencapaian'])->name('pencapaian.kpi.destroy');
