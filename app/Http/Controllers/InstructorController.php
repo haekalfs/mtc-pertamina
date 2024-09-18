@@ -22,7 +22,7 @@ class InstructorController extends Controller
             'address'           => 'required',
             'gender'            => 'required',
             'user_status'       => 'required',
-            'profile_picture'   => 'required|mimes:jpeg,png,jpg,gif,svg',
+            'profile_picture'   => 'required',
             'cv'                => 'required',
             'pendukung'         => 'sometimes',
             'working_hour'      => 'required',
