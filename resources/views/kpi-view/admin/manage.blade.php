@@ -118,7 +118,8 @@ font-weight-bold
                         </div>
                         <div class="form-group">
                             <label for="target">Target</label>
-                            <input type="text" class="form-control" id="target" name="target" oninput="formatAmount(this)" placeholder="Nominal Angka Tercapai..." required>
+                            <input type="text" class="form-control" id="target" name="target_display" oninput="formatAmount(this)" placeholder="Nominal Angka Tercapai..." required>
+                            <input type="hidden" id="target_hidden" name="target"> <!-- Unformatted value for submission -->
                         </div>
                         <div class="form-group">
                             <label for="periode">Periode</label>
@@ -160,14 +161,17 @@ function confirmDelete(itemId) {
     });
 }
 function formatAmount(input) {
-    // Remove non-numeric characters
-    let amount = input.value.replace(/[^0-9]/g, '');
+    // Remove non-numeric characters for display purposes
+    let displayValue = input.value.replace(/[^0-9]/g, '');
 
-    // Add thousands separator (dots) using a regular expression
-    amount = amount.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    // Add thousands separator (dots) for display
+    displayValue = displayValue.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 
-    // Set the formatted value back to the input
-    input.value = amount;
+    // Set the formatted value back to the input (for display)
+    input.value = displayValue;
+
+    // Also set the unformatted value in a hidden input for submission
+    document.getElementById('target_hidden').value = input.value.replace(/\./g, '');
 }
 </script>
 @endsection
