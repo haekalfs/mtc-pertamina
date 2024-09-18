@@ -373,31 +373,31 @@ class OperationController extends Controller
 
     public function utility_store(Request $request)
     {
-        // $validator = Validator::make($request->all(), [
-        //     'penlat' => [
-        //         'required',
-        //         'min:1', // Ensure at least 2 characters in length
-        //     ],
-        //     'batch' => [
-        //         'required',
-        //         'min:1', // Ensure at least 2 characters in length
-        //     ],
-        //     'date' => 'sometimes', // Ensure valid date format
-        //     'image' => 'sometimes', // Ensure file is an image if present
-        //     'program' => 'sometimes' // Optional field
-        // ], [
-        //     // Custom error messages for min length validation
-        //     'penlat.min' => 'Penlat must contain at least 2 characters.',
-        //     'batch.min' => 'Batch must contain at least 2 characters.',
-        // ]);
+        $validator = Validator::make($request->all(), [
+            'penlat' => [
+                'required',
+                'min:2', // Ensure at least 2 characters in length
+            ],
+            'batch' => [
+                'required',
+                'min:2', // Ensure at least 2 characters in length
+            ],
+            'date' => 'required|date', // Ensure valid date format
+            'image' => 'sometimes|image', // Ensure file is an image if present
+            'program' => 'sometimes' // Optional field
+        ], [
+            // Custom error messages for min length validation
+            'penlat.min' => 'Penlat must contain at least 2 characters.',
+            'batch.min' => 'Batch must contain at least 2 characters.',
+        ]);
 
-        // // Check if the validation fails
-        // if ($validator->fails()) {
-        //     return redirect()->back()
-        //         ->withInput($request->input()) // Preserve form input
-        //         ->with('failed', 'Penlat or Batch must contain at least 2 characters or is not in valid format!') // Set session message
-        //         ->withErrors($validator); // Pass validation errors
-        // }
+        // Check if the validation fails
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withInput($request->input()) // Preserve form input
+                ->with('failed', 'Penlat or Batch must contain at least 2 characters or is not in valid format!') // Set session message
+                ->withErrors($validator); // Pass validation errors
+        }
 
         DB::beginTransaction();
 
