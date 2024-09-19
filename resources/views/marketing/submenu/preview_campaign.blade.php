@@ -52,17 +52,55 @@ font-weight-bold
 @endif
 <div class="row zoom90">
     <div class="col-xl-12 col-lg-12">
+        <div class="content card">
+            <img style="width: 100%; height: 600px;" class="photo" src="{{ asset($data->img_filepath) }}" alt="Main Image">
+            <div class="desc mt-4" style="position: relative;">
+                <a href="#" data-id="{{ $data->id }}" class="position-absolute edit-campaign" style="top: 1px; right: 15px; z-index: 1;">
+                    <i class="fa fa-edit fa-lg ml-2" style="color: rgb(181, 181, 181);"></i>
+                </a>
+                <h1>{{ $data->campaign_name }}</h1>
+                <div class="d-flex justify-content-between align-items-start" style="font-weight: 500;">
+                    <!-- Jenis Kegiatan -->
+                    <div class="me-4">
+                        <strong>Jenis Kegiatan</strong>: {{ $data->jenis->description }}
+                    </div>
+
+                    <!-- Tanggal Pelaksanaan -->
+                    @php
+                        $date = \Carbon\Carbon::parse($data->date);
+                    @endphp
+                    <div>
+                        {{ $date->format('d-M-Y') }}
+                    </div>
+                </div>
+                <p>{!! $data->campaign_result !!}</p>
+                <hr>
+                <div class="d-flex justify-content-between align-items-start" style="font-weight: 500;">
+                    <!-- Jenis Kegiatan -->
+
+                    <div style="font-weight: 500; line-height: 1.5;" class="text-muted">
+                        <!-- Informasi Kegiatan -->
+                        <div>
+                            <strong>Informasi Kegiatan</strong>: {{ $data->campaign_details }}
+                        </div>
+
+                        <!-- Person in Charge -->
+                        <div>
+                            <strong>Person in Charge</strong>: {{ $data->user->name }}
+                        </div>
+                    </div>
+
+                    <div class="text-muted">
+                        <strong>Last Updated by</strong>: {{ $data->user->name }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- <div class="col-xl-12 col-lg-12">
         <div class="card">
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-bullhorn"></i> Campaign</h6>
-                <div class="text-right">
-                    {{-- @mtd_acc(4) --}}
-                    {{-- <a href="#" class="btn btn-danger btn-sm text-white delete-campaign mr-2" data-id="{{ $data->id }}"><i class="menu-Logo fa fa-trash-o"></i> Delete</a> --}}
-                    {{-- @endmtd_acc
-                    @mtd_acc(3) --}}
-                    {{-- <a href="#" class="btn btn-secondary btn-sm text-white edit-campaign" data-id="{{ $data->id }}"><i class="menu-Logo fa fa-edit"></i> Update Data</a> --}}
-                    {{-- @endmtd_acc --}}
-                </div>
             </div>
             <div class="card-body" style="position: relative;">
                 <a href="#" data-id="{{ $data->id }}" class="position-absolute edit-campaign" style="top: 10px; right: 15px; z-index: 10;">
@@ -83,14 +121,6 @@ font-weight-bold
                                     <th>Jenis Kegiatan</th>
                                     <td style="text-align: start; font-weight:500">: {{ $data->jenis->description }}</td>
                                 </tr>
-                                <tr>
-                                    <th>Informasi Kegiatan</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $data->campaign_details }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Person in Charge</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $data->user->name }}</td>
-                                </tr>
                                 @php
                                     $date = \Carbon\Carbon::parse($data->date);
                                 @endphp
@@ -104,16 +134,16 @@ font-weight-bold
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 </div>
-<div class="animated fadeIn zoom90">
+{{-- <div class="animated fadeIn zoom90">
     <div class="row">
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-bullhorn"></i> Hasil Campaign</h6>
                     <div class="text-right">
-                        {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Add Utilities</a> --}}
+                        <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Add Utilities</a>
                     </div>
                 </div>
                 <div class="card-body">
@@ -122,7 +152,7 @@ font-weight-bold
             </div>
         </div>
     </div>
-</div>
+</div> --}}
 <div class="modal fade zoom90" id="editCampaignModal" tabindex="-1" role="dialog" aria-labelledby="editCampaignModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 900px;" role="document">
         <div class="modal-content">

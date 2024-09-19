@@ -38,9 +38,9 @@ class MarketingController extends Controller
         $currentYear = now()->year;
         $yearSelected = $request->input('year', 'all');  // Default to 'all' if not provided
         $monthSelected = $request->input('month', 'all'); // Default to 'all' if not provided
-        $typeSelected = $request->input('typeSelected', '-1'); // Default to 'all' if not provided
+        $typeSelected = $request->input('typeSelected', '-1'); // Default to '-1' if not provided
 
-        // Query to filter data based on year and month
+        // Query to filter data based on year, month, and type
         $query = Campaign::query();
 
         if ($yearSelected !== 'all') {
@@ -55,7 +55,8 @@ class MarketingController extends Controller
             $query->where('campaign_type_id', $typeSelected);
         }
 
-        $data = $query->get();
+        // Add pagination (6 items per page)
+        $data = $query->paginate(6);
         $users = User::all();
         $campaignType = Campaign_type::all();
 

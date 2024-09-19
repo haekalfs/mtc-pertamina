@@ -9,5 +9,5 @@ class User_pencapaian_akhlak_files extends Model
 {
     use HasFactory;
     protected $table = "user_pencapaian_akhlak_files";
-    protected $fillable = ["id", "user_id", 'filename', 'filepath', 'user_pencapaian_akhlak_id',"created_at", "updated_at"];
+    protected $fillable = ["id", 'filename', 'filepath', 'user_pencapaian_akhlak_id',"created_at", "updated_at"];
 }

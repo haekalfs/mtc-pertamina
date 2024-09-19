@@ -12,7 +12,7 @@ class Campaign extends Model
     protected $fillable = ["id", "campaign_type_id", "campaign_name", 'campaign_details', 'campaign_result', 'user_id', 'date', 'img_filepath',"created_at", "updated_at"];
 
     public function user(){
-    	return $this->belongsTo('App\Models\User');
+    	return $this->belongsTo('App\Models\User')->withDefault();
     }
 
     public function jenis(){

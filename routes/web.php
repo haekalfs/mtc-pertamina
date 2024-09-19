@@ -63,6 +63,7 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
         Route::get('/api/chart-data/{year}', [OperationController::class, 'getChartData']);
         Route::get('/api/chart-data-profits/{year}', [FinanceController::class, 'getChartDataProfits']);
         Route::get('/api/chart-data-trend-revenue/{year}', [FinanceController::class, 'getTrendChartData']);
+        Route::get('/api/pie-chart-data-profits/{year}', [FinanceController::class, 'getPieChartData']);
         Route::get('/api/comparison-chart-data-profits/{year}/{secondYear}', [FinanceController::class, 'getComparisonChartData']);
         Route::get('/api/summary-data-profits/{year}', [FinanceController::class, 'getSummaryProfits']);
         Route::get('/feedback-chart-data/{year}', [PDController::class, 'getFeedbackChartData']);
@@ -107,6 +108,9 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
             Route::get('/akhlak/preview-achievements/{coreValue}/{quarter}/{periode}', [AkhlakController::class, 'preview_achievements'])->name('preview.achievements');
             Route::get('/akhlak-report', [AkhlakController::class, 'report'])->name('report-akhlak');
             Route::post('/akhlak-store', [AkhlakController::class, 'store'])->name('akhlak.store');
+            Route::get('/akhlak/edit/{id}', [AkhlakController::class, 'edit'])->name('akhlak.edit');
+            Route::put('/akhlak/update/{id}', [AkhlakController::class, 'update'])->name('akhlak.update');
+            Route::delete('/akhlak/{id}', [AkhlakController::class, 'destroy'])->name('akhlak.destroy');
             Route::post('/akhlak/downloadPdf', [AkhlakController::class, 'downloadPdf'])->name('akhlak.downloadPdf');
 
             Route::get('/akhlak/morning-briefing', [MorningBriefingController::class, 'index'])->name('morning-briefing');

@@ -136,7 +136,7 @@ font-weight-bold
                                 <td>{{ number_format($item->score, 0, ',', '.') }}</td>
                                 <td>{{ $item->indicator->indicator }}</td>
                                 <td>{{ \Carbon\Carbon::parse($item->periode_start)->format('d/m/y') }} - {{ \Carbon\Carbon::parse($item->periode_end)->format('d/m/y') }}</td>
-                                <td>
+                                <td class="text-center">
                                     <a class="btn btn-outline-secondary btn-sm btn-update" data-id="{{ $item->id }}"><i class="fa fa-edit"></i> Update</a>
                                 </td>
                             </tr>
@@ -171,7 +171,8 @@ font-weight-bold
                         </div>
                         <div class="form-group">
                             <label for="score">Score Tercapai <small class="text-danger"><i>(Number Format)</i></small></label>
-                            <input type="text" oninput="formatAmount(this)" class="form-control" id="score" name="score" required>
+                            <input type="text" class="form-control" id="score" name="score_display" oninput="formatAmount(this)" placeholder="Nominal Angka Tercapai..." required>
+                            <input type="hidden" id="target_hidden" name="score"> <!-- Unformatted value for submission -->
                         </div>
                     </div>
                 </div>
@@ -207,7 +208,8 @@ font-weight-bold
 
                     <div class="form-group">
                         <label for="score">Score</label>
-                        <input type="text" oninput="formatAmount(this)" class="form-control" id="edit_score" name="edit_score" placeholder="Enter score" required>
+                        <input type="text" class="form-control" id="edit_score" oninput="formatAmount2(this)" placeholder="Nominal Angka Tercapai..." required>
+                        <input type="hidden" id="score_hidden" name="edit_score"> <!-- Unformatted value for submission -->
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -302,8 +304,14 @@ window.onload = function () {
                 $('#edit_pencapaian').val(data.pencapaian);
 
                 // Properly format the score
-                var formattedScore = data.score.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                var score = data.score || 0; // Ensure score is not undefined or null, default to 0 if it is
+                var formattedScore = score.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+                // Set the formatted value in the visible input field
                 $('#edit_score').val(formattedScore);
+
+                // Set the unformatted value in the hidden input field
+                $('#score_hidden').val(score); // Use the raw unformatted score here
 
                 // Set the date range in the daterangepicker
                 var startDate = moment(data.periode_start);
@@ -364,15 +372,30 @@ window.onload = function () {
         });
     });
 
-    function formatAmount(input) {
-        // Remove non-numeric characters
-        let amount = input.value.replace(/[^0-9]/g, '');
 
-        // Add thousands separator (dots) using a regular expression
-        amount = amount.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+function formatAmount(input) {
+    // Remove non-numeric characters for display purposes
+    let displayValue = input.value.replace(/[^0-9]/g, '');
 
-        // Set the formatted value back to the input
-        input.value = amount;
-    }
+    // Add thousands separator (dots) for display
+    displayValue = displayValue.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+    // Set the formatted value back to the input (for display)
+    input.value = displayValue;
+
+    // Also set the unformatted value in a hidden input for submission
+    document.getElementById('target_hidden').value = input.value.replace(/\./g, '');
+}
+
+function formatAmount2(input) {
+    // Remove non-numeric characters for display purposes
+    let displayValue = input.value.replace(/[^0-9]/g, '');
+
+    // Add thousands separator (dots) for display
+    input.value = displayValue.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+    // Also set the unformatted value in the hidden input for submission
+    document.getElementById('score_hidden').value = displayValue;
+}
 </script>
 @endsection

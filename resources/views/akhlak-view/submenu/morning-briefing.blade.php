@@ -49,23 +49,6 @@ font-weight-bold
     <strong>{{ $message }}</strong>
 </div>
 @endif
-<style>
-    #dataTable tbody tr {
-        margin: 0;
-        padding-bottom: 0;
-        padding-top: 0;
-        padding-left: 15px;
-        padding-right: 15px;
-    }
-
-    #dataTable tbody td {
-        padding-bottom: 0;
-        padding-top: 0;
-        padding-left: 15px;
-        padding-right: 15px;
-        border: none; /* Optional: removes the borders */
-    }
-</style>
 <div class="animated fadeIn zoom90">
     <div class="row">
         <div class="col-md-12">
@@ -119,72 +102,98 @@ font-weight-bold
                             </div>
                         </div>
                     </form>
-                    <div>
-                        <table id="dataTable" class="table table-borderless mt-4">
-                            <thead class="text-center" style="display: none;">
-                                <tr>
-                                    <th>Kegiatan Briefing</th>
-                                </tr>
-                            </thead>
-                            <tbody class="mt-4 zoom90">
-                                @foreach($data as $item)
-                                <tr>
-                                    <td>
-                                        <div class="row">
-                                            <div class="col-12 mt-3">
-                                                <div class="card" style="position: relative;">
-                                                    <!-- Edit Icon in the Top Right Corner -->
-                                                    <a href="{{ route('preview-briefing', $item->id) }}" class="position-absolute" style="top: 12px; right: 12px; z-index: 12; font-size: 20px;">
-                                                        <i class="fa fa-edit fa-lg" style="color: rgb(181, 181, 181);"></i>
-                                                    </a>
-                                                    <div class="card-horizontal" style="display: flex; flex: 1 1 auto;">
-                                                        <div class="img-square-wrapper">
-                                                            <a href="{{ route('preview-briefing', $item->id) }}">
-                                                                <img class="animateBox" src="{{ asset($item->img_filepath ? $item->img_filepath : 'img/default-img.png') }}" style="height: 100%; width: 500px;" alt="Card image cap">
-                                                            </a>
-                                                        </div>
-                                                        <div class="card-body">
-                                                            <h4 class="card-title">{{ $item->briefing_name }}</h4>
-                                                            <div class="ml-3">
-                                                                <div class="card-text mb-1">
-                                                                    <span class="font-weight-bold"><i class="fa fa-arrow-right"></i>&nbsp; Briefing Detail</span> : {{ $item->briefing_details }}
-                                                                </div>
-                                                                <div class="card-text mb-1">
-                                                                    @php
-                                                                        $date = \Carbon\Carbon::parse($item->date);
-                                                                    @endphp
-                                                                    <span class="font-weight-bold"><i class="fa fa-arrow-right"></i>&nbsp; Tgl Pelaksanaan</span> : {{ $date->format('d-M-Y') }}
-                                                                </div>
-                                                                <div class="card-text">
-                                                                    <span class="font-weight-bold"><i class="fa fa-arrow-right"></i>&nbsp; Hasil Kegiatan</span> :
-                                                                    {!! Str::limit($item->briefing_result, 750, '...') !!}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    @php
-                                                        $created_at = \Carbon\Carbon::parse($item->updated_at);
-                                                        $now = \Carbon\Carbon::now();
-                                                        $diffInDays = $created_at->diffInDays($now);
-                                                    @endphp
-                                                    <div class="card-footer">
-                                                        <small class="text-muted">Last updated
-                                                            @if($diffInDays < 7)
-                                                                {{ $created_at->diffForHumans() }}
-                                                            @else
-                                                                a long time ago
-                                                            @endif
-                                                        </small>
-                                                    </div>
-                                                </div>
-                                            </div>
+                    <div class="row justify-content-start">
+                        @foreach($data as $item)
+                        <div class="col-lg-6 col-md-6 d-flex mb-4">
+                            <div class="blog-card w-100" style="height: 250px; border: 1px solid rgb(220, 219, 219);">
+                                <div class="meta">
+                                    <div class="photo" style="background-image: url('{{ asset($item->img_filepath ? $item->img_filepath : 'img/default-img.png') }}');"></div>
+                                </div>
+                                <div class="description">
+                                    <h1>{{ Str::limit($item->briefing_name, 45, '...') }}</h1>
+                                    <div style="font-weight: 500; line-height: 1.8; font-size: 13px; margin-top: 15px;">
+                                        <!-- Informasi Kegiatan -->
+                                        <div>
+                                            <strong>Tanggal </strong>: {{ $item->date }}
                                         </div>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                                        <div>
+                                            <strong>Informasi Kegiatan</strong>: {{ Str::limit($item->briefing_details, 30, '...') }}
+                                        </div>
+
+                                        <!-- Person in Charge -->
+                                        <div>
+                                            <strong>PIC</strong>: {{ $item->user->name }}
+                                        </div>
+                                    </div>
+                                    @php
+                                        $created_at = \Carbon\Carbon::parse($item->updated_at);
+                                        $now = \Carbon\Carbon::now();
+                                        $diffInDays = $created_at->diffInDays($now);
+                                    @endphp
+                                    <div class="mt-2">
+                                        <small class="text-muted">Last updated
+                                            @if($diffInDays < 7)
+                                                {{ $created_at->diffForHumans() }}
+                                            @else
+                                                a long time ago
+                                            @endif
+                                        </small>
+                                    </div>
+                                    <p class="read-more">
+                                        <a href="{{ route('preview-briefing', $item->id) }}">View Detail</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
                     </div>
+
+
+                    <!-- Pagination Links -->
+                    <nav>
+                        <ul class="pagination justify-content-center">
+                            {{-- Previous Page Link --}}
+                            @if ($data->onFirstPage())
+                                <li class="page-item disabled">
+                                    <span class="page-link">Previous</span>
+                                </li>
+                            @else
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ $data->previousPageUrl() }}" rel="prev">Previous</a>
+                                </li>
+                            @endif
+
+                            {{-- Pagination Elements --}}
+                            @foreach ($data->links()->elements as $element)
+                                {{-- "Three Dots" Separator --}}
+                                @if (is_string($element))
+                                    <li class="page-item disabled"><span class="page-link">{{ $element }}</span></li>
+                                @endif
+
+                                {{-- Array Of Links --}}
+                                @if (is_array($element))
+                                    @foreach ($element as $page => $url)
+                                        @if ($page == $data->currentPage())
+                                            <li class="page-item active"><span class="page-link">{{ $page }}</span></li>
+                                        @else
+                                            <li class="page-item"><a class="page-link" href="{{ $url }}">{{ $page }}</a></li>
+                                        @endif
+                                    @endforeach
+                                @endif
+                            @endforeach
+
+                            {{-- Next Page Link --}}
+                            @if ($data->hasMorePages())
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ $data->nextPageUrl() }}" rel="next">Next</a>
+                                </li>
+                            @else
+                                <li class="page-item disabled">
+                                    <span class="page-link">Next</span>
+                                </li>
+                            @endif
+                        </ul>
+                    </nav>
                 </div>
             </div>
         </div>

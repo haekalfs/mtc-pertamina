@@ -392,7 +392,7 @@ class KpiController extends Controller
         // Create a new record in the kpi_pencapaian table
         PencapaianKPI::create([
             'pencapaian' => $request->pencapaian,
-            'score' => preg_replace('/[^0-9]/', '', $request->score),
+            'score' => $request->score,
             'periode_start' => $periode_start,
             'periode_end' => $periode_end,
             'quarter_id' => $Quarter,
@@ -408,7 +408,7 @@ class KpiController extends Controller
     {
         // Validate the request data
         $request->validate([
-            'edit_pencapaian' => 'required|string|max:255',
+            'edit_pencapaian' => 'required',
             'edit_score' => 'required',
             'edit_daterange' => 'required',
         ]);
@@ -424,7 +424,7 @@ class KpiController extends Controller
         $pencapaianKPI = PencapaianKPI::findOrFail($id);
         $pencapaianKPI->update([
             'pencapaian' => $request->edit_pencapaian,
-            'score' => preg_replace('/[^0-9]/', '', $request->edit_score),
+            'score' => $request->edit_score,
             'periode_start' => $periode_start,
             'periode_end' => $periode_end,
             'quarter_id' => $Quarter,

@@ -52,67 +52,49 @@ font-weight-bold
 @endif
 <div class="row zoom90">
     <div class="col-xl-12 col-lg-12">
-        <div class="card">
-            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="ti-signal"></i> Briefing</h6>
-                <div class="text-right">
-                    {{-- <a href="#" class="btn btn-danger btn-sm text-white delete-briefing mr-2" data-id="{{ $data->id }}"><i class="menu-Logo fa fa-trash-o"></i> Delete</a>
-                    <a href="#" class="btn btn-secondary btn-sm text-white edit-briefing" data-id="{{ $data->id }}"><i class="menu-Logo fa fa-edit"></i> Update Data</a> --}}
-                </div>
-            </div>
-            <div class="card-body" style="position: relative;">
-                <a href="#" data-id="{{ $data->id }}" class="position-absolute edit-briefing" style="top: 10px; right: 15px; z-index: 10;">
+        <div class="content card">
+            <img style="width: 100%; height: 600px;" class="photo" src="{{ asset($data->img_filepath) }}" alt="Main Image">
+            <div class="desc mt-4" style="position: relative;">
+                <a href="#" data-id="{{ $data->id }}" class="position-absolute edit-briefing" style="top: 1px; right: 15px; z-index: 1;">
                     <i class="fa fa-edit fa-lg ml-2" style="color: rgb(181, 181, 181);"></i>
                 </a>
-                <div class="col-md-12 mb-3">
-                    <div class="row">
-                        <div class="col-md-3 d-flex align-items-center justify-content-center" style="padding-left: 1em;">
-                            <img src="{{ asset($data->img_filepath) }}" style="height: 150px; width: 250px; border-radius: 15px;" class="card-img" alt="...">
-                        </div>
-                        <div class="col-md-8">
-                            <table class="table table-borderless table-sm">
-                                <tr>
-                                    <th style="width: 200px;">Judul Kegiatan</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $data->briefing_name }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Informasi Kegiatan</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $data->briefing_details }}</td>
-                                </tr>
-                                <tr>
-                                    <th>PIC</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $data->user_id }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Tanggal Pelaksanaan</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $data->date }}</td>
-                                </tr>
-                          </table>
-                        </div>
+                <h1>{{ $data->briefing_name }}</h1>
+                <div class="d-flex justify-content-between align-items-start" style="font-weight: 500;">
+                    <!-- Jenis Kegiatan -->
+                    <div class="me-4">
+                        <strong>Person in Charge</strong>: {{ $data->user->name }}
                     </div>
 
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="animated fadeIn zoom90">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="ti-signal"></i> Resume Info</h6>
-                    <div class="text-right">
-                        {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Add Utilities</a> --}}
+                    <!-- Tanggal Pelaksanaan -->
+                    @php
+                        $date = \Carbon\Carbon::parse($data->date);
+                    @endphp
+                    <div>
+                        {{ $date->format('d-M-Y') }}
                     </div>
                 </div>
-                <div class="card-body">
-                    {!! $data->briefing_result !!}
+                <p>{!! $data->briefing_result !!}</p>
+                <hr>
+                <div class="d-flex justify-content-between align-items-start" style="font-weight: 500;">
+                    <!-- Jenis Kegiatan -->
+
+                    <div style="font-weight: 500; line-height: 1.5;" class="text-muted">
+                        <!-- Informasi Kegiatan -->
+                        <div>
+                            <strong>Informasi Kegiatan</strong>: {{ $data->briefing_details }}
+                        </div>
+
+                    </div>
+
+                    <div class="text-muted">
+                        <strong>Last Updated by</strong>: {{ $data->user->name }}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 <div class="modal fade zoom90" id="editCampaignModal" tabindex="-1" role="dialog" aria-labelledby="editCampaignModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 900px;" role="document">
         <div class="modal-content">

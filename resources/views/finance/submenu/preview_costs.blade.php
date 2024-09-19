@@ -295,23 +295,22 @@ font-weight-bold
 
 <script>
     window.onload = function() {
+        var chart = new CanvasJS.Chart("chartContainer", {
+            animationEnabled: true,
+            title: {
+                text: "Revenue Consumption by Cost (in Percentage)"
+            },
+            data: [{
+                type: "pie",
+                yValueFormatString: "#,##0.##\"%\"",
+                indexLabel: "{label} ({y}%)",
+                dataPoints: @json($dataPoints)
+            }]
+        });
+        chart.render();
 
-    var chart = new CanvasJS.Chart("chartContainer", {
-        animationEnabled: true,
-        title: {
-            text: "Revenue Consumption by Cost (in Percentage)"
-        },
-        data: [{
-            type: "pie",
-            yValueFormatString: "#,##0.##\"%\"",
-            indexLabel: "{label} ({y}%)",
-            dataPoints: @json($dataPoints)
-        }]
-    });
-    chart.render();
-
-    // Display profits below the chart
-    var profitDisplay = document.createElement('div');
+        // Display profits below the chart
+        var profitDisplay = document.createElement('div');
         profitDisplay.innerHTML = "<strong>Revenue : Rp " + @json($profitsValue) + "</strong>";
         document.getElementById("profitContainer").appendChild(profitDisplay);
     }

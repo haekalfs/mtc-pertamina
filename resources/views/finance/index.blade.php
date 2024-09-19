@@ -13,10 +13,44 @@ font-weight-bold
 @endsection
 
 @section('content')
-<div class="d-sm-flex align-items-center zoom90 justify-content-between">
-    <div>
+<style>
+#revenue-tag {
+    font-weight: inherit !important;
+    border-radius: 0px !important;
+}
+
+#header2 {
+    border-bottom: 5px solid rgb(109, 109, 109);
+    color: rgb(109, 109, 109);
+    margin-bottom: 1.5rem;
+    padding: 1rem 0;
+}
+.card2 {
+    border: 0rem;
+    border-radius: 0rem;
+}
+
+.card-header2 {
+    background-color: rgb(76, 132, 206);
+    border-radius: 0 !important;
+    color:	white;
+    margin-bottom: 0;
+    padding:	1rem;
+}
+
+.card-block2 {
+    border: 1px solid #cccccc;
+    margin-bottom: 30px;
+}
+#revenue-column-chart, #products-revenue-pie-chart, #orders-spline-chart {
+    height: 300px;
+    width: 100%;
+}
+</style>
+<div class="d-sm-flex align-items-center justify-content-between">
+    <div class="mb-3">
         <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="menu-icon fa fa-money"></i> Dashboard Finances</h1>
-        <p class="mb-4">Dashboard Finances.</a></p>
+        <small class="text-muted">Jan {{ $currentYear }} - Dec {{ $currentYear }}</small>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
         <select class="form-control" id="yearSelected" name="yearSelected" required onchange="redirectToPage()">
@@ -36,8 +70,8 @@ font-weight-bold
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
                                 <div class="stat-heading mb-1 font-weight-bold">
-                                    Revenue {{ $currentYear }}</div>
-                                <div class="h6 mb-0 text-gray-800"> {{ $totalRevenue ? 'Rp ' . number_format($totalRevenue, 0, ',', '.') : '-' }}</div>
+                                    Revenue </div>
+                                <div class="h6 mb-0 text-gray-800"> {{ $totalRevenue ? 'IDR ' . number_format($totalRevenue, 0, ',', '.') : '-' }}</div>
                             </div>
                             <div class="col-auto">
                                 <i class="ti-stats-up fa-2x text-primary"></i>
@@ -56,9 +90,9 @@ font-weight-bold
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
                                 <div class="stat-heading mb-1 font-weight-bold">
-                                    Cost {{ $currentYear }}
+                                    Cost
                                 </div>
-                                <div class="h6 mb-0 text-gray-800"> {{ $totalCosts ? 'Rp ' . number_format($totalCosts, 0, ',', '.') : '-' }}</div>
+                                <div class="h6 mb-0 text-gray-800"> {{ $totalCosts ? 'IDR ' . number_format($totalCosts, 0, ',', '.') : '-' }}</div>
                             </div>
                             <div class="col-auto">
                                 <i class="ti-stats-down fa-2x text-danger"></i>
@@ -77,9 +111,9 @@ font-weight-bold
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
                                 <div class="stat-heading mb-1 font-weight-bold">
-                                    Nett Income {{ $currentYear }}
+                                    Nett Income
                                 </div>
-                                <div class="h6 mb-0 text-gray-800">{{ $nettIncome ? 'Rp ' . number_format($nettIncome, 0, ',', '.') : '-' }}</div>
+                                <div class="h6 mb-0 text-gray-800">{{ $nettIncome ? 'IDR ' . number_format($nettIncome, 0, ',', '.') : '-' }}</div>
                             </div>
                             <div class="col-auto">
                                 <i class="ti-money fa-2x text-success"></i>
@@ -91,13 +125,108 @@ font-weight-bold
         </div>
     </div>
     <div class="row">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold" id="judul">Summary <span id="tahunSummary"></span></h6>
+        <div class="col-md-12">
+            <div class="card2 shadow">
+                <h4 class="card-header2">Penlat with Most Revenue</h4>
+                <div class="card-block2 bg-white">
+                    <div class="row">
+                        <div class="col-lg-12 d-flex justify-content-end align-items-end">
+                            <select class="form-control mt-3 mr-4 zoom90" id="revenueChartPeriode" name="revenueChartPeriode" style="width: 150px;">
+                                <option value="-1" selected disabled>Select Periode...</option>
+                                @foreach(range(date('Y'), date('Y') - 5) as $year)
+                                    <option value="{{ $year }}" @if ($year == $currentYear) selected @endif>{{ $year }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="card-body d-flex justify-content-center align-items-center">
+                                <!-- <canvas id="TrafficChart"></canvas>   -->
+                            <div id="trendRevenueChart" style="height: 370px; width: 100%;"></div>
+                            </div>
+                        </div>
+                    </div> <!-- /.row -->
                 </div>
-                <div class="card-body zoom80">
-                    <div class="">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card2 shadow">
+                <h4 class="card-header2">Profits Per-Quarters</h4>
+                <div class="card-block2 bg-white">
+                    <div class="row">
+                        <div class="col-lg-12 d-flex justify-content-end align-items-end">
+                            <select class="form-control mt-3 mr-4 zoom90" id="chartPeriode" name="chartPeriode" style="width: 150px;">
+                                <option value="-1" selected disabled>Select Periode...</option>
+                                @foreach(range(date('Y'), date('Y') - 5) as $year)
+                                    <option value="{{ $year }}" @if ($year == $currentYear) selected @endif>{{ $year }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="card-body d-flex justify-content-center align-items-center">
+                                <!-- <canvas id="TrafficChart"></canvas>   -->
+                                <div id="chartContainerSpline" style="height: 370px; width: 100%;"></div>
+                            </div>
+                        </div>
+                    </div> <!-- /.row -->
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card2 shadow">
+                <h4 class="card-header2">Total Revenue <span class="badge bg-success" id="profitText"></span></h4>
+                <div class="card-block2 bg-white">
+                    <div class="row">
+                        <div class="col-lg-12 d-flex justify-content-end align-items-end">
+                            <select class="form-control mt-3 mr-4 zoom90" id="pieChartPeriode" name="pieChartPeriode" style="width: 150px;">
+                                <option value="-1" selected disabled>Select Periode...</option>
+                                @foreach(range(date('Y'), date('Y') - 5) as $year)
+                                    <option value="{{ $year }}" @if ($year == $currentYear) selected @endif>{{ $year }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="card-body d-flex justify-content-center align-items-center">
+                                <div id="pieContainer" style="height: 370px; width: 100%;"></div>
+                            </div>
+                        </div>
+                    </div> <!-- /.row -->
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="card2 shadow">
+                <h4 class="card-header2">Compare Profits</h4>
+                <div class="card-block2 bg-white">
+                    <div class="row">
+                        <div class="col-lg-12 d-flex justify-content-end align-items-end">
+                            <select class="form-control mt-3 mr-4 zoom90" id="firstDataset" name="firstDataset" style="width: 150px;">
+                                <option value="-1" selected disabled>First Dataset...</option>
+                                @foreach(range(date('Y'), date('Y') - 5) as $year)
+                                    <option value="{{ $year }}">{{ $year }}</option>
+                                @endforeach
+                            </select>
+                            <select class="form-control mt-3 mr-4 zoom90" id="secondDataset" name="secondDataset" style="width: 150px;">
+                                <option value="-1" selected disabled>Second Dataset...</option>
+                                @foreach(range(date('Y'), date('Y') - 5) as $year)
+                                    <option value="{{ $year }}">{{ $year }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="card-body d-flex justify-content-center align-items-center">
+                                <!-- <canvas id="TrafficChart"></canvas>   -->
+                            <div id="stackedArea" style="height: 370px; width: 100%;"></div>
+                            </div>
+                        </div>
+                    </div> <!-- /.row -->
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card2 shadow">
+                <h4 class="card-header2">Summary <span id="tahunSummary"></span></h4>
+                <div class="card-block2 bg-white">
+                    <div class="p-4">
                         <h5 class="card-title font-weight-bold">Revenue & Operating Expenses <span id="tahunRevenue"></span></h5>
                         <div class="ml-2">
                             <table class="table table-borderless table-sm">
@@ -165,69 +294,6 @@ font-weight-bold
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="card">
-                <div class="row">
-                    <div class="col-lg-12 d-flex justify-content-end align-items-end">
-                        <select class="form-control mt-3 mr-4 zoom90" id="chartPeriode" name="chartPeriode" style="width: 150px;">
-                            <option value="-1" selected disabled>Select Periode...</option>
-                            @foreach(range(date('Y'), date('Y') - 5) as $year)
-                                <option value="{{ $year }}" @if ($year == $currentYear) selected @endif>{{ $year }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-lg-12">
-                        <div class="card-body d-flex justify-content-center align-items-center">
-                            <!-- <canvas id="TrafficChart"></canvas>   -->
-                            <div id="chartContainerSpline" style="height: 370px; width: 100%;"></div>
-                        </div>
-                    </div>
-                </div> <!-- /.row -->
-            </div>
-        </div>
-        <div class="col-lg-12">
-            <div class="card">
-                <div class="row">
-                    <div class="col-lg-12 d-flex justify-content-end align-items-end">
-                        <select class="form-control mt-3 mr-4 zoom90" id="revenueChartPeriode" name="revenueChartPeriode" style="width: 150px;">
-                            <option value="-1" selected disabled>Select Periode...</option>
-                            @foreach(range(date('Y'), date('Y') - 5) as $year)
-                                <option value="{{ $year }}" @if ($year == $currentYear) selected @endif>{{ $year }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-lg-12">
-                        <div class="card-body d-flex justify-content-center align-items-center">
-                            <!-- <canvas id="TrafficChart"></canvas>   -->
-                            <div id="trendRevenueChart" style="height: 370px; width: 100%;"></div>
-                        </div>
-                    </div>
-                </div> <!-- /.row -->
-            </div>
-            <div class="card">
-                <div class="row">
-                    <div class="col-lg-12 d-flex justify-content-end align-items-end">
-                        <select class="form-control mt-3 mr-4 zoom90" id="firstDataset" name="firstDataset" style="width: 150px;">
-                            <option value="-1" selected disabled>First Dataset...</option>
-                            @foreach(range(date('Y'), date('Y') - 5) as $year)
-                                <option value="{{ $year }}">{{ $year }}</option>
-                            @endforeach
-                        </select>
-                        <select class="form-control mt-3 mr-4 zoom90" id="secondDataset" name="secondDataset" style="width: 150px;">
-                            <option value="-1" selected disabled>Second Dataset...</option>
-                            @foreach(range(date('Y'), date('Y') - 5) as $year)
-                                <option value="{{ $year }}">{{ $year }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-lg-12">
-                        <div class="card-body d-flex justify-content-center align-items-center">
-                            <div id="stackedArea" style="height: 370px; width: 100%;"></div>
-                        </div>
-                    </div>
-                </div> <!-- /.row -->
-            </div>
-        </div>
     </div>
 </div>
 <script>
@@ -243,6 +309,12 @@ window.onload = function () {
     loadTrendChartData();
     revenueChartPeriode.addEventListener("change", function() {
         loadTrendChartData();
+    });
+
+    var pieChartPeriode = document.getElementById("pieChartPeriode");
+    loadPieChartData();
+    pieChartPeriode.addEventListener("change", function() {
+        loadPieChartData();
     });
 
     loadComparisonChartData();
@@ -313,7 +385,6 @@ function loadChartData() {
                 },
                 data: [{
                     type: "column",
-                    color: "#6599FF",
                     yValueFormatString: "#,##0 Rupiah",
                     dataPoints: data.profitDataPoints // Use the updated data points with label and y values
                 }]
@@ -334,6 +405,7 @@ function loadComparisonChartData() {
         .then(data => {
             var chart = new CanvasJS.Chart("stackedArea", {
                 animationEnabled: true,
+                theme: "light2",
                 title: {
                     text: "Comparison of Profits: " + firstDataset + " vs " + secondDataset
                 },
@@ -346,7 +418,7 @@ function loadComparisonChartData() {
                 axisY: {
                     includeZero: true,
                     title: "Profits",
-                    prefix: "Rp",
+                    prefix: "IDR",
                     labelFormatter: function(e) {
                         return CanvasJS.formatNumber(e.value, "#,##0");
                     }
@@ -415,6 +487,33 @@ function loadTrendChartData() {
         .catch(error => console.error('Error fetching data:', error));
 }
 
+function loadPieChartData() {
+    var selectedYear = document.getElementById("pieChartPeriode").value;
+
+    fetch('/api/pie-chart-data-profits/' + selectedYear)
+        .then(response => response.json())
+        .then(data => {
+            var chart = new CanvasJS.Chart("pieContainer", {
+                animationEnabled: true,
+                title: {
+                    text: "Revenue Consumption by Cost (in Percentage)"
+                },
+                data: [{
+                    type: "pie",
+                    yValueFormatString: "#,##0.##\"%\"",
+                    indexLabel: "{label} ({y}%)",
+                    dataPoints: data.dataPoints
+                }]
+            });
+            chart.render();
+
+            // Display profits below the chart
+            var profitText = document.getElementById("profitText");
+            profitText.innerHTML = "IDR " + data.profitsValue;
+        })
+        .catch(error => console.error('Error fetching data:', error));
+}
+
 function redirectToPage() {
     var selectedOption = document.getElementById("yearSelected").value;
     var url = "{{ url('/financial-dashboard') }}" + "/" + selectedOption;
@@ -422,7 +521,7 @@ function redirectToPage() {
 }
 // Function to format currency
 function formatCurrency(value) {
-    return 'Rp ' + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    return 'IDR ' + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }
 </script>
 @endsection

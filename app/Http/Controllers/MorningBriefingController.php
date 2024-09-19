@@ -26,7 +26,8 @@ class MorningBriefingController extends Controller
             $query->whereMonth('created_at', $monthSelected);
         }
 
-        $data = $query->get();
+        // Add pagination (6 items per page)
+        $data = $query->paginate(6);
         $users = User::all();
 
         return view('akhlak-view.submenu.morning-briefing', [

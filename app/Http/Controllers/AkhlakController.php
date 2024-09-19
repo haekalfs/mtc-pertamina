@@ -12,7 +12,9 @@ use Carbon\Carbon;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\File;
 
 class AkhlakController extends Controller
 {
@@ -40,6 +42,8 @@ class AkhlakController extends Controller
             ->with(['akhlak', 'user', 'quarter'])
             ->groupBy('akhlak_id', 'quarter_id', 'periode');
 
+        $allPencapaianQuery = User_pencapaian_akhlak::query();
+
         $userSelected = User::find($userId);
         // Apply filters
         if ($userId != -1) {
@@ -52,6 +56,7 @@ class AkhlakController extends Controller
 
         if ($year != -1) {
             $pencapaianQuery->where('periode', $year);
+            $allPencapaianQuery->where('periode', $year);
         }
 
         $pencapaianResults = $pencapaianQuery->get();
@@ -70,6 +75,9 @@ class AkhlakController extends Controller
             $result->nilai_description = $nilai ? $nilai->description : 'Unknown';
         }
 
+        $pencapaianByAkhlak = $pencapaianResults->groupBy('akhlak_id');
+
+        $allPencapaian = $allPencapaianQuery->where('user_id', $userId)->get();
         // Query to group by akhlak_id and periode for the general summary with filters
         $generalPencapaianQuery = User_pencapaian_akhlak::selectRaw('akhlak_id, periode, AVG(nilai_akhlak.score) as average_score')
             ->join('nilai_akhlak', 'user_pencapaian_akhlak.score', '=', 'nilai_akhlak.id')
@@ -125,8 +133,10 @@ class AkhlakController extends Controller
             'akhlakPoin' => $akhlakPoin,
             'users' => $users,
             'nilaiList' => $nilaiList,
+            'pencapaianByAkhlak' => $pencapaianByAkhlak,
             'pencapaianResults' => $pencapaianResults,
             'generalPencapaianResults' => $generalPencapaianResults,
+            'allPencapaian' => $allPencapaian,
             'yearsBefore' => $yearsBefore,
             'userSelectedOpt' => $userId,
             'quarterList' => $quarterList,
@@ -174,12 +184,100 @@ class AkhlakController extends Controller
             // Save the file information in the User_pencapaian_akhlak_files model
             User_pencapaian_akhlak_files::create([
                 'filename' => $fileName,
-                'filepath' => $filePath,
+                'filepath' => 'akhlak_evidences/' . $fileName,
                 'user_pencapaian_akhlak_id' => $userPencapaianAkhlak->id,
             ]);
         }
 
         return redirect()->back()->with('success', 'Data Pencapaian Akhlak has been successfully saved.');
+    }
+
+    public function edit($id)
+    {
+        $userPencapaian = User_pencapaian_akhlak::with('akhlak', 'quarter', 'scores', 'file')->find($id);
+
+        if (!$userPencapaian) {
+            return response()->json(['error' => 'Data not found'], 404);
+        }
+
+        // Construct the URL for the file (assuming files are stored in the public path)
+        $fileUrl = asset($userPencapaian->file->filepath);
+
+        return response()->json([
+            'judul_kegiatan' => $userPencapaian->judul_kegiatan,
+            'score' => $userPencapaian->score,
+            'filename' => $userPencapaian->file->filename,
+            'file_url' => $fileUrl,  // Include the file URL
+            'akhlak_ids' => $userPencapaian->akhlak_id,  // Assuming akhlak_id is not an array
+            'quarter_id' => $userPencapaian->quarter->id,
+            'periode' => $userPencapaian->periode,
+        ]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        // Validate the request
+        $validatedData = $request->validate([
+            'activity_title' => 'required',
+            'akhlak_value' => 'required',
+            'akhlak_points' => 'required',
+            'quarter' => 'required',
+            'year' => 'required',
+            'evidence' => 'nullable|mimes:pdf,docx,xlsx,xls,jpeg,png,jpg,gif', // 2MB max file size
+        ]);
+
+        // Use a database transaction
+        DB::beginTransaction();
+
+        try {
+            // Find the record by ID
+            $pencapaian = User_pencapaian_akhlak::findOrFail($id);
+
+            // Prepare the data for updating
+            $pencapaian->judul_kegiatan = $validatedData['activity_title'];
+            $pencapaian->score = $validatedData['akhlak_value'];
+            $pencapaian->akhlak_id = $validatedData['akhlak_points'];
+            $pencapaian->quarter_id = $validatedData['quarter'];
+            $pencapaian->periode = $validatedData['year'];
+
+            // Handle the file upload if there's a new file
+            if ($request->hasFile('evidence')) {
+                // Delete the existing file if it exists
+                if ($pencapaian->file && File::exists(public_path('akhlak_evidences/' . $pencapaian->file->filename))) {
+                    File::delete(public_path('akhlak_evidences/' . $pencapaian->file->filename));
+                }
+
+                // Store the new file
+                $file = $request->file('evidence');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('akhlak_evidences'), $filename);
+
+                // Update the filename in the database (assuming you have a `file` relationship)
+                $pencapaian->file->update([
+                    'filename' => $filename,
+                    'filepath' => 'akhlak_evidences/' . $filename,
+                ]);
+            }
+
+            // Save the updated data
+            $pencapaian->save();
+
+            // Commit the transaction
+            DB::commit();
+
+            // Redirect back with success message
+            return redirect()->back()->with('success', 'Pencapaian Akhlak updated successfully.');
+
+        } catch (\Exception $e) {
+            // Rollback the transaction if there's an error
+            DB::rollBack();
+
+            // Log the error for debugging purposes (optional)
+            // Log::error('Error updating Pencapaian Akhlak: ' . $e->getMessage());
+
+            // Redirect back with error message
+            return redirect()->back()->with('error', 'Failed to update Pencapaian Akhlak. Please try again.');
+        }
     }
 
     public function report(Request $request)
@@ -221,14 +319,14 @@ class AkhlakController extends Controller
         $nilaiAkhlakRanges = Nilai::all();
 
         foreach ($pencapaianResults as $result) {
-        $averageScore = $result->average_score;
+            $averageScore = $result->average_score;
 
-        // Find the corresponding nilai_akhlak description based on the average score
-        $nilai = $nilaiAkhlakRanges->filter(function ($range) use ($averageScore) {
-            return $averageScore <= $range->score;
-        })->first();
+            // Find the corresponding nilai_akhlak description based on the average score
+            $nilai = $nilaiAkhlakRanges->filter(function ($range) use ($averageScore) {
+                return $averageScore <= $range->score;
+            })->first();
 
-        $result->nilai_description = $nilai ? $nilai->description : 'Unknown';
+            $result->nilai_description = $nilai ? $nilai->description : 'Unknown';
         }
 
         // Group by Akhlak to avoid duplicating the Indicator
@@ -406,5 +504,31 @@ class AkhlakController extends Controller
         $dompdf->render();
 
         return $dompdf->stream('AKHLAK_Report.pdf');
+    }
+
+    public function destroy($id)
+    {
+        DB::beginTransaction();
+
+        try {
+            // Find the record by ID
+            $pencapaian = User_pencapaian_akhlak::findOrFail($id);
+
+            // Check if a file exists and delete it
+            if ($pencapaian->file && file_exists(public_path('akhlak_evidences/' . $pencapaian->file->filename))) {
+                unlink(public_path('akhlak_evidences/' . $pencapaian->file->filename));
+            }
+
+            // Delete the record
+            $pencapaian->delete();
+
+            DB::commit();
+
+            return response()->json(['message' => 'Data deleted successfully'], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Failed to delete data: ' . $e->getMessage()], 500);
+        }
     }
 }

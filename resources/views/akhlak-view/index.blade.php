@@ -272,44 +272,97 @@ font-weight-bold
                 </div> <!-- /.row -->
             </div>
         </div>
+        @if($userSelected)
         <div class="col-md-12 zoom90">
             <div class="card shadow">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-secondary" id="judul">Average Pencapaian AKHLAK - @if ($userSelected) {{ $userSelected->name }} @else Overall @endif</h6>
-                    <div class="text-right">
-                        <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-icon fa fa-plus"></i> Insert Pencapaian</a>
-                    </div>
-                </div>
                 <div class="card-body">
-                    <table id="listPencapaianAkhlak" class="table table-striped table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Core Value</th>
-                                <th>Nilai Akhlak</th>
-                                {{-- <th>Avg. Nilai</th> --}}
-                                <th>Quarter</th>
-                                <th>Periode</th>
-                                <th>Action</th>
+                    <table class="table table-bordered mb-4">
+                        <thead class="text-white">
+                            <tr class="thead-light">
+                                <th class="" rowspan="2" style="vertical-align: middle; text-align: center;">Core Values</th>
+                                <th class="text-center" colspan="4">Average Quarterly</th>
+                            </tr>
+                            <tr class="thead-light">
+                                <th class="text-center">Quarter 1</th>
+                                <th class="text-center">Quarter 2</th>
+                                <th class="text-center">Quarter 3</th>
+                                <th class="text-center">Quarter 4</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($pencapaianResults as $item)
-                            <tr>
-                                <td>{{ $item->akhlak->indicator }}</td>
-                                <td>{{ $item->nilai_description }}</td>
-                                {{-- <td>{{ $item->average_score }} %</td> --}}
-                                <td>{{ $item->quarter->quarter_name }}</td>
-                                <td>{{ $item->periode }}</td>
-                                <td class="text-center">
-                                    <a href="" class="btn btn-outline-secondary btn-sm btn-details mr-2"><i class="fa fa-info-circle"></i> Preview</a>
-                                </td>
-                            </tr>
-                            @endforeach
+                            @if(!$pencapaianByAkhlak)
+                                <tr class="text-center">
+                                    <td colspan="5">No Data Available</td>
+                                </tr>
+                            @else
+                                @foreach($pencapaianByAkhlak as $akhlakId => $quarters)
+                                    <tr>
+                                        <td class="font-weight-bold">{{ $quarters->first()->akhlak->indicator }}</td>
+                                        <td>{{ $quarters->firstWhere('quarter_id', 1)->nilai_description ?? '-' }}</td>
+                                        <td>{{ $quarters->firstWhere('quarter_id', 2)->nilai_description ?? '-' }}</td>
+                                        <td>{{ $quarters->firstWhere('quarter_id', 3)->nilai_description ?? '-' }}</td>
+                                        <td>{{ $quarters->firstWhere('quarter_id', 4)->nilai_description ?? '-' }}</td>
+                                    </tr>
+                                @endforeach
+                            @endif
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
+        <div class="col-md-12 zoom90">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-secondary" id="judul">Pencapaian AKHLAK - @if ($userSelected) {{ $userSelected->name }} @else Overall @endif</h6>
+                    <div class="text-right">
+                        <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-icon fa fa-plus"></i> Insert Pencapaian</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <table id="docLetter" class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Kegiatan</th>
+                                <th>Nilai Akhlak</th>
+                                <th>Score</th>
+                                <th>Core Value</th>
+                                <th>Quarter</th>
+                                <th>Periode</th>
+                                <th>Evidence</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if($allPencapaian->isEmpty())
+                                <tr class="text-center">
+                                    <td colspan="7">No Data Available</td>
+                                </tr>
+                            @else
+                                @foreach ($allPencapaian as $item)
+                                <tr>
+                                    <td>{{ $item->judul_kegiatan }}</td>
+                                    <td>{{ $item->scores->description }}</td>
+                                    <td>{{ $item->scores->score }}</td>
+                                    <td>{{ $item->akhlak->indicator }}</td>
+                                    <td>{{ $item->quarter->quarter_name }}</td>
+                                    <td>{{ $item->periode }}</td>
+                                    <td class="text-center">
+                                        <button
+                                            class="btn btn-outline-secondary btn-sm btn-edit-pencapaian"
+                                            data-id="{{ $item->id }}"
+                                            data-toggle="modal"
+                                            data-target="#editDataModal">
+                                            <i class="fa fa-edit"></i> Update
+                                        </button>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            @endif
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        @endif
     </div>
 </div>
 <div class="modal fade" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
@@ -392,6 +445,81 @@ font-weight-bold
         </div>
     </div>
 </div>
+<div class="modal fade" id="editDataModal" tabindex="-1" role="dialog" aria-labelledby="editDataModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header d-flex flex-row align-items-center justify-content-between">
+                <h5 class="modal-title" id="editDataModalLabel">Edit Pencapaian</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" action="" enctype="multipart/form-data" id="editForm">
+                @csrf
+                @method('PUT')
+                <div class="modal-body">
+                    <div class="col-md-12 zoom90">
+                        <div class="form-group">
+                            <label for="edit_activity_title">Judul Kegiatan</label>
+                            <input type="text" class="form-control" id="edit_activity_title" name="activity_title" placeholder="e.g Corporate Social Responsibility (CSR) “Event 1”" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_akhlak_points">Core Values</label>
+                            <select data-placeholder="Akhlak Poin" class="form-control" id="edit_akhlak_points" name="akhlak_points">
+                                @foreach ($akhlakPoin as $item)
+                                    <option value="{{ $item->id }}">{{ $item->indicator }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_akhlak_value">Nilai AKHLAK</label>
+                            <select class="form-control" id="edit_akhlak_value" name="akhlak_value" required>
+                                @foreach ($nilaiList as $item)
+                                    <option value="{{ $item->id }}">{{ $item->description }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_evidence">Evidence <small class="text-danger"><i>(pdf,docx,xlsx,xls,jpeg,png,jpg,gif)</i></small></label>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="edit_evidence" name="evidence" onchange="changeFileName('edit_evidence', 'evidence-label-edit')">
+                                <label class="custom-file-label" for="edit_evidence" id="evidence-label-edit">Choose file</label>
+                                <small>
+                                    Existing: <a id="existingFile" href="" target="_blank"><u>View/Download</u> <i class="fa fa-download"></i></a>
+                                </small>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="edit_quarter">Periode</label>
+                                    <select class="form-control" name="quarter" id="edit_quarter" required>
+                                        <option value="1">Quarter 1</option>
+                                        <option value="2">Quarter 2</option>
+                                        <option value="3">Quarter 3</option>
+                                        <option value="4">Quarter 4</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="edit_year">Year</label>
+                                    <select class="form-control" name="year" id="edit_year" required>
+                                        @foreach (array_reverse($yearsBefore) as $year)
+                                            <option value="{{ $year }}">{{ $year }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="deleteButton">Delete</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <script>
     function redirectToPage() {
         var selectedOption = document.getElementById("yearSelected").value;
@@ -400,6 +528,24 @@ font-weight-bold
         url += "/" + selectedOption;
 
         window.location.href = url; // Redirect to the desired page
+    }
+
+    function changeFileName(inputId, labelId) {
+        // Get the file input and label elements by their IDs
+        var fileInput = document.getElementById(inputId);
+        var label = document.getElementById(labelId);
+
+        // Check if any file is selected
+        if (fileInput.files && fileInput.files.length > 0) {
+            // Get the name of the selected file
+            var fileName = fileInput.files[0].name;
+
+            // Update the label text to the file name
+            label.textContent = fileName;
+        } else {
+            // If no file is selected, reset the label to its default text
+            label.textContent = 'Choose file';
+        }
     }
 
     function toggleFullScreen(elementId) {
@@ -462,6 +608,83 @@ font-weight-bold
                 }
             }
         }
+    });
+    $(document).ready(function() {
+        $('.btn-edit-pencapaian').on('click', function() {
+            var id = $(this).data('id');  // Get the ID from the button
+
+            // Use Laravel's route name to generate the URL for the edit request
+            var editUrl = '{{ route("akhlak.edit", ":id") }}'.replace(':id', id);
+
+            // Fetch the data via AJAX
+            $.ajax({
+                url: editUrl,
+                type: 'GET',
+                success: function(response) {
+                    // Populate the modal fields with the fetched data
+                    $('#edit_activity_title').val(response.judul_kegiatan);
+                    $('#edit_akhlak_value').val(response.score);
+                    $('#edit_akhlak_points').val(response.akhlak_ids);  // Assuming this is an array for multi-select
+                    $('#edit_quarter').val(response.quarter_id);
+                    $('#edit_year').val(response.periode);
+
+                    // Set the existing file link
+                    $('#existingFile').attr('href', response.file_url).text(response.filename);
+
+                    // Set the correct form action with the update route
+                    var updateUrl = '{{ route("akhlak.update", ":id") }}'.replace(':id', id);
+                    $('#editForm').attr('action', updateUrl);
+                    // Assign the ID to the delete button dynamically
+                    $('#deleteButton').data('id', id); // Attach the KPI ID to the delete button
+
+                    // Open the modal
+                    $('#editDataModal').modal('show');
+                },
+                error: function(xhr) {
+                    alert('Failed to fetch data');
+                }
+            });
+        });
+    });
+
+
+    $(document).ready(function() {
+        // Handle Delete Button Click
+        $('#deleteButton').on('click', function(e) {
+            e.preventDefault();
+            var id = $(this).data('id');  // Get the ID of the record (Make sure to set this when populating the modal)
+            var deleteUrl = '{{ route("akhlak.destroy", ":id") }}'.replace(':id', id);  // Use Laravel's named route
+
+            // Use SweetAlert for confirmation
+            swal({
+                title: "Are you sure?",
+                text: "Once deleted, you will not be able to recover this data!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            }).then((willDelete) => {
+                if (willDelete) {
+                    // Make AJAX request to delete the record
+                    $.ajax({
+                        url: deleteUrl,
+                        type: 'DELETE',
+                        data: {
+                            _token: '{{ csrf_token() }}',  // Include CSRF token for security
+                        },
+                        success: function(response) {
+                            swal("Success!", "The data has been deleted.", "success").then(() => {
+                                location.reload();  // Reload the page or redirect after successful deletion
+                            });
+                        },
+                        error: function(xhr) {
+                            swal("Error!", "Failed to delete the data. Please try again.", "error");
+                        }
+                    });
+                } else {
+                    swal("Your data is safe!");
+                }
+            });
+        });
     });
 </script>
 @endsection

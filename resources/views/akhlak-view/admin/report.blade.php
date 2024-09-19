@@ -126,6 +126,7 @@ font-weight-bold
                     </div>
                 </div>
                 <div class="card-body">
+                    @if($userSelected)
                     <div class="col-md-12 d-flex justify-content-center">
                         <table>
                             <tr>
@@ -152,7 +153,6 @@ font-weight-bold
                     </ul>
                     <div class="row pt-4">
                         <div class="col-md-6">
-                            @if($userSelected)
                             <section class="card shadow-none" style="border: 1px solid grey;">
                                 <div class="card-header bg-login alt mb-4 p-4" style="background-image: url('{{ asset('img/kilang-minyak.png') }}');">
                                     <div class="media">
@@ -202,9 +202,6 @@ font-weight-bold
                                     @endif
                                 </ul>
                             </section>
-                            @else
-                            <p>Please select data in search report section...</p>
-                            @endif
                         </div>
                         <div class="col-md-6">
                             <div class="card shadow-none">
@@ -285,6 +282,9 @@ font-weight-bold
                             @endif
                         </tbody>
                     </table>
+                    @else
+                    <p>Please select data in search report section...</p>
+                    @endif
                 </div>
             </div>
         </div>

@@ -34,6 +34,7 @@ class FinanceController extends Controller
                 (int) $item->penagihan_atk +
                 (int) $item->penagihan_snack +
                 (int) $item->penagihan_makan_siang +
+                (int) $item->penlat_usage +
                 (int) $item->penagihan_laundry;
         });
 
@@ -92,7 +93,7 @@ class FinanceController extends Controller
 
         foreach ($dataByQuarter as $row) {
             // Generate label for each quarter and year
-            $label = "Q" . $row->quarter . " " . $row->year;
+            $label = "TW-" . $row->quarter;
 
             $dataPointsSpline[] = [
                 "label" => $label, // Use this for x-axis label
@@ -530,5 +531,79 @@ class FinanceController extends Controller
         // Profits value to display below the chart
         $profitsValue = number_format($profits, 0, ',', '.');
         return view('finance.submenu.preview_costs', ['data' => $utility, 'item' => $item, 'dataPoints' => $dataPoints, 'profitsValue' => $profitsValue]);
+    }
+
+    public function getPieChartData($year)
+    {
+        // Get all profit records for the given year
+        $items = Profit::whereYear('tgl_pelaksanaan', $year)->get();
+
+        // Sum the values of each column, converting them to floats and handling null/empty cases
+        $profits = (float) $items->sum(function ($item) {
+            return (float) ($item->total_biaya_pendaftaran_peserta ?? 0);
+        });
+
+        $biayaInstruktur = (float) $items->sum(function ($item) {
+            return (float) ($item->biaya_instruktur ?? 0);
+        });
+
+        $totalPNBP = (float) $items->sum(function ($item) {
+            return (float) ($item->total_pnbp ?? 0);
+        });
+
+        $biayaTransportasi = (float) $items->sum(function ($item) {
+            return (float) ($item->biaya_transportasi_hari ?? 0);
+        });
+
+        $penagihanFoto = (float) $items->sum(function ($item) {
+            return (float) ($item->penagihan_foto ?? 0);
+        });
+
+        $penagihanATK = (float) $items->sum(function ($item) {
+            return (float) ($item->penagihan_atk ?? 0);
+        });
+
+        $penagihanSnack = (float) $items->sum(function ($item) {
+            return (float) ($item->penagihan_snack ?? 0);
+        });
+
+        $penagihanMakanSiang = (float) $items->sum(function ($item) {
+            return (float) ($item->penagihan_makan_siang ?? 0);
+        });
+
+        $penlatUsage = (float) $items->sum(function ($item) {
+            return (float) ($item->penlat_usage ?? 0);
+        });
+
+        $penagihanLaundry = (float) $items->sum(function ($item) {
+            return (float) ($item->penagihan_laundry ?? 0);
+        });
+
+        // Check if profits is greater than 0 to avoid division by zero
+        if ($profits > 0) {
+            $dataPoints = [
+                ['label' => 'Biaya Instruktur', 'y' => ($biayaInstruktur / $profits) * 100],
+                ['label' => 'Total PNBP', 'y' => ($totalPNBP / $profits) * 100],
+                ['label' => 'Biaya Transportasi', 'y' => ($biayaTransportasi / $profits) * 100],
+                ['label' => 'Penagihan Foto', 'y' => ($penagihanFoto / $profits) * 100],
+                ['label' => 'Penagihan ATK', 'y' => ($penagihanATK / $profits) * 100],
+                ['label' => 'Penagihan Snack', 'y' => ($penagihanSnack / $profits) * 100],
+                ['label' => 'Penagihan Makan Siang', 'y' => ($penagihanMakanSiang / $profits) * 100],
+                ['label' => 'Penggunaan Utilitas', 'y' => ($penlatUsage / $profits) * 100],
+                ['label' => 'Penagihan Laundry', 'y' => ($penagihanLaundry / $profits) * 100],
+            ];
+
+            // Format profits value for display
+            $profitsValue = number_format($profits, 0, ',', '.');
+        } else {
+            $dataPoints = [];
+            $profitsValue = '0';
+        }
+
+        // Return data as JSON for the chart
+        return response()->json([
+            'dataPoints' => $dataPoints,
+            'profitsValue' => $profitsValue
+        ]);
     }
 }
