@@ -109,13 +109,13 @@ class FinanceController extends Controller
     public function getTrendChartData($year)
     {
         $profits = Profit::select(
-                'penlat.description', // Get the nama_pelatihan from Penlat
+                'penlat.description', // Get the description from Penlat
                 DB::raw('SUM(CAST(profits.total_biaya_pendaftaran_peserta AS UNSIGNED)) as total_biaya')
             )
             ->join('penlat_batch', 'profits.pelaksanaan', '=', 'penlat_batch.batch') // Join with penlat_batch
             ->join('penlat', 'penlat_batch.penlat_id', '=', 'penlat.id') // Join with penlat
             ->whereYear('profits.tgl_pelaksanaan', $year) // Filter by the year
-            ->groupBy('penlat_batch.penlat_id') // Group by penlat_id
+            ->groupBy('penlat_batch.penlat_id', 'penlat.description') // Add description to GROUP BY
             ->orderByDesc('total_biaya') // Order by total_biaya
             ->get();
 
