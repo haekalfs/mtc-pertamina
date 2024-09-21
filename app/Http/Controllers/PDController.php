@@ -81,6 +81,72 @@ class PDController extends Controller
         '))
         ->value('average_score');
 
+        //3 Years Prior Avg Feedback
+        // Get current year, last year, and two years ago
+        $currentYearMtc = now()->year;
+        $lastYearMtc = now()->subYear(1)->year;
+        $twoYearsAgoMtc = now()->subYears(2)->year;
+
+        // Calculate average feedback score for each year
+        $feedbackScoresPerYear = [];
+        $yearsMtc = [$currentYearMtc, $lastYearMtc, $twoYearsAgoMtc];
+
+        foreach ($yearsMtc as $yearMtc) {
+            $feedbackScoresPerYear[$yearMtc] = DB::table('feedback_mtc')
+                ->whereYear('tgl_pelaksanaan', $yearMtc)
+                ->select(DB::raw('
+                    avg(
+                        (
+                            COALESCE(relevansi_materi, 0) +
+                            COALESCE(manfaat_training, 0) +
+                            COALESCE(durasi_training, 0) +
+                            COALESCE(sistematika_penyajian, 0) +
+                            COALESCE(tujuan_tercapai, 0) +
+                            COALESCE(kedisiplinan_steward, 0) +
+                            COALESCE(fasilitasi_steward, 0) +
+                            COALESCE(layanan_pelaksana, 0) +
+                            COALESCE(proses_administrasi, 0) +
+                            COALESCE(kemudahan_registrasi, 0) +
+                            COALESCE(kondisi_peralatan, 0) +
+                            COALESCE(kualitas_boga, 0) +
+                            COALESCE(media_online, 0) +
+                            COALESCE(rekomendasi, 0)
+                        ) / 14
+                    ) as average_score_mtc
+                '))
+                ->value('average_score_mtc') ?? 0; // Default to 0 if no score
+        }
+
+        $regulations = Regulation::latest()->take(3)->get();
+
+        // Fetch the suggestions with pagination (e.g., 5 per page)
+        $suggestions = Feedback_mtc::select('saran')->whereNotNull('saran')->orderBy('updated_at', 'desc')->take(min(Feedback_mtc::count(), 12))->get();
+
+        // Fetch the unique titles for the dropdown
+        $trainingTitles = Feedback_mtc::select('judul_pelatihan')->whereYear('tgl_pelaksanaan', $yearSelected)
+        ->distinct()
+        ->orderBy('judul_pelatihan')
+        ->pluck('judul_pelatihan');
+
+        return view('plan_dev.index', [
+            'instructorCount' => $instructorCount,
+            'referencesCount' => $referencesCount,
+            'instructors' => $instructors,
+            'averageFeedbackScore' => $averageFeedbackScore,
+            'regulations' => $regulations,
+            'instructorsList' => $getInstructors,
+            'yearsBefore' => $yearsBefore,
+            'yearSelected'=> $yearSelected,
+            'feedbackScoresPerYear' => $feedbackScoresPerYear,
+            'suggestions' => $suggestions,
+            'trainingTitles' => $trainingTitles
+        ]);
+    }
+
+    public function getFeedbackMTCChartData($yearSelected, Request $request)
+    {
+        $instructorId = $request->query('ratingPelatihan', 'all');
+
         // List of columns to calculate averages for
         $columns = [
             'relevansi_materi',
@@ -99,26 +165,23 @@ class PDController extends Controller
             'rekomendasi'
         ];
 
+        // Initialize query
+        $query = Feedback_mtc::whereYear('tgl_pelaksanaan', $yearSelected);
+
+        // Apply filter if instructorId is not 'all'
+        if ($instructorId !== 'all') {
+            $query->where('judul_pelatihan', $instructorId);
+        }
+
         // Fetch the average for each column
         $averages = [];
         foreach ($columns as $column) {
-            $average = Feedback_mtc::whereYear('tgl_pelaksanaan', $yearSelected)->avg(DB::raw("CAST($column AS DECIMAL(10,2))"));
-            $averages[$column] = $average;
+            $average = $query->avg(DB::raw("CAST($column AS DECIMAL(10,2))"));
+            $averages[$column] = $average ?? 0;
         }
 
-        $regulations = Regulation::latest()->take(3)->get();
-
-        return view('plan_dev.index', [
-            'instructorCount' => $instructorCount,
-            'referencesCount' => $referencesCount,
-            'instructors' => $instructors,
-            'averageFeedbackScore' => $averageFeedbackScore,
-            'averages' => $averages,
-            'regulations' => $regulations,
-            'instructorsList' => $getInstructors,
-            'yearsBefore' => $yearsBefore,
-            'yearSelected'=> $yearSelected,
-        ]);
+        // Return data in JSON format
+        return response()->json($averages);
     }
 
     public function getFeedbackChartData(Request $request, $year)

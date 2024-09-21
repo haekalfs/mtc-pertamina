@@ -5,6 +5,7 @@
 /public/akhlak_evidences
 /storage/*.key
 /vendor
+/public/vendor
 .env
 .env.backup
 .phpunit.result.cache

@@ -81,7 +81,6 @@ class FeedbackImport implements ToCollection, WithBatchInserts, WithChunkReading
             // Commit the transaction
             DB::commit();
 
-            Cache::forget('jobs_processing');
         } catch (\Exception $e) {
             // Rollback the transaction if any error occurs
             DB::rollBack();

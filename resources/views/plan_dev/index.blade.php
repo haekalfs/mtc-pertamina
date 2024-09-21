@@ -176,13 +176,89 @@ font-weight-bold
                 </div>
             </div>
         </div>
+        <div class="col-lg-8">
+            <div class="card">
+                <h4 class="pt-3 pb-0 pl-3">Rating Feedback Pelatihan (All Parameter)</h4>
+                <hr>
+                <div class="row mt-1">
+                    @foreach($feedbackScoresPerYear as $yearMtc => $averageScoreMtc)
+                        <div class="col-lg-4">
+                            <div class="d-flex flex-column justify-content-center align-items-center">
+                                <span>{{ $yearMtc }}</span> <!-- Year above the progress bar -->
+                                <a class="progress-circle-wrapper animateBox">
+                                    <div class="progress-circle p{{ round($averageScoreMtc * 20, 0) }} @if(round($averageScoreMtc * 20, 2) >= 50) over50 @endif">
+                                        <span><i class="fa fa-star text-warning"></i> {{ round($averageScoreMtc, 2) ?? '-' }}</span>
+                                        <div class="left-half-clipper">
+                                            <div class="first50-bar"></div>
+                                            <div class="value-bar"></div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+
+                <!-- Professional description with padding -->
+                <div style="padding: 10px;">
+                    <small>
+                        This chart displays the average feedback scores for each year, showcasing the participants' evaluation of various aspects of the training programs.
+                        The scores are derived from 14 different parameters, such as relevance of the material, training benefits, and overall organization quality.
+                        The visual elements compare the results from the current year, last year, and two years ago.
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <h4 class="pt-3 pb-0 pl-3">Saran & Kritik</h4>
+                <hr>
+                <div class="col-md-12">
+                    @if(!$suggestions || $suggestions->isEmpty())
+                        No Data Available
+                    @else
+                    <div id="carouselExampleIndicators2" class="carousel slide" data-ride="carousel">
+
+                        <div class="carousel-inner">
+                            @foreach($suggestions->chunk(3) as $index => $chunk)
+                                <div class="carousel-item{{ $index === 0 ? ' active' : '' }}">
+                                    @foreach($chunk as $hl)
+                                        <small>{{ $hl->saran }}</small>
+                                    @endforeach
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+
+                    <div class="col-12 text-right pt-4 pb-4 pr-0 pl-4">
+                        <a class="btn btn-sm btn-primary mr-1" href="#carouselExampleIndicators2" role="button" data-slide="prev">
+                            <i class="fa fa-arrow-left"></i>
+                        </a>
+                        <a class="btn btn-primary btn-sm" href="#carouselExampleIndicators2" role="button" data-slide="next">
+                            <i class="fa fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="col-lg-12">
             <div class="card">
                 <div class="row">
+                    <div class="col-lg-12 d-flex justify-content-end align-items-end">
+                        <!-- Dropdown for filtering -->
+                        <select class="form-control mt-3 mr-4 zoom90" id="ratingPelatihan" name="ratingPelatihan" style="width: 200px;">
+                            <option value="all">Show All</option> <!-- Show All option -->
+                            @foreach($trainingTitles as $title)
+                                <option value="{{ $title }}">{{ $title }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                     <div class="col-lg-12">
                         <div class="card-body d-flex justify-content-center align-items-center">
-                            <!-- <canvas id="TrafficChart"></canvas>   -->
-                            <div id="chartContainer" style="height: 370px; width: 100%;"></div>
+                            <!-- Chart container -->
+                            <div id="chartContainer" style="height: 400px; width: 100%;"></div>
                         </div>
                     </div>
                 </div> <!-- /.row -->
@@ -201,7 +277,7 @@ font-weight-bold
                     </div>
                     <div class="col-lg-12">
                         <div class="card-body d-flex justify-content-center align-items-center">
-                            <div id="feedbackChart" style="height: 370px; width: 100%;"></div>
+                            <div id="feedbackChart" style="height: 410px; width: 100%;"></div>
                         </div>
                     </div>
                 </div>
@@ -310,8 +386,62 @@ window.onload = function () {
 
                 var chart = new CanvasJS.Chart("feedbackChart", {
                     animationEnabled: true,
+                    theme: "light2",
                     title: {
-                        text: instructorId === 'all' ? "Rating Feedback terhadap Semua Instruktur" : "Rating Feedback " + instructorId
+                        text: instructorId === 'all' ? "Rating Feedback terhadap Semua Instruktur" : "Rating Feedback " + instructorId, margin: 30
+                    },
+                    axisY: {
+                        title: "Average Score",
+                        minimum: 2,
+                        maximum: 5,
+                        stripLines: [{
+                            value: 4.5,
+                            label: "Target Minimum: 4.5",
+                            color: "#FF0000",
+                            thickness: 2,
+                            labelPlacement: "outside",
+                            labelAlign: "center",
+                            zIndex: 10
+                        }]
+                    },
+                    data: [{
+                        type: "bar",
+                        yValueFormatString: "#0.##",
+                        dataPointWidth: 50,
+                        dataPoints: dataPoints
+                    }]
+                });
+                chart.render();
+            });
+    }
+
+    // Initial fetch and render for "Show All" option
+    fetchAndRenderChart('all');
+
+    // Event listener to fetch and render data whenever the instructor is changed
+    instructorSelected.addEventListener('change', function() {
+        fetchAndRenderChart(this.value);
+    });
+
+
+    const ratingPelatihan = document.getElementById('ratingPelatihan');
+
+    // Fetch and render chart data based on selected training title
+    function fetchAndRenderMTCChart(trainingTitle) {
+        const yearSelected = "{{ $yearSelected }}"; // Assuming $yearSelected is passed from the backend
+        const url = trainingTitle === 'all'
+            ? `/feedback-MTC-chart-data/${yearSelected}`
+            : `/feedback-MTC-chart-data/${yearSelected}?ratingPelatihan=${encodeURIComponent(trainingTitle)}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                // Render chart directly here
+                var chart = new CanvasJS.Chart("chartContainer", {
+                    animationEnabled: true,
+                    theme: "light2",
+                    title: {
+                        text: "Rating Feedback Pelatihan " + trainingTitle, margin: 20
                     },
                     axisY: {
                         title: "Average Score",
@@ -330,56 +460,28 @@ window.onload = function () {
                     data: [{
                         type: "column",
                         yValueFormatString: "#0.##",
-                        dataPointWidth: 50,
-                        dataPoints: dataPoints
+                        dataPointWidth: 50, // Set the width of each bar (in pixels)
+                        dataPoints: Object.keys(data).map(key => ({
+                            label: key.replace('_', ' ').toUpperCase(), // Properly format the label
+                            y: parseFloat(data[key]) || 0 // Convert the string values to floats and ensure 'y' is not null
+                        }))
                     }]
                 });
                 chart.render();
+            })
+            .catch(error => {
+                console.error('Error fetching chart data:', error);
             });
     }
 
-    // Initial fetch and render for "Show All" option
-    fetchAndRenderChart('all');
+    // Initial chart render: Show all feedback on page load
+    fetchAndRenderMTCChart('all');
 
-    // Event listener to fetch and render data whenever the instructor is changed
-    instructorSelected.addEventListener('change', function() {
-        fetchAndRenderChart(this.value);
+    // Function to update the chart when dropdown value changes
+    ratingPelatihan.addEventListener('change', function() {
+        fetchAndRenderMTCChart(this.value);
     });
-    var chart = new CanvasJS.Chart("chartContainer", {
-        animationEnabled: true,
-        title: {
-            text: "Rating Feedback Pelatihan : {{ round($averageFeedbackScore, 2) ?? '-' }} Avg "
-        },
-        axisY: {
-            title: "Average Score",
-            minimum: 2,
-            maximum: 5,
-            stripLines: [
-                {
-                    value: 4.5,
-                    label: "Target Minimum: 4.5",
-                    color: "#FF0000", // Color of the line
-                    thickness: 2, // Thickness of the line
-                    labelPlacement: "outside",
-                    labelAlign: "center",
-                    zIndex: 10 // Ensure line is in front of bars
-                }
-            ]
-        },
-        data: [{
-            type: "column",
-            yValueFormatString: "#0.##",
-            dataPointWidth: 50, // Set the width of each bar (in pixels)
-            dataPoints: [
-                @foreach ($averages as $column => $average)
-                    { label: "{{ str_replace('_', ' ', ucwords($column)) }}", y: {{ $average ?? 0 }} }, // Ensuring 'y' is not null
-                @endforeach
-            ]
-        }]
-    });
-    chart.render();
 }
-
 function redirectToPage() {
     var selectedOption = document.getElementById("yearSelected").value;
     var url = "{{ url('/planning-development-dashboard') }}" + "/" + selectedOption;

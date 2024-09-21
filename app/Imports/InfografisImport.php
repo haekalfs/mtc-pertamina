@@ -89,7 +89,6 @@ class InfografisImport implements ToCollection, WithBatchInserts, WithChunkReadi
             }
 
             DB::commit();
-            Cache::forget('jobs_processing');
         } catch (\Exception $e) {
             DB::rollBack();
 

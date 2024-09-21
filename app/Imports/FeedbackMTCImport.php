@@ -77,7 +77,6 @@ class FeedbackMTCImport implements ToCollection, WithBatchInserts, WithChunkRead
             // Commit the transaction
             DB::commit();
 
-            Cache::forget('jobs_processing');
         } catch (\Exception $e) {
             // Rollback the transaction if any error occurs
             DB::rollBack();

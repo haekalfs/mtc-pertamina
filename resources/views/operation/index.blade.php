@@ -115,25 +115,179 @@ font-weight-bold
                 </div> <!-- /.row -->
             </div>
         </div><!-- /# column -->
-        <div class="col-lg-6">
+        <div class="col-lg-7">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="row mt-2">
+                            <div class="col-lg-6">
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <div id='myDiv'><!-- Plotly chart will be drawn inside this DIV --></div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <div id='myDiv2'><!-- Plotly chart will be drawn inside this DIV --></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Professional description with padding -->
+                        <div style="padding: 10px;">
+                            <small>
+                                This chart illustrates the increase or decrease in participant realization for the latest month compared to the previous month.
+                                The data reflects changes in both STCW and Non-STCW programs.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="card zoom80">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="card-body d-flex justify-content-center align-items-center">
+                                    <!-- Make the table responsive and prevent overflow -->
+                                    <div class="table-responsive w-100">
+                                        <table class="table table-bordered mb-4" style="table-layout: fixed; width: 100%;">
+                                            <thead class="text-white">
+                                                <!-- Year and Quarter Headers -->
+                                                <tr>
+                                                    <th class="bg-secondary" rowspan="3" style="vertical-align: middle; text-align: center; width: 20%;">Category</th>
+                                                    <th class="text-center bg-secondary" colspan="8">{{ $yearSelected }}</th>
+                                                </tr>
+                                                <tr class="bg-secondary">
+                                                    @foreach(['TW-1', 'TW-2', 'TW-3', 'TW-4'] as $tw)
+                                                        <th class="text-center" colspan="2">{{ $tw }}</th>
+                                                    @endforeach
+                                                </tr>
+                                                <!-- Sub-headers for each quarter (Total, Percentage) -->
+                                                <tr class="bg-secondary">
+                                                    @foreach(['TW-1', 'TW-2', 'TW-3', 'TW-4'] as $tw)
+                                                        <th class="text-center" style="width: 10%;">Total</th>
+                                                        <th class="text-center" style="width: 10%;">%</th>
+                                                    @endforeach
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if(empty($quarterlyData))
+                                                    <tr class="text-center">
+                                                        <td colspan="9">No Data Available</td>
+                                                    </tr>
+                                                @else
+                                                    <!-- External Data Row -->
+                                                    <tr>
+                                                        <th>External</th>
+                                                        @foreach($quarterlyData as $dataQuarter)
+                                                            <td>{{ number_format($dataQuarter['external_count']) }}</td>
+                                                            <td>{{ number_format($dataQuarter['external_percentage'], 2) }}%</td>
+                                                        @endforeach
+                                                    </tr>
+                                                    <!-- Internal Data Row -->
+                                                    <tr>
+                                                        <th>Internal</th>
+                                                        @foreach($quarterlyData as $dataQuarter)
+                                                            <td>{{ number_format($dataQuarter['internal_count']) }}</td>
+                                                            <td>{{ number_format($dataQuarter['internal_percentage'], 2) }}%</td>
+                                                        @endforeach
+                                                    </tr>
+                                                @endif
+                                            </tbody>
+                                        </table>
+                                    </div> <!-- /.table-responsive -->
+                                </div> <!-- /.card-body -->
+                            </div> <!-- /.col-lg-12 -->
+                        </div> <!-- /.row -->
+                        <div class="pl-4 pr-4 pb-4">
+                            <small>
+                                This chart illustrates the increase or decrease in participant realization for the latest month compared to the previous month.
+                                The data reflects changes in both STCW and Non-STCW programs.
+                            </small>
+                        </div>
+                    </div> <!-- /.card -->
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
             <div class="card">
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="card-body d-flex justify-content-center align-items-center">
-                            <!-- <canvas id="TrafficChart"></canvas>   -->
-                            <div id="chartContainerPie" style="height: 370px; width: 100%;"></div>
+                            <table class="table table-bordered table-striped zoom90">
+                                <thead>
+                                    <tr>
+                                        <th>Bulan</th>
+                                        <th>Peserta Eksternal</th>
+                                        <th>Peserta Internal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($data as $index => $row)
+                                        <tr>
+                                            <td>{{ $row['month'] }}</td>
+
+                                            <!-- External Participants Count and Percentage Calculation -->
+                                            <td>
+                                                {{ $row['external_count'] }}
+                                                @if($index > 0)
+                                                    @php
+                                                        // Calculate the difference between the current and previous month
+                                                        $previousExternalCount = $data[$index - 1]['external_count'];
+                                                        $percentageChange = 0;
+                                                        if($previousExternalCount > 0) {
+                                                            $percentageChange = (($row['external_count'] - $previousExternalCount) / $previousExternalCount) * 100;
+                                                        }
+                                                    @endphp
+
+                                                    <!-- Display the percentage change -->
+                                                    @if($percentageChange > 0)
+                                                        <small class="badge bg-success text-white" style="font-size: 10px;">(+{{ number_format($percentageChange, 2) }}%)</small>
+                                                    @elseif($percentageChange < 0)
+                                                        <small class="badge bg-danger text-white" style="font-size: 10px;">({{ number_format($percentageChange, 2) }}%)</small>
+                                                    @else
+                                                        <small class="badge bg-secondary text-white" style="font-size: 10px;">(0%)</small>
+                                                    @endif
+                                                @endif
+                                            </td>
+
+                                            <!-- Internal Participants Count -->
+                                            <td>
+                                                {{ $row['internal_count'] }}
+                                                @if($index > 0)
+                                                    @php
+                                                        // Calculate the percentage change for internal participants
+                                                        $previousInternalCount = $data[$index - 1]['internal_count'];
+                                                        $internalPercentageChange = 0;
+                                                        if($previousInternalCount > 0) {
+                                                            $internalPercentageChange = (($row['internal_count'] - $previousInternalCount) / $previousInternalCount) * 100;
+                                                        }
+                                                    @endphp
+
+                                                    <!-- Display the percentage change for internal participants -->
+                                                    @if($internalPercentageChange > 0)
+                                                        <small class="badge bg-success text-white" style="font-size: 10px;">(+{{ number_format($internalPercentageChange, 2) }}%)</small>
+                                                    @elseif($internalPercentageChange < 0)
+                                                        <small class="badge bg-danger text-white" style="font-size: 10px;">({{ number_format($internalPercentageChange, 2) }}%)</small>
+                                                    @else
+                                                        <small class="badge bg-secondary text-white" style="font-size: 10px;">(0%)</small>
+                                                    @endif
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div> <!-- /.row -->
             </div>
         </div>
-        <div class="col-lg-6">
+        <div class="col-lg-12">
             <div class="card">
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="card-body d-flex justify-content-center align-items-center">
                             <!-- <canvas id="TrafficChart"></canvas>   -->
-                            <canvas id="mostUsedUtility"></canvas>
+                            <div id="chartContainerPie" style="height: 400px; width: 100%;"></div>
                         </div>
                     </div>
                 </div> <!-- /.row -->
@@ -149,6 +303,67 @@ font-weight-bold
 </div>
 <script>
 window.onload = function() {
+    // Data passed from PHP
+    var countSTCW = {{ $countSTCWGauge }};
+    var countNonSTCW = {{ $countNonSTCWGauge }};
+    var stcwDelta = {{ $stcwDelta }};
+    var nonStcwDelta = {{ $nonStcwDelta }};
+
+    // STCW gauge
+    var dataSTCW = [
+        {
+            domain: { x: [0, 1], y: [0, 1] },
+            value: countSTCW,
+            title: { text: "STCW" },
+            type: "indicator",
+            mode: "gauge+number+delta",
+            delta: { reference: 380, valueformat: ".2f", relative: true }, // Use the delta here for percentage increase/decrease
+            gauge: {
+                axis: { range: [null, 500] },
+                steps: [
+                    { range: [0, 250], color: "lightgray" },
+                    { range: [250, 400], color: "gray" }
+                ],
+                threshold: {
+                    line: { color: "red", width: 4 },
+                    thickness: 0.75,
+                    value: 490
+                }
+            }
+        }
+    ];
+
+    // NON STCW gauge
+    var dataNONSTCW = [
+        {
+            domain: { x: [0, 1], y: [0, 1] },
+            value: countNonSTCW,
+            title: { text: "NON STCW" },
+            type: "indicator",
+            mode: "gauge+number+delta",
+            delta: { reference: 380, valueformat: ".2f", relative: true }, // Same for NON STCW
+            gauge: {
+                axis: { range: [null, 500] },
+                steps: [
+                    { range: [0, 250], color: "lightgray" },
+                    { range: [250, 400], color: "gray" }
+                ],
+                threshold: {
+                    line: { color: "red", width: 4 },
+                    thickness: 0.75,
+                    value: 490
+                }
+            }
+        }
+    ];
+
+    // Layout for both charts
+    var layout = { width: 280, height: 170, margin: { l: 40, r: 40, t: 40, b: 0 } };
+
+    // Plot the gauges
+    Plotly.newPlot('myDiv', dataSTCW, layout);
+    Plotly.newPlot('myDiv2', dataNONSTCW, layout);
+
     var selectedOption = document.getElementById("yearSelected").value;
     fetch('/api/chart-data/' + selectedOption)
         .then(response => response.json())
@@ -241,61 +456,15 @@ window.onload = function() {
             var pieChart = new CanvasJS.Chart("chartContainerPie", {
                 theme: "light2",
                 animationEnabled: true,
-                title: { text: "Top Penlat Based on Jumlah Peserta" },
+                title: { text: "Top Penlat Based on Jumlah Peserta", margin: 20 },
                 data: [{
-                    type: "doughnut",
+                    type: "bar",
                     indexLabel: "{symbol} - {y}",
                     yValueFormatString: "#,##0\" Peserta\"",
-                    showInLegend: true,
-                    legendText: "{label} : {y}",
                     dataPoints: data.pieDataPoints
                 }]
             });
             pieChart.render();
-
-            const pieCtx = document.getElementById("mostUsedUtility").getContext("2d");
-            new Chart(pieCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: data.mostUsedUtility.map(dp => dp.label),
-                    datasets: [{
-                        label: "Jumlah Penggunaan",
-                        data: data.mostUsedUtility.map(dp => dp.y),
-                        backgroundColor: data.mostUsedUtility.map((dp, index) => {
-                            const colors = ["#4F81BD", "#C0504D", "#9BBB59", "#8064A2", "#4BACC6", "#F79646"];
-                            return colors[index % colors.length];
-                        })
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'bottom'
-                        },
-                        title: {
-                            display: true,
-                            text: "Pelatihan dengan Penggunaan Utilitas Terbanyak"
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function (context) {
-                                    let label = data.mostUsedUtility[context.dataIndex].batch || '';
-
-                                    if (label) {
-                                        label += '\n'; // Move batch to the next line
-                                    }
-                                    if (context.raw !== null) {
-                                        label += context.raw.toLocaleString() + ' Items';
-                                    }
-                                    return label;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
             document.getElementById("CountSTCW").innerText = `STCW: ${data.countSTCW} Peserta`;
             document.getElementById("CountNonSTCW").innerText = `Non-STCW: ${data.countNonSTCW} Peserta`;
         });

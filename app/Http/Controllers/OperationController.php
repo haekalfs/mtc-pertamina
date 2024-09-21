@@ -49,6 +49,119 @@ class OperationController extends Controller
 
         $totalAttention = $OutOfStockCount + $requiredMaintenanceCount;
 
+        $year = $yearSelected ?? Carbon::now()->year; // Default to the current year if none is selected
+
+        // Initialize an array for months
+        $months = [
+            'Januari' => 1, 'Februari' => 2, 'Maret' => 3, 'April' => 4, 'Mei' => 5, 'Juni' => 6,
+            'Juli' => 7, 'Agustus' => 8, 'September' => 9, 'Oktober' => 10, 'November' => 11, 'Desember' => 12
+        ];
+
+        // Data for the view
+        $data = [];
+
+        // Loop through each month to get the counts
+        foreach ($months as $monthName => $monthNumber) {
+            // Count for external participants
+            $externalCount = Infografis_peserta::whereYear('tgl_pelaksanaan', $year)
+                ->whereMonth('tgl_pelaksanaan', $monthNumber)
+                ->where('subholding', 'Eksternal') // Assuming 'Eksternal' is in kategori_program
+                ->count();
+
+            // Count for internal participants
+            $internalCount = Infografis_peserta::whereYear('tgl_pelaksanaan', $year)
+                ->whereMonth('tgl_pelaksanaan', $monthNumber)
+                ->whereNotIn('subholding', ['Eksternal']) // Assuming 'Internal' is in kategori_program
+                ->count();
+
+            // Add the counts to the data array
+            $data[] = [
+                'month' => $monthName,
+                'external_count' => $externalCount,
+                'internal_count' => $internalCount,
+            ];
+        }
+
+        //gauge
+        // Find the latest month with data
+        $latestMonth = Infografis_peserta::whereYear('tgl_pelaksanaan', $year)
+            ->orderBy('tgl_pelaksanaan', 'desc')
+            ->first();
+
+        if ($latestMonth) {
+            $latestMonth = Carbon::parse($latestMonth->tgl_pelaksanaan)->month;
+
+            // Get the count for STCW and NON STCW for the latest month
+            $countSTCWGauge = Infografis_peserta::whereYear('tgl_pelaksanaan', $year)
+                ->whereMonth('tgl_pelaksanaan', $latestMonth)
+                ->where('kategori_program', 'STCW')
+                ->count();
+
+            $countNonSTCWGauge = Infografis_peserta::whereYear('tgl_pelaksanaan', $year)
+                ->whereMonth('tgl_pelaksanaan', $latestMonth)
+                ->where('kategori_program', 'NON STCW')
+                ->count();
+
+            // Get the count for STCW and NON STCW for the previous month
+            $previousMonth = ($latestMonth == 1) ? 12 : $latestMonth - 1;
+
+            $previousCountSTCW = Infografis_peserta::whereYear('tgl_pelaksanaan', $year)
+                ->whereMonth('tgl_pelaksanaan', $previousMonth)
+                ->where('kategori_program', 'STCW')
+                ->count();
+
+            $previousCountNonSTCW = Infografis_peserta::whereYear('tgl_pelaksanaan', $year)
+                ->whereMonth('tgl_pelaksanaan', $previousMonth)
+                ->where('kategori_program', 'NON STCW')
+                ->count();
+
+            // Calculate percentage changes
+            $stcwDelta = ($previousCountSTCW > 0) ? (($countSTCWGauge - $previousCountSTCW) / $previousCountSTCW) * 100 : 0;
+            $nonStcwDelta = ($previousCountNonSTCW > 0) ? (($countNonSTCWGauge - $previousCountNonSTCW) / $previousCountNonSTCW) * 100 : 0;
+        } else {
+            // If there's no data, set counts and deltas to zero
+            $countSTCW = $countNonSTCW = $previousCountSTCW = $previousCountNonSTCW = 0;
+            $stcwDelta = $nonStcwDelta = 0;
+        }
+
+        //Quarterly Data
+        // Define the quarters (array of month ranges)
+        $quarters = [
+            'TW-1' => [1, 2, 3],     // January to March
+            'TW-2' => [4, 5, 6],     // April to June
+            'TW-3' => [7, 8, 9],     // July to September
+            'TW-4' => [10, 11, 12],  // October to December
+        ];
+
+        $quarterlyData = [];
+
+        foreach ($quarters as $quarterName => $bulan) {
+            // External count for each quarter
+            $dataset1 = Infografis_peserta::whereYear('tgl_pelaksanaan', $year)
+                ->whereIn(DB::raw('MONTH(tgl_pelaksanaan)'), $bulan)
+                ->where('subholding', 'Eksternal')  // Assuming 'Eksternal' is for external participants
+                ->count();
+
+            // Internal count for each quarter
+            $dataset2 = Infografis_peserta::whereYear('tgl_pelaksanaan', $year)
+                ->whereIn(DB::raw('MONTH(tgl_pelaksanaan)'), $bulan)
+                ->whereNotIn('subholding', ['Eksternal'])  // Assuming everything else is internal
+                ->count();
+
+            // Calculate the percentage difference (if applicable)
+            $total = $dataset1 + $dataset2;
+            $externalPercentage = $total ? ($dataset1 / $total) * 100 : 0;
+            $internalPercentage = $total ? ($dataset2 / $total) * 100 : 0;
+
+            // Store the data in an array
+            $quarterlyData[$quarterName] = [
+                'external_count' => $dataset1,
+                'internal_count' => $dataset2,
+                'external_percentage' => $externalPercentage,
+                'internal_percentage' => $internalPercentage,
+            ];
+        }
+
         return view('operation.index', compact(
             'getPesertaCount',
             'totalAttention',
@@ -57,50 +170,21 @@ class OperationController extends Controller
             'yearsBefore',
             'yearSelected',
             'OutOfStockCount',
-            'requiredMaintenanceCount'
+            'requiredMaintenanceCount',
+            'data', 'year',
+            'countSTCWGauge', 'countNonSTCWGauge', 'stcwDelta', 'nonStcwDelta',
+            'quarterlyData'
         ));
     }
 
     public function getChartData($year)
     {
-        // Fetch and group the data by nama_program and batch, summing the total usage
-        $dataBatch = Penlat_batch::select('penlat_batch.nama_program', 'penlat_batch.batch', DB::raw('SUM(penlat_utility_usage.amount) as total_usage'))
-        ->join('penlat_utility_usage', 'penlat_batch.id', '=', 'penlat_utility_usage.penlat_batch_id')
-        ->whereYear('penlat_batch.date', $year)
-        ->groupBy('penlat_batch.nama_program', 'penlat_batch.batch')
-        ->orderBy('total_usage', 'DESC')
-        ->get();
-
-        // Split the data into top 5 and the rest
-        $top5Data = $dataBatch->take(5);
-        $otherData = $dataBatch->slice(5);
-
-        // Calculate the total for the 'Lain-lain' category
-        $otherTotalUsage = $otherData->sum('total_usage');
-
-        // Prepare the data for the chart, including batch information
-        $mostUsedUtility = $top5Data->map(function ($row) {
-            return [
-                "label" => $row->nama_program,
-                "batch" => $row->batch,
-                "y" => $row->total_usage
-            ];
-        })->toArray();
-
-        // Add the 'Lain-lain' category if there are more than 5 programs
-        if ($otherTotalUsage > 0) {
-            $mostUsedUtility[] = [
-                "label" => 'Lain-lain',
-                "batch" => null, // No batch info for 'Lain-lain'
-                "y" => $otherTotalUsage
-            ];
-        }
-
         // Fetch and group the data by nama_program, counting the number of participants
         $data = Infografis_peserta::select('nama_program', DB::raw('count(*) as total'))
             ->whereYear('tgl_pelaksanaan', $year)
             ->groupBy('nama_program')
-            ->having('total', '>', 500) // Only include categories with more than 500 participants
+            ->orderBy('total', 'asc')
+            ->having('total', '>', 450) // Only include categories with more than 500 participants
             ->get();
 
         // Calculate the count of participants not included in the main categories
@@ -169,7 +253,6 @@ class OperationController extends Controller
             'dataPointsSpline1' => $dataPointsSpline1,
             'dataPointsSpline2' => $dataPointsSpline2,
             'pieDataPoints' => $dataPointsPie,
-            'mostUsedUtility' => $mostUsedUtility,
             'countSTCW' => $countSTCW,
             'countNonSTCW' => $countNonSTCW
         ]);

@@ -64,6 +64,7 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
     <!-- Include Date Range Picker JS -->
     <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <script src='https://cdn.plot.ly/plotly-2.35.2.min.js'></script>
 </head>
 
 <body>
@@ -188,7 +189,7 @@
                     @endusr_acc
 
                     @usr_acc(202)
-                    <li class="menu-item-has-children dropdown @yield('active-access') @yield('show-access')" style="padding-bottom: 15%;">
+                    <li class="menu-item-has-children dropdown @yield('active-access') @yield('show-access')">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-ban"></i>User Access Control</a>
                         <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-access')">
                             <li><i class="menu-icon fa fa-ban"></i><a href="{{ route('manage.access') }}" class="@yield('manage-access')">Manage Access</a></li>
@@ -196,6 +197,10 @@
                         </ul>
                     </li>
                     @endusr_acc
+
+                    <li style="padding-bottom: 15%;">
+                        <a href="/telescope"><i class="menu-icon fa fa-signal"></i>Web Monitoring</a>
+                    </li>
                 </ul>
             </div><!-- /.navbar-collapse -->
         </nav>

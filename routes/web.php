@@ -67,6 +67,7 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
         Route::get('/api/comparison-chart-data-profits/{year}/{secondYear}', [FinanceController::class, 'getComparisonChartData']);
         Route::get('/api/summary-data-profits/{year}', [FinanceController::class, 'getSummaryProfits']);
         Route::get('/feedback-chart-data/{year}', [PDController::class, 'getFeedbackChartData']);
+        Route::get('/feedback-MTC-chart-data/{yearSelected}', [PDController::class, 'getFeedbackMTCChartData']);
         Route::get('/check-user-id/{userId}', [UserController::class, 'checkUserId']);
     });
 
