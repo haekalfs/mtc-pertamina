@@ -369,6 +369,12 @@ class PenlatController extends Controller
                 });
             }
 
+            if ($request->jenisPenlat && $request->jenisPenlat != '-1') {
+                $query->whereHas('penlat', function($q) use ($request) {
+                    $q->where('jenis_pelatihan', $request->jenisPenlat);
+                });
+            }
+
             $data = $query->get();
 
             return DataTables::of($data)

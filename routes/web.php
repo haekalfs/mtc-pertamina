@@ -69,6 +69,7 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
         Route::get('/feedback-chart-data/{year}', [PDController::class, 'getFeedbackChartData']);
         Route::get('/feedback-MTC-chart-data/{yearSelected}', [PDController::class, 'getFeedbackMTCChartData']);
         Route::get('/check-user-id/{userId}', [UserController::class, 'checkUserId']);
+        Route::get('/api/get-penlat-batch-events', [DashboardController::class, 'getEvents'])->name('penlat.batch.events');
     });
 
     //Encrypt

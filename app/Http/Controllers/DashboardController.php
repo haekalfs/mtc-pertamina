@@ -90,4 +90,24 @@ class DashboardController extends Controller
             'batchCount' => $batchCount
         ]);
     }
+
+    public function getEvents(Request $request)
+    {
+        // Fetch all records from Penlat_batch with batch and date
+        $batches = Penlat_batch::select('batch', 'date')->get();
+
+        // Create events array for FullCalendar
+        $events = [];
+
+        foreach ($batches as $batch) {
+            $events[] = [
+                'title' => $batch->batch,
+                'start' => $batch->date, // Using the date from the database
+                'end'   => $batch->date, // Assuming one-day events
+                'className' => 'bg-' . collect(['primary', 'success', 'danger', 'warning', 'info'])->random() // Random class
+            ];
+        }
+
+        return response()->json($events);
+    }
 }

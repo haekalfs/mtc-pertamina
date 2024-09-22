@@ -79,6 +79,17 @@ font-weight-bold
                                         </select>
                                     </div>
                                 </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="email">Jenis Pelatihan :</label>
+                                        <select class="custom-select" id="jenis" name="jenis">
+                                            <option value="-1" selected>Show All</option>
+                                            @foreach($penlatList->unique('jenis_pelatihan') as $jenis)
+                                                <option value="{{ $jenis->jenis_pelatihan }}">{{ $jenis->jenis_pelatihan }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -292,6 +303,7 @@ $(document).ready(function() {
             url: "{{ route('batch-penlat') }}",
             data: function (d) {
                 d.namaPenlat = $('#namaPenlat').val();
+                d.jenisPenlat = $('#jenis').val();
             }
         },
         columns: [
@@ -362,7 +374,7 @@ $(document).ready(function() {
         });
     });
 
-    $('#namaPenlat').on('click', function() {
+    $('#namaPenlat, #jenis').on('click', function() {
         table.draw();
     });
 

@@ -300,6 +300,17 @@ active font-weight-bold
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="card-body d-flex justify-content-center align-items-center">
+                            <div id="calendar"></div>
+                        </div>
+                    </div>
+                </div> <!-- /.row -->
+            </div>
+        </div><!-- /# column -->
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card-body d-flex justify-content-center align-items-center">
                             <canvas id="lineChart"></canvas>
                         </div>
                         <div class="text-center mb-3">
