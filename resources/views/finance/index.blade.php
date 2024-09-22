@@ -125,6 +125,144 @@ font-weight-bold
         </div>
     </div>
     <div class="row">
+        <div class="col-lg-3">
+            <div class="card">
+                <h4 class="pt-3 pb-0 pl-3">Yearly Revenue</h4>
+                <hr>
+                <div class="row mt-1">
+                    @php
+                        // Initialize $previousRevenue with null to compare with the first revenue
+                        $previousRevenue = null;
+                        $maxRevenue = max($revenuePerYear); // Calculate max revenue once
+                    @endphp
+
+                    @foreach($revenuePerYear as $year => $revenue)
+                        @if ($year != $threeYearsAgo)  {{-- Skip rendering the year that is 3 years ago --}}
+                            <div class="col-lg-12">
+                                <div class="d-flex flex-column justify-content-center align-items-center">
+                                    <span>{{ $year }}</span> <!-- Year above the progress bar -->
+
+                                    <!-- Calculate percentage change if not the first year -->
+                                    @php
+                                        $percentageChange = 0;
+
+                                        // Only calculate percentage change if previousRevenue exists and is > 0
+                                        if ($previousRevenue !== null && $previousRevenue > 0) {
+                                            $percentageChange = (($revenue - $previousRevenue) / $previousRevenue) * 100;
+                                        }
+
+                                        // Calculate progress percentage safely
+                                        $progress = ($maxRevenue > 0) ? round($revenue / $maxRevenue * 100, 0) : 0;
+                                    @endphp
+
+                                    <!-- Progress circle for the revenue -->
+                                    <a class="progress-circle-wrapper animateBox">
+                                        <div class="progress-circle p{{ $progress }} @if($progress >= 50) over50 @endif">
+                                            <span>
+                                            <!-- Show percentage change if available -->
+                                            @if($previousRevenue !== null)
+                                                @if($percentageChange > 0)
+                                                    <small class="text-success">(+{{ number_format($percentageChange, 2) }}%)</small>
+                                                @elseif($percentageChange < 0)
+                                                    <small class="text-danger">({{ number_format($percentageChange, 2) }}%)</small>
+                                                @else
+                                                    <small class="text-secondary">(0%)</small>
+                                                @endif
+                                            @endif
+                                            </span>
+                                            <div class="left-half-clipper">
+                                                <div class="first50-bar"></div>
+                                                <div class="value-bar"></div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        @endif
+
+                        @php
+                            // Update previousRevenue for the next iteration
+                            $previousRevenue = $revenue;
+                        @endphp
+                    @endforeach
+                </div>
+                <!-- Professional description with padding -->
+                <div style="padding: 10px;">
+                    <small> This chart shows the revenue comparison over three years, highlighting percentage changes from the previous year. </small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div class="card2 shadow">
+                <h4 class="card-header2">Monthly Revenue</h4>
+                <div class="card-block2 bg-white">
+                    <div class="p-3">
+                        <table class="table table-bordered table-striped zoom90">
+                            <thead>
+                                <tr>
+                                    <th>Bulan</th>
+                                    <th>Revenue</th>
+                                    <th>Cost</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($monthlyData as $index => $data)
+                                    <tr>
+                                        <td>{{ DateTime::createFromFormat('!m', $data['month'])->format('F') }}</td>
+
+                                        {{-- Revenue --}}
+                                        <td>
+                                            {{ number_format($data['totalRevenueMonthly'], 0, ',', '.') }}
+
+                                            @if($index > 0)
+                                                @php
+                                                    $previousRevenue = $monthlyData[$index - 1]['totalRevenueMonthly'];
+                                                    $revenueChange = 0;
+                                                    if($previousRevenue > 0) {
+                                                        $revenueChange = (($data['totalRevenueMonthly'] - $previousRevenue) / $previousRevenue) * 100;
+                                                    }
+                                                @endphp
+
+                                                @if($revenueChange > 0)
+                                                    <small class="badge bg-success text-white" style="font-size: 10px;">(+{{ number_format($revenueChange, 2) }}%)</small>
+                                                @elseif($revenueChange < 0)
+                                                    <small class="badge bg-danger text-white" style="font-size: 10px;">({{ number_format($revenueChange, 2) }}%)</small>
+                                                @else
+                                                    <small class="badge bg-secondary text-white" style="font-size: 10px;">(0%)</small>
+                                                @endif
+                                            @endif
+                                        </td>
+
+                                        {{-- Costs --}}
+                                        <td>
+                                            {{ number_format($data['totalCostsMonthly'], 0, ',', '.') }}
+
+                                            @if($index > 0)
+                                                @php
+                                                    $previousCost = $monthlyData[$index - 1]['totalCostsMonthly'];
+                                                    $costChange = 0;
+                                                    if($previousCost > 0) {
+                                                        $costChange = (($data['totalCostsMonthly'] - $previousCost) / $previousCost) * 100;
+                                                    }
+                                                @endphp
+
+                                                @if($costChange > 0)
+                                                    <small class="badge bg-success text-white" style="font-size: 10px;">(+{{ number_format($costChange, 2) }}%)</small>
+                                                @elseif($costChange < 0)
+                                                    <small class="badge bg-danger text-white" style="font-size: 10px;">({{ number_format($costChange, 2) }}%)</small>
+                                                @else
+                                                    <small class="badge bg-secondary text-white" style="font-size: 10px;">(0%)</small>
+                                                @endif
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div> <!-- /.row -->
+                </div>
+            </div>
+        </div>
         <div class="col-md-12">
             <div class="card2 shadow">
                 <h4 class="card-header2">Penlat with Most Revenue</h4>
@@ -150,7 +288,7 @@ font-weight-bold
         </div>
         <div class="col-md-6">
             <div class="card2 shadow">
-                <h4 class="card-header2">Profits Per-Quarters</h4>
+                <h4 class="card-header2">Revenue Per-Quarters</h4>
                 <div class="card-block2 bg-white">
                     <div class="row">
                         <div class="col-lg-12 d-flex justify-content-end align-items-end">
@@ -195,7 +333,7 @@ font-weight-bold
         </div>
         <div class="col-md-12">
             <div class="card2 shadow">
-                <h4 class="card-header2">Compare Profits</h4>
+                <h4 class="card-header2">Revenue Comparison</h4>
                 <div class="card-block2 bg-white">
                     <div class="row">
                         <div class="col-lg-12 d-flex justify-content-end align-items-end">
@@ -407,7 +545,7 @@ function loadComparisonChartData() {
                 animationEnabled: true,
                 theme: "light2",
                 title: {
-                    text: "Comparison of Profits: " + firstDataset + " vs " + secondDataset
+                    text: "Revenue Comparison: " + firstDataset + " vs " + secondDataset, margin: 20
                 },
                 axisX: {
                     interval: 1,

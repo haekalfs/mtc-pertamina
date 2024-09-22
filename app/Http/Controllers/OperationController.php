@@ -88,6 +88,8 @@ class OperationController extends Controller
             ->orderBy('tgl_pelaksanaan', 'desc')
             ->first();
 
+        $countNonSTCWGauge = 0;
+        $countSTCWGauge = 0;
         if ($latestMonth) {
             $latestMonth = Carbon::parse($latestMonth->tgl_pelaksanaan)->month;
 
@@ -116,8 +118,8 @@ class OperationController extends Controller
                 ->count();
 
             // Calculate percentage changes
-            $stcwDelta = ($previousCountSTCW > 0) ? (($countSTCWGauge - $previousCountSTCW) / $previousCountSTCW) * 100 : 0;
-            $nonStcwDelta = ($previousCountNonSTCW > 0) ? (($countNonSTCWGauge - $previousCountNonSTCW) / $previousCountNonSTCW) * 100 : 0;
+            $stcwDelta = ($previousCountSTCW > 0) ? $previousCountSTCW : 0;
+            $nonStcwDelta = ($previousCountNonSTCW > 0) ? $previousCountNonSTCW : 0;
         } else {
             // If there's no data, set counts and deltas to zero
             $countSTCW = $countNonSTCW = $previousCountSTCW = $previousCountNonSTCW = 0;

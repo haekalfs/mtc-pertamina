@@ -46,8 +46,70 @@ class FinanceController extends Controller
         // Nett income calculation
         $nettIncome = $totalRevenue - $totalCosts;
 
+        // Create an array to store monthly data
+        $monthlyData = [];
+
+        // Loop through all months (1 = January, 12 = December)
+        for ($month = 1; $month <= 12; $month++) {
+            // Filter records by the selected year and month
+            $dataMonthly = Profit::whereYear('tgl_pelaksanaan', $currentYear)
+                ->whereMonth('tgl_pelaksanaan', $month)
+                ->get();
+
+            // Sum up total costs for the month
+            $totalCostsMonthly = $dataMonthly->sum(function ($item) {
+                return (int) $item->biaya_instruktur +
+                    (int) $item->total_pnbp +
+                    (int) $item->penagihan_foto +
+                    (int) $item->biaya_transportasi_hari +
+                    (int) $item->penagihan_atk +
+                    (int) $item->penagihan_snack +
+                    (int) $item->penagihan_makan_siang +
+                    (int) $item->penlat_usage +
+                    (int) $item->penagihan_laundry;
+            });
+
+            // Sum up total revenue for the month
+            $totalRevenueMonthly = $dataMonthly->sum(function ($item) {
+                return (int) $item->total_biaya_pendaftaran_peserta;
+            });
+
+            // Add the data to the monthlyData array
+            $monthlyData[] = [
+                'month' => $month,
+                'totalRevenueMonthly' => $totalRevenueMonthly,
+                'totalCostsMonthly' => $totalCostsMonthly,
+            ];
+        }
+
+        // Set the base date to either the selected year or the current year
+        $baseDate = $yearSelected ? now()->setYear($yearSelected) : now();
+
+        // Get current year, last year, two years ago, and three years ago
+        $currentYear = $baseDate->year; // Current or selected year
+        $lastYear = $baseDate->clone()->subYear(1)->year; // Last year
+        $twoYearsAgo = $baseDate->clone()->subYears(2)->year; // Two years ago
+        $threeYearsAgo = $baseDate->clone()->subYears(3)->year; // Three years ago
+
+        // Array to store revenue per year
+        $revenuePerYear = [];
+
+        // Years to calculate
+        $years = [$currentYear, $lastYear, $twoYearsAgo, $threeYearsAgo];
+
+        // Loop through each year and calculate total revenue
+        foreach ($years as $year) {
+            $revenue = Profit::whereYear('tgl_pelaksanaan', $year)->sum('total_biaya_pendaftaran_peserta');
+
+            // Ensure revenue is 0 if there is no data
+            $revenuePerYear[$year] = $revenue ?? 0;
+        }
+
+        // Reverse the array so the latest year is first
+        $revenuePerYear = array_reverse($revenuePerYear, true);
+
         // Return the view with the correct variables
-        return view('finance.index', compact('yearsBefore', 'currentYear', 'totalRevenue', 'nettIncome', 'totalCosts'));
+        return view('finance.index', compact('yearsBefore', 'currentYear', 'totalRevenue', 'nettIncome', 'totalCosts', 'monthlyData', 'revenuePerYear', 'threeYearsAgo'));
     }
 
     public function vendor_payment(Request $request)
@@ -83,7 +145,7 @@ class FinanceController extends Controller
         $dataByQuarter = Profit::select(
             DB::raw('QUARTER(tgl_pelaksanaan) as quarter'),
             DB::raw('YEAR(tgl_pelaksanaan) as year'),
-            DB::raw('sum(profit) as total')
+            DB::raw('sum(total_biaya_pendaftaran_peserta) as total')
         )
         ->whereYear('tgl_pelaksanaan', $year)
         ->groupBy('year', 'quarter')
@@ -144,13 +206,13 @@ class FinanceController extends Controller
         }
 
         // Grouping data by month for the current year
-        $dataByMonthCurrentYear = Profit::select(DB::raw('MONTH(tgl_pelaksanaan) as month'), DB::raw('SUM(profit) as total'))
+        $dataByMonthCurrentYear = Profit::select(DB::raw('MONTH(tgl_pelaksanaan) as month'), DB::raw('SUM(total_biaya_pendaftaran_peserta) as total'))
             ->whereYear('tgl_pelaksanaan', $currentYear)
             ->groupBy(DB::raw('MONTH(tgl_pelaksanaan)'))
             ->get();
 
         // Grouping data by month for the previous year
-        $dataByMonthPreviousYear = Profit::select(DB::raw('MONTH(tgl_pelaksanaan) as month'), DB::raw('SUM(profit) as total'))
+        $dataByMonthPreviousYear = Profit::select(DB::raw('MONTH(tgl_pelaksanaan) as month'), DB::raw('SUM(total_biaya_pendaftaran_peserta) as total'))
             ->whereYear('tgl_pelaksanaan', $previousYear)
             ->groupBy(DB::raw('MONTH(tgl_pelaksanaan)'))
             ->get();

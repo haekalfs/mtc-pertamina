@@ -221,7 +221,7 @@ font-weight-bold
                     <div id="carouselExampleIndicators2" class="carousel slide" data-ride="carousel">
 
                         <div class="carousel-inner">
-                            @foreach($suggestions->chunk(3) as $index => $chunk)
+                            @foreach($suggestions->chunk(1) as $index => $chunk)
                                 <div class="carousel-item{{ $index === 0 ? ' active' : '' }}">
                                     @foreach($chunk as $hl)
                                         <small>{{ $hl->saran }}</small>

@@ -20,6 +20,7 @@ use App\Models\Regulation;
 use App\Models\Role;
 use App\Models\Status;
 use App\Models\Training_reference;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -82,10 +83,13 @@ class PDController extends Controller
         ->value('average_score');
 
         //3 Years Prior Avg Feedback
-        // Get current year, last year, and two years ago
-        $currentYearMtc = now()->year;
-        $lastYearMtc = now()->subYear(1)->year;
-        $twoYearsAgoMtc = now()->subYears(2)->year;
+        // Set the selected year or default to the current year
+        $selectedDate = Carbon::createFromDate($yearSelected ?? now()->year);
+
+        // Now you can apply subYear() and subYears() based on this dynamically selected date
+        $currentYearMtc = $selectedDate->year;
+        $lastYearMtc = $selectedDate->copy()->subYear(1)->year;
+        $twoYearsAgoMtc = $selectedDate->copy()->subYears(2)->year;
 
         // Calculate average feedback score for each year
         $feedbackScoresPerYear = [];

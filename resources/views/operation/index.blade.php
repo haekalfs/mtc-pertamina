@@ -317,9 +317,9 @@ window.onload = function() {
             title: { text: "STCW" },
             type: "indicator",
             mode: "gauge+number+delta",
-            delta: { reference: 380, valueformat: ".2f", relative: true }, // Use the delta here for percentage increase/decrease
+            delta: { reference: stcwDelta, valueformat: ".2f", relative: true }, // Use the delta here for percentage increase/decrease
             gauge: {
-                axis: { range: [null, 500] },
+                axis: { range: [null, stcwDelta + 100] },
                 steps: [
                     { range: [0, 250], color: "lightgray" },
                     { range: [250, 400], color: "gray" }
@@ -327,7 +327,7 @@ window.onload = function() {
                 threshold: {
                     line: { color: "red", width: 4 },
                     thickness: 0.75,
-                    value: 490
+                    value: stcwDelta
                 }
             }
         }
@@ -341,9 +341,9 @@ window.onload = function() {
             title: { text: "NON STCW" },
             type: "indicator",
             mode: "gauge+number+delta",
-            delta: { reference: 380, valueformat: ".2f", relative: true }, // Same for NON STCW
+            delta: { reference: nonStcwDelta, valueformat: ".2f", relative: true }, // Same for NON STCW
             gauge: {
-                axis: { range: [null, 500] },
+                axis: { range: [null, nonStcwDelta + 100] },
                 steps: [
                     { range: [0, 250], color: "lightgray" },
                     { range: [250, 400], color: "gray" }
@@ -351,7 +351,7 @@ window.onload = function() {
                 threshold: {
                     line: { color: "red", width: 4 },
                     thickness: 0.75,
-                    value: 490
+                    value: nonStcwDelta
                 }
             }
         }
