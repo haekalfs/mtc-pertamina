@@ -47,11 +47,7 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'suspicious', 'verified']) // 60 requests per minute
     ->name('dashboard');
 
-Route::middleware(['checkForErrors'])->group(function () {
-
-});
-
-Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
+Route::middleware('checkForErrors', 'suspiciousActivity', 'suspicious', 'auth')->group(function () {
     //Import data
     Route::post('/clear-toast-session', function () {
         Session::forget('loading-import');

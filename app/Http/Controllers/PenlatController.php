@@ -369,6 +369,12 @@ class PenlatController extends Controller
                 });
             }
 
+            if ($request->kategoriPenlat && $request->kategoriPenlat != '-1') {
+                $query->whereHas('penlat', function($q) use ($request) {
+                    $q->where('kategori_pelatihan', $request->kategoriPenlat);
+                });
+            }
+
             if ($request->jenisPenlat && $request->jenisPenlat != '-1') {
                 $query->whereHas('penlat', function($q) use ($request) {
                     $q->where('jenis_pelatihan', $request->jenisPenlat);

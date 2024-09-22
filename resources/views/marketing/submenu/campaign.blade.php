@@ -127,15 +127,15 @@ font-weight-bold
                                     <div style="font-weight: 500; line-height: 1.8; font-size: 13px; margin-top: 15px;">
                                         <!-- Informasi Kegiatan -->
                                         <div>
-                                            <strong>Tanggal </strong>: {{ $item->date }}
-                                        </div>
-                                        <div>
-                                            <strong>Informasi Kegiatan</strong>: {{ Str::limit($item->campaign_details, 30, '...') }}
+                                            <strong>Jenis Kegiatan</strong>: {{ Str::limit($item->jenis->description, 30, '...') }}
                                         </div>
 
                                         <!-- Person in Charge -->
                                         <div>
                                             <strong>PIC</strong>: {{ $item->user->name }}
+                                        </div>
+                                        <div>
+                                            <strong>Tanggal </strong>: {{ $item->date }}
                                         </div>
                                     </div>
                                     @php

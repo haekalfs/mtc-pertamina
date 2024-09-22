@@ -81,6 +81,17 @@ font-weight-bold
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
+                                        <label for="email">Kategori Pelatihan :</label>
+                                        <select class="custom-select" id="kategori" name="kategori">
+                                            <option value="-1" selected>Show All</option>
+                                            @foreach($penlatList->unique('kategori_pelatihan') as $kategori)
+                                                <option value="{{ $kategori->kategori_pelatihan }}">{{ $kategori->kategori_pelatihan }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
                                         <label for="email">Jenis Pelatihan :</label>
                                         <select class="custom-select" id="jenis" name="jenis">
                                             <option value="-1" selected>Show All</option>
@@ -304,6 +315,7 @@ $(document).ready(function() {
             data: function (d) {
                 d.namaPenlat = $('#namaPenlat').val();
                 d.jenisPenlat = $('#jenis').val();
+                d.kategoriPenlat = $('#kategori').val();
             }
         },
         columns: [
@@ -374,7 +386,7 @@ $(document).ready(function() {
         });
     });
 
-    $('#namaPenlat, #jenis').on('click', function() {
+    $('#namaPenlat, #jenis, #kategori').on('click', function() {
         table.draw();
     });
 
