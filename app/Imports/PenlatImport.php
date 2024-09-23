@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
@@ -17,7 +18,7 @@ use Maatwebsite\Excel\Concerns\WithStartRow;
 use Maatwebsite\Excel\Events\AfterImport;
 use Maatwebsite\Excel\Jobs\AfterImportJob;
 
-class PenlatImport implements ToCollection, WithBatchInserts, WithChunkReading, ShouldQueue, WithStartRow, WithEvents
+class PenlatImport implements ToCollection, SkipsEmptyRows, WithBatchInserts, WithChunkReading, ShouldQueue, WithStartRow, WithEvents
 {
     protected $filePath;
     protected $userId;
@@ -43,7 +44,7 @@ class PenlatImport implements ToCollection, WithBatchInserts, WithChunkReading, 
                 Penlat::updateOrCreate(
                     [
                         'description' => $row[60],
-                        'alias' => $row[68],
+                        'alias' => str_replace(' ', '-', trim($row[68])),
                         'jenis_pelatihan' => $row[69],
                         'kategori_pelatihan' => $row[70],
                     ],

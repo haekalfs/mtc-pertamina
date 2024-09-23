@@ -769,19 +769,89 @@ class OperationController extends Controller
 
     public function tool_inventory(Request $request)
     {
-        $locations = Location::all();
-
+        $locations = Location::all(); // For filter dropdown
+        $selectedLocation = $request->locationFilter ?? '-1';
         $assetCondition = Asset_condition::all();
-        $selectedLocation = '-1';
 
-        if($request->locationFilter){
-            $selectedLocation = $request->locationFilter;
-        }
+        // Check if it's an AJAX request for DataTables
+        if ($request->ajax()) {
+            $query = Inventory_tools::with(['location', 'condition', 'img']);
 
-        if($selectedLocation != '-1'){
-            $assets = Inventory_tools::where('location_id', $selectedLocation)->get();
-        } else {
-            $assets = Inventory_tools::all();
+            if ($selectedLocation != '-1') {
+                $query->where('location_id', $selectedLocation);
+            }
+
+            return DataTables::of($query)
+                ->addColumn('tool', function ($item) {
+                    $hoursDifference = \Carbon\Carbon::now()->diffInHours(\Carbon\Carbon::parse($item->last_maintenance));
+
+                    $html = '
+                    <div class="row">
+                        <div class="col-md-4 d-flex justify-content-center align-items-start mt-2">
+                            <a class="animateBox" href="' . route('preview-asset', $item->id) . '">
+                                <img src="' . asset($item->img->filepath) . '" style="height: 150px; width: 160px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
+                            </a>
+                        </div>
+                        <div class="col-md-8 text-left mt-sm-2">
+                            <h5 class="card-title font-weight-bold">' . $item->asset_name . '</h5>
+                            <div class="ml-2">
+                                <table class="table table-borderless table-sm">
+                                    <tr>
+                                        <td style="width: 200px;" class="mb-2"><i class="fa fa-chevron-right mr-2"></i> Nomor Aset</td>
+                                        <td style="text-align: start;">: ' . $item->asset_id . '</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width: 200px;" class="mb-2"><i class="fa fa-chevron-right mr-2"></i> Location</td>
+                                        <td style="text-align: start;">: ' . $item->location->description . '</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width: 200px;" class="mb-2"><i class="fa fa-chevron-right mr-2"></i> Running Hour</td>
+                                        <td style="text-align: start;">: ' . $hoursDifference . ' hours</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width: 200px;" class="mb-2"><i class="fa fa-chevron-right mr-2"></i> Next Maintenance</td>
+                                        <td style="text-align: start;">: ' . \Carbon\Carbon::parse($item->next_maintenance)->format('d-M-Y') . '</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>';
+
+                    return $html;
+                })
+                ->addColumn('stock', function ($item) {
+                    return $item->asset_stock ? $item->asset_stock . ' Unit(s)' : 'Out of Stock';
+                })
+                ->addColumn('used', function ($item) {
+                    return $item->used_amount ? $item->used_amount . ' Unit(s)' : '0 Unit';
+                })
+                ->addColumn('condition', function ($item) {
+                    $nextMaintenanceDate = strtotime($item->next_maintenance);
+                    $currentDate = strtotime(date('Y-m-d'));
+
+                    $conditionHtml = $item->condition->badge . '<br>';
+                    if ($nextMaintenanceDate < $currentDate) {
+                        $conditionHtml .= '<span class="badge out-of-stock">Maintenance Required</span><br>';
+                    }
+                    if ($item->asset_stock <= 0) {
+                        $conditionHtml .= '<span class="badge out-of-stock">Out of Stock</span><br>';
+                    }
+
+                    return $conditionHtml;
+                })
+                ->addColumn('action', function ($item) {
+                    return '
+                    <div>
+                        <a data-id="' . $item->id . '" href="#" class="btn btn-outline-secondary btn-md mr-2 edit-tool">
+                            <i class="fa fa-edit"></i>
+                        </a>
+                        <button data-id="' . $item->id . '" class="btn btn-outline-secondary btn-md mr-2 view-tool">
+                            <i class="fa fa-info-circle"></i>
+                        </button>
+                    </div>';
+                })
+                ->rawColumns(['tool', 'condition', 'action']) // Indicate which columns contain HTML
+                ->make(true);
         }
 
         // Get count of assets that are out of stock
@@ -799,7 +869,6 @@ class OperationController extends Controller
         }
 
         return view('operation.submenu.tool_inventory', [
-            'assets' => $assets,
             'selectedLocation' => $selectedLocation,
             'locations' => $locations,
             'assetCondition' => $assetCondition,

@@ -126,15 +126,14 @@ font-weight-bold
                     </div>
                 </div>
                 <div class="card-body zoom90">
-                    <form method="GET" action="{{ route('tool-inventory') }}">
-                        @csrf
+                    <form id="filterForm">
                         <div class="row d-flex justify-content-right mb-4">
                             <div class="col-md-12">
                                 <div class="row align-items-center">
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label for="year">Filter :</label>
-                                            <select class="form-control" name="locationFilter">
+                                            <label for="locationFilter">Filter by Location:</label>
+                                            <select class="form-control" id="locationFilter" name="locationFilter">
                                                 <option value="-1" selected>Show All</option>
                                                 @foreach ($locations as $item)
                                                     <option value="{{ $item->id }}" @if($item->id == $selectedLocation) selected @endif>{{ $item->description }}</option>
@@ -145,7 +144,9 @@ font-weight-bold
                                     <div class="col-md-1 d-flex align-self-end justify-content-start">
                                         <div class="form-group">
                                             <div class="align-self-center">
-                                                <button type="submit" class="btn btn-primary" style="padding-left: 1.2em; padding-right: 1.2em;"><i class="ti-search"></i></button>
+                                                <button type="submit" class="btn btn-primary" style="padding-left: 1.2em; padding-right: 1.2em;">
+                                                    <i class="ti-search"></i>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -154,7 +155,7 @@ font-weight-bold
                         </div>
                     </form>
                     <div class="table-responsive">
-                        <table id="dataTable" class="table table-bordered mt-4">
+                        <table id="listInventory" class="table table-bordered mt-4">
                             <thead class="thead-light">
                                 <tr>
                                     <th>Tool</th>
@@ -164,98 +165,7 @@ font-weight-bold
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                @foreach($assets as $item)
-                                <tr>
-                                    <td data-th="Product">
-                                        <div class="row">
-                                            <div class="col-md-4 d-flex justify-content-center align-items-start mt-2">
-                                                <a class="animateBox" href="{{ route('preview-asset', $item->id) }}">
-                                                    <img src="{{ asset($item->img->filepath) }}" style="height: 150px; width: 160px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
-                                                </a>
-                                            </div>
-                                            <div class="col-md-8 text-left mt-sm-2">
-                                                <h5 class="card-title font-weight-bold">{{ $item->asset_name }}</h5>
-                                                <div class="ml-2">
-                                                    <table class="table table-borderless table-sm">
-                                                        <tr>
-                                                            <td style="width: 200px;" class="mb-2"><i class="fa fa-chevron-right mr-2"></i> Nomor Aset</td>
-                                                            <td style="text-align: start;">: {{ $item->asset_id }}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td style="width: 200px;" class="mb-2"><i class="fa fa-chevron-right mr-2"></i> Location</td>
-                                                            <td style="text-align: start;">: {{ $item->location->description }}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td style="width: 200px;" class="mb-2"><i class="fa fa-chevron-right mr-2"></i> Running Hour</td>
-                                                            @php
-                                                                $purchaseDate = \Carbon\Carbon::parse($item->last_maintenance);
-                                                                $currentDate = \Carbon\Carbon::now();
-                                                                $hoursDifference = $currentDate->diffInHours($purchaseDate);
-                                                            @endphp
-
-                                                            <td style="text-align: start;">: {{ $hoursDifference }} hours</td>
-                                                        </tr>
-                                                        {{-- <tr>
-                                                            <td style="width: 200px;" class="mb-2"><i class="fa fa-chevron-right mr-2"></i> Last Maintenance</td>
-                                                            <td style="text-align: start;">: {{ \Carbon\Carbon::parse($item->last_maintenance)->format('d-M-Y') }}</td>
-                                                        </tr> --}}
-                                                        <tr>
-                                                            <td style="width: 200px;" class="mb-2"><i class="fa fa-chevron-right mr-2"></i> Next Maintenance</td>
-                                                            <td style="text-align: start;">: {{ \Carbon\Carbon::parse($item->next_maintenance)->format('d-M-Y') }}</td>
-                                                        </tr>
-                                                        {{-- <tr>
-                                                            <td style="width: 200px;" class="mb-2"><i class="fa fa-chevron-right mr-2"></i> Panduan Maintenance</td>
-                                                            <td style="text-align: start;">: &nbsp; <a href="{{ asset($item->asset_guidance) }}" target="_blank" class="text-secondary"><i class="fa fa-external-link fa-sm"></i> <u>View</u></a></td>
-                                                        </tr> --}}
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td data-th="Price">
-                                        @if($item->asset_stock)
-                                            {{ $item->asset_stock }} @if($item->asset_stock > 1) Units @else Unit @endif
-                                        @else
-                                            0 Unit
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if($item->used_amount)
-                                            {{ $item->used_amount }} @if($item->used_amount > 1) Units @else Unit @endif
-                                        @else
-                                            0 Unit
-                                        @endif
-                                    </td>
-                                    <td data-th="Quantity">
-                                        {!! $item->condition->badge !!}<br>
-                                        @php
-                                            // Convert $item->next_maintenance to a timestamp
-                                            $nextMaintenanceDate = strtotime($item->next_maintenance);
-                                            $currentDate = strtotime(date('Y-m-d'));
-                                        @endphp
-
-                                        @if($nextMaintenanceDate < $currentDate)
-                                            <span class="badge out-of-stock">Maintenance Required</span><br>
-                                        @endif
-
-                                        @if($item->asset_stock <= 0)
-                                            <span class="badge out-of-stock">Out of Stock</span><br>
-                                        @endif
-                                    </td>
-                                    <td class="actions text-center" data-th="">
-                                        <div>
-                                            <a data-id="{{ $item->id }}" href="#" class="btn btn-outline-secondary btn-md mr-2 edit-tool">
-                                                <i class="fa fa-edit"></i>
-                                            </a>
-                                            <button data-id="{{ $item->id }}" class="btn btn-outline-secondary btn-md mr-2 view-tool">
-                                                <i class="fa fa-info-circle"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
+                            <tbody></tbody>
                         </table>
                     </div>
                 </div>
@@ -507,6 +417,32 @@ font-weight-bold
         </div>
     </div>
 </div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var table = $('#listInventory').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "{{ route('tool-inventory') }}",
+                data: function (d) {
+                    d.locationFilter = $('#locationFilter').val(); // Pass location filter
+                }
+            },
+            columns: [
+                { data: 'tool', name: 'tool', orderable: false, searchable: false },
+                { data: 'stock', name: 'stock' },
+                { data: 'used', name: 'used' },
+                { data: 'condition', name: 'condition', orderable: false, searchable: false },
+                { data: 'action', name: 'action', orderable: false, searchable: false }
+            ]
+        });
+
+        $('#filterForm').on('submit', function (e) {
+            e.preventDefault();
+            table.draw(); // Redraw the table when the filter is applied
+        });
+    });
+</script>
 <script>
     function displayFileName() {
         const input = document.getElementById('file');

@@ -43,7 +43,7 @@ font-weight-bold
                                                 <div class="d-flex align-items-top justify-content-center text-center">
                                                     <label for="file-upload" style="cursor: pointer;">
                                                         <img id="image-preview" src="{{ asset('img/default-img.png') }}" style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
-                                                        <small style="font-size: 10px;"><i><u>Click above to upload image!</u></i></small>
+                                                        <small style="font-size: 10px;"><i><u>REQUIRED!</u></i></small>
                                                     </label>
                                                     <input id="file-upload" type="file" name="profile_picture" style="display: none;" accept="image/*" onchange="previewImage(event)">
                                                 </div>
@@ -111,7 +111,7 @@ font-weight-bold
                         <div class="row form-group">
                             <div class="col col-md-3"><label for="user_status" class=" form-control-label">Instructor Status</label></div>
                             <div class="col-12 col-md-9">
-                                <select name="user_status" id="user_status" class="form-control form-control">
+                                <select name="user_status" id="user_status" class="form-control form-control" required>
                                     <option disabled selected>Please select</option>
                                     <option value="1">Active</option>
                                     <option value="0">Non Active</option>
@@ -122,11 +122,11 @@ font-weight-bold
                         <hr class="sidebar-divider mb-4">
                         <div class="row form-group">
                             <div class="col col-md-3"><label for="cv" class=" form-control-label">CV</label></div>
-                            <div class="col-12 col-md-9"><input type="file" id="cv" name="cv" class="form-control"></div>
+                            <div class="col-12 col-md-9"><input type="file" id="cv" name="cv" class="form-control" required></div>
                         </div>
                         <div class="row form-group">
                             <div class="col col-md-3"><label for="ijazah" class=" form-control-label">Ijazah</label></div>
-                            <div class="col-12 col-md-9"><input type="file" id="ijazah" name="ijazah" class="form-control"></div>
+                            <div class="col-12 col-md-9"><input type="file" id="ijazah" name="ijazah" class="form-control" required></div>
                         </div>
                         <div class="row form-group">
                             <div class="col col-md-3" style="font-size: 13px;"><label for="ijazah" class=" form-control-label">Dokumen Pendukung Lainnya (Optional)</label></div>

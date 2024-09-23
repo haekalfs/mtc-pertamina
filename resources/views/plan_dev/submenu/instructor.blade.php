@@ -139,7 +139,54 @@ font-weight-bold
                         </div>
                     </form>
                     <div class="table-responsive">
-                        <table id="dataTable" class="table table-bordered mt-4 zoom90">
+                        <table id="docLetter" class="table table-striped mt-4" style="border: 1px solid rgb(229, 229, 229);">
+                            <thead class="text-dark" style="background-color: #ced4da;">
+                                <tr>
+                                    <th>Avatar</th>
+                                    <th>Name</th>
+                                    <th>Umur</th>
+                                    <th>Gender</th>
+                                    <th>Jam Mengajar</th>
+                                    <th>Rate</th>
+                                    <th>Total Feedback</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($data as $item)
+                                <tr>
+                                    <td class="text-center">
+                                        <div class="round-img">
+                                            <a href="{{ route('preview-instructor', ['id' => $item->id, 'penlatId' => $penlatId]) }}"><img class="rounded-circle" src="{{ $item->imgFilepath ? asset($item->imgFilepath) : asset('img/default-img.png') }}" style="height: 70px; width: 70px; border: 1px solid rgb(202, 202, 202);" alt=""></a>
+                                        </div>
+                                    </td>
+                                    <td>{{ $item->instructor_name }}</td>
+                                    <td class="text-center">{{ \Carbon\Carbon::parse($item->instructor_dob)->age }} Tahun</td>
+                                    <td class="text-center">{{ $item->instructor_gender }}</td>
+                                    <td class="text-center">{{ $item->working_hours ? $item->working_hours : 0 }} Jam</td>
+                                    <td class="text-center">
+                                        @php
+                                            $roundedScore = round($item->average_feedback_score, 1); // Round to one decimal place
+                                            $wholeStars = floor($roundedScore);
+                                            $halfStar = ($roundedScore - $wholeStars) >= 0.5;
+                                        @endphp
+                                        <span>
+                                            <i class="fa fa-star text-warning"></i>
+                                            {{ $roundedScore ?? '-' }}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        {{ $item->feedbacks_count / 5 }} feedbacks
+                                    </td>
+                                    <td class="actions text-center">
+                                        <a class="btn btn-outline-secondary btn-sm mr-2 zoom90" href="{{ route('edit-instructor', $item->id) }}"><i class="fa fa-edit"></i> Update</a>
+                                        <a class="btn btn-outline-secondary btn-sm zoom90" href="{{ route('preview-instructor', ['id' => $item->id, 'penlatId' => $penlatId]) }}"><i class="fa fa-info-circle"></i> Preview</a>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                        {{-- <table id="dataTable" class="table table-bordered mt-4 zoom90">
                             <thead class="thead-light">
                                 <tr>
                                     <th>Instructors</th>
@@ -206,7 +253,7 @@ font-weight-bold
                                 </tr>
                                 @endforeach
                             </tbody>
-                        </table>
+                        </table> --}}
                     </div>
                 </div>
             </div>

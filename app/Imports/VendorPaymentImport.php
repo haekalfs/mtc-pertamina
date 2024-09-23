@@ -16,8 +16,9 @@ use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 use Maatwebsite\Excel\Events\AfterImport;
 use App\Models\Notification;
+use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 
-class VendorPaymentImport implements ToCollection, WithBatchInserts, WithChunkReading, ShouldQueue, WithStartRow, WithCalculatedFormulas, WithEvents
+class VendorPaymentImport implements ToCollection, SkipsEmptyRows, WithBatchInserts, WithChunkReading, ShouldQueue, WithStartRow, WithCalculatedFormulas, WithEvents
 {
     protected $filePath;
     protected $userId;

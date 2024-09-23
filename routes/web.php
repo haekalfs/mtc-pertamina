@@ -5,6 +5,7 @@ use App\Http\Controllers\AkhlakController;
 use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentPositionController;
+use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\ImportController;
@@ -66,6 +67,8 @@ Route::middleware('checkForErrors', 'suspiciousActivity', 'suspicious', 'auth')-
         Route::get('/feedback-MTC-chart-data/{yearSelected}', [PDController::class, 'getFeedbackMTCChartData']);
         Route::get('/check-user-id/{userId}', [UserController::class, 'checkUserId']);
         Route::get('/api/get-penlat-batch-events', [DashboardController::class, 'getEvents'])->name('penlat.batch.events');
+        //will be used
+        Route::get('/download-file/{filepath}', [DownloadController::class, 'downloadFile'])->name('download.file');
     });
 
     //Encrypt

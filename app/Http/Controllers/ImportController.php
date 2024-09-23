@@ -62,7 +62,7 @@ class ImportController extends Controller
 
             // Set a cache indicating the job is processing, if it doesn't already exist
             if (!Cache::has('jobs_processing')) {
-                Cache::put('jobs_processing', true, now()->addMinutes(5)); // Cache for 10 minutes
+                Cache::put('jobs_processing', true, now()->addMinutes(10)); // Cache for 10 minutes
             }
 
             return redirect()->back()->with('success', 'Data import started successfully, please wait until the data is all processed.');
@@ -102,7 +102,7 @@ class ImportController extends Controller
             Excel::queueImport(new ImportProfits($filePath, $userId), $filePath);
             // Set a cache indicating the job is processing, if it doesn't already exist
             if (!Cache::has('jobs_processing')) {
-                Cache::put('jobs_processing', true, now()->addMinutes(5)); // Cache for 10 minutes
+                Cache::put('jobs_processing', true, now()->addMinutes(10)); // Cache for 10 minutes
             }
 
             return redirect()->back()->with('success', 'Data import started successfully, please wait until the data is all processed.');
@@ -140,7 +140,7 @@ class ImportController extends Controller
         try {
             Excel::queueImport(new PenlatImport($filePath, $userId), $filePath);
             if (!Cache::has('jobs_processing')) {
-                Cache::put('jobs_processing', true, now()->addMinutes(5));
+                Cache::put('jobs_processing', true, now()->addMinutes(10));
             }
 
             return redirect()->back()->with('success', 'Data conversion started successfully, please wait until the data is processed.');
@@ -181,7 +181,7 @@ class ImportController extends Controller
             Excel::queueImport(new FeedbackImport($filePath, $userId), $filePath);
             // Set a cache indicating the job is processing, if it doesn't already exist
             if (!Cache::has('jobs_processing')) {
-                Cache::put('jobs_processing', true, now()->addMinutes(5)); // Cache for 10 minutes
+                Cache::put('jobs_processing', true, now()->addMinutes(10)); // Cache for 10 minutes
             }
 
             return redirect()->back()->with('success', 'Data import started successfully, please wait until the data is all processed.');
@@ -222,7 +222,7 @@ class ImportController extends Controller
             Excel::queueImport(new VendorPaymentImport($filePath, $userId), $filePath);
             // Set a cache indicating the job is processing, if it doesn't already exist
             if (!Cache::has('jobs_processing')) {
-                Cache::put('jobs_processing', true, now()->addMinutes(5)); // Cache for 10 minutes
+                Cache::put('jobs_processing', true, now()->addMinutes(10)); // Cache for 10 minutes
             }
 
             return redirect()->back()->with('success', 'Data import started successfully, please wait until the data is all processed.');
@@ -263,7 +263,7 @@ class ImportController extends Controller
             Excel::queueImport(new FeedbackMTCImport($filePath, $userId), $filePath);
             // Set a cache indicating the job is processing, if it doesn't already exist
             if (!Cache::has('jobs_processing')) {
-                Cache::put('jobs_processing', true, now()->addMinutes(5)); // Cache for 10 minutes
+                Cache::put('jobs_processing', true, now()->addMinutes(10)); // Cache for 10 minutes
             }
 
             return redirect()->back()->with('success', 'Data import started successfully, please wait until the data is all processed.');

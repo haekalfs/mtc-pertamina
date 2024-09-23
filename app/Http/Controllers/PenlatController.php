@@ -381,7 +381,7 @@ class PenlatController extends Controller
                 });
             }
 
-            $data = $query->get();
+            $data = $query->orderBy('date', 'desc')->get();
 
             return DataTables::of($data)
                 ->addColumn('display', function($item) {

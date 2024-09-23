@@ -512,7 +512,7 @@ function loadChartData() {
                 animationEnabled: true,
                 zoomEnabled: true,
                 theme: "light2",
-                title: { text: "Data Profits (Quarterly)",
+                title: { text: "Revenue (Quarterly)",
                 margin: 50 },
                 axisX: {
                     interval: 1, // Ensure one label per point
@@ -555,7 +555,7 @@ function loadComparisonChartData() {
                 },
                 axisY: {
                     includeZero: true,
-                    title: "Profits",
+                    title: "Revenue",
                     prefix: "IDR",
                     labelFormatter: function(e) {
                         return CanvasJS.formatNumber(e.value, "#,##0");
@@ -570,15 +570,15 @@ function loadComparisonChartData() {
                 },
                 data: [
                     {
-                        type: "stackedArea",
-                        name: "Current Year",
+                        type: "column",
+                        name: firstDataset,
                         showInLegend: true,
                         yValueFormatString: "#,##0 Rupiah",
                         dataPoints: data.dataPointsCurrentYear
                     },
                     {
-                        type: "stackedArea",
-                        name: "Previous Year",
+                        type: "column",
+                        name: secondDataset,
                         showInLegend: true,
                         yValueFormatString: "#,##0 Rupiah",
                         dataPoints: data.dataPointsPreviousYear

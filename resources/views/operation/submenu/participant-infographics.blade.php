@@ -434,7 +434,8 @@ $(document).ready(function() {
             { data: 'kategori_program', name: 'kategori_program' },
             { data: 'realisasi', name: 'realisasi' },
             { data: 'action', name: 'action', orderable: false, searchable: false },
-        ]
+        ],
+    order: [[2, 'desc']]
     });
 
     // Re-draw the table when filters are changed

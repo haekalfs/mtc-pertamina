@@ -662,7 +662,8 @@ aside.left-panel {
           color: #607d8b;
           float: left;
           margin-top: 8px;
-          width: 55px;
+          width: 45px;
+          /* Change the width of the icon */
           text-align: left;
           z-index: 9; }
         .navbar .navbar-nav li > a .menu-title-text {

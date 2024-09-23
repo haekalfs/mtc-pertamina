@@ -15,8 +15,9 @@ use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 use Maatwebsite\Excel\Events\AfterImport;
 use App\Models\Notification;
+use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 
-class FeedbackMTCImport implements ToCollection, WithBatchInserts, WithChunkReading, ShouldQueue, WithStartRow, WithEvents
+class FeedbackMTCImport implements ToCollection, SkipsEmptyRows, WithBatchInserts, WithChunkReading, ShouldQueue, WithStartRow, WithEvents
 {
     protected $filePath;
     protected $userId;
