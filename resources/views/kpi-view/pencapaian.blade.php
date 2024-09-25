@@ -276,101 +276,86 @@ window.onload = function () {
 }
 </script>
 <script>
-    function confirmDelete(itemId) {
-        event.preventDefault();
-        swal({
-            title: "Are you sure?",
-            text: "Once deleted, you will not be able to recover this KPI!",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true,
-        }).then((willDelete) => {
-            if (willDelete) {
-                document.getElementById('delete-pencapaian-kpi-' + itemId).submit();
-            }
-        });
-    }
+// Update KPI Modal Trigger
+$(document).on('click', '.btn-update', function() {
+    var id = $(this).data('id');
 
-    // Update KPI Modal Trigger
-    $(document).on('click', '.btn-update', function() {
-        var id = $(this).data('id');
+    // Fetch existing KPI data using AJAX
+    $.ajax({
+        url: '/pencapaian-kpi/edit/' + id,
+        method: 'GET',
+        success: function(data) {
+            // Prefill the modal with the fetched data
+            $('#edit_pencapaian').val(data.pencapaian);
 
-        // Fetch existing KPI data using AJAX
-        $.ajax({
-            url: '/pencapaian-kpi/edit/' + id,
-            method: 'GET',
-            success: function(data) {
-                // Prefill the modal with the fetched data
-                $('#edit_pencapaian').val(data.pencapaian);
+            // Properly format the score
+            var score = data.score || 0; // Ensure score is not undefined or null, default to 0 if it is
+            var formattedScore = score.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 
-                // Properly format the score
-                var score = data.score || 0; // Ensure score is not undefined or null, default to 0 if it is
-                var formattedScore = score.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            // Set the formatted value in the visible input field
+            $('#edit_score').val(formattedScore);
 
-                // Set the formatted value in the visible input field
-                $('#edit_score').val(formattedScore);
+            // Set the unformatted value in the hidden input field
+            $('#score_hidden').val(score); // Use the raw unformatted score here
 
-                // Set the unformatted value in the hidden input field
-                $('#score_hidden').val(score); // Use the raw unformatted score here
+            // Set the date range in the daterangepicker
+            var startDate = moment(data.periode_start);
+            var endDate = moment(data.periode_end);
+            $('input[name="edit_daterange"]').data('daterangepicker').setStartDate(startDate);
+            $('input[name="edit_daterange"]').data('daterangepicker').setEndDate(endDate);
 
-                // Set the date range in the daterangepicker
-                var startDate = moment(data.periode_start);
-                var endDate = moment(data.periode_end);
-                $('input[name="edit_daterange"]').data('daterangepicker').setStartDate(startDate);
-                $('input[name="edit_daterange"]').data('daterangepicker').setEndDate(endDate);
+            // Update the form action using Laravel route helper in Blade
+            var updateRoute = '{{ route("pencapaian.update", ":id") }}';
+            updateRoute = updateRoute.replace(':id', id);
+            $('#kpiForm').attr('action', updateRoute);
 
-                // Update the form action using Laravel route helper in Blade
-                var updateRoute = '{{ route("pencapaian.update", ":id") }}';
-                updateRoute = updateRoute.replace(':id', id);
-                $('#kpiForm').attr('action', updateRoute);
+            // Assign the ID to the delete button dynamically
+            $('#deleteButton').data('id', id); // Attach the KPI ID to the delete button
 
-                // Assign the ID to the delete button dynamically
-                $('#deleteButton').data('id', id); // Attach the KPI ID to the delete button
-
-                // Show the modal
-                $('#kpiModal').modal('show');
-            }
-        });
+            // Show the modal
+            $('#kpiModal').modal('show');
+        }
     });
+});
 
-    // Handle the delete button click event with SweetAlert
-    $(document).on('click', '#deleteButton', function() {
-        var id = $(this).data('id'); // Fetch the ID of the KPI to be deleted
+// Handle the delete button click event with SweetAlert
+$(document).on('click', '#deleteButton', function() {
+    var id = $(this).data('id'); // Fetch the ID of the KPI to be deleted
 
-        // Show SweetAlert confirmation dialog
-        swal({
-            title: "Are you sure?",
-            text: "Once deleted, you will not be able to recover this KPI data!",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true,
-        })
-        .then((willDelete) => {
-            if (willDelete) {
-                // Send delete request via AJAX if confirmed
-                $.ajax({
-                    url: '/pencapaian-kpi/delete/' + id, // Delete route
-                    method: 'DELETE',
-                    data: {
-                        _token: '{{ csrf_token() }}' // Ensure CSRF token is included
-                    },
-                    success: function(response) {
-                        swal("Success!", "The KPI data has been deleted.", "success")
-                        .then(() => {
-                            // Optionally close the modal and refresh the page or table
-                            $('#kpiModal').modal('hide');
-                            location.reload(); // Refresh the page to reflect the deletion
-                        });
-                    },
-                    error: function(xhr) {
-                        swal("Error", "There was an issue deleting the KPI data.", "error");
-                    }
-                });
-            } else {
-                swal("Your KPI data is safe!");
-            }
-        });
+    // Show SweetAlert confirmation dialog
+    swal({
+        title: "Are you sure?",
+        text: "Once deleted, you will not be able to recover this KPI data!",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+    })
+    .then((willDelete) => {
+        if (willDelete) {
+            // Send delete request via AJAX if confirmed
+            $.ajax({
+                url: '/pencapaian-kpi/delete/' + id, // Delete route
+                method: 'DELETE',
+                data: {
+                    _token: '{{ csrf_token() }}' // Ensure CSRF token is included
+                },
+                success: function(response) {
+                    swal("Success!", "The KPI data has been deleted.", "success")
+                    .then(() => {
+                        // Optionally close the modal and refresh the page or table
+                        $('#kpiModal').modal('hide');
+                        location.reload(); // Refresh the page to reflect the deletion
+                    });
+                },
+                error: function(xhr) {
+                    swal("Error", "There was an issue deleting the KPI data.", "error");
+                }
+            });
+        } else {
+            swal("Your KPI data is safe!");
+        }
     });
+});
 
 
 function formatAmount(input) {

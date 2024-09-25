@@ -299,6 +299,9 @@ active font-weight-bold
             <div class="card">
                 <div class="row">
                     <div class="col-lg-12">
+                        <div class="card-header d-flex justify-content-start">
+                            <h6 class="m-0 font-weight-bold">Kalender Pelatihan</h6>
+                        </div>
                         <div class="card-body d-flex justify-content-center align-items-center">
                             <div id="calendar"></div>
                         </div>
@@ -306,10 +309,13 @@ active font-weight-bold
                 </div> <!-- /.row -->
             </div>
         </div><!-- /# column -->
-        <div class="col-lg-12">
+        <div class="col-lg-6">
             <div class="card">
                 <div class="row">
                     <div class="col-lg-12">
+                        <div class="card-header d-flex justify-content-end">
+                            <a href="{{ route('operation') }}" class="btn btn-primary btn-sm">Show More</a>
+                        </div>
                         <div class="card-body d-flex justify-content-center align-items-center">
                             <canvas id="lineChart"></canvas>
                         </div>
@@ -321,10 +327,13 @@ active font-weight-bold
                 </div> <!-- /.row -->
             </div>
         </div><!-- /# column -->
-        <div class="col-lg-12">
+        <div class="col-lg-6">
             <div class="card">
                 <div class="row">
                     <div class="col-lg-12">
+                        <div class="card-header d-flex justify-content-end">
+                            <a href="{{ route('plan-dev') }}" class="btn btn-primary btn-sm">Show More</a>
+                        </div>
                         <div class="card-body d-flex justify-content-center align-items-center">
                             <div id="chartContainerSpline2" style="height: 370px; width: 100%;"></div>
                         </div>
