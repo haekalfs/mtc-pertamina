@@ -471,8 +471,8 @@ class PDController extends Controller
                         <a class="btn btn-outline-secondary btn-sm" href="' . $previewUrl . '"><i class="fa fa-info-circle"></i> Preview</a>
                     ';
                 })
-                ->rawColumns(['rate', 'action'])
-                ->make(true);
+            ->rawColumns(['rate', 'action'])
+            ->make(true);
         }
 
         $penlatList = Penlat::all();

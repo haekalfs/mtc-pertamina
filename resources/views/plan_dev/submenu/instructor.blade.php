@@ -126,7 +126,7 @@ font-weight-bold
                             </div>
                         </div>
                     </div>
-                    <div class="table-responsive">
+                    <div class="table-responsive zoom90">
                         <table id="listInstructors" class="table table-striped mt-4" style="border: 1px solid rgb(229, 229, 229);">
                             <thead class="text-secondary" style="background-color: #ecedee;">
                                 <tr>
@@ -135,7 +135,6 @@ font-weight-bold
                                     <th>Umur</th>
                                     <th>Gender</th>
                                     <th>Jam Mengajar</th>
-                                    <th>Rate</th>
                                     <th>Total Feedback</th>
                                     <th>Action</th>
                                 </tr>
@@ -156,61 +155,61 @@ $(document).ready(function() {
         allowClear: true,
     });
 });
-$(document).ready(function() {
-    $('#listInstructors').DataTable({
-        processing: true,
-        serverSide: true,
-        ajax: {
-            url: "{{ route('instructor') }}",
-            data: function (d) {
-                d.penlat = $('#penlatSelect').val();
-                d.status = $('select[name="status"]').val();
-                d.age = $('select[name="age"]').val();
+$('#listInstructors').DataTable({
+    processing: true,
+    serverSide: true,
+    ajax: {
+        url: "{{ route('instructor') }}",
+        data: function (d) {
+            d.penlat = $('#penlatSelect').val();
+            d.status = $('select[name="status"]').val();
+            d.age = $('select[name="age"]').val();
+        }
+    },
+    columns: [
+        {
+            data: 'avatar_img',
+            name: 'avatar_img',
+            orderable: false,
+            searchable: false,
+            render: function (data, type, full) {
+                return '<div class="round-img"><a href="' + full.avatar_url + '"><img class="rounded-circle" src="' + data + '" style="height: 70px; width: 70px; border: 1px solid rgb(202, 202, 202);"></a></div>';
             }
         },
-        columns: [
-            {
-                data: 'avatar_img',
-                name: 'avatar_img',
-                orderable: false,
-                searchable: false,
-                render: function (data, type, full) {
-                    return '<div class="round-img"><a href="' + full.avatar_url + '"><img class="rounded-circle" src="' + data + '" style="height: 70px; width: 70px; border: 1px solid rgb(202, 202, 202);"></a></div>';
-                }
-            },
-            { data: 'instructor_name', name: 'instructor_name' },
-            { data: 'age', name: 'age' },
-            { data: 'instructor_gender', name: 'instructor_gender' },
-            { data: 'working_hours', name: 'working_hours' },
-            {
-                data: 'rate',
-                name: 'rate',
-                orderable: false,
-                searchable: false,
-                render: function (data, type, full) {
-                    return data;
-                }
-            },
-            {
-                data: 'feedbacks_count',
-                name: 'feedbacks_count',
-                render: function (data, type, full) {
-                    return data;
-                }
-            },
-            {
-                data: 'action',
-                name: 'action',
-                orderable: false,
-                searchable: false
+        {
+            data: 'instructor_name',
+            name: 'instructor_name',
+            render: function (data, type, full) {
+                // Combine the instructor_name and rate with minimal spacing between them
+                return '<div>' + data +
+                    '<div style="margin-top: 3px;">' + full.rate + '</div></div>';
             }
-        ]
-    });
+        },
+        { data: 'age', name: 'age' },
+        { data: 'instructor_gender', name: 'instructor_gender' },
+        { data: 'working_hours', name: 'working_hours' },
+        {
+            data: 'feedbacks_count',
+            name: 'feedbacks_count',
+            render: function (data, type, full) {
+                return data;
+            }
+        },
+        {
+            data: 'action',
+            name: 'action',
+            orderable: false,
+            searchable: false,
+            render: function(data, type, full) {
+                return '<div class="text-center">' + data + '</div>';
+            }
+        }
+    ]
+});
 
-    // Reload table when filter is changed
-    $('#penlatSelect, select[name="status"], select[name="age"]').change(function () {
-        $('#listInstructors').DataTable().draw();
-    });
+// Reload table when filter is changed
+$('#penlatSelect, select[name="status"], select[name="age"]').change(function () {
+    $('#listInstructors').DataTable().draw();
 });
 </script>
 @endsection
