@@ -19,8 +19,16 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 
-    # Block access to any shell, script, or executable files in public directory
-    <FilesMatch "\.(php|sh|pl|py|exe|cgi|phar|phtml|php[0-9]*)$">
+   # Block access to all PHP files except index.php
+    <FilesMatch "\.(php|phar|phtml|php[0-9]*)$">
+        <If "%{REQUEST_URI} != '/index.php'">
+            Order allow,deny
+            Deny from all
+        </If>
+    </FilesMatch>
+
+    # Block access to other potentially dangerous executable file types
+    <FilesMatch "\.(sh|pl|py|exe|cgi)$">
         Order allow,deny
         Deny from all
     </FilesMatch>
