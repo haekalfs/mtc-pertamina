@@ -43,7 +43,7 @@ active font-weight-bold
                             <div class="stat-content">
                                 <div class="text-left dib">
                                     <div class="stat-text"><span class="count">{{ $countCampaign }}</span></div>
-                                    <div class="stat-heading">Event Campaign</div>
+                                    <div class="stat-heading">Campaign</div>
                                 </div>
                             </div>
                         </div>
@@ -83,7 +83,7 @@ active font-weight-bold
                             <div class="stat-content">
                                 <div class="text-left dib">
                                     <div class="h6"><span>{{ number_format($rawProfits, 0, ',', '.') }}</span></div>
-                                    <div class="stat-heading">Raw Profits MTC</div>
+                                    <div class="stat-heading">Revenue</div>
                                 </div>
                             </div>
                         </div>

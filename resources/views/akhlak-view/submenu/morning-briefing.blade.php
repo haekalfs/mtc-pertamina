@@ -102,6 +102,7 @@ font-weight-bold
                             </div>
                         </div>
                     </form>
+                    @if($data->isNotEmpty())
                     <div class="row justify-content-start">
                         @foreach($data as $item)
                         <div class="col-lg-6 col-md-6 d-flex mb-4">
@@ -147,53 +148,59 @@ font-weight-bold
                         </div>
                         @endforeach
                     </div>
+                    @else
+                    <p class="d-flex justify-content-center align-items-center text-center"> No Data Available </p>
+                    @endif
 
 
-                    <!-- Pagination Links -->
-                    <nav>
-                        <ul class="pagination justify-content-center">
-                            {{-- Previous Page Link --}}
-                            @if ($data->onFirstPage())
-                                <li class="page-item disabled">
-                                    <span class="page-link">Previous</span>
-                                </li>
-                            @else
-                                <li class="page-item">
-                                    <a class="page-link" href="{{ $data->previousPageUrl() }}" rel="prev">Previous</a>
-                                </li>
-                            @endif
-
-                            {{-- Pagination Elements --}}
-                            @foreach ($data->links()->elements as $element)
-                                {{-- "Three Dots" Separator --}}
-                                @if (is_string($element))
-                                    <li class="page-item disabled"><span class="page-link">{{ $element }}</span></li>
+                    <!-- Show Pagination Only If Data Exists -->
+                    @if($data->isNotEmpty())
+                        <!-- Pagination Links -->
+                        <nav>
+                            <ul class="pagination justify-content-center">
+                                {{-- Previous Page Link --}}
+                                @if ($data->onFirstPage())
+                                    <li class="page-item disabled">
+                                        <span class="page-link">Previous</span>
+                                    </li>
+                                @else
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ $data->previousPageUrl() }}" rel="prev">Previous</a>
+                                    </li>
                                 @endif
 
-                                {{-- Array Of Links --}}
-                                @if (is_array($element))
-                                    @foreach ($element as $page => $url)
-                                        @if ($page == $data->currentPage())
-                                            <li class="page-item active"><span class="page-link">{{ $page }}</span></li>
-                                        @else
-                                            <li class="page-item"><a class="page-link" href="{{ $url }}">{{ $page }}</a></li>
-                                        @endif
-                                    @endforeach
-                                @endif
-                            @endforeach
+                                {{-- Pagination Elements --}}
+                                @foreach ($data->links()->elements as $element)
+                                    {{-- "Three Dots" Separator --}}
+                                    @if (is_string($element))
+                                        <li class="page-item disabled"><span class="page-link">{{ $element }}</span></li>
+                                    @endif
 
-                            {{-- Next Page Link --}}
-                            @if ($data->hasMorePages())
-                                <li class="page-item">
-                                    <a class="page-link" href="{{ $data->nextPageUrl() }}" rel="next">Next</a>
-                                </li>
-                            @else
-                                <li class="page-item disabled">
-                                    <span class="page-link">Next</span>
-                                </li>
-                            @endif
-                        </ul>
-                    </nav>
+                                    {{-- Array Of Links --}}
+                                    @if (is_array($element))
+                                        @foreach ($element as $page => $url)
+                                            @if ($page == $data->currentPage())
+                                                <li class="page-item active"><span class="page-link">{{ $page }}</span></li>
+                                            @else
+                                                <li class="page-item"><a class="page-link" href="{{ $url }}">{{ $page }}</a></li>
+                                            @endif
+                                        @endforeach
+                                    @endif
+                                @endforeach
+
+                                {{-- Next Page Link --}}
+                                @if ($data->hasMorePages())
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ $data->nextPageUrl() }}" rel="next">Next</a>
+                                    </li>
+                                @else
+                                    <li class="page-item disabled">
+                                        <span class="page-link">Next</span>
+                                    </li>
+                                @endif
+                            </ul>
+                        </nav>
+                    @endif
                 </div>
             </div>
         </div>

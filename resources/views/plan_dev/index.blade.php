@@ -69,17 +69,16 @@ font-weight-bold
 
         <!-- Earnings (Monthly) Card Example -->
         <div class="col-xl-4 col-md-6 animateBox">
-            <a href="{{ route('training-reference') }}" class="clickable-card">
+            <a href="{{ route('certificate') }}" class="clickable-card">
                 <div class="card border-left-info shadow py-2">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="stat-heading mb-1 font-weight-bold">
-                                    Referensi Materi</div>
-                                <div class="h6 mb-0 text-gray-800">{{ $referencesCount }} Materi</div>
+                                <div class="stat-heading mb-1 font-weight-bold">Issued Certificate</div>
+                                <div class="h6 mb-0 text-gray-800">{{ $countIncompleteCert ? $countIncompleteCert . ' Certificates Pending' : $countCert . ' Total Issued' }} </div>
                             </div>
                             <div class="col-auto">
-                                <i class="fa fa-tag fa-2x text-info"></i>
+                                <i class="fa fa-trophy fa-2x text-info"></i>
                             </div>
                         </div>
                     </div>

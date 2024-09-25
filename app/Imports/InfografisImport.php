@@ -59,8 +59,12 @@ class InfografisImport implements ToCollection, SkipsEmptyRows, WithBatchInserts
                         'perusahaan' => $row[18],
                         'kategori_program' => $row[19],
                         'realisasi' => $row[20],
+                        'seafarer_code' => $row[8],
+                        'participant_id' => $row[1]
                     ],
-                    []
+                    [
+                        'isDuplicate' => false
+                    ]
                 );
 
                 if (strpos($row[10], '/') !== false) {

@@ -55,8 +55,8 @@ class PDController extends Controller
         $instructorCount = Instructor::count();
 
         // Get reference data
-        $getData = Training_reference::groupBy('penlat_id')->pluck('penlat_id')->toArray();
-        $referencesCount = Penlat::whereIn('id', $getData)->count();
+        $countIncompleteCert = Penlat_certificate::whereYear('created_at', $yearSelected)->where('status', 'On Process')->count();
+        $countCert = Penlat_certificate::whereYear('created_at', $yearSelected)->count();
 
         // Calculate the average feedback score
         $averageFeedbackScore = DB::table('feedback_mtc')->whereYear('tgl_pelaksanaan', $yearSelected)
@@ -134,7 +134,8 @@ class PDController extends Controller
 
         return view('plan_dev.index', [
             'instructorCount' => $instructorCount,
-            'referencesCount' => $referencesCount,
+            'countIncompleteCert' => $countIncompleteCert,
+            'countCert' => $countCert,
             'instructors' => $instructors,
             'averageFeedbackScore' => $averageFeedbackScore,
             'regulations' => $regulations,
@@ -410,74 +411,77 @@ class PDController extends Controller
 
     public function instructor(Request $request, $penlatId = '-1', $statusId = '-1')
     {
-        // Validate the request inputs
-        $validator = Validator::make($request->all(), [
-            'penlat' => 'sometimes',
-            'status' => 'sometimes',
-            'age' => 'sometimes'
-        ]);
+        $query = Instructor::with('feedbacks')
+            ->withCount('feedbacks');  // Count feedbacks related to the instructor
 
-        // Initialize the query with eager loading of the feedbacks relationship
-        $query = Instructor::with('feedbacks');
+        if ($request->ajax()) {
+            // Apply the Penlat filter
+            if ($request->filled('penlat') && $request->penlat != '-1') {
+                $penlatId = $request->penlat;
+                $certificatesCatalogIds = Certificates_to_penlat::where('penlat_id', $penlatId)
+                    ->pluck('certificates_catalog_id');
+                $instructorIds = Instructor_certificate::whereIn('certificates_catalog_id', $certificatesCatalogIds)
+                    ->pluck('instructor_id');
+                $query->whereIn('id', $instructorIds);
+            }
 
-        // Apply the Pelatihan (Training) filter
-        if ($request->filled('penlat') && $request->penlat != '-1') {
-            $penlatId = $request->penlat;
+            // Apply the Status filter
+            if ($request->filled('status') && $request->status != '-1') {
+                $query->where('status', $request->status);
+            }
 
-            // Search for related certificates
-            $certificatesCatalogIds = Certificates_to_penlat::where('penlat_id', $penlatId)
-                ->pluck('certificates_catalog_id');
+            // Apply the Age filter
+            if ($request->filled('age') && $request->age != '-1') {
+                $ageRange = $request->age;
+                $query->where(function ($q) use ($ageRange) {
+                    switch ($ageRange) {
+                        case '1': $q->whereBetween(DB::raw('TIMESTAMPDIFF(YEAR, instructor_dob, CURDATE())'), [20, 30]); break;
+                        case '2': $q->whereBetween(DB::raw('TIMESTAMPDIFF(YEAR, instructor_dob, CURDATE())'), [30, 40]); break;
+                        case '3': $q->where(DB::raw('TIMESTAMPDIFF(YEAR, instructor_dob, CURDATE())'), '>=', 40); break;
+                    }
+                });
+            }
 
-            // Get instructor IDs related to the certificates
-            $instructorIds = Instructor_certificate::whereIn('certificates_catalog_id', $certificatesCatalogIds)
-                ->pluck('instructor_id');
-
-            // Filter instructors by these IDs
-            $query->whereIn('id', $instructorIds);
+            return DataTables::of($query)
+                // Handle the image with the fallback logic
+                ->addColumn('avatar_img', function ($row) {
+                    return $row->imgFilepath ? asset($row->imgFilepath) : asset('img/default-img.png');
+                })
+                ->addColumn('avatar_url', function ($row) {
+                    return route('preview-instructor', ['id' => $row->id, 'penlatId' => request()->penlatId ?? '-1']);
+                })
+                ->addColumn('age', function ($row) {
+                    return \Carbon\Carbon::parse($row->instructor_dob)->age . ' Tahun';
+                })
+                ->addColumn('working_hours', function ($row) {
+                    return $row->working_hours ? $row->working_hours . ' Jam' : '-';
+                })
+                ->addColumn('rate', function ($row) {
+                    $roundedScore = round($row->average_feedback_score, 1);
+                    return '<span><i class="fa fa-star text-warning"></i> ' . ($roundedScore ?? '-') . '</span>';
+                })
+                ->addColumn('feedbacks_count', function ($row) {
+                    return ($row->feedbacks_count / 5) . ' feedbacks'; // Fix feedback count by dividing by 5
+                })
+                ->addColumn('action', function ($row) use ($penlatId) {
+                    $previewUrl = route('preview-instructor', ['id' => $row->id, 'penlatId' => $penlatId]);
+                    $editUrl = route('edit-instructor', $row->id);
+                    return '
+                        <a class="btn btn-outline-secondary btn-sm mr-2" href="' . $editUrl . '"><i class="fa fa-edit"></i> Update</a>
+                        <a class="btn btn-outline-secondary btn-sm" href="' . $previewUrl . '"><i class="fa fa-info-circle"></i> Preview</a>
+                    ';
+                })
+                ->rawColumns(['rate', 'action'])
+                ->make(true);
         }
 
-        // Apply the Status filter
-        if ($request->filled('status') && $request->status != '-1') {
-            $statusId = $request->status;
-            $query->where('status', $statusId);
-        }
-
-        // Apply the Age filter
-        if ($request->filled('age') && $request->age != '-1') {
-            $ageRange = $request->age;
-            $query->where(function ($q) use ($ageRange) {
-                switch ($ageRange) {
-                    case '1': // 20 - 30 Years
-                        $q->whereBetween(DB::raw('TIMESTAMPDIFF(YEAR, instructor_dob, CURDATE())'), [20, 30]);
-                        break;
-                    case '2': // 30 - 40 Years
-                        $q->whereBetween(DB::raw('TIMESTAMPDIFF(YEAR, instructor_dob, CURDATE())'), [30, 40]);
-                        break;
-                    case '3': // >= 40 Years
-                        $q->where(DB::raw('TIMESTAMPDIFF(YEAR, instructor_dob, CURDATE())'), '>=', 40);
-                        break;
-                }
-            });
-        }
-
-        // Get the filtered data
-        $data = $query->withCount([
-            'feedbacks as average_feedback_score' => function ($query) {
-                $query->select(DB::raw('coalesce(avg(score), 0)'));
-            },
-            'feedbacks' // This will count the number of feedbacks
-        ])->get();
-
-        // Get all Penlat data
         $penlatList = Penlat::all();
 
-        // Pass the data to the view
         return view('plan_dev.submenu.instructor', [
-            'data' => $data,
             'penlatList' => $penlatList,
             'penlatId' => $penlatId,
             'statusId' => $statusId,
-            'umur' => $request->age
+            'umur' => $request->age,
         ]);
     }
 

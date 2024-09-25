@@ -146,10 +146,6 @@ font-weight-bold
             <div class="card-body" style="background-color: rgb(247, 247, 247);">
                 <h6 class="h6 mb-2 font-weight-bold text-gray-800">Overview</h6>
                 <p>The Asset Management menu provides essential sub-menus for viewing and editing assets within the system:</p>
-                <ul class="ml-4">
-                    <li><strong>View Assets</strong>: This menu allows authorized personnel to access a detailed overview of all assets in the system. It includes current stock, asset status, and other relevant information for effective management.</li>
-                    <li><strong>Edit Assets</strong>: This menu enables authorized users to make modifications to asset details, such as stock levels, asset descriptions, and status updates. Ensuring accurate and up-to-date information is crucial for effective asset management.</li>
-                </ul>
                 <h6 class="h6 mb-2 font-weight-bold text-gray-800">Key Points</h6>
                 <ul class="ml-4">
                     <li>Access to both viewing and editing menus is restricted to authorized personnel only to maintain data integrity and security.</li>

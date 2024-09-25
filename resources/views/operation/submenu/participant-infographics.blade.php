@@ -139,6 +139,7 @@ font-weight-bold
                                     <th>Nama Peserta</th>
                                     <th>Nama Program</th>
                                     <th>Tgl Pelaksanaan</th>
+                                    <th>Batch</th>
                                     <th>Tempat Pelaksanaan</th>
                                     <th>Jenis Pelatihan</th>
                                     <th>Keterangan</th>
@@ -158,7 +159,7 @@ font-weight-bold
         </div>
     </div>
 </div>
-<div class="modal fade zoom90" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
+<div class="modal fade" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 1000px;" role="document">
         <div class="modal-content">
 			<div class="modal-header d-flex flex-row align-items-center justify-content-between border-bottom-1">
@@ -171,8 +172,28 @@ font-weight-bold
                 @csrf
                 <div class="modal-body mr-2 ml-2">
                     <input type="hidden" id="editId" name="id">
+                    <div class="d-flex justify-content-end mb-4">
+                        <!-- Small width for Tgl Pelaksanaan in the right top corner -->
+                        <div class="d-flex align-items-center" style="width: 330px;">
+                            <div style="width: 150px;" class="mr-2">
+                                <p style="margin: 0;">Tgl Pelaksanaan:</p>
+                            </div>
+                            <div class="flex-grow-1">
+                                <input type="date" class="form-control underline-input" name="tgl_pelaksanaan" style="width: 150px;" required>
+                            </div>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Person ID:</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="text" class="form-control" name="person_id" required>
+                                </div>
+                            </div>
+
                             <div class="d-flex align-items-center mb-4">
                                 <div style="width: 140px;" class="mr-2">
                                     <p style="margin: 0;">Nama Peserta:</p>
@@ -183,11 +204,16 @@ font-weight-bold
                             </div>
 
                             <div class="d-flex align-items-center mb-4">
-                                <div style="width: 140px;" class="mr-2">
+                                <div style="width: 300px;" class="mr-2">
                                     <p style="margin: 0;">Nama Program:</p>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <input type="text" class="form-control" name="nama_program" required>
+                                    <select id="infografis" class="form-control" name="nama_program">
+                                        <option selected disabled>Select Pelatihan...</option>
+                                        @foreach ($penlatList as $item)
+                                            <option value="{{ $item->id }}">{{ $item->description }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
 
@@ -196,30 +222,29 @@ font-weight-bold
                                     <p style="margin: 0;">Batch:</p>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <input type="text" class="form-control" name="batch" required>
+                                    <select id="mySelect2" class="form-control" name="batch"></select>
                                 </div>
                             </div>
 
                             <div class="d-flex align-items-center mb-4">
                                 <div style="width: 140px;" class="mr-2">
-                                    <p style="margin: 0;">Tgl Pelaksanaan:</p>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <input type="date" class="form-control" name="tgl_pelaksanaan" required>
-                                </div>
-                            </div>
-
-                            <div class="d-flex align-items-center mb-4">
-                                <div style="width: 140px;" class="mr-2">
-                                    <p style="margin: 0;">Tempat Pelaksanaan:</p>
+                                    <p style="margin: 0;">Lokasi:</p>
                                 </div>
                                 <div class="flex-grow-1">
                                     <input type="text" class="form-control" name="tempat_pelaksanaan" required>
                                 </div>
                             </div>
+
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Seafarer Code:</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="text" class="form-control" name="seafarer_code" required>
+                                </div>
+                            </div>
                         </div>
                         <div class="col-md-6">
-
                             <div class="d-flex align-items-center mb-4">
                                 <div style="width: 140px;" class="mr-2">
                                     <p style="margin: 0;">Jenis Pelatihan:</p>
@@ -256,29 +281,23 @@ font-weight-bold
                                 </div>
                             </div>
 
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="d-flex align-items-center mb-4">
-                                        <div style="width: 140px;" class="mr-2">
-                                            <p style="margin: 0;">Kategori Program:</p>
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <input type="text" class="form-control" name="kategori_program" required>
-                                        </div>
-                                    </div>
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Kategori Program:</p>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="d-flex align-items-center mb-4">
-                                        <div style="width: 140px;" class="mr-2">
-                                            <p style="margin: 0;">Realisasi:</p>
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <input type="text" class="form-control" name="realisasi" required>
-                                        </div>
-                                    </div>
+                                <div class="flex-grow-1">
+                                    <input type="text" class="form-control" name="kategori_program" required>
                                 </div>
                             </div>
 
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Realisasi:</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="text" class="form-control" name="realisasi" required>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -303,8 +322,28 @@ font-weight-bold
                 @csrf
                 <div class="modal-body mr-2 ml-2">
                     <input type="hidden" id="editId" name="id">
+                    <div class="d-flex justify-content-end mb-4">
+                        <!-- Small width for Tgl Pelaksanaan in the right top corner -->
+                        <div class="d-flex align-items-center" style="width: 330px;">
+                            <div style="width: 150px;" class="mr-2">
+                                <p style="margin: 0;">Tgl Pelaksanaan:</p>
+                            </div>
+                            <div class="flex-grow-1">
+                                <input type="date" class="form-control underline-input" id="editTglPelaksanaan" name="tgl_pelaksanaan" style="width: 150px;" required>
+                            </div>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Person ID:</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="text" class="form-control" id="editPersonId" name="person_id" required>
+                                </div>
+                            </div>
+
                             <div class="d-flex align-items-center mb-4">
                                 <div style="width: 140px;" class="mr-2">
                                     <p style="margin: 0;">Nama Peserta:</p>
@@ -325,16 +364,16 @@ font-weight-bold
 
                             <div class="d-flex align-items-center mb-4">
                                 <div style="width: 140px;" class="mr-2">
-                                    <p style="margin: 0;">Tgl Pelaksanaan:</p>
+                                    <p style="margin: 0;">Batch:</p>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <input type="date" class="form-control" id="editTglPelaksanaan" name="tgl_pelaksanaan" required>
+                                    <input type="text" class="form-control" id="editBatch" name="batch" required>
                                 </div>
                             </div>
 
                             <div class="d-flex align-items-center mb-4">
                                 <div style="width: 140px;" class="mr-2">
-                                    <p style="margin: 0;">Tempat Pelaksanaan:</p>
+                                    <p style="margin: 0;">Lokasi:</p>
                                 </div>
                                 <div class="flex-grow-1">
                                     <input type="text" class="form-control" id="editTempatPelaksanaan" name="tempat_pelaksanaan" required>
@@ -343,14 +382,23 @@ font-weight-bold
 
                             <div class="d-flex align-items-center mb-4">
                                 <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Seafarer Code:</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="text" class="form-control" id="editSeafarerCode" name="seafarer_code" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
                                     <p style="margin: 0;">Jenis Pelatihan:</p>
                                 </div>
                                 <div class="flex-grow-1">
                                     <input type="text" class="form-control" id="editJenisPelatihan" name="jenis_pelatihan" required>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-6">
+
                             <div class="d-flex align-items-center mb-4">
                                 <div style="width: 140px;" class="mr-2">
                                     <p style="margin: 0;">Keterangan:</p>
@@ -426,6 +474,7 @@ $(document).ready(function() {
             { data: 'nama_peserta', name: 'nama_peserta' },
             { data: 'nama_program', name: 'nama_program' },
             { data: 'tgl_pelaksanaan', name: 'tgl_pelaksanaan' },
+            { data: 'batch', name: 'batch' },
             { data: 'tempat_pelaksanaan', name: 'tempat_pelaksanaan' },
             { data: 'jenis_pelatihan', name: 'jenis_pelatihan' },
             { data: 'keterangan', name: 'keterangan' },
@@ -458,6 +507,9 @@ $(document).ready(function() {
                 $('#editJenisPelatihan').val(data.jenis_pelatihan);
                 $('#editKeterangan').val(data.keterangan);
                 $('#editSubholding').val(data.subholding);
+                $('#editBatch').val(data.batch);
+                $('#editSeafarerCode').val(data.seafarer_code);
+                $('#editPersonId').val(data.participant_id);
                 $('#editPerusahaan').val(data.perusahaan);
                 $('#editKategoriProgram').val(data.kategori_program);
                 $('#editRealisasi').val(data.realisasi);
@@ -527,5 +579,78 @@ $(document).ready(function() {
         });
     });
 });
+
+
+$(document).ready(function() {
+    // Update hidden input on Penlat change
+    $('#infografis').on('change', function() {
+
+        // Reinitialize the batch select dropdown, passing the selected penlat_id
+        initSelect2WithAjax('mySelect2', '{{ route('batches.fetch') }}', 'Select or add a Batch', $(this).val());
+    });
+
+    // Initialize Select2 with AJAX for the batch dropdown (default initialization)
+    initSelect2WithAjax('mySelect2', '{{ route('batches.fetch') }}', 'Select or add a Batch', null);
+});
+
+function initSelect2WithAjax(elementId, ajaxUrl, placeholderText, penlatId = null) {
+    $('#' + elementId).select2({
+        ajax: {
+            url: ajaxUrl,
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    q: params.term, // search term
+                    page: params.page || 1, // pagination
+                    penlat_id: penlatId // pass penlat_id for filtering, if provided
+                };
+            },
+            processResults: function (data, params) {
+                params.page = params.page || 1;
+                return {
+                    results: $.map(data.items, function (item) {
+                        return {
+                            id: item.batch, // Use the 'batch' column for the option value
+                            text: item.batch, // Use the 'batch' column for the option label
+                            filepath: item.filepath, // Include filepath to use for image preview
+                            date: item.date // Include date to prefill the date input
+                        };
+                    }),
+                    pagination: {
+                        more: data.total_count > (params.page * 10) // Check if more results are available
+                    }
+                };
+            },
+            cache: true
+        },
+        placeholder: placeholderText,
+        minimumInputLength: 1, // Start searching after 1 character
+        dropdownParent: $('#inputDataModal'),
+        theme: 'classic',
+        width: '100%',
+        tags: true, // Allow adding new tags
+        createTag: function (params) {
+            var term = $.trim(params.term);
+            if (term === '') {
+                return null;
+            }
+            return {
+                id: term,
+                text: term,
+                newTag: true // Mark as a new tag
+            };
+        },
+        templateResult: function (data) {
+            if (data.newTag) {
+                return $('<span><em>Add new: "' + data.text + '"</em></span>');
+            }
+            return data.text;
+        },
+        templateSelection: function (data) {
+            return data.text;
+        }
+    });
+}
 </script>
 @endsection

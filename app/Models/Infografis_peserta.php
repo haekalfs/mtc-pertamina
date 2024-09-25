@@ -27,7 +27,10 @@ class Infografis_peserta extends Model
         'subholding',
         'perusahaan',
         'kategori_program',
-        'realisasi'
+        'realisasi',
+        'isDuplicate',
+        'participant_id',
+        'seafarer_code'
     ];
 
     public function certificate(){

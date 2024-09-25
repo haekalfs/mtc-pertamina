@@ -88,6 +88,12 @@ class OperationController extends Controller
             ->orderBy('tgl_pelaksanaan', 'desc')
             ->first();
 
+        // Assuming $latestMonth is an object that contains 'tgl_pelaksanaan'
+        $getDate = Carbon::parse($latestMonth->tgl_pelaksanaan);
+
+        // Get the full month name
+        $monthName = $getDate->format('F');
+
         $countNonSTCWGauge = 0;
         $countSTCWGauge = 0;
         if ($latestMonth) {
@@ -175,7 +181,8 @@ class OperationController extends Controller
             'requiredMaintenanceCount',
             'data', 'year',
             'countSTCWGauge', 'countNonSTCWGauge', 'stcwDelta', 'nonStcwDelta',
-            'quarterlyData'
+            'quarterlyData',
+            'monthName'
         ));
     }
 
@@ -241,22 +248,38 @@ class OperationController extends Controller
         }
 
         // Prepare data points for the pie chart
-        $dataPointsPie = [];
+        $dataPointsBar = [];
         foreach ($data as $row) {
-            $dataPointsPie[] = [
+            $dataPointsBar[] = [
                 "label" => $row->nama_program,
                 "symbol" => substr($row->nama_program, 0, 2),
                 "y" => $row->total
             ];
         }
 
+        // Fetch total number of participants for each year, starting 7 years ago
+        $dataYearly = Infografis_peserta::select(DB::raw('YEAR(tgl_pelaksanaan) as year'), DB::raw('count(*) as total'))
+            ->whereYear('tgl_pelaksanaan', '>=', $year - 7)
+            ->groupBy(DB::raw('YEAR(tgl_pelaksanaan)'))
+            ->orderBy('year', 'asc')
+            ->get();
+
+        // Prepare the data for the chart
+        $dataPointsColumn = [];
+        foreach ($dataYearly as $row) {
+            $dataPointsColumn[] = [
+                "label" => $row->year,
+                "y" => $row->total
+            ];
+        }
         // Return the data points in a JSON response
         return response()->json([
             'dataPointsSpline1' => $dataPointsSpline1,
             'dataPointsSpline2' => $dataPointsSpline2,
-            'pieDataPoints' => $dataPointsPie,
+            'barDataPoints' => $dataPointsBar,
             'countSTCW' => $countSTCW,
-            'countNonSTCW' => $countNonSTCW
+            'countNonSTCW' => $countNonSTCW,
+            'columnDataPoints' => $dataPointsColumn // New column chart data
         ]);
     }
 
@@ -316,12 +339,16 @@ class OperationController extends Controller
         $listJenisPenlat = $filter->unique('jenis_pelatihan');
         $listTw = $filter->unique('realisasi');
 
+        $batches = Penlat_batch::all();
+        $penlatList = Penlat::all();
+
         return view('operation.submenu.participant-infographics', [
             'yearsBefore' => $yearsBefore,
             'listPenlat' => $listPenlat,
             'listStcw' => $listStcw,
             'listJenisPenlat' => $listJenisPenlat,
             'listTw' => $listTw,
+            'penlatList' => $penlatList,
             'selectedArray' => $selectedArray
         ]);
     }
@@ -335,10 +362,12 @@ class OperationController extends Controller
     {
         // Validate the incoming request data
         $validatedData = $request->validate([
+            'person_id' => 'required|string|max:255',
             'nama_peserta' => 'required|string|max:255',
             'nama_program' => 'required|string|max:255',
             'batch' => 'required|string|max:145',
             'tgl_pelaksanaan' => 'required|date',
+            'seafarer_code' => 'required|string|max:255',
             'tempat_pelaksanaan' => 'required|string|max:255',
             'jenis_pelatihan' => 'required|string|max:255',
             'keterangan' => 'required|string|max:255',
@@ -350,10 +379,12 @@ class OperationController extends Controller
 
         // Create a new infografis_peserta record
         $infografisPeserta = new Infografis_peserta();
+        $infografisPeserta->participant_id = $request->input('person_id');
         $infografisPeserta->nama_peserta = $request->input('nama_peserta');
         $infografisPeserta->nama_program = $request->input('nama_program');
         $infografisPeserta->batch = $request->input('batch');
         $infografisPeserta->tgl_pelaksanaan = $request->input('tgl_pelaksanaan');
+        $infografisPeserta->seafarer_code = $request->input('seafarer_code');
         $infografisPeserta->tempat_pelaksanaan = $request->input('tempat_pelaksanaan');
         $infografisPeserta->jenis_pelatihan = $request->input('jenis_pelatihan');
         $infografisPeserta->keterangan = $request->input('keterangan');
@@ -376,9 +407,9 @@ class OperationController extends Controller
                 Receivables_participant_certificate::updateOrCreate(
                     [
                         'infografis_peserta_id' => $infografisPeserta->id,
-                        'penlat_certificate_id' => $penlatCert->id,
                     ],
                     [
+                        'penlat_certificate_id' => $penlatCert->id,
                         'updated_at' => now(),
                     ]
                 );
@@ -399,12 +430,14 @@ class OperationController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
+            'person_id' => 'required|string|max:255',
             'nama_peserta' => 'required|string|max:255',
             'nama_program' => 'required|string|max:255',
             'tgl_pelaksanaan' => 'required|date',
             'tempat_pelaksanaan' => 'required|string|max:255',
             'jenis_pelatihan' => 'required|string|max:255',
             'keterangan' => 'required|string|max:255',
+            'seafarer_code' => 'required|string|max:255',
             'subholding' => 'required|string|max:255',
             'perusahaan' => 'required|string|max:255',
             'kategori_program' => 'required|string|max:255',
@@ -413,17 +446,40 @@ class OperationController extends Controller
 
         $participant = Infografis_peserta::find($id);
         if ($participant) {
+            $participant->participant_id = $request->input('person_id');
             $participant->nama_peserta = $request->input('nama_peserta');
             $participant->nama_program = $request->input('nama_program');
             $participant->tgl_pelaksanaan = $request->input('tgl_pelaksanaan');
             $participant->tempat_pelaksanaan = $request->input('tempat_pelaksanaan');
             $participant->jenis_pelatihan = $request->input('jenis_pelatihan');
+            $participant->batch = $request->input('batch');
+            $participant->seafarer_code = $request->input('seafarer_code');
             $participant->keterangan = $request->input('keterangan');
             $participant->subholding = $request->input('subholding');
             $participant->perusahaan = $request->input('perusahaan');
             $participant->kategori_program = $request->input('kategori_program');
             $participant->realisasi = $request->input('realisasi'); // Update this field as per your schema
             $participant->save();
+
+            $findBatch = Penlat_batch::where('batch', $request->input('batch'))->first();
+
+            if($findBatch){
+                // Find the corresponding Penlat_certificate record
+                $penlatCert = Penlat_certificate::where('penlat_batch_id', $findBatch->id)->first();
+
+                if ($penlatCert) {
+                    // Update or create the Receivables_participant_certificate record
+                    Receivables_participant_certificate::updateOrCreate(
+                        [
+                            'infografis_peserta_id' => $participant->id,
+                        ],
+                        [
+                            'penlat_certificate_id' => $penlatCert->id,
+                            'updated_at' => now(),
+                        ]
+                    );
+                }
+            }
 
             return response()->json($participant);
         } else {

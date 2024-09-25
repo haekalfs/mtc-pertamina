@@ -257,13 +257,13 @@ font-weight-bold
                 <div class="modal-body">
                     <div class="col-md-12 zoom90">
                         <div class="d-flex align-items-center mb-4">
-                            <div style="width: 140px;" class="mr-2">
+                            <div style="width: 200px;" class="mr-2">
                                 <p style="margin: 0;">Update Hours :</p>
                             </div>
                             <div class="flex-grow-1 ml-4">
                                 <div class="counter">
                                     <span class="down" onclick='decreaseCount(event, this)'><i class="fa fa-minus text-danger"></i></span>
-                                    <input class="form-control" name="working_hours" type="text" value="{{ $data->working_hours }}">
+                                    <input class="form-control" name="working_hours" type="text" value="{{ $data->working_hours }}" min="0" style="border: 1px solid rgb(217, 217, 217); width: 1200px;">
                                     <span class="up" onclick='increaseCount(event, this)'><i class="fa fa-plus text-success"></i></span>
                                 </div>
                             </div>

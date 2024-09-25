@@ -86,61 +86,49 @@ font-weight-bold
                     </div>
                 </div>
                 <div class="card-body">
-                    <form method="GET" action="{{ route('instructor') }}">
-                        @csrf
-                        <div class="row d-flex justify-content-start mb-1 p-1">
-                            <div class="col-md-12">
-                                <div class="row align-items-center">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="email">Nama Pelatihan :</label>
-                                            <select id="penlatSelect" class="form-control" name="penlat">
-                                                <option value="-1" {{ $penlatId == '-1' ? 'selected' : '' }}>Show All</option>
-                                                @foreach ($penlatList as $item)
-                                                    <option value="{{ $item->id }}" {{ $item->id == $penlatId ? 'selected' : '' }}>
-                                                        {{ $item->description }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
+                    <div class="row d-flex justify-content-start mb-1 p-1">
+                        <div class="col-md-12">
+                            <div class="row align-items-center">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="email">Nama Pelatihan :</label>
+                                        <select id="penlatSelect" class="form-control" name="penlat">
+                                            <option value="-1" {{ $penlatId == '-1' ? 'selected' : '' }}>Show All</option>
+                                            @foreach ($penlatList as $item)
+                                                <option value="{{ $item->id }}" {{ $item->id == $penlatId ? 'selected' : '' }}>
+                                                    {{ $item->description }}
+                                                </option>
+                                            @endforeach
+                                        </select>
                                     </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="email">Status :</label>
-                                            <select class="form-control" name="status">
-                                                <option value="-1" {{ $statusId == '-1' ? 'selected' : '' }}>Show All</option>
-                                                <option value="1" {{ $statusId == '1' ? 'selected' : '' }}>Active</option>
-                                                <option value="0" {{ $statusId == '0' ? 'selected' : '' }}>Non Active</option>
-                                            </select>
-                                        </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="email">Status :</label>
+                                        <select class="form-control" name="status">
+                                            <option value="-1" {{ $statusId == '-1' ? 'selected' : '' }}>Show All</option>
+                                            <option value="1" {{ $statusId == '1' ? 'selected' : '' }}>Active</option>
+                                            <option value="0" {{ $statusId == '0' ? 'selected' : '' }}>Non Active</option>
+                                        </select>
                                     </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label for="email">Umur :</label>
-                                            <select class="form-control" name="age">
-                                                <option value="-1" {{ $umur == '-1' ? 'selected' : '' }}>Show All</option>
-                                                <option value="1" {{ $umur == '1' ? 'selected' : '' }}>20 - 30 Tahun</option>
-                                                <option value="2" {{ $umur == '2' ? 'selected' : '' }}>30 - 40 Tahun</option>
-                                                <option value="3" {{ $umur == '3' ? 'selected' : '' }}>>= 40</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-1 d-flex align-self-end justify-content-start mb-1">
-                                        <div class="form-group">
-                                            <div class="align-self-center">
-                                                <button type="submit" class="btn btn-primary" style="padding-left: 1.2em; padding-right: 1.2em;">
-                                                    <i class="ti-search"></i>
-                                                </button>
-                                            </div>
-                                        </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="email">Umur :</label>
+                                        <select class="form-control" name="age">
+                                            <option value="-1" {{ $umur == '-1' ? 'selected' : '' }}>Show All</option>
+                                            <option value="1" {{ $umur == '1' ? 'selected' : '' }}>20 - 30 Tahun</option>
+                                            <option value="2" {{ $umur == '2' ? 'selected' : '' }}>30 - 40 Tahun</option>
+                                            <option value="3" {{ $umur == '3' ? 'selected' : '' }}>>= 40</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </form>
+                    </div>
                     <div class="table-responsive">
-                        <table id="docLetter" class="table table-striped mt-4" style="border: 1px solid rgb(229, 229, 229);">
-                            <thead class="text-dark" style="background-color: #ced4da;">
+                        <table id="listInstructors" class="table table-striped mt-4" style="border: 1px solid rgb(229, 229, 229);">
+                            <thead class="text-secondary" style="background-color: #ecedee;">
                                 <tr>
                                     <th>Avatar</th>
                                     <th>Name</th>
@@ -152,108 +140,7 @@ font-weight-bold
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                @foreach($data as $item)
-                                <tr>
-                                    <td class="text-center">
-                                        <div class="round-img">
-                                            <a href="{{ route('preview-instructor', ['id' => $item->id, 'penlatId' => $penlatId]) }}"><img class="rounded-circle" src="{{ $item->imgFilepath ? asset($item->imgFilepath) : asset('img/default-img.png') }}" style="height: 70px; width: 70px; border: 1px solid rgb(202, 202, 202);" alt=""></a>
-                                        </div>
-                                    </td>
-                                    <td>{{ $item->instructor_name }}</td>
-                                    <td class="text-center">{{ \Carbon\Carbon::parse($item->instructor_dob)->age }} Tahun</td>
-                                    <td class="text-center">{{ $item->instructor_gender }}</td>
-                                    <td class="text-center">{{ $item->working_hours ? $item->working_hours : 0 }} Jam</td>
-                                    <td class="text-center">
-                                        @php
-                                            $roundedScore = round($item->average_feedback_score, 1); // Round to one decimal place
-                                            $wholeStars = floor($roundedScore);
-                                            $halfStar = ($roundedScore - $wholeStars) >= 0.5;
-                                        @endphp
-                                        <span>
-                                            <i class="fa fa-star text-warning"></i>
-                                            {{ $roundedScore ?? '-' }}
-                                        </span>
-                                    </td>
-                                    <td class="text-center">
-                                        {{ $item->feedbacks_count / 5 }} feedbacks
-                                    </td>
-                                    <td class="actions text-center">
-                                        <a class="btn btn-outline-secondary btn-sm mr-2 zoom90" href="{{ route('edit-instructor', $item->id) }}"><i class="fa fa-edit"></i> Update</a>
-                                        <a class="btn btn-outline-secondary btn-sm zoom90" href="{{ route('preview-instructor', ['id' => $item->id, 'penlatId' => $penlatId]) }}"><i class="fa fa-info-circle"></i> Preview</a>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
                         </table>
-                        {{-- <table id="dataTable" class="table table-bordered mt-4 zoom90">
-                            <thead class="thead-light">
-                                <tr>
-                                    <th>Instructors</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($data as $item)
-                                <tr>
-                                    <td data-th="Product">
-                                        <div class="row">
-                                            <div class="col-md-3 d-flex justify-content-center align-items-center text-center">
-                                                <a href="{{ route('preview-instructor', ['id' => $item->id, 'penlatId' => $penlatId]) }}">
-                                                    <img src="{{ $item->imgFilepath ? asset($item->imgFilepath) : asset('img/default-img.png') }}" style="height: 150px; width: 120px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow animateBox">
-                                                </a>
-                                            </div>
-                                            <div class="col-md-9 text-left mt-sm-2">
-                                                <h5 class="card-title font-weight-bold">{{ $item->instructor_name }}</h5>
-                                                <div class="ml-2">
-                                                    <table class="table table-borderless table-sm">
-                                                        <tr>
-                                                            <td style="width: 180px;"><i class="fa fa-caret-right mr-2"></i> Email</td>
-                                                            <td style="text-align: start;">: {{ $item->instructor_email }}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td><i class="fa fa-caret-right mr-2"></i> Umur</td>
-                                                            <td style="text-align: start;">: {{ \Carbon\Carbon::parse($item->instructor_dob)->age }} Tahun</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td><i class="fa fa-caret-right mr-2"></i> Jam Mengajar</td>
-                                                            <td style="text-align: start;">: {{ $item->working_hours }} Jam</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td style="width: 180px;"><i class="fa fa-caret-right mr-2"></i> Avg Nilai Feedback</td>
-                                                            <td style="text-align: start;">:
-                                                                @php
-                                                                    $roundedScore = round($item->average_feedback_score, 1); // Round to one decimal place
-                                                                    $wholeStars = floor($roundedScore);
-                                                                    $halfStar = ($roundedScore - $wholeStars) >= 0.5;
-                                                                @endphp
-
-                                                                @for ($i = 0; $i < 5; $i++)
-                                                                    @if ($i < $wholeStars)
-                                                                        <i class="fa fa-star text-warning"></i>
-                                                                    @elseif ($halfStar && $i == $wholeStars)
-                                                                        <i class="fa fa-star-half-o text-warning"></i>
-                                                                    @else
-                                                                        <i class="fa fa-star-o text-warning"></i>
-                                                                    @endif
-                                                                @endfor
-                                                                {{ $roundedScore ?? '-' }}
-                                                                <small>({{ $item->feedbacks_count / 5 }} feedbacks)</small>
-                                                            </td>
-                                                        </tr>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="actions text-center">
-                                        <a class="btn btn-outline-secondary btn-sm mr-2" href="{{ route('edit-instructor', $item->id) }}"><i class="fa fa-edit"></i> Update</a>
-                                        <a class="btn btn-outline-secondary btn-sm" href="{{ route('preview-instructor', ['id' => $item->id, 'penlatId' => $penlatId]) }}"><i class="fa fa-info-circle"></i> Preview</a>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table> --}}
                     </div>
                 </div>
             </div>
@@ -267,6 +154,62 @@ $(document).ready(function() {
         width: '100%',
         height: '100%',
         allowClear: true,
+    });
+});
+$(document).ready(function() {
+    $('#listInstructors').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: "{{ route('instructor') }}",
+            data: function (d) {
+                d.penlat = $('#penlatSelect').val();
+                d.status = $('select[name="status"]').val();
+                d.age = $('select[name="age"]').val();
+            }
+        },
+        columns: [
+            {
+                data: 'avatar_img',
+                name: 'avatar_img',
+                orderable: false,
+                searchable: false,
+                render: function (data, type, full) {
+                    return '<div class="round-img"><a href="' + full.avatar_url + '"><img class="rounded-circle" src="' + data + '" style="height: 70px; width: 70px; border: 1px solid rgb(202, 202, 202);"></a></div>';
+                }
+            },
+            { data: 'instructor_name', name: 'instructor_name' },
+            { data: 'age', name: 'age' },
+            { data: 'instructor_gender', name: 'instructor_gender' },
+            { data: 'working_hours', name: 'working_hours' },
+            {
+                data: 'rate',
+                name: 'rate',
+                orderable: false,
+                searchable: false,
+                render: function (data, type, full) {
+                    return data;
+                }
+            },
+            {
+                data: 'feedbacks_count',
+                name: 'feedbacks_count',
+                render: function (data, type, full) {
+                    return data;
+                }
+            },
+            {
+                data: 'action',
+                name: 'action',
+                orderable: false,
+                searchable: false
+            }
+        ]
+    });
+
+    // Reload table when filter is changed
+    $('#penlatSelect, select[name="status"], select[name="age"]').change(function () {
+        $('#listInstructors').DataTable().draw();
     });
 });
 </script>

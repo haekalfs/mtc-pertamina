@@ -141,13 +141,13 @@ font-weight-bold
                                             </div>
                                         </td>
                                         <td style="width:10%">
-                                            <input type="number" class="form-control form-control-md underline-input qty-input" name="qty_{{ $tool->id }}" value="{{ $tool->amount }}">
+                                            <input type="text" class="form-control form-control-md underline-input qty-input" name="qty_{{ $tool->id }}" value="{{ $tool->amount }}">
                                         </td>
                                         <td style="width:20%">
-                                            <input type="text" class="form-control form-control-md underline-input price-input" name="price_{{ $tool->id }}" value="{{ $tool->price ? 'IDR ' . number_format($tool->price, 0, ',', '.') : '-' }}">
+                                            <input type="text" class="form-control form-control-md underline-input price-input" name="price_{{ $tool->id }}" value="{{ $tool->price ? number_format($tool->price, 0, ',', '.') : '-' }}">
                                         </td>
                                         <td style="width:20%">
-                                            <input type="text" class="form-control form-control-md underline-input total-input" name="total_{{ $tool->id }}" value="{{ $tool->total ? 'IDR ' . number_format($tool->total, 0, ',', '.') : '-' }}">
+                                            <input type="text" class="form-control form-control-md underline-input total-input" name="total_{{ $tool->id }}" value="{{ $tool->total ? number_format($tool->total, 0, ',', '.') : '-' }}">
                                         </td>
                                         <td class="actions text-center">
                                             <button class="btn btn-white btn-md border-secondary bg-white mr-2 update-utility" data-id="{{ $tool->id }}">
@@ -409,9 +409,24 @@ $(document).on('click', '.btn-outline-danger-usage', function() {
 });
 
 document.querySelectorAll('.price-input, .qty-input').forEach(function(input) {
+    // Listen to input for recalculating the total
     input.addEventListener('input', function() {
         calculateTotalForRow(this);
     });
+
+    // Auto format the price while typing
+    if (input.classList.contains('price-input')) {
+        input.addEventListener('input', function() {
+            formatPriceWhileTyping(this);
+        });
+    }
+
+    // Restrict qty-input to only allow numbers (no commas or decimals)
+    if (input.classList.contains('qty-input')) {
+        input.addEventListener('input', function() {
+            formatQtyWhileTyping(this);
+        });
+    }
 });
 
 function calculateTotalForRow(element) {
@@ -420,36 +435,57 @@ function calculateTotalForRow(element) {
     const qtyInput = row.querySelector('.qty-input');
     const totalInput = row.querySelector('.total-input');
 
-    // Format the price as Rupiah
-    let priceValue = priceInput.value.replace(/[^0-9]/g, '');
-    priceValue = priceValue ? parseFloat(priceValue) : 0;
-    priceInput.value = formatRupiah(priceValue, 'IDR ');
+    // Get raw price value (strip non-numeric characters except for commas and dots)
+    let priceValue = priceInput.value.replace(/[^0-9.,]/g, '');
+
+    // Replace commas with dots for decimals, and remove any thousands separators
+    priceValue = priceValue.replace(/\./g, '').replace(',', '.');
+
+    // Convert to float for calculation
+    priceValue = parseFloat(priceValue) || 0;
 
     const qty = parseFloat(qtyInput.value) || 0;
 
     // Calculate total
-    const total = priceValue * qty;
+    const total = Math.floor(priceValue * qty); // Remove decimals for total
 
-    // Format total as Rupiah
-    totalInput.value = formatRupiah(total, 'IDR ');
+    // Set the total value formatted as Rupiah
+    totalInput.value = formatRupiah(total);
 }
 
-function formatRupiah(number, prefix) {
-    var number_string = number.toString().replace(/[^,\d]/g, ''),
-        split = number_string.split(','),
-        remainder = split[0].length % 3,
-        rupiah = split[0].substr(0, remainder),
-        thousands = split[0].substr(remainder).match(/\d{3}/gi);
+function formatPriceWhileTyping(input) {
+    let cursorPosition = input.selectionStart; // Save the cursor position
+    let priceValue = input.value.replace(/[^0-9]/g, ''); // Only allow numbers
+
+    // Convert the string back to an integer for formatting
+    let intValue = parseInt(priceValue) || 0;
+
+    // Format the price as Rupiah with no decimals
+    input.value = formatRupiah(intValue);
+}
+
+function formatQtyWhileTyping(input) {
+    // Restrict the input to only allow numbers (no commas or decimals)
+    let qtyValue = input.value.replace(/[^0-9.]/g, ''); // Only allow numbers
+
+    // Set the cleaned qty value back to the input
+    input.value = qtyValue;
+}
+
+function formatRupiah(number) {
+    // Convert the number to a string and format with thousands separator
+    var number_string = number.toString(),
+        remainder = number_string.length % 3,
+        rupiah = number_string.substr(0, remainder),
+        thousands = number_string.substr(remainder).match(/\d{3}/gi);
 
     if (thousands) {
         var separator = remainder ? '.' : '';
         rupiah += separator + thousands.join('.');
     }
 
-    rupiah = split[1] !== undefined ? rupiah + ',' + split[1] : rupiah;
-    return prefix === undefined ? rupiah : (rupiah ? prefix + rupiah : '');
+    return rupiah === undefined ? rupiah : (rupiah ? rupiah : '');
 }
-
 </script>
 @endsection
 

@@ -119,6 +119,8 @@ font-weight-bold
             <div class="row">
                 <div class="col-lg-12">
                     <div class="card">
+                        <h4 class="pt-3 pb-0 pl-3">{{ $monthName ? $monthName : '-' }} - {{ $yearSelected }}</h4>
+                        <hr>
                         <div class="row mt-2">
                             <div class="col-lg-6">
                                 <div class="d-flex justify-content-center align-items-center">
@@ -209,73 +211,83 @@ font-weight-bold
         </div>
         <div class="col-lg-5">
             <div class="card">
+                <h4 class="pt-3 pb-0 pl-3">Monthly Realization</h4>
+                <hr>
+                <div class="card-body pt-0 d-flex justify-content-center align-items-center">
+                    <table class="table table-bordered table-striped zoom90">
+                        <thead>
+                            <tr>
+                                <th>Bulan</th>
+                                <th>Peserta Eksternal</th>
+                                <th>Peserta Internal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($data as $index => $row)
+                                <tr>
+                                    <td>{{ $row['month'] }}</td>
+
+                                    <!-- External Participants Count and Percentage Calculation -->
+                                    <td>
+                                        {{ $row['external_count'] }}
+                                        @if($index > 0)
+                                            @php
+                                                // Calculate the difference between the current and previous month
+                                                $previousExternalCount = $data[$index - 1]['external_count'];
+                                                $percentageChange = 0;
+                                                if($previousExternalCount > 0) {
+                                                    $percentageChange = (($row['external_count'] - $previousExternalCount) / $previousExternalCount) * 100;
+                                                }
+                                            @endphp
+
+                                            <!-- Display the percentage change -->
+                                            @if($percentageChange > 0)
+                                                <small class="badge bg-success text-white" style="font-size: 10px;">(+{{ number_format($percentageChange, 2) }}%)</small>
+                                            @elseif($percentageChange < 0)
+                                                <small class="badge bg-danger text-white" style="font-size: 10px;">({{ number_format($percentageChange, 2) }}%)</small>
+                                            @else
+                                                <small class="badge bg-secondary text-white" style="font-size: 10px;">(0%)</small>
+                                            @endif
+                                        @endif
+                                    </td>
+
+                                    <!-- Internal Participants Count -->
+                                    <td>
+                                        {{ $row['internal_count'] }}
+                                        @if($index > 0)
+                                            @php
+                                                // Calculate the percentage change for internal participants
+                                                $previousInternalCount = $data[$index - 1]['internal_count'];
+                                                $internalPercentageChange = 0;
+                                                if($previousInternalCount > 0) {
+                                                    $internalPercentageChange = (($row['internal_count'] - $previousInternalCount) / $previousInternalCount) * 100;
+                                                }
+                                            @endphp
+
+                                            <!-- Display the percentage change for internal participants -->
+                                            @if($internalPercentageChange > 0)
+                                                <small class="badge bg-success text-white" style="font-size: 10px;">(+{{ number_format($internalPercentageChange, 2) }}%)</small>
+                                            @elseif($internalPercentageChange < 0)
+                                                <small class="badge bg-danger text-white" style="font-size: 10px;">({{ number_format($internalPercentageChange, 2) }}%)</small>
+                                            @else
+                                                <small class="badge bg-secondary text-white" style="font-size: 10px;">(0%)</small>
+                                            @endif
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-12">
+            <div class="card">
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="card-body d-flex justify-content-center align-items-center">
-                            <table class="table table-bordered table-striped zoom90">
-                                <thead>
-                                    <tr>
-                                        <th>Bulan</th>
-                                        <th>Peserta Eksternal</th>
-                                        <th>Peserta Internal</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($data as $index => $row)
-                                        <tr>
-                                            <td>{{ $row['month'] }}</td>
-
-                                            <!-- External Participants Count and Percentage Calculation -->
-                                            <td>
-                                                {{ $row['external_count'] }}
-                                                @if($index > 0)
-                                                    @php
-                                                        // Calculate the difference between the current and previous month
-                                                        $previousExternalCount = $data[$index - 1]['external_count'];
-                                                        $percentageChange = 0;
-                                                        if($previousExternalCount > 0) {
-                                                            $percentageChange = (($row['external_count'] - $previousExternalCount) / $previousExternalCount) * 100;
-                                                        }
-                                                    @endphp
-
-                                                    <!-- Display the percentage change -->
-                                                    @if($percentageChange > 0)
-                                                        <small class="badge bg-success text-white" style="font-size: 10px;">(+{{ number_format($percentageChange, 2) }}%)</small>
-                                                    @elseif($percentageChange < 0)
-                                                        <small class="badge bg-danger text-white" style="font-size: 10px;">({{ number_format($percentageChange, 2) }}%)</small>
-                                                    @else
-                                                        <small class="badge bg-secondary text-white" style="font-size: 10px;">(0%)</small>
-                                                    @endif
-                                                @endif
-                                            </td>
-
-                                            <!-- Internal Participants Count -->
-                                            <td>
-                                                {{ $row['internal_count'] }}
-                                                @if($index > 0)
-                                                    @php
-                                                        // Calculate the percentage change for internal participants
-                                                        $previousInternalCount = $data[$index - 1]['internal_count'];
-                                                        $internalPercentageChange = 0;
-                                                        if($previousInternalCount > 0) {
-                                                            $internalPercentageChange = (($row['internal_count'] - $previousInternalCount) / $previousInternalCount) * 100;
-                                                        }
-                                                    @endphp
-
-                                                    <!-- Display the percentage change for internal participants -->
-                                                    @if($internalPercentageChange > 0)
-                                                        <small class="badge bg-success text-white" style="font-size: 10px;">(+{{ number_format($internalPercentageChange, 2) }}%)</small>
-                                                    @elseif($internalPercentageChange < 0)
-                                                        <small class="badge bg-danger text-white" style="font-size: 10px;">({{ number_format($internalPercentageChange, 2) }}%)</small>
-                                                    @else
-                                                        <small class="badge bg-secondary text-white" style="font-size: 10px;">(0%)</small>
-                                                    @endif
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                            <!-- <canvas id="TrafficChart"></canvas>   -->
+                            <div id="chartContainerBar" style="height: 400px; width: 100%;"></div>
                         </div>
                     </div>
                 </div> <!-- /.row -->
@@ -286,11 +298,10 @@ font-weight-bold
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="card-body d-flex justify-content-center align-items-center">
-                            <!-- <canvas id="TrafficChart"></canvas>   -->
-                            <div id="chartContainerPie" style="height: 400px; width: 100%;"></div>
+                            <div id="chartContainerColumn" style="height: 400px; width: 100%;"></div>
                         </div>
                     </div>
-                </div> <!-- /.row -->
+                </div>
             </div>
         </div>
     </div>
@@ -453,7 +464,7 @@ window.onload = function() {
                 }
             });
 
-            var pieChart = new CanvasJS.Chart("chartContainerPie", {
+            var pieChart = new CanvasJS.Chart("chartContainerBar", {
                 theme: "light2",
                 animationEnabled: true,
                 title: { text: "Top Penlat Based on Jumlah Peserta", margin: 20 },
@@ -461,10 +472,32 @@ window.onload = function() {
                     type: "bar",
                     indexLabel: "{symbol} - {y}",
                     yValueFormatString: "#,##0\" Peserta\"",
-                    dataPoints: data.pieDataPoints
+                    dataPoints: data.barDataPoints
                 }]
             });
             pieChart.render();
+
+             // Column chart (New)
+            var columnChart = new CanvasJS.Chart("chartContainerColumn", {
+                theme: "light2",
+                animationEnabled: true,
+                title: {
+                    text: "7 Years Prior of Total Participants",
+                    margin: 20
+                },
+                axisY: {
+                    title: "Jumlah Peserta",
+                    labelFormatter: function(e) {
+                        return CanvasJS.formatNumber(e.value, "#,##0");
+                    }
+                },
+                data: [{
+                    type: "column",
+                    yValueFormatString: "#,##0\" Peserta\"",
+                    dataPoints: data.columnDataPoints
+                }]
+            });
+            columnChart.render();
             document.getElementById("CountSTCW").innerText = `STCW: ${data.countSTCW} Peserta`;
             document.getElementById("CountNonSTCW").innerText = `Non-STCW: ${data.countNonSTCW} Peserta`;
         });

@@ -369,6 +369,10 @@ font-weight-bold
                         <div class="ml-2">
                             <table class="table table-borderless table-sm">
                                 <tr>
+                                    <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Total Peserta</td>
+                                    <td style="text-align: start;">: &nbsp; <span id="total_peserta">-</span> Peserta</td>
+                                </tr>
+                                <tr>
                                     <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Biaya Instruktur</td>
                                     <td style="text-align: start;">: &nbsp; <span id="total_biaya_instruktur">-</span></td>
                                 </tr>
@@ -403,10 +407,6 @@ font-weight-bold
                                 <tr>
                                     <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Penggunaan Alat</td>
                                     <td style="text-align: start;">: &nbsp; <span id="total_penggunaan_alat">-</span></td>
-                                </tr>
-                                <tr>
-                                    <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Total Peserta</td>
-                                    <td style="text-align: start;">: &nbsp; <span id="total_peserta">-</span> Peserta</td>
                                 </tr>
                             </table>
                         </div>

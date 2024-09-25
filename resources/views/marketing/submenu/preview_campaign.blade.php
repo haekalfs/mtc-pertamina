@@ -58,11 +58,12 @@ font-weight-bold
                 <a href="#" data-id="{{ $data->id }}" class="position-absolute edit-campaign" style="top: 1px; right: 15px; z-index: 1;">
                     <i class="fa fa-edit fa-lg ml-2" style="color: rgb(181, 181, 181);"></i>
                 </a>
-                <h1>{{ $data->campaign_name }}</h1>
+                <h1 class="mb-1">{{ $data->campaign_name }}</h1>
+                <div class="text-muted small mb-2">{{ $data->jenis->description }}</div>
                 <div class="d-flex justify-content-between align-items-start" style="font-weight: 500;">
                     <!-- Jenis Kegiatan -->
                     <div class="me-4">
-                        <strong>Jenis Kegiatan</strong>: {{ $data->jenis->description }}
+                        <strong>Person in Charge</strong>: {{ $data->user->name }}
                     </div>
 
                     <!-- Tanggal Pelaksanaan -->
@@ -82,11 +83,6 @@ font-weight-bold
                         <!-- Informasi Kegiatan -->
                         <div>
                             <strong>Informasi Kegiatan</strong>: {{ $data->campaign_details }}
-                        </div>
-
-                        <!-- Person in Charge -->
-                        <div>
-                            <strong>Person in Charge</strong>: {{ $data->user->name }}
                         </div>
                     </div>
 
