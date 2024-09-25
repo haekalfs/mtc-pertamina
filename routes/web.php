@@ -111,7 +111,7 @@ Route::middleware('checkForErrors', 'suspiciousActivity', 'suspicious', 'auth')-
             Route::post('/akhlak-store', [AkhlakController::class, 'store'])->name('akhlak.store');
             Route::get('/akhlak/edit/{id}', [AkhlakController::class, 'edit'])->name('akhlak.edit');
             Route::put('/akhlak/update/{id}', [AkhlakController::class, 'update'])->name('akhlak.update');
-            Route::delete('/akhlak/{id}', [AkhlakController::class, 'destroy'])->name('akhlak.destroy');
+            Route::delete('/akhlak-destroy/{id}', [AkhlakController::class, 'destroy'])->name('akhlak.destroy');
             Route::post('/akhlak/downloadPdf', [AkhlakController::class, 'downloadPdf'])->name('akhlak.downloadPdf');
 
             Route::get('/akhlak/morning-briefing', [MorningBriefingController::class, 'index'])->name('morning-briefing');
