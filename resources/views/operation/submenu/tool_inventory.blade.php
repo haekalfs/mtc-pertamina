@@ -490,7 +490,7 @@ font-weight-bold
 
                 // Handle guide download link
                 if(response.asset_guidance) {
-                    $('#view_maintenance_guide').html(`<a href="${response.asset_guidance}" target="_blank">Download Guide</a>`);
+                    $('#view_maintenance_guide').html(`<a href="${response.asset_guidance}" target="_blank"><i class="fa fa-download"></i><u> Download Guide</u></a>`);
                 } else {
                     $('#view_maintenance_guide').text('No guide available');
                 }

@@ -121,7 +121,7 @@ font-weight-bold
                                                     @foreach($item->references as $index => $list)
                                                         @if($index < 3)
                                                         <tr>
-                                                            <td class="mb-2"><i class="ti-minus mr-2"></i> {{ $list->references }} &nbsp; <small><a href="{{ asset($list->filepath) }}" target="_blank" class="text-secondary"><i class="fa fa-external-link fa-sm"></i> <u>View</u></a></small></td>
+                                                            <td class="mb-2"><i class="ti-minus mr-2"></i> {{ $list->references }} &nbsp; @if($list->filepath)<small><a href="{{ asset($list->filepath) }}" target="_blank" class="text-secondary"><i class="fa fa-external-link fa-sm"></i> <u>View</u></a></small> @endif</td>
                                                         </tr>
                                                         @endif
                                                     @endforeach

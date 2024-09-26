@@ -157,14 +157,17 @@ font-weight-bold
 
                                     <!-- Progress circle for the revenue -->
                                     <a class="progress-circle-wrapper animateBox">
-                                        <div class="progress-circle p{{ $progress }} @if($progress >= 50) over50 @endif">
+                                        <div class="progress-circle p{{ $progress }} @if($progress >= 50) over50 @endif @if($progress <= 33) low
+                                            @elseif($progress <= 66) medium
+                                            @else high
+                                            @endif">
                                             <span>
                                             <!-- Show percentage change if available -->
                                             @if($previousRevenue !== null)
                                                 @if($percentageChange > 0)
-                                                    <small class="text-success">(+{{ number_format($percentageChange, 2) }}%)</small>
+                                                    <small class="text-success">+{{ number_format($percentageChange, 2) }}%</small>
                                                 @elseif($percentageChange < 0)
-                                                    <small class="text-danger">({{ number_format($percentageChange, 2) }}%)</small>
+                                                    <small class="text-danger">{{ number_format($percentageChange, 2) }}%</small>
                                                 @else
                                                     <small class="text-secondary">(0%)</small>
                                                 @endif

@@ -860,7 +860,7 @@ class PDController extends Controller
     {
         $request->validate([
             'document' => 'required',
-            'attachment' => 'sometimes|file',
+            'attachment' => 'sometimes|file|mimes:pdf,docx,xlsx,xls,jpeg,png,jpg,gif',
         ]);
 
         $reference = Training_reference::findOrFail($request->id);
@@ -899,7 +899,7 @@ class PDController extends Controller
         // Validate the form data
         $request->validate([
             'documents.*' => 'required',
-            'attachments.*' => 'sometimes|file', // Adjust the allowed file types and size
+            'attachments.*' => 'sometimes|file|mimes:pdf,docx,xlsx,xls,jpeg,png,jpg,gif', // Adjust the allowed file types and size
         ]);
 
         // Get the form data
@@ -957,21 +957,48 @@ class PDController extends Controller
     public function deleteTrainingReference($penlat_id)
     {
         try {
+            // Retrieve all references associated with the given penlat_id
+            $references = Training_reference::where('penlat_id', $penlat_id)->get();
+
+            // Loop through each reference and delete the associated file if it exists
+            foreach ($references as $reference) {
+                $filePath = public_path($reference->filepath); // Full path to the file
+
+                if (file_exists($filePath)) {
+                    // Delete the file from public_path
+                    unlink($filePath);
+                }
+            }
+
             // Delete all references associated with the given penlat_id
             Training_reference::where('penlat_id', $penlat_id)->delete();
 
-            return response()->json(['message' => 'All references have been deleted successfully!']);
+            return response()->json(['message' => 'All references and their files have been deleted successfully!']);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to delete references. Please try again.'], 500);
+            return response()->json(['message' => 'Failed to delete references or files. Please try again.'], 500);
         }
     }
 
     public function destroy_reference($id)
     {
-        $trainingReference = Training_reference::findOrFail($id);
-        $trainingReference->delete();
+        try {
+            // Find the training reference by ID
+            $trainingReference = Training_reference::findOrFail($id);
 
-        return response()->json(['success' => 'Item deleted successfully']);
+            // Check if the file exists and delete it
+            $filePath = public_path($trainingReference->filepath); // Full path to the file
+
+            if (file_exists($filePath)) {
+                unlink($filePath); // Delete the file
+            }
+
+            // Delete the database record
+            $trainingReference->delete();
+
+            return response()->json(['success' => 'Item and associated file deleted successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to delete the item or file. Please try again.'], 500);
+        }
     }
 
     public function save_receivable(Request $request)

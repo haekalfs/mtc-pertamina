@@ -122,7 +122,12 @@ font-weight-bold
                     <div class="row">
                         <div class="col-md-3 d-flex justify-content-center">
                             <a class="progress-circle-wrapper animateBox">
-                                <div class="progress-circle p{{ round($overallProgress, 0) }} @if(round($overallProgress, 2) >= 50) over50 @endif">
+                                <div class="progress-circle p{{ round($overallProgress, 0) }}
+                                @if(round($overallProgress, 2) >= 50) over50 @endif
+                                @if($overallProgress <= 33) low
+                                @elseif($overallProgress <= 66) medium
+                                @else high
+                                @endif">
                                     <span>{{ round($overallProgress, 2) }}%</span>
                                     <div class="left-half-clipper">
                                         <div class="first50-bar"></div>

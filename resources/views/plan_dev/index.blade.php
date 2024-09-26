@@ -112,7 +112,7 @@ font-weight-bold
                                             </div>
                                         </a>
                                     </td>
-                                    <td class="text-center zoom90 pt-4">
+                                    <td class="text-right zoom90 pt-4">
                                         @php
                                             $roundedScore = round($instructor->average_feedback_score, 1);
                                             $wholeStars = floor($roundedScore);
@@ -185,7 +185,10 @@ font-weight-bold
                             <div class="d-flex flex-column justify-content-center align-items-center">
                                 <span>{{ $yearMtc }}</span> <!-- Year above the progress bar -->
                                 <a class="progress-circle-wrapper animateBox">
-                                    <div class="progress-circle p{{ round($averageScoreMtc * 20, 0) }} @if(round($averageScoreMtc * 20, 2) >= 50) over50 @endif">
+                                    <div class="progress-circle p{{ round($averageScoreMtc * 20, 0) }} @if(round($averageScoreMtc * 20, 2) >= 50) over50 @endif @if($averageScoreMtc * 20 <= 33) low
+                                        @elseif($averageScoreMtc * 20 <= 66) medium
+                                        @else high
+                                        @endif">
                                         <span><i class="fa fa-star text-warning"></i> {{ round($averageScoreMtc, 2) ?? '-' }}</span>
                                         <div class="left-half-clipper">
                                             <div class="first50-bar"></div>
