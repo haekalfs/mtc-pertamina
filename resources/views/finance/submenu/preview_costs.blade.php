@@ -62,7 +62,7 @@ font-weight-bold
     <div class="col-xl-12 col-lg-12">
         <div class="card">
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> List Data</h6>
+                <h6 class="m-0 font-weight-bold text-secondary" id="judul">Detail Pelatihan</h6>
                 <div class="text-right">
                     {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Update Data</a> --}}
                 </div>

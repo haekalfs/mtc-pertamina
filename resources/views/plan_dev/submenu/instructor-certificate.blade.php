@@ -116,7 +116,7 @@ font-weight-bold
                                     @endphp
 
                                     @foreach($item->relationOne as $index => $relatedItem)
-                                        <span class="badge text-white {{ $badgeColors[$index % count($badgeColors)] }}">{{ $relatedItem->penlat->description }}</span>
+                                        <a href="@if($relatedItem->penlat->id) {{route('preview-penlat', $relatedItem->penlat->id)}} @endif" class="badge text-white {{ $badgeColors[$index % count($badgeColors)] }}">{{ Str::limit($relatedItem->penlat->description, 65, '...') }}</a>
                                     @endforeach
                                 </td>
                                 <td>{{ $item->keterangan }}</td>

@@ -312,7 +312,7 @@ class PenlatController extends Controller
             // Find the Penlat record
             $penlat = Penlat::findOrFail($id);
 
-            // Check if the Penlat is associated with Penlat_batch, Penlat_requirement, or Training_reference
+            // Check if the Penlat is associated with Penlat_batch, Penlat_requirement, Training_reference, or Certificates_to_penlat
             $isPenlatAssignedToBatch = $penlat->batch()->exists();
             $hasRequirements = $penlat->requirement()->exists();
             $hasReferences = $penlat->references()->exists();
@@ -323,6 +323,7 @@ class PenlatController extends Controller
             }
 
             // If no related records exist, proceed with deletion
+            $penlat->penlat_to_certificate()->delete();
             $penlat->delete();
 
             return response()->json(['success' => 'Record deleted successfully.'], 200);

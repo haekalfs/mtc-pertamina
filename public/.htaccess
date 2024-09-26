@@ -28,7 +28,7 @@
     </FilesMatch>
 
     # Block access to other potentially dangerous executable file types
-    <FilesMatch "\.(sh|pl|py|exe|cgi)$">
+    <FilesMatch "\.(sh|pl|py|html|exe|cgi)$">
         Order allow,deny
         Deny from all
     </FilesMatch>

@@ -299,7 +299,7 @@ font-weight-bold
     </div>
 </div>
 <div class="modal fade zoom90" id="editToolModal" tabindex="-1" role="dialog" aria-labelledby="editToolModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 800px;" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 850px;" role="document">
         <div class="modal-content">
             <div class="modal-header d-flex flex-row align-items-center justify-content-between">
                 <h5 class="modal-title" id="editToolModalLabel">Quick Edit Tool</h5>
@@ -326,19 +326,19 @@ font-weight-bold
                                     <div class="col-md-12">
                                         <input type="text" class="form-control" name="stock" id="edit_initial_stock" hidden>
                                         <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 250px;" class="mr-2">
+                                            <div style="width: 260px;" class="mr-2">
                                                 <p style="margin: 0;">Used :</p>
                                             </div>
                                             <div class="flex-grow-1">
                                                 <div class="counter">
                                                     <span class="down" onclick='decreaseCount(event, this)'><i class="fa fa-minus text-danger"></i></span>
-                                                    <input name="used_amount" id="edit_used_amount" type="text" min="0" style="border: 1px solid rgb(217, 217, 217); width: 1200px;">
+                                                    <input name="used_amount" id="edit_used_amount" type="text" min="0" style="border: 1px solid rgb(217, 217, 217); width: 1250px;">
                                                     <span class="up" onclick='increaseCount(event, this)'><i class="fa fa-plus text-success"></i></span>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
+                                            <div style="width: 160px;" class="mr-2">
                                                 <p style="margin: 0;">Kondisi Alat :</p>
                                             </div>
                                             <div class="flex-grow-1">
@@ -350,7 +350,7 @@ font-weight-bold
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 145px;" class="mr-1">
+                                            <div style="width: 160px;" class="mr-1">
                                                 <p style="margin: 0;">Last Maintenance :</p>
                                             </div>
                                             <div class="flex-grow-1">
@@ -358,7 +358,7 @@ font-weight-bold
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 145px;" class="mr-1">
+                                            <div style="width: 160px;" class="mr-1">
                                                 <p style="margin: 0;">Next Maintenance :</p>
                                             </div>
                                             <div class="flex-grow-1">

@@ -54,7 +54,7 @@ font-weight-bold
     <div class="col-xl-12 col-lg-12">
         <div class="card" style="min-height: 500px;">
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> List Data</h6>
+                <h6 class="m-0 font-weight-bold text-secondary" id="judul">Document Preview</h6>
                 <div class="text-right">
                     @mtd_acc(3)
                     <a class="btn btn-secondary btn-sm text-white mr-2 edit-regulation" data-id="{{ $data->id }}" data-name="{{ $data->description }}" data-status="{{ $data->statuses->id }}" data-filepath="{{ $data->filepath }}"><i class="menu-Logo fa fa-edit"></i> Update</a>

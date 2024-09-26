@@ -26,4 +26,9 @@ class Penlat extends Model
     {
         return $this->hasMany('App\Models\Penlat_batch', 'penlat_id', 'id');
     }
+
+    public function penlat_to_certificate()
+    {
+        return $this->hasMany('App\Models\Certificates_to_penlat', 'penlat_id', 'id');
+    }
 }
