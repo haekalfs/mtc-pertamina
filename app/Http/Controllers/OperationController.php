@@ -33,48 +33,44 @@ class OperationController extends Controller
         $nowYear = date('Y');
         $yearsBefore = range($nowYear - 4, $nowYear);
 
-        // Set the selected year
+        // Set the selected year, default to the current year if null
         $yearSelected = $yearSelected ?? $nowYear;
 
-        // Get counts for various items
-        $getPesertaCount = Infografis_peserta::whereYear('tgl_pelaksanaan', $yearSelected)->count();
-        $getKebutuhanCount = Penlat_requirement::count();
-        $getAssetCount = Inventory_tools::count();
+        // Get counts for various items, handle null with default values
+        $getPesertaCount = Infografis_peserta::whereYear('tgl_pelaksanaan', $yearSelected)->count() ?? 0;
+        $getKebutuhanCount = Penlat_requirement::count() ?? 0;
+        $getAssetCount = Inventory_tools::count() ?? 0;
 
         // Get count of assets that are out of stock
-        $OutOfStockCount = Inventory_tools::where('asset_stock', '=', 0)->count();
+        $OutOfStockCount = Inventory_tools::where('asset_stock', '=', 0)->count() ?? 0;
 
-        // Get count of assets that are reaching their next maintenance date
-        $requiredMaintenanceCount = Inventory_tools::where('next_maintenance', '<=', now())->count();
+        // Get count of assets requiring maintenance
+        $requiredMaintenanceCount = Inventory_tools::where('next_maintenance', '<=', now())->count() ?? 0;
 
         $totalAttention = $OutOfStockCount + $requiredMaintenanceCount;
 
-        $year = $yearSelected ?? Carbon::now()->year; // Default to the current year if none is selected
+        // Initialize the year and months array
+        $year = $yearSelected ?? Carbon::now()->year;
 
-        // Initialize an array for months
         $months = [
             'Januari' => 1, 'Februari' => 2, 'Maret' => 3, 'April' => 4, 'Mei' => 5, 'Juni' => 6,
             'Juli' => 7, 'Agustus' => 8, 'September' => 9, 'Oktober' => 10, 'November' => 11, 'Desember' => 12
         ];
 
-        // Data for the view
         $data = [];
 
-        // Loop through each month to get the counts
+        // Loop through each month to get counts, handle null counts
         foreach ($months as $monthName => $monthNumber) {
-            // Count for external participants
             $externalCount = Infografis_peserta::whereYear('tgl_pelaksanaan', $year)
                 ->whereMonth('tgl_pelaksanaan', $monthNumber)
-                ->where('subholding', 'Eksternal') // Assuming 'Eksternal' is in kategori_program
-                ->count();
+                ->where('subholding', 'Eksternal')
+                ->count() ?? 0;
 
-            // Count for internal participants
             $internalCount = Infografis_peserta::whereYear('tgl_pelaksanaan', $year)
                 ->whereMonth('tgl_pelaksanaan', $monthNumber)
-                ->whereNotIn('subholding', ['Eksternal']) // Assuming 'Internal' is in kategori_program
-                ->count();
+                ->whereNotIn('subholding', ['Eksternal'])
+                ->count() ?? 0;
 
-            // Add the counts to the data array
             $data[] = [
                 'month' => $monthName,
                 'external_count' => $externalCount,
@@ -82,86 +78,77 @@ class OperationController extends Controller
             ];
         }
 
-        //gauge
-        // Find the latest month with data
-        $latestMonth = Infografis_peserta::whereYear('tgl_pelaksanaan', $year)
+        // Gauge
+        $latestMonthRecord = Infografis_peserta::whereYear('tgl_pelaksanaan', $year)
             ->orderBy('tgl_pelaksanaan', 'desc')
             ->first();
 
-        // Assuming $latestMonth is an object that contains 'tgl_pelaksanaan'
-        $getDate = Carbon::parse($latestMonth->tgl_pelaksanaan);
+        // Safely parse the date and handle null
+        $getDate = optional($latestMonthRecord)->tgl_pelaksanaan ? Carbon::parse($latestMonthRecord->tgl_pelaksanaan) : null;
+        $monthName = optional($getDate)->format('F') ?? 'No data';
 
-        // Get the full month name
-        $monthName = $getDate->format('F');
-
-        $countNonSTCWGauge = 0;
         $countSTCWGauge = 0;
-        if ($latestMonth) {
-            $latestMonth = Carbon::parse($latestMonth->tgl_pelaksanaan)->month;
+        $countNonSTCWGauge = 0;
+
+        if ($latestMonthRecord) {
+            $latestMonth = Carbon::parse($latestMonthRecord->tgl_pelaksanaan)->month ?? null;
 
             // Get the count for STCW and NON STCW for the latest month
             $countSTCWGauge = Infografis_peserta::whereYear('tgl_pelaksanaan', $year)
                 ->whereMonth('tgl_pelaksanaan', $latestMonth)
                 ->where('kategori_program', 'STCW')
-                ->count();
+                ->count() ?? 0;
 
             $countNonSTCWGauge = Infografis_peserta::whereYear('tgl_pelaksanaan', $year)
                 ->whereMonth('tgl_pelaksanaan', $latestMonth)
                 ->where('kategori_program', 'NON STCW')
-                ->count();
+                ->count() ?? 0;
 
-            // Get the count for STCW and NON STCW for the previous month
+            // Previous month
             $previousMonth = ($latestMonth == 1) ? 12 : $latestMonth - 1;
 
             $previousCountSTCW = Infografis_peserta::whereYear('tgl_pelaksanaan', $year)
                 ->whereMonth('tgl_pelaksanaan', $previousMonth)
                 ->where('kategori_program', 'STCW')
-                ->count();
+                ->count() ?? 0;
 
             $previousCountNonSTCW = Infografis_peserta::whereYear('tgl_pelaksanaan', $year)
                 ->whereMonth('tgl_pelaksanaan', $previousMonth)
                 ->where('kategori_program', 'NON STCW')
-                ->count();
+                ->count() ?? 0;
 
-            // Calculate percentage changes
             $stcwDelta = ($previousCountSTCW > 0) ? $previousCountSTCW : 0;
             $nonStcwDelta = ($previousCountNonSTCW > 0) ? $previousCountNonSTCW : 0;
         } else {
-            // If there's no data, set counts and deltas to zero
-            $countSTCW = $countNonSTCW = $previousCountSTCW = $previousCountNonSTCW = 0;
+            // Set default counts and deltas if no data
             $stcwDelta = $nonStcwDelta = 0;
         }
 
-        //Quarterly Data
-        // Define the quarters (array of month ranges)
+        // Quarterly Data
         $quarters = [
-            'TW-1' => [1, 2, 3],     // January to March
-            'TW-2' => [4, 5, 6],     // April to June
-            'TW-3' => [7, 8, 9],     // July to September
-            'TW-4' => [10, 11, 12],  // October to December
+            'TW-1' => [1, 2, 3],
+            'TW-2' => [4, 5, 6],
+            'TW-3' => [7, 8, 9],
+            'TW-4' => [10, 11, 12],
         ];
 
         $quarterlyData = [];
 
         foreach ($quarters as $quarterName => $bulan) {
-            // External count for each quarter
             $dataset1 = Infografis_peserta::whereYear('tgl_pelaksanaan', $year)
                 ->whereIn(DB::raw('MONTH(tgl_pelaksanaan)'), $bulan)
-                ->where('subholding', 'Eksternal')  // Assuming 'Eksternal' is for external participants
-                ->count();
+                ->where('subholding', 'Eksternal')
+                ->count() ?? 0;
 
-            // Internal count for each quarter
             $dataset2 = Infografis_peserta::whereYear('tgl_pelaksanaan', $year)
                 ->whereIn(DB::raw('MONTH(tgl_pelaksanaan)'), $bulan)
-                ->whereNotIn('subholding', ['Eksternal'])  // Assuming everything else is internal
-                ->count();
+                ->whereNotIn('subholding', ['Eksternal'])
+                ->count() ?? 0;
 
-            // Calculate the percentage difference (if applicable)
             $total = $dataset1 + $dataset2;
             $externalPercentage = $total ? ($dataset1 / $total) * 100 : 0;
             $internalPercentage = $total ? ($dataset2 / $total) * 100 : 0;
 
-            // Store the data in an array
             $quarterlyData[$quarterName] = [
                 'external_count' => $dataset1,
                 'internal_count' => $dataset2,
