@@ -132,7 +132,9 @@ class FinanceController extends Controller
                 ->make(true);
         }
 
-        return view('finance.submenu.vendor_payment');
+        $vendorPayments = Vendor_payment::select('vendor')->distinct()->get();
+
+        return view('finance.submenu.vendor_payment', ['vendorPayment' => $vendorPayments]);
     }
 
     public function vendor_payment_import()

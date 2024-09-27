@@ -67,6 +67,9 @@ font-weight-bold
                                         <select class="custom-select" id="namaPenlat" name="namaPenlat">
                                             <option value="-1" selected>Show All</option>
                                             <!-- Populate vendor names dynamically -->
+                                            @foreach($vendorPayment as $payment)
+                                                <option value="{{ $payment->vendor }}">{{ $payment->vendor }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
                                 </div>
