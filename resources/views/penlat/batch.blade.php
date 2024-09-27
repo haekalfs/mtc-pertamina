@@ -19,7 +19,9 @@ font-weight-bold
         <p class="mb-4">List Pelatihan at MTC.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
-        {{-- <a href="{{ route('participant-infographics-import-page') }}" class="btn btn-sm btn-primary shadow-sm text-white"><i class="fa fa-file-text fa-sm"></i> Import Data</a> --}}
+        <a href="#" id="refreshBatchBtn" class="btn btn-sm btn-secondary shadow-sm text-white">
+            <i class="fa fa-refresh fa-sm"></i> Refresh Data
+        </a>
     </div>
 </div>
 <div class="overlay overlay-mid" style="display: none;"></div>
@@ -426,5 +428,67 @@ function validateForm() {
     }
     return true; // Allow form submission
 }
+document.getElementById('refreshBatchBtn').addEventListener('click', function (event) {
+    // Prevent default behavior of the link
+    event.preventDefault();
+
+    // Trigger SweetAlert confirmation
+    swal({
+        title: "Are you sure?",
+        text: "This will refresh all the Penlat batch data.",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+    })
+    .then((willRefresh) => {
+        if (willRefresh) {
+            // Show a loading message before making the request
+            swal({
+                title: "Processing...",
+                text: "Refreshing Penlat batch data.",
+                icon: "info",
+                buttons: false,
+                closeOnClickOutside: false
+            });
+
+            // Send AJAX request to trigger the batch refresh job
+            $.ajax({
+                url: "{{ route('refresh.batch') }}", // Your route to refresh data
+                method: "GET",
+                headers: {
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}", // CSRF token for protection
+                },
+                success: function (data) {
+                    // Handle the success response
+                    if (data.success) {
+                        swal({
+                            title: "Success!",
+                            text: "The Penlat batch data refresh has been started successfully.",
+                            icon: "success",
+                            button: "OK",
+                        });
+                    } else {
+                        // Handle any errors returned from the server
+                        swal({
+                            title: "Error!",
+                            text: "Something went wrong while trying to refresh the data.",
+                            icon: "error",
+                            button: "OK",
+                        });
+                    }
+                },
+                error: function (xhr, status, error) {
+                    // Handle AJAX errors
+                    swal({
+                        title: "Error!",
+                        text: "There was an error processing the request: " + xhr.responseText,
+                        icon: "error",
+                        button: "OK",
+                    });
+                }
+            });
+        }
+    });
+});
 </script>
 @endsection

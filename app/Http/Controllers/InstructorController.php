@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Certificates_catalog;
+use App\Models\Feedback_report;
 use Illuminate\Http\Request;
 use App\Models\Instructor;
 use App\Models\Instructor_certificate;
@@ -258,5 +259,19 @@ class InstructorController extends Controller
 
         // Redirect back with a success message
         return redirect()->back()->with('success', 'Working hours updated successfully.');
+    }
+
+    public function getInstructors(Request $request)
+    {
+        // Fetch the query from the request
+        $search = $request->get('q', '');
+
+        // Fetch instructors, filtering based on the search term
+        $instructors = Feedback_report::where('instruktur', 'LIKE', '%' . $search . '%')
+            ->distinct()
+            ->pluck('instruktur')
+            ->toArray();
+
+        return response()->json($instructors);
     }
 }

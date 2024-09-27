@@ -65,6 +65,8 @@
     <!-- Include Date Range Picker JS -->
     <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     <script src='https://cdn.plot.ly/plotly-2.35.2.min.js'></script>
+    {{-- TypeAHead --}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/corejs-typeahead/1.3.1/typeahead.bundle.min.js"></script>
 </head>
 
 <body>
@@ -197,6 +199,10 @@
                         </ul>
                     </li>
                     @endusr_acc
+
+                    <li class="@yield('active-refractor')">
+                        <a href="{{ route('refractor') }}"><i class="menu-icon fa fa-trash-o"></i>Refractor Data</a>
+                    </li>
 
                     <li style="padding-bottom: 15%;">
                         <a href="/telescope"><i class="menu-icon fa fa-signal"></i>Web Monitoring</a>

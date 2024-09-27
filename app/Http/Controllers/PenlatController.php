@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\RefreshBatchData;
 use App\Models\Inventory_tools;
 use App\Models\Location;
 use App\Models\Penlat;
@@ -11,6 +12,7 @@ use App\Models\Penlat_requirement;
 use App\Models\Penlat_utility_usage;
 use App\Models\Profit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
@@ -592,5 +594,29 @@ class PenlatController extends Controller
             'items' => $batches->items(),
             'total_count' => $batches->total()
         ]);
+    }
+
+    public function refresh_batch_data()
+    {
+        try {
+            // Dispatch the job to refresh the batch data
+            RefreshBatchData::dispatch();
+
+            // Set a cache indicating the job is processing, if it doesn't already exist
+            if (!Cache::has('jobs_processing')) {
+                Cache::put('jobs_processing', true, now()->addMinutes(3)); // Cache for 10 minutes
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Batch data refresh initiated successfully.'
+            ]);
+        } catch (\Exception $e) {
+            // Handle any exceptions that occur during dispatching
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to initiate batch data refresh.'
+            ], 500);
+        }
     }
 }

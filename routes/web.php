@@ -20,6 +20,7 @@ use App\Http\Controllers\MyProfileController;
 use App\Http\Controllers\OperationController;
 use App\Http\Controllers\PDController;
 use App\Http\Controllers\PenlatController;
+use App\Http\Controllers\RefractorController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\SocialMediaController;
@@ -225,6 +226,7 @@ Route::middleware('checkForErrors', 'suspiciousActivity', 'suspicious', 'auth')-
             Route::post('/planning-development/instructor-update-hours/{id}', [InstructorController::class, 'update_hours'])->name('instructor.update.hours');
             Route::post('/planning-development/instructor-store', [InstructorController::class, 'store'])->name('instructor.store');
             Route::delete('/planning-development/instructor-delete/{id}', [InstructorController::class, 'deleteInstructor'])->name('instructor.delete');
+            Route::get('/get-instructors', [InstructorController::class, 'getInstructors'])->name('get.instructors');
 
 
             Route::get('/planning-development/training-reference', [PDController::class, 'training_reference'])->name('training-reference');
@@ -292,6 +294,7 @@ Route::middleware('checkForErrors', 'suspiciousActivity', 'suspicious', 'auth')-
         Route::put('/penlat-batch-update/{id}', [PenlatController::class, 'update_batch'])->name('batch.update');
         Route::delete('/penlat-batch-delete/{id}', [PenlatController::class, 'delete_batch'])->name('delete.batch');
         Route::get('/fetch-penlat-batches', [PenlatController::class, 'fetchBatches'])->name('batches.fetch');
+        Route::get('/penlat-batch/refresh', [PenlatController::class, 'refresh_batch_data'])->name('refresh.batch');
 
         //Finance
         Route::middleware(['checkUserAccess:102'])->group(function () {
@@ -343,6 +346,10 @@ Route::middleware('checkForErrors', 'suspiciousActivity', 'suspicious', 'auth')-
         Route::get('/manage-access', [ManageAccessController::class, 'index'])->name('manage.access');
         Route::post('/assign-role-to-page', [ManageAccessController::class, 'grant_access_to_roles'])->name('assign.roles.to.page');
         Route::get('/reset-access/{id}', [ManageAccessController::class, 'remove_access'])->name('remove.access');
+
+        //Refractore Data
+        Route::get('/data-management/refractor', [RefractorController::class, 'index'])->name('refractor');
+        Route::post('/refractor-data-deletion', [RefractorController::class, 'data_deletion'])->name('delete.data');
     });
     //alowed method
     Route::get('/manage-allowed-method', [ManageAccessController::class, 'manage_request'])->name('manage.request');

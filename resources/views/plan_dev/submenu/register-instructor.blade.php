@@ -80,15 +80,15 @@ font-weight-bold
                     <div class="card-body card-block">
                         <div class="row form-group">
                             <div class="col col-md-3"><label for="full_name" class=" form-control-label">Instructor Fullname</label></div>
-                            <div class="col-12 col-md-9"><input type="text" id="full_name" name="full_name" placeholder="Full Name" class="form-control"></div>
+                            <div class="col-12 col-md-9"><input type="text" id="full_name" name="full_name" placeholder="Full Name" class="form-control typeahead" autocomplete="instructor"></div>
                         </div>
                         <div class="row form-group">
                             <div class="col col-md-3"><label for="email" class=" form-control-label">E-Mail Address</label></div>
-                            <div class="col-12 col-md-9"><input type="email" id="email" name="email" placeholder="Enter Email" class="form-control"></div>
+                            <div class="col-12 col-md-9"><input type="email" id="email" name="email" placeholder="Enter Email" class="form-control" autocomplete="off"></div>
                         </div>
                         <div class="row form-group">
                             <div class="col col-md-3"><label for="dob" class=" form-control-label">Date of Birth</label></div>
-                            <div class="col-12 col-md-9"><input type="date" id="dob" name="dob" class="form-control"></div>
+                            <div class="col-12 col-md-9"><input type="date" id="dob" name="dob" class="form-control" autocomplete="off"></div>
                         </div>
                         <div class="row form-group">
                             <div class="col col-md-3"><label for="gender" class=" form-control-label">Instructor Gender</label></div>
@@ -102,7 +102,7 @@ font-weight-bold
                         </div>
                         <div class="row form-group">
                             <div class="col col-md-3"><label for="address" class=" form-control-label">Address</label></div>
-                            <div class="col-12 col-md-9"><textarea name="address" rows="3" class="form-control"></textarea></div>
+                            <div class="col-12 col-md-9"><textarea name="address" rows="3" class="form-control" autocomplete="off"></textarea></div>
                         </div>
                         <div class="row form-group">
                             <div class="col col-md-3"><label for="working_hour" class=" form-control-label">Jam Mengajar</label></div>
@@ -176,5 +176,30 @@ function previewImage(event) {
     };
     reader.readAsDataURL(event.target.files[0]);
 }
+</script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+    var instructors_suggestion = new Bloodhound({
+        datumTokenizer: Bloodhound.tokenizers.whitespace,
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        remote: {
+            url: '{{ route("get.instructors") }}?q=%QUERY', // Laravel route name for fetching instructors
+            wildcard: '%QUERY'
+        }
+    });
+
+    $('.typeahead').typeahead(
+        {
+            hint: true,
+            highlight: true,
+            minLength: 1
+        },
+        {
+            name: 'instructors',
+            source: instructors_suggestion
+        }
+    );
+});
 </script>
 @endsection

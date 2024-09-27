@@ -89,7 +89,7 @@ font-weight-bold
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <label for="status">Tanggal :</label>
-                                        <input type="text" class="form-control" name="daterange" id="daterange"/>
+                                        <input type="text" class="form-control" name="daterange" id="daterange" autocomplete="off"/>
                                     </div>
                                 </div>
                                 <div class="col-md-1 d-flex align-self-end justify-content-start">
