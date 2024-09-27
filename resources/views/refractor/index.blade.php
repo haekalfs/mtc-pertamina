@@ -54,10 +54,10 @@ active font-weight-bold
                                         <label for="table_name">Database :</label>
                                         <select class="custom-select" id="table_name" name="table_name" required>
                                             <option selected disabled>Choose...</option>
-                                            <option value="profits">Profits & Loss</option>
-                                            <option value="infografis_peserta">Infografis Peserta</option>
-                                            <option value="feedback_reports">Feedback Instruktur</option>
-                                            <option value="feedback_mtc">Feedback Pelatihan</option>
+                                            <option value="{{ $encryptedTables['profits'] }}">Profits & Loss</option>
+                                            <option value="{{ $encryptedTables['infografis_peserta'] }}">Infografis Peserta</option>
+                                            <option value="{{ $encryptedTables['feedback_reports'] }}">Feedback Instruktur</option>
+                                            <option value="{{ $encryptedTables['feedback_mtc'] }}">Feedback Pelatihan</option>
                                         </select>
                                     </div>
                                 </div>
