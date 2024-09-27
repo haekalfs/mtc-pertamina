@@ -123,7 +123,7 @@ class UserController extends Controller
             'department' => 'required',
             'position' => 'required',
             'user_status' => 'required',
-            'roles' => 'required',
+            'roles' => 'sometimes',
             'profile_picture' => 'sometimes|file|mimes:jpeg,png,jpg,gif|max:5048',
         ]);
 
