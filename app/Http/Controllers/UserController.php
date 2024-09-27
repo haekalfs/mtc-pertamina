@@ -174,15 +174,18 @@ class UserController extends Controller
 
         // Update roles (first remove all roles, then add the selected ones)
         Usr_role::where('user_id', $user->id)->delete();
-        foreach ($request->roles as $role_id) {
-            $role = Role::find($role_id);
-            Usr_role::create([
-                'user_id' => $user->id,
-                'role_id' => $role->id,
-                'role_name' => $role->role,
-            ]);
+        if (!empty($request->roles) && is_array($request->roles)) {
+            foreach ($request->roles as $role_id) {
+                // Ensure role_id is not null or invalid
+                if ($role_id && $role = Role::find($role_id)) {
+                    Usr_role::create([
+                        'user_id' => $user->id,
+                        'role_id' => $role->id,
+                        'role_name' => $role->role,
+                    ]);
+                }
+            }
         }
-
         return redirect('/manage-users')->with('success', 'User updated successfully');
     }
 
