@@ -36,7 +36,7 @@ class DashboardController extends Controller
         $countCampaign = $queryCampaign->count();
 
         //sum profits
-        $rawProfits = Profit::sum('profit');
+        $rawProfits = Profit::whereYear('tgl_pelaksanaan', date('Y'))->sum('total_biaya_pendaftaran_peserta');
 
         // Calculate the average feedback score
         $averageFeedbackScore = DB::table('feedback_mtc')
