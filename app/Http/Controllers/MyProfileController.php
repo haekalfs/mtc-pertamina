@@ -57,24 +57,31 @@ class MyProfileController extends Controller
             return redirect()->back()->with('failed', $validator->errors());
         }
 
-        $employeeId = Auth::user()->users_detail->employee_id;
-        $pictureFile = $request->file('picture');
+        // Get user details
+        $userDetail = Users_detail::where('user_id', Auth::id())->first();
 
-        $pictureFileName = $employeeId . "_picture." . $pictureFile->getClientOriginalExtension();
-        $pictureStoragePath = public_path('img/avatar');
+        // Handle profile picture upload
+        if ($request->hasFile('picture')) {
+            // Delete old profile picture if it exists
+            if ($userDetail->profile_pic) {
+                $oldImagePath = public_path($userDetail->profile_pic);
+                if (file_exists($oldImagePath)) {
+                    unlink($oldImagePath);
+                }
+            }
 
-        // Remove old CV file if it exists
-        $oldpicturePath = $pictureStoragePath . '/' . $pictureFileName;
-        if (file_exists($oldpicturePath)) {
-            unlink($oldpicturePath);
+            // Save the new profile picture to public/img/avatar directory
+            $pictureFile = $request->file('picture');
+            $profile_picture_name = time() . '_' . $pictureFile->getClientOriginalName();
+            $profile_picture_path = 'img/avatar/' . $profile_picture_name;
+            $pictureFile->move(public_path('img/avatar/'), $profile_picture_name);
+        } else {
+            // If no new profile picture is uploaded, retain the old one
+            $profile_picture_path = $userDetail->profile_pic;
         }
 
-        // Move new CV file to storage
-        $pictureFile->move($pictureStoragePath, $pictureFileName);
-
-        // Update user details with the new CV file
-        $userDetail = Users_detail::where('user_id', Auth::id())->first();
-        $userDetail->profile_pic = $pictureFileName;
+        // Update user details with the new profile picture path
+        $userDetail->profile_pic = $profile_picture_path;
         $userDetail->save();
 
         return redirect()->back()->with('success', "Your profile pic has been uploaded successfully.");
