@@ -124,7 +124,11 @@ class PDController extends Controller
         $regulations = Regulation::latest()->take(3)->get();
 
         // Fetch the suggestions with pagination (e.g., 5 per page)
-        $suggestions = Feedback_mtc::select('saran')->whereNotNull('saran')->orderBy('updated_at', 'desc')->take(min(Feedback_mtc::count(), 12))->get();
+        $suggestions = Feedback_mtc::select('saran')
+        ->whereNotNull('saran')
+        ->orderByRaw('LENGTH(saran) DESC')
+        ->take(min(Feedback_mtc::count(), 12))
+        ->get();
 
         // Fetch the unique titles for the dropdown
         $trainingTitles = Feedback_mtc::select('judul_pelatihan')->whereYear('tgl_pelaksanaan', $yearSelected)

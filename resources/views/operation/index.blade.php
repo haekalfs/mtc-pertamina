@@ -284,10 +284,15 @@ font-weight-bold
         <div class="col-lg-12">
             <div class="card">
                 <div class="row">
-                    <div class="col-lg-12">
-                        <div class="card-body d-flex justify-content-center align-items-center">
-                            <!-- <canvas id="TrafficChart"></canvas>   -->
-                            <div id="chartContainerBar" style="height: 400px; width: 100%;"></div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <div class="pl-4" id="pieChartNewParticipant" style="height: 370px; width: 100%;"></div>
+                            </div>
+                            <div class="col-lg-9">
+                                <!-- <canvas id="TrafficChart"></canvas>   -->
+                                <div class="pr-4" id="chartContainerBar" style="height: 400px; width: 100%;"></div>
+                            </div>
                         </div>
                     </div>
                 </div> <!-- /.row -->
@@ -467,7 +472,9 @@ window.onload = function() {
             var pieChart = new CanvasJS.Chart("chartContainerBar", {
                 theme: "light2",
                 animationEnabled: true,
-                title: { text: "Top Penlat Based on Jumlah Peserta", margin: 20 },
+                title: { text: "Top Penlat Based on Total Participants",
+                margin: 20,
+                fontSize: 16 },
                 data: [{
                     type: "bar",
                     indexLabel: "{symbol} - {y}",
@@ -498,6 +505,22 @@ window.onload = function() {
                 }]
             });
             columnChart.render();
+
+            // Render the chart using CanvasJS
+            var pieChartNewParticipant = new CanvasJS.Chart("pieChartNewParticipant", {
+                animationEnabled: true,
+                theme: "light2",
+                title: {
+                    text: "New vs Returning Participants " + selectedOption
+                },
+                data: [{
+                    type: "pie",
+                    indexLabel: "{label} - {y}",
+                    dataPoints: data.chartData
+                }]
+            });
+            pieChartNewParticipant.render();
+
             document.getElementById("CountSTCW").innerText = `STCW: ${data.countSTCW} Peserta`;
             document.getElementById("CountNonSTCW").innerText = `Non-STCW: ${data.countNonSTCW} Peserta`;
         });

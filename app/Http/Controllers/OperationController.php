@@ -244,14 +244,18 @@ class OperationController extends Controller
             ];
         }
 
-        // Fetch total number of participants for each year, starting 7 years ago
+        // Use the selected year to calculate the 7 years prior range
+        $startYear = $year - 7;
+
+        // Fetch total number of participants for each year, starting 7 years prior to the selected year
         $dataYearly = Infografis_peserta::select(DB::raw('YEAR(tgl_pelaksanaan) as year'), DB::raw('count(*) as total'))
-            ->whereYear('tgl_pelaksanaan', '>=', $year - 7)
+            ->whereYear('tgl_pelaksanaan', '>=', $startYear)
+            ->whereYear('tgl_pelaksanaan', '<=', $year) // Make sure to include up to the selected year
             ->groupBy(DB::raw('YEAR(tgl_pelaksanaan)'))
             ->orderBy('year', 'asc')
             ->get();
 
-        // Prepare the data for the chart
+        // Prepare the data for the column chart
         $dataPointsColumn = [];
         foreach ($dataYearly as $row) {
             $dataPointsColumn[] = [
@@ -259,6 +263,27 @@ class OperationController extends Controller
                 "y" => $row->total
             ];
         }
+
+         // Retrieve the participants for the selected year
+        $yearlyParticipants = Infografis_peserta::whereYear('tgl_pelaksanaan', $year)
+            ->pluck('nama_peserta')
+            ->toArray();
+
+        // Retrieve all participants before the selected year
+        $previousParticipants = Infografis_peserta::whereYear('tgl_pelaksanaan', '<', $year)
+            ->pluck('nama_peserta')
+            ->toArray();
+
+        // Calculate the returning and new participants
+        $returningParticipants = array_intersect($yearlyParticipants, $previousParticipants);
+        $newParticipants = array_diff($yearlyParticipants, $previousParticipants);
+
+        // Prepare data for the pie chart
+        $chartData = [
+            ['label' => 'New Participants', 'y' => count($newParticipants)],
+            ['label' => 'Returning Participants', 'y' => count($returningParticipants)],
+        ];
+
         // Return the data points in a JSON response
         return response()->json([
             'dataPointsSpline1' => $dataPointsSpline1,
@@ -266,7 +291,8 @@ class OperationController extends Controller
             'barDataPoints' => $dataPointsBar,
             'countSTCW' => $countSTCW,
             'countNonSTCW' => $countNonSTCW,
-            'columnDataPoints' => $dataPointsColumn // New column chart data
+            'columnDataPoints' => $dataPointsColumn,
+            'chartData' => $chartData // New column chart data
         ]);
     }
 
