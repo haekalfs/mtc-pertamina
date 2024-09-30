@@ -93,8 +93,9 @@ class DashboardController extends Controller
 
     public function getEvents(Request $request)
     {
+        $currentYear = date('Y');
         // Fetch all records from Penlat_batch with batch and date
-        $batches = Penlat_batch::select('batch', 'date')->get();
+        $batches = Penlat_batch::select('batch', 'date')->whereYear('date', $currentYear)->get();
 
         // Create events array for FullCalendar
         $events = [];
