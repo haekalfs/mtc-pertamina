@@ -300,7 +300,7 @@ class PenlatController extends Controller
         $penlat = Penlat::findOrFail($id);
 
         // Get aliases as a comma-separated string
-        $aliases = $penlat->aliases->pluck('alias')->implode(', ');
+        $aliases = $penlat->aliases->pluck('alias')->implode(',');
 
         $penlatData = [
             'id' => $penlat->id,

@@ -4,6 +4,7 @@ namespace App\Imports;
 
 use App\Models\Notification;
 use App\Models\Penlat;
+use App\Models\Penlat_alias;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -37,19 +38,36 @@ class PenlatImport implements ToCollection, SkipsEmptyRows, WithBatchInserts, Wi
             DB::beginTransaction();
 
             foreach ($rows as $row) {
+                // Check if required fields are empty, if so, skip the row
                 if (empty($row[60]) || empty($row[68]) || empty($row[69]) || empty($row[70])) {
-                    break;
+                    continue;  // Use continue to skip the current iteration and move to the next row
                 }
 
-                Penlat::updateOrCreate(
+                // Update or create Penlat record
+                $penlat = Penlat::updateOrCreate(
                     [
                         'description' => $row[60],
-                        'alias' => str_replace(' ', '-', trim($row[68])),
                         'jenis_pelatihan' => $row[69],
                         'kategori_pelatihan' => $row[70],
                     ],
                     []
                 );
+
+                // Process aliases (remove spaces and trim)
+                $alias = str_replace(' ', '-', trim($row[68]));
+
+                // Check if alias already exists for the given penlat_id
+                $existingAlias = Penlat_alias::where('penlat_id', $penlat->id)
+                    ->where('alias', $alias)
+                    ->first();
+
+                // If alias does not exist, save it
+                if (!$existingAlias) {
+                    $penlatAlias = new Penlat_alias();
+                    $penlatAlias->penlat_id = $penlat->id;  // Associate alias with Penlat ID
+                    $penlatAlias->alias = $alias;  // Save the alias
+                    $penlatAlias->save();
+                }
             }
 
             DB::commit();

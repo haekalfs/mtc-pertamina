@@ -343,14 +343,17 @@ document.getElementById('edit_alias').addEventListener('input', function () {
     const inputField = document.getElementById('edit_alias');
     const helpBlock = document.getElementById('alias_help');
 
-    // Regular expression to allow any character except periods, allow commas as separators, and only one space between words
-    const pattern = /^[^.,]+(?:,[^.,]+)*(?: [^.,]+)*$/;
+    // Regular expression to allow any character except periods, and replace spaces with commas
+    const pattern = /^[^.,]+(?:,[^.,]+)*(?:,[^.,]+)*$/;
+
+    // Replace spaces with commas as the user types
+    inputField.value = inputField.value.replace(/ /g, ',');
 
     // If the input does not match the pattern
     if (!pattern.test(inputField.value)) {
         helpBlock.classList.remove('d-none'); // Show the warning message
-        // Remove invalid characters: periods, multiple spaces, or consecutive commas
-        inputField.value = inputField.value.replace(/[.]+| {2,}|,{2,}/g, '');
+        // Remove invalid characters: periods, multiple commas
+        inputField.value = inputField.value.replace(/[.]+|,{2,}/g, '');
     } else {
         helpBlock.classList.add('d-none'); // Hide the warning message
     }
@@ -393,7 +396,6 @@ function overLimit() {
 function clearTags() {
   list.innerHTML = '';
   input.value = '';
-  remaining.textContent = '10 tags remaining';
   setTimeout(() => bottom.classList.remove('active'),500);
 }
 
@@ -407,13 +409,11 @@ function showTags() {
   bottom.classList.add('active');
   list.innerHTML += createMarkup();
   input.value = '';
-  remaining.textContent = `${limit - totalTags()} tags remaining`;
   updateAliasInput(); // Update hidden input
 }
 
 function closeTag(e) {
   e.target.parentElement.remove();
-  remaining.textContent = `${limit - totalTags()} tags remaining`;
   totalTags() === 0 && clearTags();
   overLimit();
   updateAliasInput(); // Update hidden input
