@@ -31,4 +31,9 @@ class Penlat extends Model
     {
         return $this->hasMany('App\Models\Certificates_to_penlat', 'penlat_id', 'id');
     }
+
+    public function aliases()
+    {
+        return $this->hasMany('App\Models\Penlat_alias', 'penlat_id', 'id');
+    }
 }

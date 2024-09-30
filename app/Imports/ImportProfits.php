@@ -4,6 +4,7 @@ namespace App\Imports;
 
 use App\Models\Notification;
 use App\Models\Penlat;
+use App\Models\Penlat_alias;
 use App\Models\Penlat_batch;
 use App\Models\Penlat_utility_usage;
 use App\Models\Profit;
@@ -60,16 +61,16 @@ class ImportProfits implements ToCollection, SkipsEmptyRows, WithBatchInserts, W
                     $checkBatch = Penlat_batch::where('batch', $row[0])->exists();
                     if (!$checkBatch) {
 
-                        $checkPenlat = Penlat::where('alias', $firstWord)->exists();
+                        $checkPenlat = Penlat_alias::where('alias', $firstWord)->exists();
                         if($checkPenlat){
-                            $getPenlat = Penlat::where('alias', $firstWord)->first();
+                            $getPenlat = Penlat_alias::where('alias', $firstWord)->first();
                             Penlat_batch::updateOrCreate(
                                 [
                                     'batch' => $row[0],
                                 ],
                                 [
-                                    'penlat_id' => $getPenlat->id,
-                                    'nama_program' => $getPenlat->description,
+                                    'penlat_id' => $getPenlat->penlat->id,
+                                    'nama_program' => $getPenlat->penlat->description,
                                     'date' => $currentDate,
                                 ]
                             );

@@ -530,7 +530,7 @@ class OperationController extends Controller
         $validator = Validator::make($request->all(), [
             'penlat' => [
                 'required',
-                'min:2', // Ensure at least 2 characters in length
+                'min:1', // Ensure at least 2 characters in length
             ],
             'batch' => [
                 'required',

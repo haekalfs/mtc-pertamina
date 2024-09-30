@@ -72,9 +72,9 @@ font-weight-bold
                             <tr>
                                 <td data-th="Product">
                                     <div class="row">
-                                        <div class="col-md-3 d-flex justify-content-center align-items-center text-center">
+                                        <div class="col-md-3 d-flex justify-content-center align-items-start text-center">
                                             <a href="{{ route('preview-requirement', $item->id) }}" class="animateBox">
-                                                <img src="{{ $item->filepath ? asset($item->filepath) : asset('img/default-img.png') }}" style="height: 150px; width: 150px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
+                                                <img src="{{ $item->filepath ? asset($item->filepath) : asset('img/default-img.png') }}" style="height: 150px; width: 200px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
                                             </a>
                                         </div>
                                         <div class="col-md-9 text-left mt-sm-2">
@@ -82,15 +82,19 @@ font-weight-bold
                                             <div class="ml-2">
                                                 <table class="table table-borderless table-sm">
                                                     @foreach($item->requirement as $index => $list)
-                                                        @if($index < 4)
+                                                        @if($index < 3)
                                                         <tr>
-                                                            <td class="mb-2"><i class="ti-minus mr-2"></i>{{ $list->tools->asset_name }}&nbsp;&nbsp;&nbsp; : &nbsp;</span><span>{{ $list->amount }} Units</td>
+                                                            <td><i class="ti-minus mr-2"></i>{{ $list->tools->asset_name }}&nbsp;&nbsp;&nbsp; : &nbsp;</span><span>{{ $list->amount }} Units</td>
                                                         </tr>
                                                         @endif
                                                     @endforeach
 
-                                                    @if($item->requirement->count() > 4)
-                                                        <li><span class=""><a href="{{ route('preview-room-user', $item->id) }}"><i>Show More...</i></li>
+                                                    @if($item->requirement->count() > 3)
+                                                        <tr>
+                                                            <td colspan="2" style="width: 300px;" class="mb-2 text-muted">
+                                                                <a href="{{ route('preview-room-user', $item->id) }}"><i>+ {{ $item->requirement->count() - 3 }} More...</i></a>
+                                                            </td>
+                                                        </tr>
                                                     @endif
                                                 </table>
                                             </div>

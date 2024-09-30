@@ -19,6 +19,7 @@ use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 use Maatwebsite\Excel\Events\AfterImport;
 use App\Models\Notification;
+use App\Models\Penlat_alias;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 
 class InfografisImport implements ToCollection, SkipsEmptyRows, WithBatchInserts, WithChunkReading, ShouldQueue, WithStartRow, WithEvents
@@ -75,16 +76,16 @@ class InfografisImport implements ToCollection, SkipsEmptyRows, WithBatchInserts
                         $parts = explode('/', $row[10]);
                         $firstWord = $parts[0];
 
-                        $checkPenlat = Penlat::where('alias', $firstWord)->exists();
+                        $checkPenlat = Penlat_alias::where('alias', $firstWord)->exists();
                         if ($checkPenlat) {
-                            $getPenlat = Penlat::where('alias', $firstWord)->first();
+                            $getPenlat = Penlat_alias::where('alias', $firstWord)->first();
                             Penlat_batch::updateOrCreate(
                                 [
                                     'batch' => $row[10],
                                 ],
                                 [
-                                    'penlat_id' => $getPenlat->id,
-                                    'nama_program' => $getPenlat->description,
+                                    'penlat_id' => $getPenlat->penlat->id,
+                                    'nama_program' => $getPenlat->penlat->description,
                                     'date' => $this->getFormattedDate($row[12])
                                 ]
                             );

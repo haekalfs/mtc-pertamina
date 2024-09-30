@@ -327,7 +327,8 @@ $(document).ready(function() {
             { data: 'jenis_pelatihan', name: 'penlat.jenis_pelatihan' },
             { data: 'tgl_pelaksanaan', name: 'date' },
             { data: 'action', name: 'action', orderable: false, searchable: false }
-        ]
+        ],
+    order: [[1, 'asc']]
     });
 
     // Edit functionality

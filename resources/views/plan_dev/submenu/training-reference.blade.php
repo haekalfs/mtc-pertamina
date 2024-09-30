@@ -128,8 +128,8 @@ font-weight-bold
 
                                                     @if($item->references->count() > 3)
                                                         <tr>
-                                                            <td colspan="2" style="width: 300px;" class="mb-2">
-                                                                <i class="ti-minus mr-2"></i> <a href="{{ route('preview-training-reference', $item->id) }}"><i>Show More</i></a>
+                                                            <td colspan="2" style="width: 300px;" class="mb-2 text-muted">
+                                                                <a href="{{ route('preview-training-reference', $item->id) }}"><i>{{ $item->references->count() - 3}} More...</i></a>
                                                             </td>
                                                         </tr>
                                                     @endif

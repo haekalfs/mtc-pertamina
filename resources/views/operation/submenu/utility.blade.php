@@ -295,6 +295,7 @@ $(document).ready(function() {
         theme: "classic",
         placeholder: "Select Pelatihan...",
         width: '100%',
+        allowClear: true,
         language: {
             noResults: function() {
                 return "No result match your request... Create new in Master Data Menu!"; // Customize this message as needed
@@ -352,6 +353,7 @@ function initSelect2WithAjax(elementId, ajaxUrl, placeholderText, penlatId = nul
         theme: 'classic',
         width: '100%',
         tags: true, // Allow adding new tags
+        allowClear: true,
         createTag: function (params) {
             var term = $.trim(params.term);
             if (term === '') {

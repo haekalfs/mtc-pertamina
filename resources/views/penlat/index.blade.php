@@ -13,6 +13,56 @@ font-weight-bold
 @endsection
 
 @section('content')
+<style>
+
+.interface-list {
+  list-style-type: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.interface-tag {
+  color: rgba(0,0,0,0.6);
+  border: 0.5px solid rgba(162, 162, 162, 0.75);
+  padding: 0.35rem 0.75rem;
+  display: flex;
+  gap: 0.75rem;
+  border-radius: 10px; /* Added for rounded corners */
+}
+
+.interface-close {
+  cursor: pointer;
+  color: rgba(0,0,0,0.65);
+}
+
+.interface-close:active { color: rgba(0,0,0,0.5); }
+
+.interface-footer {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+}
+
+.interface-remaining {
+  margin-left: 1rem;
+}
+
+.interface-clear {
+  color: white;
+  background-color: black;
+  border: 1.5px solid black;
+  outline: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.interface-clear:active {
+  border: 1.5px solid black;
+  background-color: transparent;
+  color: black;
+}
+</style>
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
         <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-list-alt"></i> List Pelatihan</h1>
@@ -105,7 +155,7 @@ font-weight-bold
                             <tr>
                                 <th>Display</th>
                                 <th>Nama Pelatihan</th>
-                                <th>Alias</th>
+                                <th>Aliases</th>
                                 <th>Jenis Pelatihan</th>
                                 <th>Kategori</th>
                                 <th width="100px">Action</th>
@@ -168,14 +218,6 @@ font-weight-bold
                                         </div>
                                         <div class="d-flex align-items-center mb-4">
                                             <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Alias :</p>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <input type="text" class="form-control" name="alias" required>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
                                                 <p style="margin: 0;">Jenis Pelatihan :</p>
                                             </div>
                                             <div class="flex-grow-1">
@@ -189,6 +231,21 @@ font-weight-bold
                                             <div class="flex-grow-1">
                                                 <input type="text" class="form-control" name="kategori_program" required>
                                             </div>
+                                        </div>
+                                        <div class="d-flex align-items-start mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Aliases :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class='interface-top'>
+                                                    <input type='text' class='interface-input form-control' placeholder='Press enter or add a comma after each tag'>
+                                                    <input type="hidden" name="alias" id="aliasInput">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class='interface-bottom mt-2'>
+                                            <ul class='interface-list'></ul>
                                         </div>
                                     </div>
                                 </div>
@@ -230,21 +287,13 @@ font-weight-bold
                             <div class="card-body text-secondary">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <!-- Repeat input fields here, but with id's for JS to fill them -->
+                                        <!-- Input fields for edit -->
                                         <div class="d-flex align-items-center mb-4">
                                             <div style="width: 140px;" class="mr-2">
                                                 <p style="margin: 0;">Nama Program :</p>
                                             </div>
                                             <div class="flex-grow-1">
                                                 <input type="text" class="form-control" id="edit_nama_program" name="nama_program" required>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Alias :</p>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <input type="text" class="form-control" id="edit_alias" name="alias" required>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-4">
@@ -263,7 +312,17 @@ font-weight-bold
                                                 <input type="text" class="form-control" id="edit_kategori_pelatihan" name="kategori_pelatihan" required>
                                             </div>
                                         </div>
-                                        <!-- Continue for alias, jenis_pelatihan, kategori_program -->
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Aliases :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <textarea type="text" class="form-control" id="edit_alias" name="alias" required></textarea>
+                                                <small id="alias_help" class="help-block form-text text-danger d-none">
+                                                    Only letters (A-Z), dashes (-), and commas (,) are allowed.
+                                                </small>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -272,7 +331,7 @@ font-weight-bold
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Update Request</button>
+                    <button type="submit" class="btn btn-primary" id="submitEditForm">Update Request</button>
                 </div>
             </form>
         </div>
@@ -280,22 +339,135 @@ font-weight-bold
 </div>
 
 <script>
-    function previewImage(event) {
-        const reader = new FileReader();
-        reader.onload = function(){
-            const output = document.getElementById('image-preview');
-            output.src = reader.result;
-        };
-        reader.readAsDataURL(event.target.files[0]);
-    }
+document.getElementById('edit_alias').addEventListener('input', function () {
+    const inputField = document.getElementById('edit_alias');
+    const helpBlock = document.getElementById('alias_help');
 
-    function previewEditImage(event) {
-        const output = document.getElementById('edit-image-preview');
-        output.src = URL.createObjectURL(event.target.files[0]);
-        output.onload = function () {
-            URL.revokeObjectURL(output.src) // Free up memory
-        }
+    // Regular expression to allow any character except periods, allow commas as separators, and only one space between words
+    const pattern = /^[^.,]+(?:,[^.,]+)*(?: [^.,]+)*$/;
+
+    // If the input does not match the pattern
+    if (!pattern.test(inputField.value)) {
+        helpBlock.classList.remove('d-none'); // Show the warning message
+        // Remove invalid characters: periods, multiple spaces, or consecutive commas
+        inputField.value = inputField.value.replace(/[.]+| {2,}|,{2,}/g, '');
+    } else {
+        helpBlock.classList.add('d-none'); // Hide the warning message
     }
+});
+// Intercept form submission to show SweetAlert confirmation
+document.getElementById('submitEditForm').addEventListener('click', function (event) {
+    event.preventDefault();  // Prevent form from submitting immediately
+
+    swal({
+        title: "Are you sure?",
+        text: "Do you really want to update the data? Please be careful with the aliases. Ensure they are in the correct format (e.g., alias1, alias2) without duplicates, spaces, or incorrect characters. Any changes will directly affect integration between Infografis, Profit Menu, and other related systems.",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+    })
+    .then((willUpdate) => {
+        if (willUpdate) {
+            // Submit the form if the user confirms
+            document.getElementById('editForm').submit();
+        } else {
+            swal("Your changes are safe!");
+        }
+    });
+});
+const input = document.querySelector('.interface-input');
+const bottom = document.querySelector('.interface-bottom');
+const list = document.querySelector('.interface-list');
+const remaining = document.querySelector('.interface-remaining');
+const limit = 10;
+
+const totalTags = () => list.querySelectorAll('.interface-tag').length;
+
+function overLimit() {
+  input.value = '';
+  input.placeholder = totalTags() >= limit
+    ? `You've reached the limit of 10 tags`
+    : `Press enter or add a comma after each tag`;
+}
+
+function clearTags() {
+  list.innerHTML = '';
+  input.value = '';
+  remaining.textContent = '10 tags remaining';
+  setTimeout(() => bottom.classList.remove('active'),500);
+}
+
+function updateAliasInput() {
+  const tagNames = Array.from(list.querySelectorAll('.interface-tagName')).map(tag => tag.textContent);
+  document.getElementById('aliasInput').value = tagNames.join(',');
+}
+
+function showTags() {
+  if (!input.value.length) return;
+  bottom.classList.add('active');
+  list.innerHTML += createMarkup();
+  input.value = '';
+  remaining.textContent = `${limit - totalTags()} tags remaining`;
+  updateAliasInput(); // Update hidden input
+}
+
+function closeTag(e) {
+  e.target.parentElement.remove();
+  remaining.textContent = `${limit - totalTags()} tags remaining`;
+  totalTags() === 0 && clearTags();
+  overLimit();
+  updateAliasInput(); // Update hidden input
+}
+
+function isEnter(e) {
+  if (e.keyCode === 13) {
+    e.preventDefault(); // This will prevent the form submission
+    showTags();
+  }
+}
+
+function createMarkup() {
+  const tags = input.value.split(/[, ]/);
+  const markup = [];
+  if (totalTags() >= limit || !tags[0].length) overLimit();
+  for (let i = 0; i < limit - totalTags(); i++) {
+    if (!tags[i]) continue;
+    markup.push(`
+      <li class='interface-tag'>
+        <span class='interface-tagName'>${tags[i]}</span>
+        <span class='interface-close'>x</span>
+      </li>
+    `);
+  }
+  return markup.join('');
+}
+
+function init(e) {
+  e.target.matches('.interface-clear') && clearTags();
+  e.target.matches('.interface-close') && closeTag(e);
+  e.target.matches('.interface-btn') && showTags();
+}
+
+input.addEventListener('input',createMarkup,false);
+input.addEventListener('keydown',isEnter,false);
+document.addEventListener('click',init,false);
+
+function previewImage(event) {
+    const reader = new FileReader();
+    reader.onload = function(){
+        const output = document.getElementById('image-preview');
+        output.src = reader.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+}
+
+function previewEditImage(event) {
+    const output = document.getElementById('edit-image-preview');
+    output.src = URL.createObjectURL(event.target.files[0]);
+    output.onload = function () {
+        URL.revokeObjectURL(output.src) // Free up memory
+    }
+}
 </script>
 <script>
 $(document).ready(function() {
@@ -317,7 +489,8 @@ $(document).ready(function() {
             { data: 'jenis_pelatihan', name: 'jenis_pelatihan' },
             { data: 'kategori_pelatihan', name: 'kategori_pelatihan' },
             { data: 'action', name: 'action', orderable: false, searchable: false }
-        ]
+        ],
+    order: [[1, 'asc']]
     });
 
     // Edit functionality

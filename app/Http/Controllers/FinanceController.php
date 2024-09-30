@@ -332,6 +332,10 @@ class FinanceController extends Controller
             }])->get();
 
             return DataTables::of($data)
+                ->addColumn('description', function($item) {
+                    // Return the description with alias below it
+                    return '<span>' . $item->description . '</span><br><span class="text-muted">' . $item->kategori_pelatihan . '</span>';
+                })
                 ->addColumn('display', function($item) use ($request) {
                     $filePath = $item->filepath;
                     $imageUrl = $filePath ? asset($item->filepath) : asset('img/default-img.png');
@@ -401,7 +405,7 @@ class FinanceController extends Controller
                     });
                     return 'Rp ' . number_format($totalNettIncome, 0, ',', '.');
                 })
-                ->rawColumns(['display'])
+                ->rawColumns(['display', 'description'])
                 ->make(true);
         }
 

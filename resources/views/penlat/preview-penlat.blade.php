@@ -72,8 +72,10 @@ font-weight-bold
                                     <td style="text-align: start; font-weight:500">: {{ $data->description }}</td>
                                 </tr>
                                 <tr>
-                                    <th style="width: 200px;">Alias</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $data->alias }}</td>
+                                    <th style="width: 200px;">Aliases</th>
+                                    <td style="text-align: start; font-weight:500">
+                                        : {{ $data->aliases->pluck('alias')->implode(', ') }}
+                                    </td>
                                 </tr>
                                 <tr>
                                     <th>Jenis Pelatihan</th>

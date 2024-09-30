@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Penlat;
+use App\Models\Penlat_alias;
 use App\Models\Penlat_batch;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -40,10 +41,10 @@ class ProcessBatchChunk implements ShouldQueue
             $firstWord = $parts[0];
 
             // Check if the alias exists in the Penlat table
-            $checkPenlat = Penlat::where('alias', $firstWord)->exists();
+            $checkPenlat = Penlat_alias::where('alias', $firstWord)->exists();
             if ($checkPenlat) {
                 // Fetch the matching Penlat record
-                $getPenlat = Penlat::where('alias', $firstWord)->first();
+                $getPenlat = Penlat_alias::where('alias', $firstWord)->first();
 
                 // Update or create the record in the Penlat_batch table
                 Penlat_batch::updateOrCreate(
@@ -51,8 +52,8 @@ class ProcessBatchChunk implements ShouldQueue
                         'batch' => $row->batch, // The unique batch identifier
                     ],
                     [
-                        'penlat_id' => $getPenlat->id,
-                        'nama_program' => $getPenlat->description,
+                        'penlat_id' => $getPenlat->penlat->id,
+                        'nama_program' => $getPenlat->penlat->description,
                         'date' => $this->getFormattedDate($row->tgl_pelaksanaan) // Replace 'date_column' with the actual date field in Infografis_peserta
                     ]
                 );

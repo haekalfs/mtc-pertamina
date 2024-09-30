@@ -6,6 +6,7 @@ use App\Jobs\RefreshBatchData;
 use App\Models\Inventory_tools;
 use App\Models\Location;
 use App\Models\Penlat;
+use App\Models\Penlat_alias;
 use App\Models\Penlat_batch;
 use App\Models\Penlat_certificate;
 use App\Models\Penlat_requirement;
@@ -50,6 +51,10 @@ class PenlatController extends Controller
                 }
 
                 return '<a href="'. route('preview-penlat', $item->id) .'"><img src="' . $imageUrl . '" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow animateBox"></a>';
+            })
+            ->addColumn('alias', function($item) {
+                // Join aliases into a comma-delimited string
+                return $item->aliases->pluck('alias')->implode(', ');
             })
             ->addColumn('action', function($item) {
                 return '<div>
@@ -149,30 +154,61 @@ class PenlatController extends Controller
         // Validate the form inputs
         $validatedData = $request->validate([
             'nama_program' => 'required|string|max:255',
-            'alias' => 'nullable|string|max:100',
+            'alias' => 'nullable', // Comma-separated tags
             'jenis_pelatihan' => 'nullable|string|max:255',
             'kategori_program' => 'nullable|string|max:255',
             'display' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        // Store the main data in the Penlat table
-        $penlat = new Penlat();
-        $penlat->description = $request->input('nama_program');
-        $penlat->alias = $request->input('alias');
-        $penlat->jenis_pelatihan = $request->input('jenis_pelatihan');
-        $penlat->kategori_pelatihan = $request->input('kategori_program');
+        // Start database transaction
+        DB::beginTransaction();
 
-        // If an image was uploaded, save the file path
-        if ($request->hasFile('display')) {
-            $image = $request->file('display');
-            $filename = time() . '_' . $image->getClientOriginalName();
-            $image->move(public_path('uploads/penlat'), $filename);
-            $penlat->filepath = 'uploads/penlat/' . $filename;
+        try {
+            // Check if any of the aliases already exist (ignoring case sensitivity)
+            $aliasArray = explode(',', $request->alias);
+            foreach ($aliasArray as $alias) {
+                if (Penlat_alias::where('alias', trim($alias))->exists()) {
+                    return redirect()->back()->with('failed', 'One of the aliases already exists. Please choose different aliases.');
+                }
+            }
+
+            // Create a new Penlat record
+            $penlat = new Penlat();
+            $penlat->description = $request->input('nama_program');
+            $penlat->jenis_pelatihan = $request->input('jenis_pelatihan');
+            $penlat->kategori_pelatihan = $request->input('kategori_program');
+
+            // Handle file upload if an image was uploaded
+            if ($request->hasFile('display')) {
+                $image = $request->file('display');
+                $filename = time() . '_' . $image->getClientOriginalName();
+                $image->move(public_path('uploads/penlat'), $filename);
+                $penlat->filepath = 'uploads/penlat/' . $filename;
+            }
+
+            // Save the Penlat data
+            $penlat->save();
+
+            // Save aliases in Penlat_alias model
+            foreach ($aliasArray as $alias) {
+                $penlatAlias = new Penlat_alias();
+                $penlatAlias->penlat_id = $penlat->id;  // Save the newly created Penlat's ID
+                $penlatAlias->alias = trim($alias);  // Trim to remove any extra spaces
+                $penlatAlias->save();
+            }
+
+            // Commit the transaction if everything went well
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Program data and image uploaded successfully.');
+
+        } catch (\Exception $e) {
+            // Rollback the transaction if something goes wrong
+            DB::rollBack();
+
+            // Return with an error message
+            return redirect()->back()->with('error', 'Failed to save program data. Please try again.')->withInput();
         }
-
-        $penlat->save();
-
-        return redirect()->back()->with('success', 'Program data and image uploaded successfully.');
     }
 
     public function edit_requirement($id)
@@ -263,10 +299,13 @@ class PenlatController extends Controller
     {
         $penlat = Penlat::findOrFail($id);
 
+        // Get aliases as a comma-separated string
+        $aliases = $penlat->aliases->pluck('alias')->implode(', ');
+
         $penlatData = [
             'id' => $penlat->id,
             'description' => $penlat->description,
-            'alias' => $penlat->alias,
+            'alias' => $aliases, // Add comma-delimited aliases
             'jenis_pelatihan' => $penlat->jenis_pelatihan,
             'kategori_pelatihan' => $penlat->kategori_pelatihan,
             'image' => $penlat->filepath ? asset($penlat->filepath) : null,
@@ -277,34 +316,71 @@ class PenlatController extends Controller
 
     public function update(Request $request, $id)
     {
+        // Validate the incoming request
         $validatedData = $request->validate([
             'nama_program' => 'required|string|max:255',
-            'alias' => 'nullable|string|max:100',
+            'alias' => 'nullable|string|max:100',  // Alias can be a comma-separated string
             'jenis_pelatihan' => 'nullable|string|max:255',
             'kategori_program' => 'nullable|string|max:255',
             'display' => 'sometimes',
         ]);
 
+        // Find the Penlat record
         $penlat = Penlat::findOrFail($id);
         $penlat->description = $request->input('nama_program');
-        $penlat->alias = $request->input('alias');
         $penlat->jenis_pelatihan = $request->input('jenis_pelatihan');
         $penlat->kategori_pelatihan = $request->input('kategori_pelatihan');
 
+        // Handle file upload (display image)
         if ($request->hasFile('display')) {
-            // Delete the old image if exists
+            // Delete the old image if it exists
             if ($penlat->filepath && file_exists(public_path($penlat->filepath))) {
                 unlink(public_path($penlat->filepath));
             }
 
+            // Upload the new image
             $image = $request->file('display');
             $filename = time() . '_' . $image->getClientOriginalName();
             $image->move(public_path('uploads/penlat'), $filename);
             $penlat->filepath = 'uploads/penlat/' . $filename;
         }
 
+        // Update the Penlat entry in the database
         $penlat->save();
 
+        // Handling alias updates
+        if ($request->input('alias')) {
+            // Split the alias string into an array, trim whitespace, and remove duplicates
+            $aliasArray = array_unique(array_map('trim', explode(',', $request->alias)));
+
+            // Fetch existing Penlat_alias entries for this Penlat
+            $existingAliases = Penlat_alias::where('penlat_id', $penlat->id)->pluck('alias')->toArray();
+
+            // Fetch existing batch aliases (first word of 'batch' column in Penlat_batch) for this Penlat
+            $batchAliases = Penlat_batch::where('penlat_id', $penlat->id)->get()->map(function ($row) {
+                $parts = explode('/', $row->batch);
+                return $parts[0];  // Get the first word of the batch
+            })->toArray();
+
+            // Filter out aliases that are in the batch (don't delete them)
+            $aliasesToDelete = array_diff($existingAliases, $batchAliases, $aliasArray);
+
+            // Delete aliases that are no longer needed and not in batches
+            Penlat_alias::where('penlat_id', $penlat->id)->whereIn('alias', $aliasesToDelete)->delete();
+
+            // Save the new aliases in the Penlat_alias model
+            foreach ($aliasArray as $alias) {
+                // Check if alias already exists for this penlat_id, if not, create a new entry
+                if (!in_array($alias, $existingAliases)) {
+                    $penlatAlias = new Penlat_alias();
+                    $penlatAlias->penlat_id = $penlat->id;
+                    $penlatAlias->alias = $alias;
+                    $penlatAlias->save();
+                }
+            }
+        }
+
+        // Redirect back with a success message
         return redirect()->back()->with('success', 'Program data updated successfully.');
     }
 
@@ -326,6 +402,7 @@ class PenlatController extends Controller
 
             // If no related records exist, proceed with deletion
             $penlat->penlat_to_certificate()->delete();
+            $penlat->aliases()->delete();
             $penlat->delete();
 
             return response()->json(['success' => 'Record deleted successfully.'], 200);
