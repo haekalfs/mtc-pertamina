@@ -62,7 +62,7 @@
 
         <div class="text-center p-t-12">
             <span class="txt1">
-                Already have an Accout?
+                Already have an Account?
             </span>
             <a class="txt2" href="/login">
                 Login

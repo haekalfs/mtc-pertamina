@@ -80,7 +80,7 @@ font-weight-bold
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> List Data</h6>
+                    <h6 class="m-0 font-weight-bold text-secondary" id="judul">Daftar Instruktur</h6>
                     <div class="text-right">
                         <a class="btn btn-primary btn-sm text-white" href="{{ route('register-instructor') }}"><i class="menu-Logo fa fa-plus"></i> Register Instructor</a>
                     </div>

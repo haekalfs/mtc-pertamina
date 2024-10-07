@@ -124,7 +124,7 @@ font-weight-bold
 </div>
 
 <div class="modal fade" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 900px;" role="document">
+    <div class="modal-dialog modal-lg" style="max-width: 950px;" role="document">
         <div class="modal-content">
             <div class="modal-header d-flex flex-row align-items-center justify-content-between">
                 <h5 class="modal-title" id="inputDataModalLabel">Input Data</h5>
@@ -145,7 +145,7 @@ font-weight-bold
                         </div>
                         <div class="col-md-9">
                             <div class="d-flex align-items-center mb-4">
-                                <div style="width: 140px;" class="mr-2">
+                                <div style="width: 150px;" class="mr-2">
                                     <p style="margin: 0;">Nama Pelatihan <span class="text-danger">*</span>:</p>
                                 </div>
                                 <div class="flex-grow-1">
@@ -158,7 +158,7 @@ font-weight-bold
                                 </div>
                             </div>
                             <div class="d-flex align-items-center mb-4">
-                                <div style="width: 140px;" class="mr-2">
+                                <div style="width: 150px;" class="mr-2">
                                     <p style="margin: 0;">Nama Program <span class="text-danger">*</span>:</p>
                                 </div>
                                 <div class="flex-grow-1">
@@ -166,7 +166,7 @@ font-weight-bold
                                 </div>
                             </div>
                             <div class="d-flex align-items-center mb-4">
-                                <div style="width: 140px;" class="mr-2">
+                                <div style="width: 150px;" class="mr-2">
                                     <p style="margin: 0;">Batch <span class="text-danger">*</span>:</p>
                                 </div>
                                 <div class="flex-grow-1">
@@ -174,7 +174,7 @@ font-weight-bold
                                 </div>
                             </div>
                             <div class="d-flex align-items-center mb-4">
-                                <div style="width: 140px;" class="mr-2">
+                                <div style="width: 150px;" class="mr-2">
                                     <p style="margin: 0;">Tgl Pelaksanaan <span class="text-danger">*</span>:</p>
                                 </div>
                                 <div class="flex-grow-1">
@@ -226,15 +226,19 @@ font-weight-bold
                                 @foreach($utilities as $tool)
                                 <tr id="row_{{ $tool->id }}" style="display: none;">
                                     <td>
-                                        <div class="row">
+                                        <div class="row position-relative">
                                             <div class="col-md-4 text-left">
-                                                <img src="{{ asset($tool->filepath) }}" style="height: 100px; width: 100px;" alt=""
-                                                     class="img-fluid d-none d-md-block rounded mb-2 shadow ">
+                                                <div class="image-wrapper">
+                                                    <img src="{{ asset($tool->filepath) }}" style="height: 100px; width: 100px;" alt="" class="img-fluid rounded mb-2 shadow">
+                                                </div>
                                             </div>
                                             <div class="col-md-8 text-left mt-sm-2">
                                                 <h5>{{ $tool->utility_name }}</h5>
                                                 <p class="font-weight-light">Satuan Default ({{$tool->utility_unit}})</p>
                                             </div>
+                                            <a class="removeUtilityBtn position-absolute" style="top: -10px; right: 10px; font-size: 17px;" data-id="{{ $tool->id }}">
+                                                <i class="fa fa-times"></i>
+                                            </a>
                                         </div>
                                     </td>
                                     <td style="width:10%">
@@ -509,26 +513,43 @@ function formatRupiah(number) {
 }
 </script>
 <script>
-    $(document).ready(function() {
-        $('#addUtilityBtn').on('click', function() {
-            // Get the selected utility id from the dropdown
-            let selectedUtilityId = $('#utilitiesSelect').val();
+$(document).ready(function() {
+    $('#addUtilityBtn').on('click', function() {
+        // Get the selected utility id from the dropdown
+        let selectedUtilityId = $('#utilitiesSelect').val();
 
-            // Escape special characters in the ID (replace slashes and other special characters)
-            let escapedUtilityId = selectedUtilityId.replace(/([!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~])/g, '\\$1');
+        // Escape special characters in the ID (replace slashes and other special characters)
+        let escapedUtilityId = selectedUtilityId.replace(/([!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~])/g, '\\$1');
 
-            // Show the corresponding row for the selected utility
-            let utilityRow = $('#row_' + escapedUtilityId);
+        // Show the corresponding row for the selected utility
+        let utilityRow = $('#row_' + escapedUtilityId);
 
-            // Check if the row is already visible
-            if (utilityRow.is(':visible')) {
-                alert('This utility is already added to the table.');
-                return;
-            }
+        // Check if the row is already visible
+        if (utilityRow.is(':visible')) {
+            alert('This utility is already added to the table.');
+            return;
+        }
 
-            // Make the row visible
-            utilityRow.show();
-        });
+        // Make the row visible
+        utilityRow.show();
     });
+
+    // Event listener for removing a utility row
+    $(document).on('click', '.removeUtilityBtn', function() {
+        // Get the id of the utility to remove
+        let utilityId = $(this).data('id');
+
+        // Find the corresponding row
+        let utilityRow = $('#row_' + utilityId);
+
+        // Reset all input fields in the row
+        utilityRow.find('.qty-input').val('0');
+        utilityRow.find('.price-input').val('0');
+        utilityRow.find('.total-input').val('0');
+
+        // Hide the row
+        utilityRow.hide();
+    });
+});
 </script>
 @endsection

@@ -468,7 +468,7 @@ class FinanceController extends Controller
             })
             ->addColumn('pelaksanaan', function($item) {
                 return $item->pelaksanaan ?
-                    '<div class="animateBox"><a href="' . route('preview-costs', $item->batch->id) . '">' . $item->pelaksanaan . '</a></div>' : '-';
+                    '<div class="animateBox"><a class="text-primary" href="' . route('preview-costs', $item->batch->id) . '"><u>' . $item->pelaksanaan . '</u></a></div>' : '-';
             })
             ->addColumn('revenue', function($item) {
                 return $item->total_biaya_pendaftaran_peserta ? 'Rp ' . number_format($item->total_biaya_pendaftaran_peserta, 0, ',', '.') : '-';

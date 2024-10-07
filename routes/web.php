@@ -43,14 +43,23 @@ use Illuminate\Support\Facades\Session;
 // Throttle middleware for 10 requests per minute
 Route::get('/', function () {
     return redirect('/dashboard');
-})->middleware(['auth', 'suspicious', 'verified', 'throttle:10,1']);
+})->middleware(['auth', 'suspicious', 'suspiciousActivity', 'verified', 'throttle:10,1']);
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->middleware(['auth', 'suspicious', 'verified']) // 60 requests per minute
+    ->middleware(['auth', 'suspicious', 'suspiciousActivity', 'verified']) // 60 requests per minute
     ->name('dashboard');
 
 Route::middleware('checkForErrors', 'suspiciousActivity', 'suspicious', 'auth')->group(function () {
-    //Import data
+    //On Dev Notification
+    Route::get('/closed-menu', function () {
+        // Set the session flash message
+        Session::flash('warning', 'The menu you try to access is on development & testing, thank you for your patience.');
+
+        // Redirect back to the current page or any other specific page
+        return redirect()->back();
+    })->name('on.development');
+
+    //Toast
     Route::post('/clear-toast-session', function () {
         Session::forget('loading-import');
         return response()->json(['status' => 'success']);
@@ -136,8 +145,10 @@ Route::middleware('checkForErrors', 'suspiciousActivity', 'suspicious', 'auth')-
             Route::delete('/infografis-peserta-delete-data/{id}', [OperationController::class, 'delete_data_peserta']);
 
             //inventaris Alat
-            Route::get('/operation/tool-inventory', [OperationController::class, 'tool_inventory'])->name('tool-inventory');
-            Route::get('/operation/tool-inventory/preview/{id}', [InventoryToolController::class, 'preview_asset'])->name('preview-asset');
+            Route::get('/tool-inventory', [InventoryToolController::class, 'tool_inventory'])->name('tool-inventory');
+            Route::get('/tool-inventory/preview/{id}', [InventoryToolController::class, 'preview_asset'])->name('preview-asset');
+            //QR CODE PREVIEWER
+            Route::get('/tool-inventory-validation/qr-code/preview-asset/{id}', [InventoryToolController::class, 'validate_asset'])->name('validate-asset');
 
             Route::post('/store-asset', [InventoryToolController::class, 'store'])->name('asset.store');
             Route::get('/inventory-tools/{id}/edit', [InventoryToolController::class, 'edit']);
@@ -145,6 +156,10 @@ Route::middleware('checkForErrors', 'suspiciousActivity', 'suspicious', 'auth')-
             Route::put('/inventory-tools-update/{id}', [InventoryToolController::class, 'update'])->name('update.asset');
             Route::put('/inventory-tools-update-partially/{id}', [InventoryToolController::class, 'update_partially'])->name('update.asset.partially');
             Route::delete('/asset-delete/{id}', [InventoryToolController::class, 'delete_asset'])->name('delete.asset');
+            Route::patch('/inventory-tools-mark-as-used/{id}', [InventoryToolController::class, 'markAsUsed'])->name('inventory-tools.mark-as-used');
+            Route::patch('/inventory-tools-mark-as-unused/{id}', [InventoryToolController::class, 'markAsUnused'])->name('inventory-tools.mark-as-unused');
+            Route::get('/tool-inventory-generate-qr/{id}', [InventoryToolController::class, 'generateQrCode'])->name('generate-qr');
+            Route::post('/update-asset-condition', [InventoryToolController::class, 'updateAssetCondition'])->name('update-asset-condition');
 
 
             //inventaris ruangan

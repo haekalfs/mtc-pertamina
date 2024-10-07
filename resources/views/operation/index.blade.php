@@ -101,20 +101,28 @@ font-weight-bold
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="card-body d-flex justify-content-center align-items-center">
-                            <!-- <canvas id="TrafficChart"></canvas>   -->
-                            <canvas id="lineChart"></canvas>
-                        </div>
-                        <div class="text-center mb-3">
-                            <span id="CountSTCW"></span><span> & </span>
-                            <span id="CountNonSTCW"></span>
-                        </div>
+                <h4 class="pt-3 pb-0 pl-3">{{ $yearSelected }}</h4>
+                <hr>
+                <div class="col-lg-12">
+                    <div class="card-body d-flex justify-content-center align-items-center">
+                        <!-- <canvas id="TrafficChart"></canvas>   -->
+                        <canvas id="lineChart"></canvas>
                     </div>
-                </div> <!-- /.row -->
+                    <div class="text-center mb-3">
+                        <span id="CountSTCW"></span><span> & </span>
+                        <span id="CountNonSTCW"></span>
+                    </div>
+                </div>
+
+                <!-- Professional description with padding -->
+                <div style="padding: 10px;">
+                    <small>
+                        This chart illustrates the increase or decrease in participant realization for the latest month compared to the previous month.
+                        The data reflects changes in both STCW and Non-STCW programs.
+                    </small>
+                </div>
             </div>
-        </div><!-- /# column -->
+        </div>
         <div class="col-lg-7">
             <div class="row">
                 <div class="col-lg-12">
@@ -224,12 +232,16 @@ font-weight-bold
                         </thead>
                         <tbody>
                             @foreach ($data as $index => $row)
-                                <tr>
-                                    <td>{{ $row['month'] }}</td>
+                            <tr>
+                                <td>{{ $row['month'] }}</td>
 
-                                    <!-- External Participants Count and Percentage Calculation -->
-                                    <td>
-                                        {{ $row['external_count'] }}
+                                <!-- External Participants Count and Percentage Calculation -->
+                                <td>
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        {{-- External Participants Count (left aligned) --}}
+                                        <span>{{ $row['external_count'] }}</span>
+
+                                        {{-- Percentage Change (right aligned) --}}
                                         @if($index > 0)
                                             @php
                                                 // Calculate the difference between the current and previous month
@@ -240,20 +252,25 @@ font-weight-bold
                                                 }
                                             @endphp
 
-                                            <!-- Display the percentage change -->
+                                            {{-- Display the percentage change --}}
                                             @if($percentageChange > 0)
-                                                <small class="badge bg-success text-white" style="font-size: 10px;">(+{{ number_format($percentageChange, 2) }}%)</small>
+                                                <small class="badge bg-success text-white" style="font-size: 10px;"><i class="fa fa-caret-up"></i> {{ number_format($percentageChange, 2) }}%</small>
                                             @elseif($percentageChange < 0)
-                                                <small class="badge bg-danger text-white" style="font-size: 10px;">({{ number_format($percentageChange, 2) }}%)</small>
+                                                <small class="badge bg-danger text-white" style="font-size: 10px;"><i class="fa fa-caret-down"></i> {{ number_format(abs($percentageChange), 2) }}%</small>
                                             @else
                                                 <small class="badge bg-secondary text-white" style="font-size: 10px;">(0%)</small>
                                             @endif
                                         @endif
-                                    </td>
+                                    </div>
+                                </td>
 
-                                    <!-- Internal Participants Count -->
-                                    <td>
-                                        {{ $row['internal_count'] }}
+                                <!-- Internal Participants Count -->
+                                <td>
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        {{-- Internal Participants Count (left aligned) --}}
+                                        <span>{{ $row['internal_count'] }}</span>
+
+                                        {{-- Percentage Change (right aligned) --}}
                                         @if($index > 0)
                                             @php
                                                 // Calculate the percentage change for internal participants
@@ -264,17 +281,18 @@ font-weight-bold
                                                 }
                                             @endphp
 
-                                            <!-- Display the percentage change for internal participants -->
+                                            {{-- Display the percentage change for internal participants --}}
                                             @if($internalPercentageChange > 0)
-                                                <small class="badge bg-success text-white" style="font-size: 10px;">(+{{ number_format($internalPercentageChange, 2) }}%)</small>
+                                                <small class="badge bg-success text-white" style="font-size: 10px;"><i class="fa fa-caret-up"></i> {{ number_format($internalPercentageChange, 2) }}%</small>
                                             @elseif($internalPercentageChange < 0)
-                                                <small class="badge bg-danger text-white" style="font-size: 10px;">({{ number_format($internalPercentageChange, 2) }}%)</small>
+                                                <small class="badge bg-danger text-white" style="font-size: 10px;"><i class="fa fa-caret-down"></i> {{ number_format(abs($internalPercentageChange), 2) }}%</small>
                                             @else
                                                 <small class="badge bg-secondary text-white" style="font-size: 10px;">(0%)</small>
                                             @endif
                                         @endif
-                                    </td>
-                                </tr>
+                                    </div>
+                                </td>
+                            </tr>
                             @endforeach
                         </tbody>
                     </table>
@@ -283,28 +301,36 @@ font-weight-bold
         </div>
         <div class="col-lg-12">
             <div class="card">
+                <h4 class="pt-3 pb-0 pl-3">{{ $yearSelected }} Most Participants Penlat & Returning Participants from Previous Year</h4>
+                <hr>
+
                 <div class="row">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-lg-3">
-                                <div class="pl-4" id="pieChartNewParticipant" style="height: 370px; width: 100%;"></div>
-                            </div>
-                            <div class="col-lg-9">
-                                <!-- <canvas id="TrafficChart"></canvas>   -->
-                                <div class="pr-4" id="chartContainerBar" style="height: 400px; width: 100%;"></div>
-                            </div>
-                        </div>
+                    <div class="col-lg-3">
+                        <div class="pl-4" id="pieChartNewParticipant" style="height: 370px; width: 100%;"></div>
                     </div>
-                </div> <!-- /.row -->
+                    <div class="col-lg-9">
+                        <!-- <canvas id="TrafficChart"></canvas>   -->
+                        <div class="pr-4" id="chartContainerBar" style="height: 400px; width: 100%;"></div>
+                    </div>
+                </div>
+
+                <!-- Professional description with padding -->
+                <div style="padding: 10px;">
+                    <small>
+                        This chart illustrates the increase or decrease in participant realization for the latest month compared to the previous month.
+                        The data reflects changes in both STCW and Non-STCW programs.
+                    </small>
+                </div>
             </div>
         </div>
         <div class="col-lg-12">
             <div class="card">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="card-body d-flex justify-content-center align-items-center">
-                            <div id="chartContainerColumn" style="height: 400px; width: 100%;"></div>
-                        </div>
+                <h4 class="pt-3 pb-0 pl-3">{{ $yearSelected - 7 }} - {{ $yearSelected }} Realization</h4>
+                <hr>
+
+                <div class="col-lg-12">
+                    <div class="card-body d-flex justify-content-center align-items-center">
+                        <div id="chartContainerColumn" style="height: 400px; width: 100%;"></div>
                     </div>
                 </div>
             </div>

@@ -39,9 +39,9 @@ class Inventory_tools extends Model
     	return $this->belongsTo('App\Models\Asset_condition', 'asset_condition_id', 'id');
     }
 
-    public function penlat_usage()
+    public function items()
     {
-        return $this->hasMany('App\Models\Penlat_utility_usage', 'inventory_tool_id', 'id');
+        return $this->hasMany('App\Models\Asset_item', 'inventory_tool_id', 'id');
     }
 
     public function location()

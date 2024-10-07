@@ -223,7 +223,7 @@ font-weight-bold
                                 @foreach($utilities as $tool)
                                 <tr id="row_{{ $tool->id }}" style="display: none;">
                                     <td>
-                                        <div class="row">
+                                        <div class="row position-relative">
                                             <div class="col-md-4 text-left">
                                                 <img src="{{ asset($tool->filepath) }}" style="height: 100px; width: 100px;" alt=""
                                                      class="img-fluid d-none d-md-block rounded mb-2 shadow ">
@@ -232,6 +232,9 @@ font-weight-bold
                                                 <h5>{{ $tool->utility_name }}</h5>
                                                 <p class="font-weight-light">Satuan Default ({{$tool->utility_unit}})</p>
                                             </div>
+                                            <a class="removeUtilityBtn position-absolute" style="top: -10px; right: 10px; font-size: 17px;" data-id="{{ $tool->id }}">
+                                                <i class="fa fa-times"></i>
+                                            </a>
                                         </div>
                                     </td>
                                     <td style="width:10%">
@@ -344,6 +347,7 @@ $(document).on('click', '.btn-delete-item-usage', function() {
     });
 });
 
+
 $(document).ready(function() {
     $('#addUtilityBtn').on('click', function() {
         // Get the selected utility id from the dropdown
@@ -363,6 +367,23 @@ $(document).ready(function() {
 
         // Make the row visible
         utilityRow.show();
+    });
+
+    // Event listener for removing a utility row
+    $(document).on('click', '.removeUtilityBtn', function() {
+        // Get the id of the utility to remove
+        let utilityId = $(this).data('id');
+
+        // Find the corresponding row
+        let utilityRow = $('#row_' + utilityId);
+
+        // Reset all input fields in the row
+        utilityRow.find('.qty-input').val('0');
+        utilityRow.find('.price-input').val('0');
+        utilityRow.find('.total-input').val('0');
+
+        // Hide the row
+        utilityRow.hide();
     });
 });
 

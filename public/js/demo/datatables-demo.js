@@ -22,6 +22,13 @@ $(document).ready(function() {
         "pageLength": 25
     } );
 } );
+$(document).ready(function() {
+  $('#listAsset').DataTable({
+    "order": [[ 1, "asc" ]],
+    "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+    "pageLength": 25
+  } );
+} );
 // Call the dataTables jQuery plugin
 $(document).ready(function() {
   $('#dataTable1').DataTable({

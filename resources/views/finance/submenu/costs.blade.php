@@ -119,7 +119,7 @@ font-weight-bold
                                 <th>Jumlah Peserta</th>
                                 <th>Revenue &nbsp;<i class="fa fa-plus text-success"></i></th>
                                 <th>Cost &nbsp;<i class="fa fa-minus text-danger"></i></th>
-                                <th>Nett Income</th>
+                                <th>Profit</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -192,8 +192,8 @@ font-weight-bold
                 <div class="card-body" style="background-color: rgb(247, 247, 247);">
                     <h6 class="h6 mb-2 font-weight-bold text-gray-800">General Guidelines</h6>
                     <ul class="ml-4">
-                        <li>Table diatas adalah List Batch beserta Revenue, Cost & Nett Income.</li>
-                        <li>Nominal dari table diatas, diambil dari masing-masing revenue, cost & nett Income batch tersebut.</li>
+                        <li>Table diatas adalah List Batch beserta Revenue, Cost & Profit.</li>
+                        <li>Nominal dari table diatas, diambil dari masing-masing revenue, cost & profit batch tersebut.</li>
                         <li>List Batch adalah Sub data dari List Pelatihan, batch dibuat berdasarkan Induk Data Pelatihan.</li>
                         <li>Data di samping adalah total penggunaan utilitas dari semua batch diatas.</li>
                         <li>Anda bisa mengklik detail dari pelatihan tersebut dengan mengklik batchnya, yang nanti akan menampilkan informasi lebih detail, beserta list costnya.</li>

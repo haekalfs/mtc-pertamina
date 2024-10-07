@@ -137,7 +137,7 @@ font-weight-bold
                                 <th>Nama Pelatihan</th>
                                 <th>Revenue &nbsp;<i class="fa fa-plus text-success"></i></th>
                                 <th>Cost &nbsp;<i class="fa fa-minus text-danger"></i></th>
-                                <th>Nett Income</th>
+                                <th>Profit</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -203,7 +203,7 @@ font-weight-bold
                             </table>
                         </div>
                         <hr>
-                        <h5 class="card-title font-weight-bold">Nett Income <span id="tahunIncome"></span></h5>
+                        <h5 class="card-title font-weight-bold">Profit <span id="tahunIncome"></span></h5>
                         <div class="ml-2">
                             <table class="table table-borderless table-sm">
                                 <tr>
@@ -215,7 +215,7 @@ font-weight-bold
                                     <td style="text-align: start;" class="font-weight-bold text-danger">: &nbsp; <span id="totalCosts">-</span> <i class="fa fa-minus"></i></td>
                                 </tr>
                                 <tr>
-                                    <td style="width: 250px;" class="mb-2 font-weight-bold text-success"><i class="ti-minus mr-2"></i> Nett Income</td>
+                                    <td style="width: 250px;" class="mb-2 font-weight-bold text-success"><i class="ti-minus mr-2"></i> Profit</td>
                                     <td style="text-align: start;" class="font-weight-bold text-success">: &nbsp; <span id="nett_income">-</span> <i class="fa fa-plus"></i></td>
                                 </tr>
                             </table>
@@ -232,10 +232,10 @@ font-weight-bold
                 <div class="card-body" style="background-color: rgb(247, 247, 247);">
                     <h6 class="h6 mb-2 font-weight-bold text-gray-800">General Guidelines</h6>
                     <ul class="ml-4" style="line-height:200%">
-                        <li>Table diatas adalah List Pelatihan beserta Revenue, Cost & Nett Income.</li>
+                        <li>Table diatas adalah List Pelatihan beserta Revenue, Cost & Profit.</li>
                         <li>Nominal dari table diatas, diambil dari semua batch yang dimiliki oleh pelatihan tersebut.</li>
                         <li>List Pelatihan adalah Induk Data dari Penlat, yang mana 1 Pelatihan bisa memiliki banyak batch.</li>
-                        <li>Data di samping adalah summary dari semua revenue, cost & nett income data pelatihan.</li>
+                        <li>Data di samping adalah summary dari semua revenue, cost & profit data pelatihan.</li>
                         <li class="text-danger font-weight-bold">Untuk menampilkan summary & grafik, anda perlu memilih periode tahun.</li>
                     </ul>
                     <div class="alert alert-warning alert-block">

@@ -238,7 +238,7 @@ font-weight-bold
                                             </div>
                                             <div class="flex-grow-1">
                                                 <div class='interface-top'>
-                                                    <input type='text' class='interface-input form-control' placeholder='Press enter or add a comma after each tag'>
+                                                    <input type='text' class='interface-input form-control' placeholder='Press enter after for each alias...'>
                                                     <input type="hidden" name="alias" id="aliasInput">
                                                 </div>
                                             </div>
@@ -312,14 +312,14 @@ font-weight-bold
                                                 <input type="text" class="form-control" id="edit_kategori_pelatihan" name="kategori_pelatihan" required>
                                             </div>
                                         </div>
-                                        <div class="d-flex align-items-center mb-4">
+                                        <div class="d-flex align-items-start mb-4">
                                             <div style="width: 140px;" class="mr-2">
                                                 <p style="margin: 0;">Aliases :</p>
                                             </div>
                                             <div class="flex-grow-1">
                                                 <textarea type="text" class="form-control" id="edit_alias" name="alias" required></textarea>
                                                 <small id="alias_help" class="help-block form-text text-danger d-none">
-                                                    Only letters (A-Z), dashes (-), and commas (,) are allowed.
+                                                    Only letters (A-Z), dashes (-), and commas (,) are allowed. Example : R-PSRCB-NP,R-PSRCB
                                                 </small>
                                             </div>
                                         </div>

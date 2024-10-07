@@ -87,7 +87,6 @@ font-weight-bold
         </div>
     </div>
     <div class="row">
-
         <div class="col-lg-8 mb-2">
             <div class="card-leaderboard">
                 <div class="card-header-leaderboard bg-white text-secondary" style="border-bottom: 1px solid rgb(205, 205, 205);">
@@ -247,36 +246,51 @@ font-weight-bold
         </div>
         <div class="col-lg-12">
             <div class="card">
+                <!-- Flexbox container for heading and dropdown -->
+                <div class="d-flex justify-content-between align-items-center">
+                    <!-- Year Selected Heading -->
+                    <h4 class="pt-3 pb-0 pl-3">{{ $yearSelected }}</h4>
+
+                    <!-- Dropdown for filtering, aligned right -->
+                    <select class="form-control mt-3 mr-4 zoom90" id="ratingPelatihan" name="ratingPelatihan" style="width: 200px;">
+                        <option value="all">Show All</option> <!-- Show All option -->
+                        @foreach($trainingTitles as $title)
+                            <option value="{{ $title }}">{{ $title }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <hr>
+
+                <!-- Chart section -->
                 <div class="row">
-                    <div class="col-lg-12 d-flex justify-content-end align-items-end">
-                        <!-- Dropdown for filtering -->
-                        <select class="form-control mt-3 mr-4 zoom90" id="ratingPelatihan" name="ratingPelatihan" style="width: 200px;">
-                            <option value="all">Show All</option> <!-- Show All option -->
-                            @foreach($trainingTitles as $title)
-                                <option value="{{ $title }}">{{ $title }}</option>
-                            @endforeach
-                        </select>
-                    </div>
                     <div class="col-lg-12">
                         <div class="card-body d-flex justify-content-center align-items-center">
                             <!-- Chart container -->
                             <div id="chartContainer" style="height: 400px; width: 100%;"></div>
                         </div>
                     </div>
-                </div> <!-- /.row -->
+                </div>
             </div>
         </div>
         <div class="col-lg-12">
             <div class="card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <!-- Year Selected Heading -->
+                    <h4 class="pt-3 pb-0 pl-3">{{ $yearSelected }}</h4>
+
+                    <!-- Dropdown for Instructors List, aligned right -->
+                    <select class="form-control mt-3 mr-3 zoom90" id="instructorSelected" name="instructorSelected" style="width: 200px;">
+                        <option value="all" selected>Show All</option> <!-- Add Show All option -->
+                        @foreach ($instructorsList as $instructor)
+                            <option value="{{ $instructor->instructor_name }}">{{ $instructor->instructor_name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <hr>
+
                 <div class="row">
-                    <div class="col-lg-12 d-flex justify-content-end align-items-end">
-                        <select class="form-control mt-3 mr-4 zoom90" id="instructorSelected" name="instructorSelected" style="width: 200px;">
-                            <option value="all" selected>Show All</option> <!-- Add Show All option -->
-                            @foreach ($instructorsList as $instructor)
-                                <option value="{{ $instructor->instructor_name }}">{{ $instructor->instructor_name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
                     <div class="col-lg-12">
                         <div class="card-body d-flex justify-content-center align-items-center">
                             <div id="feedbackChart" style="height: 410px; width: 100%;"></div>

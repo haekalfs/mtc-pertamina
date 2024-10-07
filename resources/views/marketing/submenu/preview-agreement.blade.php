@@ -55,7 +55,7 @@ font-weight-bold
     <div class="col-xl-12 col-lg-12">
         <div class="card">
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> List Data</h6>
+                <h6 class="m-0 font-weight-bold text-secondary" id="judul">Document Preview</h6>
             </div>
             <div class="card-body" style="position: relative;">
                 <a href="#" data-id="{{ $data->id }}" class="position-absolute edit-agreement" style="top: 10px; right: 15px; z-index: 10;">

@@ -111,7 +111,7 @@ font-weight-bold
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
                                 <div class="stat-heading mb-1 font-weight-bold">
-                                    Nett Income
+                                    Profit
                                 </div>
                                 <div class="h6 mb-0 text-gray-800">{{ $nettIncome ? 'IDR ' . number_format($nettIncome, 0, ',', '.') : '-' }}</div>
                             </div>
@@ -165,9 +165,9 @@ font-weight-bold
                                             <!-- Show percentage change if available -->
                                             @if($previousRevenue !== null)
                                                 @if($percentageChange > 0)
-                                                    <small class="text-success">+{{ number_format($percentageChange, 2) }}%</small>
+                                                    <small class="text-success"><i class="fa fa-caret-up"></i> {{ number_format($percentageChange, 2) }}%</small>
                                                 @elseif($percentageChange < 0)
-                                                    <small class="text-danger">{{ number_format($percentageChange, 2) }}%</small>
+                                                    <small class="text-danger"><i class="fa fa-caret-down"></i> {{ number_format($percentageChange, 2) }}%</small>
                                                 @else
                                                     <small class="text-secondary">(0%)</small>
                                                 @endif
@@ -215,48 +215,56 @@ font-weight-bold
 
                                         {{-- Revenue --}}
                                         <td>
-                                            {{ number_format($data['totalRevenueMonthly'], 0, ',', '.') }}
+                                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                                {{-- Revenue Amount (left aligned) --}}
+                                                <span>{{ number_format($data['totalRevenueMonthly'], 0, ',', '.') }}</span>
 
-                                            @if($index > 0)
-                                                @php
-                                                    $previousRevenue = $monthlyData[$index - 1]['totalRevenueMonthly'];
-                                                    $revenueChange = 0;
-                                                    if($previousRevenue > 0) {
-                                                        $revenueChange = (($data['totalRevenueMonthly'] - $previousRevenue) / $previousRevenue) * 100;
-                                                    }
-                                                @endphp
+                                                {{-- Percentage Change (right aligned) --}}
+                                                @if($index > 0)
+                                                    @php
+                                                        $previousRevenue = $monthlyData[$index - 1]['totalRevenueMonthly'];
+                                                        $revenueChange = 0;
+                                                        if($previousRevenue > 0) {
+                                                            $revenueChange = (($data['totalRevenueMonthly'] - $previousRevenue) / $previousRevenue) * 100;
+                                                        }
+                                                    @endphp
 
-                                                @if($revenueChange > 0)
-                                                    <small class="badge bg-success text-white" style="font-size: 10px;">(+{{ number_format($revenueChange, 2) }}%)</small>
-                                                @elseif($revenueChange < 0)
-                                                    <small class="badge bg-danger text-white" style="font-size: 10px;">({{ number_format($revenueChange, 2) }}%)</small>
-                                                @else
-                                                    <small class="badge bg-secondary text-white" style="font-size: 10px;">(0%)</small>
+                                                    @if($revenueChange > 0)
+                                                        <small class="badge bg-success text-white" style="font-size: 10px;"><i class="fa fa-caret-up"></i> {{ number_format($revenueChange, 2) }}%</small>
+                                                    @elseif($revenueChange < 0)
+                                                        <small class="badge bg-danger text-white" style="font-size: 10px;"><i class="fa fa-caret-down"></i> {{ number_format(abs($revenueChange), 2) }}%</small>
+                                                    @else
+                                                        <small class="badge bg-secondary text-white" style="font-size: 10px;">(0%)</small>
+                                                    @endif
                                                 @endif
-                                            @endif
+                                            </div>
                                         </td>
 
                                         {{-- Costs --}}
                                         <td>
-                                            {{ number_format($data['totalCostsMonthly'], 0, ',', '.') }}
+                                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                                {{-- Cost Amount (left aligned) --}}
+                                                <span>{{ number_format($data['totalCostsMonthly'], 0, ',', '.') }}</span>
 
-                                            @if($index > 0)
-                                                @php
-                                                    $previousCost = $monthlyData[$index - 1]['totalCostsMonthly'];
-                                                    $costChange = 0;
-                                                    if($previousCost > 0) {
-                                                        $costChange = (($data['totalCostsMonthly'] - $previousCost) / $previousCost) * 100;
-                                                    }
-                                                @endphp
+                                                {{-- Percentage Change (right aligned) --}}
+                                                @if($index > 0)
+                                                    @php
+                                                        $previousCost = $monthlyData[$index - 1]['totalCostsMonthly'];
+                                                        $costChange = 0;
+                                                        if($previousCost > 0) {
+                                                            $costChange = (($data['totalCostsMonthly'] - $previousCost) / $previousCost) * 100;
+                                                        }
+                                                    @endphp
 
-                                                @if($costChange > 0)
-                                                    <small class="badge bg-success text-white" style="font-size: 10px;">(+{{ number_format($costChange, 2) }}%)</small>
-                                                @elseif($costChange < 0)
-                                                    <small class="badge bg-danger text-white" style="font-size: 10px;">({{ number_format($costChange, 2) }}%)</small>
-                                                @else
-                                                    <small class="badge bg-secondary text-white" style="font-size: 10px;">(0%)</small>
+                                                    @if($costChange > 0)
+                                                        <small class="badge bg-success text-white" style="font-size: 10px;"><i class="fa fa-caret-up"></i> {{ number_format($costChange, 2) }}%</small>
+                                                    @elseif($costChange < 0)
+                                                        <small class="badge bg-danger text-white" style="font-size: 10px;"><i class="fa fa-caret-down"></i> {{ number_format(abs($costChange), 2) }}%</small>
+                                                    @else
+                                                        <small class="badge bg-secondary text-white" style="font-size: 10px;">(0%)</small>
+                                                    @endif
                                                 @endif
-                                            @endif
+                                            </div>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -414,7 +422,7 @@ font-weight-bold
                             </table>
                         </div>
                         <hr>
-                        <h5 class="card-title font-weight-bold">Nett Income <span id="tahunIncome"></span></h5>
+                        <h5 class="card-title font-weight-bold">Profit <span id="tahunIncome"></span></h5>
                         <div class="ml-2">
                             <table class="table table-borderless table-sm">
                                 <tr>
@@ -426,7 +434,7 @@ font-weight-bold
                                     <td style="text-align: start;" class="font-weight-bold text-danger">: &nbsp; <span id="totalCosts">-</span> <i class="fa fa-minus"></i></td>
                                 </tr>
                                 <tr>
-                                    <td style="width: 250px;" class="mb-2 font-weight-bold text-success"><i class="ti-minus mr-2"></i> Nett Income</td>
+                                    <td style="width: 250px;" class="mb-2 font-weight-bold text-success"><i class="ti-minus mr-2"></i> Profit</td>
                                     <td style="text-align: start;" class="font-weight-bold text-success">: &nbsp; <span id="nett_income">-</span> <i class="fa fa-plus"></i></td>
                                 </tr>
                             </table>

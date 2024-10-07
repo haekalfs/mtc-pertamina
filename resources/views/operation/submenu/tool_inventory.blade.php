@@ -120,9 +120,9 @@ font-weight-bold
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="menu-icon fa fa-fire-extinguisher"></i> Data Assets MTC</h6>
+                    <h6 class="m-0 font-weight-bold text-secondary" id="judul">Data Assets </h6>
                     <div class="text-right">
-                        <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Register Tool</a>
+                        <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Register Asset</a>
                     </div>
                 </div>
                 <div class="card-body zoom90">
@@ -158,7 +158,7 @@ font-weight-bold
                         <table id="listInventory" class="table table-bordered mt-4">
                             <thead class="thead-light">
                                 <tr>
-                                    <th>Tool</th>
+                                    <th>Asset</th>
                                     <th>Stock</th>
                                     <th>Used</th>
                                     <th>Kondisi Alat</th>
@@ -175,7 +175,7 @@ font-weight-bold
 </div>
 
 <div class="modal fade zoom90" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 1000px;" role="document">
         <div class="modal-content">
             <div class="modal-header d-flex flex-row align-items-center justify-content-between">
                 <h5 class="modal-title" id="inputDataModalLabel">Input Data</h5>
@@ -199,7 +199,7 @@ font-weight-bold
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
+                                            <div style="width: 170px;" class="mr-2">
                                                 <p style="margin: 0;">Asset Name :</p>
                                             </div>
                                             <div class="flex-grow-1">
@@ -207,7 +207,7 @@ font-weight-bold
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
+                                            <div style="width: 170px;" class="mr-2">
                                                 <p style="margin: 0;">Nomor Asset :</p>
                                             </div>
                                             <div class="flex-grow-1">
@@ -215,7 +215,7 @@ font-weight-bold
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
+                                            <div style="width: 170px;" class="mr-2">
                                                 <p style="margin: 0;">Maker :</p>
                                             </div>
                                             <div class="flex-grow-1">
@@ -223,7 +223,7 @@ font-weight-bold
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
+                                            <div style="width: 170px;" class="mr-2">
                                                 <p style="margin: 0;">Lokasi :</p>
                                             </div>
                                             <div class="flex-grow-1">
@@ -237,7 +237,7 @@ font-weight-bold
                                         <div class="row">
                                             <div class="col-md-8">
                                                 <div class="d-flex align-items-center mb-4">
-                                                    <div style="width: 140px;" class="mr-2">
+                                                    <div style="width: 170px;" class="mr-2">
                                                         <p style="margin: 0;">Kondisi Alat :</p>
                                                     </div>
                                                     <div class="flex-grow-1">
@@ -251,7 +251,7 @@ font-weight-bold
                                             </div>
                                             <div class="col-md-4">
                                                 <div class="d-flex align-items-center mb-4">
-                                                    <div style="width: 140px;" class="mr-2">
+                                                    <div style="width: 170px;" class="mr-2">
                                                         <p style="margin: 0;">Stock :</p>
                                                     </div>
                                                     <div class="flex-grow-1">
@@ -261,7 +261,7 @@ font-weight-bold
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 145px;" class="mr-1">
+                                            <div style="width: 170px;" class="mr-2">
                                                 <p style="margin: 0;">Last Maintenance :</p>
                                             </div>
                                             <div class="flex-grow-1">
@@ -269,19 +269,22 @@ font-weight-bold
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 145px;" class="mr-1">
+                                            <div style="width: 170px;" class="mr-2">
                                                 <p style="margin: 0;">Next Maintenance :</p>
                                             </div>
                                             <div class="flex-grow-1">
                                                 <input type="date" class="form-control" name="next_maintenance" required>
                                             </div>
                                         </div>
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 200px;" class="mr-2">
+                                        <div class="d-flex align-items-start mb-4">
+                                            <div style="width: 170px;" class="mr-2">
                                                 <p style="margin: 0;">Panduan Maintenance :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <input type="file" class="form-control" name="maintenance_guide" required>
+                                                <input type="file" class="form-control" name="maintenance_guide">
+                                                <small id="alias_help" class="help-block form-text text-danger">
+                                                    Only pdf,word,excel file allowed!
+                                                </small>
                                             </div>
                                         </div>
                                     </div>
@@ -338,18 +341,6 @@ font-weight-bold
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 160px;" class="mr-2">
-                                                <p style="margin: 0;">Kondisi Alat :</p>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <select name="condition" id="edit_condition" class="form-control">
-                                                    @foreach($assetCondition as $item)
-                                                    <option value="{{ $item->id }}">{{ $item->condition }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-4">
                                             <div style="width: 160px;" class="mr-1">
                                                 <p style="margin: 0;">Last Maintenance :</p>
                                             </div>
@@ -401,7 +392,6 @@ font-weight-bold
                         <p><strong>Asset Name:</strong> <span id="view_asset_name"></span></p>
                         <p><strong>Maker:</strong> <span id="view_maker"></span></p>
                         <p><strong>Location:</strong> <span id="view_location"></span></p>
-                        <p><strong>Condition:</strong> <span id="view_condition"></span></p>
                         <p><strong>Stock:</strong> <span id="view_stock"></span></p>
                         <p><strong>Used:</strong> <span id="view_used_amount"></span></p>
                         <p><strong>Last Maintenance:</strong> <span id="view_last_maintenance"></span></p>
@@ -441,126 +431,124 @@ font-weight-bold
             e.preventDefault();
             table.draw(); // Redraw the table when the filter is applied
         });
+
+
+        $('#editToolForm').on('submit', function(e) {
+            e.preventDefault();
+
+            var toolId = $('#tool_id').val();
+            var formData = new FormData(this);
+
+            var routeUrl = "{{ route('update.asset.partially', ':id') }}";
+            routeUrl = routeUrl.replace(':id', toolId);
+
+            $.ajax({
+                url: routeUrl,
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    // Show success alert dynamically
+                    alert(response.message);
+                    $('#editToolModal').modal('hide');
+                    table.draw();
+                },
+                error: function(xhr) {
+                    // Show error message dynamically
+                    var errorMessage = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Failed to update the tool. Please check the input and try again.';
+                    alert(errorMessage);
+                }
+            });
+        });
     });
 </script>
 <script>
-    function displayFileName() {
-        const input = document.getElementById('file');
-        const label = document.getElementById('file-label');
-        const file = input.files[0];
-        if (file) {
-            label.textContent = file.name;
+function displayFileName() {
+    const input = document.getElementById('file');
+    const label = document.getElementById('file-label');
+    const file = input.files[0];
+    if (file) {
+        label.textContent = file.name;
+    }
+}
+function previewImage(event) {
+    const reader = new FileReader();
+    reader.onload = function(){
+        const output = document.getElementById('image-preview');
+        output.src = reader.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+}
+</script>
+<script>
+$(document).on('click', '.view-tool', function(e) {
+    e.preventDefault();
+    var toolId = $(this).data('id');
+
+    var routeUrl = "{{ route('preview-asset', ':id') }}";
+    routeUrl = routeUrl.replace(':id', toolId);
+
+    $.ajax({
+        url: '/inventory-tools-view-info/' + toolId,
+        method: 'GET',
+        success: function(response) {
+            // Populate the modal fields with the asset data
+            $('#view_asset_name').text(response.asset_name);
+            $('#view_asset_number').text(response.asset_id);
+            $('#view_maker').text(response.asset_maker);
+            $('#view_location').text(response.location);
+            $('#view_stock').text(response.asset_stock + ' Items out of ' + response.initial_stock);
+            $('#view_used_amount').text(response.used_amount ? response.used_amount + ' Items' : '0 Items');
+            $('#view_last_maintenance').text(response.last_maintenance);
+            $('#view_next_maintenance').text(response.next_maintenance);
+            $('#view-image-preview').attr('src', response.tool_image ? response.tool_image : 'https://via.placeholder.com/150x150');
+            $('#edit_asset_page').attr('href', routeUrl);
+
+            // Handle guide download link
+            if(response.asset_guidance) {
+                $('#view_maintenance_guide').html(`<a href="${response.asset_guidance}" target="_blank"><i class="fa fa-download"></i><u> Download Guide</u></a>`);
+            } else {
+                $('#view_maintenance_guide').text('No guide available');
+            }
+
+            // Show the modal
+            $('#viewToolModal').modal('show');
         }
-    }
-</script>
-<script>
-    function previewImage(event) {
-        const reader = new FileReader();
-        reader.onload = function(){
-            const output = document.getElementById('image-preview');
-            output.src = reader.result;
-        };
-        reader.readAsDataURL(event.target.files[0]);
-    }
-</script>
-<script>
-    $(document).on('click', '.view-tool', function(e) {
-        e.preventDefault();
-        var toolId = $(this).data('id');
-
-        var routeUrl = "{{ route('preview-asset', ':id') }}";
-        routeUrl = routeUrl.replace(':id', toolId);
-
-        $.ajax({
-            url: '/inventory-tools-view-info/' + toolId,
-            method: 'GET',
-            success: function(response) {
-                // Populate the modal fields with the asset data
-                $('#view_asset_name').text(response.asset_name);
-                $('#view_asset_number').text(response.asset_id);
-                $('#view_maker').text(response.asset_maker);
-                $('#view_location').text(response.location);
-                $('#view_condition').text(response.asset_condition);
-                $('#view_stock').text(response.asset_stock + ' Items out of ' + response.initial_stock);
-                $('#view_used_amount').text(response.used_amount ? response.used_amount + ' Items' : '0 Items');
-                $('#view_last_maintenance').text(response.last_maintenance);
-                $('#view_next_maintenance').text(response.next_maintenance);
-                $('#view-image-preview').attr('src', response.tool_image ? response.tool_image : 'https://via.placeholder.com/150x150');
-                $('#edit_asset_page').attr('href', routeUrl);
-
-                // Handle guide download link
-                if(response.asset_guidance) {
-                    $('#view_maintenance_guide').html(`<a href="${response.asset_guidance}" target="_blank"><i class="fa fa-download"></i><u> Download Guide</u></a>`);
-                } else {
-                    $('#view_maintenance_guide').text('No guide available');
-                }
-
-                // Show the modal
-                $('#viewToolModal').modal('show');
-            }
-        });
     });
-    $(document).on('click', '.edit-tool', function(e) {
-        e.preventDefault();
-        var toolId = $(this).data('id');
+});
+$(document).on('click', '.edit-tool', function(e) {
+    e.preventDefault();
+    var toolId = $(this).data('id');
 
-        var routeUrl = "{{ route('preview-asset', ':id') }}";
-        routeUrl = routeUrl.replace(':id', toolId);
+    var routeUrl = "{{ route('preview-asset', ':id') }}";
+    routeUrl = routeUrl.replace(':id', toolId);
 
-        $.ajax({
-            url: '/inventory-tools/' + toolId + '/edit',
-            method: 'GET',
-            success: function(response) {
-                // Populate the fields with the tool data
-                $('#tool_id').val(response.id);
-                $('#edit_condition').val(response.asset_condition_id);
-                $('#edit_initial_stock').val(response.initial_stock);
-                $('#edit_used_amount').val(response.used_amount ? response.used_amount : '0');
-                $('#edit_last_maintenance').val(response.last_maintenance);
-                $('#edit_next_maintenance').val(response.next_maintenance);
-                $('#edit-image-preview').attr('src', response.tool_image ? response.tool_image : 'https://via.placeholder.com/150x150');
-                $('#advance_edit_asset_page').attr('href', routeUrl);
+    $.ajax({
+        url: '/inventory-tools/' + toolId + '/edit',
+        method: 'GET',
+        success: function(response) {
+            // Populate the fields with the tool data
+            $('#tool_id').val(response.id);
+            $('#edit_initial_stock').val(response.initial_stock);
+            $('#edit_used_amount').val(response.used_amount ? response.used_amount : '0');
+            $('#edit_last_maintenance').val(response.last_maintenance);
+            $('#edit_next_maintenance').val(response.next_maintenance);
+            $('#edit-image-preview').attr('src', response.tool_image ? response.tool_image : 'https://via.placeholder.com/150x150');
+            $('#advance_edit_asset_page').attr('href', routeUrl);
 
-                // Handle the existing file
-                if(response.asset_guidance) {
-                    $('#existing-file').html(`<a href="${response.asset_guidance}" target="_blank">Download Existing File</a>`);
-                } else {
-                    $('#existing-file').html('No existing file');
-                }
-
-                // Show the modal
-                $('#editToolModal').modal('show');
+            // Handle the existing file
+            if(response.asset_guidance) {
+                $('#existing-file').html(`<a href="${response.asset_guidance}" target="_blank">Download Existing File</a>`);
+            } else {
+                $('#existing-file').html('No existing file');
             }
-        });
+
+            // Show the modal
+            $('#editToolModal').modal('show');
+        }
     });
-
-    $('#editToolForm').on('submit', function(e) {
-        e.preventDefault();
-
-        var toolId = $('#tool_id').val();
-        var formData = new FormData(this);
-
-        var routeUrl = "{{ route('update.asset.partially', ':id') }}";
-        routeUrl = routeUrl.replace(':id', toolId);
-
-        $.ajax({
-            url: routeUrl,
-            method: 'POST', // Use POST since we're sending FormData with files
-            data: formData,
-            processData: false, // Prevent jQuery from processing the data
-            contentType: false, // Prevent jQuery from setting the content type
-            success: function(response) {
-                // Handle success (e.g., close modal, show success message, refresh table)
-                $('#editToolModal').modal('hide');
-                alert('Tool updated successfully');
-                location.reload(); // Reload the page or update the table dynamically
-            },
-            error: function(xhr) {
-                // Handle errors
-                alert('Failed to update the tool. Please check the input and try again.');
-            }
-        });
-    });
+});
 
 function increaseCount(a, b) {
   var input = b.previousElementSibling;

@@ -174,7 +174,7 @@ font-weight-bold
                     <h6 class="h6 mb-2 font-weight-bold text-gray-800">General Guidelines</h6>
                     <ul class="ml-4">
                         <li>Halaman ini menampilkan List Cost, Grafik, List Penggunaan Alat serta Harga & Total.</li>
-                        <li>Nominal-nominal tersebut, diambil dari masing-masing revenue, cost & nett Income batch tersebut.</li>
+                        <li>Nominal-nominal tersebut, diambil dari masing-masing revenue, cost & profit batch tersebut.</li>
                         <li>Jika tanggal pelaksanaan batch & excel Profits & Loss tidak sama, maka akan muncul notifikasi.</li>
                         <li>Data di samping adalah total penggunaan utilitas dari batch diatas.</li>
                         <li>Untuk mengedit data, cukup mengedit ulang excelnya kemudian import ulang.</li>
@@ -205,7 +205,7 @@ font-weight-bold
                                         <td style="text-align: start;">: &nbsp; {{ $item->biaya_pendaftaran_peserta ? 'Rp ' . number_format($item->biaya_pendaftaran_peserta, 0, ',', '.') : '-' }}</td>
                                     </tr>
                                     <tr>
-                                        <td style="width: 250px;" class="mb-2 font-weight-bold text-success"><i class="ti-minus mr-2"></i> Total Biaya Pendaftaran</td>
+                                        <td style="width: 250px;" class="mb-2 font-weight-bold text-success"><i class="ti-minus mr-2"></i> Revenue</td>
                                         <td style="text-align: start;" class="font-weight-bold text-success">: &nbsp; {{ $item->total_biaya_pendaftaran_peserta ? 'Rp ' . number_format($item->total_biaya_pendaftaran_peserta, 0, ',', '.') : '-' }}</td>
                                     </tr>
                                 </table>
@@ -256,11 +256,11 @@ font-weight-bold
                                 </table>
                             </div>
                             <hr>
-                            <h5 class="card-title font-weight-bold">Nett Income</h5>
+                            <h5 class="card-title font-weight-bold">Profit</h5>
                             <div class="ml-2">
                                 <table class="table table-borderless table-sm">
                                     <tr>
-                                        <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Total Keuntungan</td>
+                                        <td style="width: 250px;" class="mb-2"><i class="ti-minus mr-2"></i> Revenue</td>
                                         <td style="text-align: start;" class="">: &nbsp; {{ $item->total_biaya_pendaftaran_peserta ? 'Rp ' . number_format($item->total_biaya_pendaftaran_peserta, 0, ',', '.') : '-' }} &nbsp;<i class="fa fa-plus text-success"></i></td>
                                     </tr>
                                     @php $totalBiaya = $item->jumlah_biaya + $item->penlat_usage; @endphp
