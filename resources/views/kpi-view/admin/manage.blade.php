@@ -79,11 +79,9 @@ font-weight-bold
                                 <td>{{ $item->periode }}</td>
                                 <td class="text-center">
                                     {{-- <a href="{{ route('preview-kpi', ['id' => $item->id]) }}" class="btn btn-outline-secondary btn-sm mr-2"><i class="fa fa-edit"></i> Edit</a> --}}
-                                    <a href="#" class="btn btn-outline-danger btn-sm btn-details" onclick="confirmDelete({{ $item->id }});"><i class="fa fa-ban"></i> Delete</a>
-                                    <form id="delete-kpi-{{ $item->id }}" action="{{ route('kpi.destroy', $item->id) }}" method="POST" style="display: none;">
-                                        @csrf
-                                        @method('DELETE')
-                                    </form>
+                                    <a href="#" class="btn btn-danger text-white delete-kpi" data-id="{{ $item->id }}">
+                                        <i class="fa fa-trash-o"></i> Delete
+                                    </a>
                                 </td>
                             </tr>
                             @endforeach
@@ -146,20 +144,54 @@ function redirectToPage() {
     var url = "{{ url('/key-performance-indicators/manage-items') }}" + "/" + selectedOption;
     window.location.href = url; // Redirect to the desired page
 }
-function confirmDelete(itemId) {
-    event.preventDefault();
-    swal({
-        title: "Are you sure?",
-        text: "Once deleted, you will not be able to recover this KPI!",
-        icon: "warning",
-        buttons: true,
-        dangerMode: true,
-    }).then((willDelete) => {
-        if (willDelete) {
-            document.getElementById('delete-kpi-' + itemId).submit();
-        }
+$(document).ready(function() {
+    // Trigger the deletion on clicking the button
+    $('.delete-kpi').click(function(e) {
+        e.preventDefault();
+
+        // Get the KPI ID from the data attribute
+        let id = $(this).data('id');
+
+        // Show the confirmation modal using SweetAlert
+        swal({
+            title: "Are you sure?",
+            text: "Once deleted, you will not be able to recover this KPI!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then((willDelete) => {
+            if (willDelete) {
+                // If the user confirms, send the Ajax request
+                $.ajax({
+                    url: '{{ route("kpi.destroy", ":id") }}'.replace(':id', id),  // Dynamic URL
+                    method: 'DELETE',
+                    data: {
+                        _token: '{{ csrf_token() }}',  // CSRF token for security
+                    },
+                    success: function(response) {
+                        // Show success message and redirect or refresh the page
+                        swal("Success! The KPI has been deleted!", {
+                            icon: "success",
+                        }).then(() => {
+                            location.reload();  // Reload the page to reflect changes
+                        });
+                    },
+                    error: function(xhr) {
+                        // Handle errors
+                        swal("Error! Something went wrong.", {
+                            icon: "error",
+                        });
+                    }
+                });
+            } else {
+                // Handle cancel action
+                swal("Your KPI is safe!", {
+                    icon: "info",
+                });
+            }
+        });
     });
-}
+});
 function formatAmount(input) {
     // Remove non-numeric characters for display purposes
     let displayValue = input.value.replace(/[^0-9]/g, '');

@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use Illuminate\Support\Facades\Log;
 
 class KpiController extends Controller
 {
@@ -479,10 +480,27 @@ class KpiController extends Controller
      */
     public function destroy($id)
     {
-        $kpi = Kpi::findOrFail($id);
-        $kpi->delete();
+        try {
+            // Find the KPI by ID
+            $kpi = Kpi::find($id);
 
-        return redirect()->back()->with('success', 'KPI deleted successfully');
+            // Check if KPI exists
+            if (!$kpi) {
+                return response()->json(['status' => 'failed', 'message' => 'KPI not found!'], 404);
+            }
+
+            // Delete the KPI record
+            $kpi->delete();
+
+            // Return success response for AJAX
+            return response()->json(['status' => 'success', 'message' => 'KPI deleted successfully!']);
+        } catch (\Exception $e) {
+            // Log the exception for debugging
+            Log::error('Failed to delete KPI: ' . $e->getMessage());
+
+            // Return failure response
+            return response()->json(['status' => 'failed', 'message' => 'Failed to delete KPI due to an unexpected error!'], 500);
+        }
     }
 
     public function destroy_pencapaian($id)
