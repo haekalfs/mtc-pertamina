@@ -78,8 +78,8 @@ font-weight-bold
                                 <td>{{ number_format($item->target, 0, ',', '.') }}</td>
                                 <td>{{ $item->periode }}</td>
                                 <td class="text-center">
-                                    {{-- <a href="{{ route('preview-kpi', ['id' => $item->id]) }}" class="btn btn-outline-secondary btn-sm mr-2"><i class="fa fa-edit"></i> Edit</a> --}}
-                                    <a href="#" class="btn btn-danger text-white delete-kpi" data-id="{{ $item->id }}">
+                                    <a href="{{ route('preview-kpi', ['id' => $item->id]) }}" class="btn btn-outline-secondary btn-sm mr-2"><i class="fa fa-edit"></i> Edit</a>
+                                    <a href="#" class="btn btn-outline-danger btn-sm delete-kpi" data-id="{{ $item->id }}">
                                         <i class="fa fa-trash-o"></i> Delete
                                     </a>
                                 </td>
