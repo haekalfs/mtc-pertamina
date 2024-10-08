@@ -15,7 +15,7 @@ use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Support\Facades\Log;
 
-class KpiController extends Controller
+class KPIController extends Controller
 {
     public function index($encryptedQuarter = null, $encryptedYear = null)
     {

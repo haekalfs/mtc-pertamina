@@ -11,7 +11,7 @@ use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\InstructorController;
 use App\Http\Controllers\InventoryToolController;
-use App\Http\Controllers\KpiController;
+use App\Http\Controllers\KPIController;
 use App\Http\Controllers\ManageAccessController;
 use App\Http\Controllers\MarketingController;
 use App\Http\Controllers\MonitoringApprovalController;
@@ -96,23 +96,23 @@ Route::middleware('checkForErrors', 'suspiciousActivity', 'suspicious', 'auth')-
         //KPI
         Route::middleware(['checkUserAccess:105'])->group(function () {
             //KPI
-            Route::get('/key-performance-indicators/index/{quarterSelected?}/{yearSelected?}', [KpiController::class, 'index'])->name('kpi');
-            Route::post('/kpi-store', [KpiController::class, 'store'])->name('kpis.store');
-            Route::get('/kpi/{id}/edit', [KpiController::class, 'edit'])->name('kpis.edit');
-            Route::put('/kpi-update/{id}', [KpiController::class, 'update'])->name('kpis.update');
-            Route::post('/pencapaian-kpi/store/{kpi}', [KpiController::class, 'store_pencapaian'])->name('pencapaian.kpi.store');
-            Route::get('/pencapaian-kpi/edit/{id}', [KpiController::class, 'edit_pencapaian'])->name('pencapaian.kpi.edit');
-            Route::delete('/pencapaian-kpi/delete/{id}', [KpiController::class, 'delete_pencapaian'])->name('pencapaian.kpi.delete');
+            Route::get('/key-performance-indicators/index/{quarterSelected?}/{yearSelected?}', [KPIController::class, 'index'])->name('kpi');
+            Route::post('/kpi-store', [KPIController::class, 'store'])->name('kpis.store');
+            Route::get('/kpi/{id}/edit', [KPIController::class, 'edit'])->name('kpis.edit');
+            Route::put('/kpi-update/{id}', [KPIController::class, 'update'])->name('kpis.update');
+            Route::post('/pencapaian-kpi/store/{kpi}', [KPIController::class, 'store_pencapaian'])->name('pencapaian.kpi.store');
+            Route::get('/pencapaian-kpi/edit/{id}', [KPIController::class, 'edit_pencapaian'])->name('pencapaian.kpi.edit');
+            Route::delete('/pencapaian-kpi/delete/{id}', [KPIController::class, 'delete_pencapaian'])->name('pencapaian.kpi.delete');
             Route::post('/pencapaian-kpi/update/{id}', [KPIController::class, 'update_pencapaian'])->name('pencapaian.update');
-            Route::get('/key-performance-indicators/achievements/{id}/{quarter}/{year}', [KpiController::class, 'pencapaian'])->name('pencapaian-kpi');
-            Route::delete('/delete-kpi/{id}', [KpiController::class, 'destroy'])->name('kpi.destroy');
-            Route::delete('/delete-pencapaian-kpi/{id}', [KpiController::class, 'destroy_pencapaian'])->name('pencapaian.kpi.destroy');
-            Route::get('/key-performance-indicators/manage-items/{yearSelected?}', [KpiController::class, 'manage'])->name('manage-kpi');
-            Route::get('/key-performance-indicators/report', [KpiController::class, 'report'])->name('report-kpi');
-            Route::post('/duplicate-kpis/{year}', [KpiController::class, 'duplicateKpis'])->name('kpis.duplicate');
-            Route::post('/key-performance-indicators/downloadPdf', [KpiController::class, 'downloadPdf'])->name('kpi.downloadPdf');
+            Route::get('/key-performance-indicators/achievements/{id}/{quarter}/{year}', [KPIController::class, 'pencapaian'])->name('pencapaian-kpi');
+            Route::delete('/delete-kpi/{id}', [KPIController::class, 'destroy'])->name('kpi.destroy');
+            Route::delete('/delete-pencapaian-kpi/{id}', [KPIController::class, 'destroy_pencapaian'])->name('pencapaian.kpi.destroy');
+            Route::get('/key-performance-indicators/manage-items/{yearSelected?}', [KPIController::class, 'manage'])->name('manage-kpi');
+            Route::get('/key-performance-indicators/report', [KPIController::class, 'report'])->name('report-kpi');
+            Route::post('/duplicate-kpis/{year}', [KPIController::class, 'duplicateKpis'])->name('kpis.duplicate');
+            Route::post('/key-performance-indicators/downloadPdf', [KPIController::class, 'downloadPdf'])->name('kpi.downloadPdf');
             //KPI Unused
-            Route::get('/key-performance-indicators/preview/{id}', [KpiController::class, 'preview'])->name('preview-kpi');
+            Route::get('/key-performance-indicators/preview/{id}', [KPIController::class, 'preview'])->name('preview-kpi');
         });
 
         //Pencapaian AKhlak
