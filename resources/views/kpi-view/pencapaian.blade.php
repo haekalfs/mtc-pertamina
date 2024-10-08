@@ -121,6 +121,7 @@ font-weight-bold
                                 <th>Goal</th>
                                 <th>Tercapai</th>
                                 <th>KPI</th>
+                                <th>TW</th>
                                 <th>Periode</th>
                                 <th>Action</th>
                             </tr>
@@ -133,6 +134,7 @@ font-weight-bold
                                 <td>{{ $item->indicator->goal }}</td>
                                 <td>{{ number_format($item->score, 0, ',', '.') }}</td>
                                 <td>{{ $item->indicator->indicator }}</td>
+                                <td>{{ $item->quarter->quarter_name }}</td>
                                 <td>{{ \Carbon\Carbon::parse($item->periode_start)->format('d/m/y') }} - {{ \Carbon\Carbon::parse($item->periode_end)->format('d/m/y') }}</td>
                                 <td class="text-center">
                                     <a class="btn btn-outline-secondary btn-sm btn-update" data-id="{{ $item->id }}"><i class="fa fa-edit"></i> Update</a>
