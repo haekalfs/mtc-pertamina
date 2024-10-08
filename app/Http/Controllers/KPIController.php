@@ -176,8 +176,11 @@ class KPIController extends Controller
         $startDate = Carbon::create($currentYear, $quarterStart, 1);
         $endDate = Carbon::create($currentYear, $quarterEnd, 1)->endOfMonth();
 
+        $getQuarter = Quarter::all();
+
         return view('kpi-view.pencapaian', [
             'kpiItem' => $kpiItem,
+            'quarters' => $getQuarter,
             'percentage' => $percentage,
             'dataPoints' => $dataPoints,
             'startDate' => $startDate->format('Y-m-d'),
@@ -410,6 +413,8 @@ class KPIController extends Controller
             'pencapaian' => 'required|string|max:255',
             'score' => 'required',
             'daterange' => 'required|string',
+            'isQuarter' => 'required',
+            'quarterSelected' => 'sometimes'
         ]);
 
         // Split the daterange into start and end dates
@@ -417,7 +422,11 @@ class KPIController extends Controller
         $periode_start = Carbon::createFromFormat('m/d/Y', trim($daterange[0]))->format('Y-m-d');
         $periode_end = Carbon::createFromFormat('m/d/Y', trim($daterange[1]))->format('Y-m-d');
 
-        $Quarter = $this->getQuarter($periode_start);
+        if($request->isQuarter != '-1'){
+            $Quarter = $this->getQuarter($periode_start);
+        } else {
+            $Quarter = $request->quarterSelected;
+        }
 
         // Create a new record in the kpi_pencapaian table
         PencapaianKPI::create([

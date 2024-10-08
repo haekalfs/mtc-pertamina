@@ -109,9 +109,7 @@ font-weight-bold
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold" id="judul">List Pencapaian - {{ $kpiItem->indicator }}</h6>
                     <div class="text-right">
-                        @if($selectedQuarter != '-1')
                         <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-icon fa fa-plus"></i> Insert Pencapaian</a>
-                        @endif
                     </div>
                 </div>
                 <div class="card-body">
@@ -160,11 +158,23 @@ font-weight-bold
             <form method="post" action="{{ route('pencapaian.kpi.store', $kpiItem->id) }}">
                 @csrf
                 <div class="modal-body">
+                    <input type="hidden" name="isQuarter" value="{{ $selectedQuarter }}"/>
                     <div class="col-md-12 zoom90">
                         <div class="form-group">
                             <label for="score">Periode</label>
                             <input type="text" class="form-control" name="daterange" id="daterange"/>
                         </div>
+                        @if($selectedQuarter == '-1')
+                        <div class="form-group">
+                            <label for="score">TW</label>
+                            <select class="form-control" name="quarterSelected">
+                                <option selected disabled>Select TW...</option>
+                                @foreach ($quarters as $quarter)
+                                    <option value="{{ $quarter->id }}" {{ $selectedQuarter == $quarter->id ? 'selected' : '' }}>{{ $quarter->quarter_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @endif
                         <div class="form-group">
                             <label for="pencapaian">Pencapaian</label>
                             <input type="text" class="form-control" id="pencapaian" name="pencapaian" placeholder="Average Test Score..." required>
