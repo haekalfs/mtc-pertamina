@@ -78,7 +78,7 @@ font-weight-bold
                                 <td>{{ number_format($item->target, 0, ',', '.') }}</td>
                                 <td>{{ $item->periode }}</td>
                                 <td class="text-center" width="200">
-                                    <a href="{{ route('preview-kpi', ['id' => $item->id]) }}" class="btn btn-outline-secondary btn-sm mr-2"><i class="fa fa-edit"></i> Edit</a>
+                                    <a href="#" class="btn btn-outline-secondary btn-sm mr-2 edit-kpi" data-id="{{ $item->id }}"><i class="fa fa-edit"></i> Edit</a>
                                     <a href="#" class="btn btn-outline-danger btn-sm delete-kpi" data-id="{{ $item->id }}">
                                         <i class="fa fa-trash-o"></i> Delete
                                     </a>
@@ -137,7 +137,52 @@ font-weight-bold
         </div>
     </div>
 </div>
+<div class="modal fade" id="editDataModal" tabindex="-1" role="dialog" aria-labelledby="editDataModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header d-flex flex-row align-items-center justify-content-between">
+                <h5 class="modal-title" id="editDataModalLabel">Edit KPI</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" enctype="multipart/form-data" id="editKpiForm">
+                @csrf
+                <input type="hidden" id="edit_kpi_id" name="kpi_id"> <!-- Hidden ID field for KPI -->
 
+                <div class="modal-body">
+                    <div class="col-md-12 zoom90">
+                        <div class="form-group">
+                            <label for="edit_kpi">KPI</label>
+                            <input type="text" class="form-control" id="edit_kpi" name="kpi" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_goal">Goal</label>
+                            <input type="text" class="form-control" id="edit_goal" name="goal" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_target">Target</label>
+                            <input type="text" class="form-control" id="edit_target_display" name="target_display" oninput="formatAmountEdit(this)" required>
+                            <input type="hidden" id="edit_target_hidden" name="target"> <!-- Unformatted value -->
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_periode">Periode</label>
+                            <select class="form-control" id="edit_periode" name="periode" required>
+                                @foreach (array_reverse($yearsBefore) as $year)
+                                    <option value="{{ $year }}" {{ $year == $yearSelected ? 'selected' : '' }}>{{ $year }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <script>
 function redirectToPage() {
     var selectedOption = document.getElementById("yearSelected").value;
@@ -192,6 +237,65 @@ $(document).ready(function() {
         });
     });
 });
+$(document).ready(function() {
+    // Handle the edit button click
+    $('.edit-kpi').click(function(e) {
+        e.preventDefault();
+
+        // Get the KPI ID from the data-id attribute
+        let id = $(this).data('id');
+
+        // Send Ajax request to fetch KPI data
+        $.ajax({
+            url: '{{ route("kpis.edit", ":id") }}'.replace(':id', id),  // Dynamic URL for the KPI
+            method: 'GET',
+            success: function(response) {
+                if (response.status === 'success') {
+                    // Prefill the form inputs with the fetched data
+                    $('#edit_kpi_id').val(response.data.id);
+                    $('#edit_kpi').val(response.data.indicator);
+                    $('#edit_goal').val(response.data.goal);
+                    $('#edit_target_display').val(response.data.target);
+                    $('#edit_target_hidden').val(response.data.target);
+                    $('#edit_periode').val(response.data.periode);
+
+                    // Show the edit modal
+                    $('#editDataModal').modal('show');
+                } else {
+                    swal("Error", "Failed to retrieve KPI data", "error");
+                }
+            },
+            error: function(xhr) {
+                swal("Error", "Something went wrong!", "error");
+            }
+        });
+    });
+});
+$('#editKpiForm').submit(function(e) {
+    e.preventDefault();
+
+    let id = $('#edit_kpi_id').val();  // Get KPI ID
+    let formData = $(this).serialize();
+
+    $.ajax({
+        url: '{{ route("kpis.update", ":id") }}'.replace(':id', id),  // Dynamic update route
+        method: 'PUT',
+        data: formData,
+        success: function(response) {
+            if (response.status === 'success') {
+                swal("Success", "KPI updated successfully!", "success").then(() => {
+                    location.reload();  // Reload the page after successful update
+                });
+            } else {
+                swal("Error", "Failed to update KPI", "error");
+            }
+        },
+        error: function(xhr) {
+            swal("Error", "Something went wrong!", "error");
+        }
+    });
+});
+
 function formatAmount(input) {
     // Remove non-numeric characters for display purposes
     let displayValue = input.value.replace(/[^0-9]/g, '');
@@ -204,6 +308,19 @@ function formatAmount(input) {
 
     // Also set the unformatted value in a hidden input for submission
     document.getElementById('target_hidden').value = input.value.replace(/\./g, '');
+}
+function formatAmountEdit(input) {
+    // Remove non-numeric characters for display purposes
+    let displayValue = input.value.replace(/[^0-9]/g, '');
+
+    // Add thousands separator (dots) for display
+    displayValue = displayValue.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+    // Set the formatted value back to the input (for display)
+    input.value = displayValue;
+
+    // Also set the unformatted value in a hidden input for submission
+    document.getElementById('edit_target_hidden').value = input.value.replace(/\./g, '');
 }
 </script>
 @endsection

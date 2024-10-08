@@ -98,6 +98,8 @@ Route::middleware('checkForErrors', 'suspiciousActivity', 'suspicious', 'auth')-
             //KPI
             Route::get('/key-performance-indicators/index/{quarterSelected?}/{yearSelected?}', [KpiController::class, 'index'])->name('kpi');
             Route::post('/kpi-store', [KpiController::class, 'store'])->name('kpis.store');
+            Route::get('/kpi/{id}/edit', [KpiController::class, 'edit'])->name('kpis.edit');
+            Route::put('/kpi-update/{id}', [KpiController::class, 'update'])->name('kpis.update');
             Route::post('/pencapaian-kpi/store/{kpi}', [KpiController::class, 'store_pencapaian'])->name('pencapaian.kpi.store');
             Route::get('/pencapaian-kpi/edit/{id}', [KpiController::class, 'edit_pencapaian'])->name('pencapaian.kpi.edit');
             Route::delete('/pencapaian-kpi/delete/{id}', [KpiController::class, 'delete_pencapaian'])->name('pencapaian.kpi.delete');

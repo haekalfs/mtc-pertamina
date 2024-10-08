@@ -374,6 +374,35 @@ class KpiController extends Controller
         return redirect()->back()->with('success', 'KPI has been added successfully');
     }
 
+    public function edit($id)
+    {
+        $kpi = Kpi::findOrFail($id);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $kpi
+        ]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'kpi' => 'required',
+            'target' => 'required',
+            'goal' => 'required',
+            'periode' => 'required'
+        ]);
+
+        $kpi = Kpi::findOrFail($id);
+        $kpi->indicator = $request->input('kpi');
+        $kpi->goal = $request->input('goal');
+        $kpi->target = $request->input('target');
+        $kpi->periode = $request->input('periode');
+        $kpi->save();
+
+        return response()->json(['status' => 'success', 'message' => 'KPI updated successfully']);
+    }
+
     public function store_pencapaian(Request $request, $kpi_id)
     {
         // Validate the request data
