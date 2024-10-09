@@ -105,7 +105,7 @@ font-weight-bold
                     </div>
 
                     <table id="listUsages" class="table table-bordered">
-                        <thead class="bg-secondary text-white">
+                        <thead class="thead-light">
                             <tr>
                                 <th style="width: 100px;">Display</th>
                                 <th>Pelatihan</th>
