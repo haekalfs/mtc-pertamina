@@ -70,7 +70,7 @@ font-weight-bold
                     <div class="row d-flex justify-content-start mb-4">
                         <div class="col-md-12">
                             <div class="row align-items-center">
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label for="email">Nama Pelatihan :</label>
                                         <select class="custom-select" id="namaPenlat" name="namaPenlat">
@@ -81,7 +81,7 @@ font-weight-bold
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label for="email">Kategori Pelatihan :</label>
                                         <select class="custom-select" id="kategori" name="kategori">
@@ -92,13 +92,24 @@ font-weight-bold
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label for="email">Jenis Pelatihan :</label>
                                         <select class="custom-select" id="jenis" name="jenis">
                                             <option value="-1" selected>Show All</option>
                                             @foreach($penlatList->unique('jenis_pelatihan') as $jenis)
                                                 <option value="{{ $jenis->jenis_pelatihan }}">{{ $jenis->jenis_pelatihan }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="email">Tahun :</label>
+                                        <select class="form-control" id="periode" name="periode">
+                                            <option value="-1">Show All</option>
+                                            @foreach(range(date('Y'), date('Y') - 5) as $year)
+                                                <option value="{{ $year }}" @if ($year == date('Y')) selected @endif>{{ $year }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -312,12 +323,15 @@ $(document).ready(function() {
     var table = $('#batchTables').DataTable({
         processing: true,
         serverSide: true,
+        responsive: true,
+        deferRender: true,
         ajax: {
             url: "{{ route('batch-penlat') }}",
             data: function (d) {
                 d.namaPenlat = $('#namaPenlat').val();
                 d.jenisPenlat = $('#jenis').val();
                 d.kategoriPenlat = $('#kategori').val();
+                d.periode = $('#periode').val();
             }
         },
         columns: [
@@ -389,7 +403,7 @@ $(document).ready(function() {
         });
     });
 
-    $('#namaPenlat, #jenis, #kategori').on('click', function() {
+    $('#namaPenlat, #jenis, #kategori, #periode').on('click', function() {
         table.draw();
     });
 
@@ -435,8 +449,8 @@ document.getElementById('refreshBatchBtn').addEventListener('click', function (e
 
     // Trigger SweetAlert confirmation
     swal({
-        title: "Are you sure?",
-        text: "This will refresh all the Penlat batch data.",
+        title: "Refresh Data Batches?",
+        text: "This will register, updating and synchronize the batches data. if batches doesn't exist or if there's any batch that does not linked to Pelatihan, then you should proceed.",
         icon: "warning",
         buttons: true,
         dangerMode: true,

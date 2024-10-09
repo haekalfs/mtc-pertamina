@@ -13,56 +13,6 @@ font-weight-bold
 @endsection
 
 @section('content')
-<style>
-
-.interface-list {
-  list-style-type: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
-
-.interface-tag {
-  color: rgba(0,0,0,0.6);
-  border: 0.5px solid rgba(162, 162, 162, 0.75);
-  padding: 0.35rem 0.75rem;
-  display: flex;
-  gap: 0.75rem;
-  border-radius: 10px; /* Added for rounded corners */
-}
-
-.interface-close {
-  cursor: pointer;
-  color: rgba(0,0,0,0.65);
-}
-
-.interface-close:active { color: rgba(0,0,0,0.5); }
-
-.interface-footer {
-  display: flex;
-  align-items: start;
-  justify-content: space-between;
-}
-
-.interface-remaining {
-  margin-left: 1rem;
-}
-
-.interface-clear {
-  color: white;
-  background-color: black;
-  border: 1.5px solid black;
-  outline: none;
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-}
-
-.interface-clear:active {
-  border: 1.5px solid black;
-  background-color: transparent;
-  color: black;
-}
-</style>
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
         <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-list-alt"></i> List Pelatihan</h1>
@@ -247,6 +197,9 @@ font-weight-bold
                                                                         <div class="input-group-addon" id="addAliasBtn"><i class="fa fa-plus"></i></div>
                                                                     </div>
                                                                 </div>
+                                                                <small id="alias_help" class="help-block form-text text-danger">
+                                                                    Only alphabetics & symbols are allowed.
+                                                                </small>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -396,32 +349,29 @@ font-weight-bold
 </div>
 
 <script>
-// document.getElementById('edit_alias').addEventListener('input', function () {
-//     const inputField = document.getElementById('edit_alias');
-//     const helpBlock = document.getElementById('alias_help');
+setupAliasInput('aliasDisplay');
+setupAliasInput('edit_alias');
+function setupAliasInput(inputId) {
+    document.getElementById(inputId).addEventListener('input', function(e) {
+        let value = e.target.value;
 
-//     // Regular expression to allow any character except periods, and replace spaces with commas
-//     const pattern = /^[^.,]+(?:,[^.,]+)*(?:,[^.,]+)*$/;
+        // Replace spaces with dashes
+        value = value.replace(/\s+/g, '-');
 
-//     // Replace spaces with commas as the user types
-//     inputField.value = inputField.value.replace(/ /g, ',');
+        // Remove numbers, commas, and dots, and only allow alphabetic characters and dashes
+        value = value.replace(/[^a-zA-Z\-]/g, '');
 
-//     // If the input does not match the pattern
-//     if (!pattern.test(inputField.value)) {
-//         helpBlock.classList.remove('d-none'); // Show the warning message
-//         // Remove invalid characters: periods, multiple commas
-//         inputField.value = inputField.value.replace(/[.]+|,{2,}/g, '');
-//     } else {
-//         helpBlock.classList.add('d-none'); // Hide the warning message
-//     }
-// });
+        // Set the updated value back to the input
+        e.target.value = value;
+    });
+}
 // Intercept form submission to show SweetAlert confirmation
 document.getElementById('submitEditForm').addEventListener('click', function (event) {
     event.preventDefault();  // Prevent form from submitting immediately
 
     swal({
-        title: "Are you sure?",
-        text: "Do you really want to update the data? Please be careful with the aliases. Ensure they are in the correct format (e.g., alias1, alias2) without duplicates, spaces, or incorrect characters. Any changes will directly affect integration between Infografis, Profit Menu, and other related systems.",
+        title: "Update Data Pelatihan?",
+        text: "Do you really want to update the data? Please be careful with the aliases. Ensure they are in the correct format (e.g., R-BST, R-PSRCB-NP) without duplicates or incorrect characters. Any changes will directly affect integration between Infografis, Profit Menu, and other related systems.",
         icon: "warning",
         buttons: true,
         dangerMode: true,
@@ -466,7 +416,7 @@ $(document).ready(function () {
                 let row = `<tr>
                                 <td>${alias}</td>
                                 <td class="text-center" style="width:5%">
-                                    <button type="button" class="btn btn-outline-danger btn-sm remove-alias" data-index="${index}">
+                                    <button type="button" class="btn btn-outline-danger btn-sm remove-aliases" data-index="${index}">
                                         <i class="fa fa-trash"></i>
                                     </button>
                                 </td>
@@ -482,7 +432,7 @@ $(document).ready(function () {
     }
 
     // Handle removing an alias from the table
-    $('#aliasTableBody').on('click', '.remove-alias', function () {
+    $('#aliasesTableBody').on('click', '.remove-aliases', function () {
         let index = $(this).data('index');
         aliasArray.splice(index, 1);
         updateAliasTable();

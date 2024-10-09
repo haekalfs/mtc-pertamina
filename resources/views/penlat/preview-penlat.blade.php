@@ -102,7 +102,7 @@ font-weight-bold
                 </div>
                 <div class="card-body">
                     <table id="listReferensi" class="table table-bordered mt-4 zoom90">
-                        <thead>
+                        <thead class="thead-light">
                             <tr>
                                 <th>Referensi</th>
                             </tr>
@@ -134,8 +134,8 @@ font-weight-bold
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table id="listUtilities" class="table table-bordered mt-4">
-                            <thead>
+                        <table id="listUtilities" class="table table-bordered mt-4 zoom90">
+                            <thead class="thead-light">
                                 <tr>
                                     <th>Tool</th>
                                     <th>Quantity</th>
@@ -174,7 +174,7 @@ font-weight-bold
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold" id="judul">List of Batches Already Conducted</h6>
+                    <h6 class="m-0 font-weight-bold text-secondary" id="judul">List of Batches Already Conducted</h6>
                 </div>
                 <div class="card-body zoom90">
                     <table id="batchTables" class="table table-bordered">

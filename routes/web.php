@@ -313,6 +313,13 @@ Route::middleware('checkForErrors', 'suspiciousActivity', 'suspicious', 'auth')-
         Route::get('/fetch-penlat-batches', [PenlatController::class, 'fetchBatches'])->name('batches.fetch');
         Route::get('/penlat-batch/refresh', [PenlatController::class, 'refresh_batch_data'])->name('refresh.batch');
 
+        //Master Data
+        Route::get('/utilities/list-utilities', [OperationController::class, 'list_utilities'])->name('list-utilities');
+        Route::post('/store-data-utilities', [OperationController::class, 'store_new_utility'])->name('store-new-utility');
+        Route::delete('/delete-utility-data', [OperationController::class, 'deleteUtility'])->name('delete-utility');
+        Route::get('/get-utility/{id}', [OperationController::class, 'getUtility'])->name('get-utility');
+        Route::post('/update-utility', [OperationController::class, 'updateUtility'])->name('update-utility');
+
         //Finance
         Route::middleware(['checkUserAccess:102'])->group(function () {
             //finances

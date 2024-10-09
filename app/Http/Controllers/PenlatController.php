@@ -461,6 +461,10 @@ class PenlatController extends Controller
                 });
             }
 
+            if ($request->periode && $request->periode != '-1') {
+                $query->whereYear('date', $request->periode);
+            }
+
             $data = $query->orderBy('date', 'desc')->get();
 
             return DataTables::of($data)

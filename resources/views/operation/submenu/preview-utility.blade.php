@@ -220,6 +220,9 @@ font-weight-bold
                                 </tr>
                             </thead>
                             <tbody>
+                                <tr id="no-data">
+                                    <td colspan="4" class="text-center">Click + button to add new items...</td>
+                                </tr>
                                 @foreach($utilities as $tool)
                                 <tr id="row_{{ $tool->id }}" style="display: none;">
                                     <td>
@@ -233,7 +236,7 @@ font-weight-bold
                                                 <p class="font-weight-light">Satuan Default ({{$tool->utility_unit}})</p>
                                             </div>
                                             <a class="removeUtilityBtn position-absolute" style="top: -10px; right: 10px; font-size: 17px;" data-id="{{ $tool->id }}">
-                                                <i class="fa fa-times"></i>
+                                                <i class="fa fa-times text-danger"></i>
                                             </a>
                                         </div>
                                     </td>
@@ -367,6 +370,8 @@ $(document).ready(function() {
 
         // Make the row visible
         utilityRow.show();
+        // Hide the 'No data available' message if it is visible
+        $('#no-data').hide();
     });
 
     // Event listener for removing a utility row
@@ -384,6 +389,12 @@ $(document).ready(function() {
 
         // Hide the row
         utilityRow.hide();
+
+        // Check if any rows are still visible
+        if ($('#utilitiesTable tbody tr:visible').length === 0) {
+            // Show 'No data available' if no rows are visible
+            $('#no-data').show();
+        }
     });
 });
 

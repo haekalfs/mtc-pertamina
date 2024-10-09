@@ -1153,4 +1153,118 @@ class OperationController extends Controller
             Log::error('Error updating usage cost: ' . $e->getMessage());
         }
     }
+
+    public function list_utilities()
+    {
+        $utilities = Utility::all();
+        return view('master-data.utilities', [
+            'utilities' => $utilities
+        ]);
+    }
+
+    public function store_new_utility(Request $request)
+    {
+        // Validate the incoming request data
+        $validated = $request->validate([
+            'utility_name' => 'required|string|max:255',
+            'utility_unit' => 'required|string|max:255',
+            'utility_field_name' => 'required|string|max:255',
+            'display' => 'required|image|mimes:jpeg,png,jpg,gif', // Optional: validate file type and size
+        ]);
+
+        // Handle the image upload
+        if ($request->hasFile('display')) {
+            $image = $request->file('display');
+            $filename = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('uploads/utility_data'), $filename);
+            $imagePath = 'uploads/utility_data/' . $filename;
+        } else {
+            $imagePath = null; // In case no file is uploaded
+        }
+
+        // Create a new utility record
+        Utility::create([
+            'utility_name' => $validated['utility_name'],
+            'utility_unit' => $validated['utility_unit'],
+            'field_name' => $validated['utility_field_name'],
+            'filepath' => $imagePath,
+        ]);
+
+        // Redirect back with a success message
+        return redirect()->back()->with('success', 'Utility data saved successfully!');
+    }
+
+    public function deleteUtility(Request $request)
+    {
+        $utility = Utility::find($request->id);
+
+        if (!$utility) {
+            return response()->json(['error' => 'Utility not found.'], 404);
+        }
+
+        // Prohibit deletion for utility IDs 1 to 6
+        if (in_array($utility->id, [1, 2, 3, 4, 5, 6])) {
+            return response()->json(['error' => 'This utility cannot be deleted.'], 400);
+        }
+
+        // Check if utility has related records
+        $isUtilityUsed = $utility->items()->exists();  // Check if there are related records in the penlat_utility_usage table
+
+        if ($isUtilityUsed) {
+            return response()->json(['error' => 'Utility cannot be deleted because it has related records.'], 400);
+        }
+
+        // Delete the utility if no related records exist
+        $utility->delete();
+
+        return response()->json(['success' => 'Utility deleted successfully.']);
+    }
+
+    public function getUtility($id)
+    {
+        $utility = Utility::find($id);
+
+        if (!$utility) {
+            return response()->json(['error' => 'Utility not found.'], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $utility
+        ]);
+    }
+
+    public function updateUtility(Request $request)
+    {
+        // Validate input data
+        $request->validate([
+            'utility_name' => 'required|string|max:255',
+            'utility_unit' => 'required|regex:/^[A-Za-z]+$/',
+            'display' => 'nullable|image|mimes:jpeg,png,jpg,gif', // Limit to 2MB and specific formats
+        ]);
+
+        $utility = Utility::find($request->utility_id);
+
+        // Handle image upload
+        if ($request->hasFile('display')) {
+            // Delete existing image if exists
+            if ($utility->filepath && file_exists(public_path($utility->filepath))) {
+                unlink(public_path($utility->filepath));
+            }
+
+            $image = $request->file('display');
+            $filename = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('uploads/utility_data'), $filename);
+            $utility->filepath = 'uploads/utility_data/' . $filename;
+        }
+
+        // Update utility fields with sanitized inputs
+        $utility->utility_name = e($request->utility_name); // Escape HTML characters
+        $utility->utility_unit = e($request->utility_unit);
+        $utility->field_name = e($request->utility_field_name);
+
+        $utility->save();
+
+        return response()->json(['success' => 'Utility updated successfully.']);
+    }
 }
