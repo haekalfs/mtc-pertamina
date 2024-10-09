@@ -319,7 +319,7 @@ class PenlatController extends Controller
         // Validate the incoming request
         $validatedData = $request->validate([
             'nama_program' => 'required|string|max:255',
-            'alias' => 'nullable|string|max:100',  // Alias can be a comma-separated string
+            'alias_hidden' => 'sometimes',  // Alias can be a comma-separated string
             'jenis_pelatihan' => 'nullable|string|max:255',
             'kategori_program' => 'nullable|string|max:255',
             'display' => 'sometimes',
@@ -349,9 +349,9 @@ class PenlatController extends Controller
         $penlat->save();
 
         // Handling alias updates
-        if ($request->input('alias')) {
+        if ($request->input('alias_hidden')) {
             // Split the alias string into an array, trim whitespace, and remove duplicates
-            $aliasArray = array_unique(array_map('trim', explode(',', $request->alias)));
+            $aliasArray = array_unique(array_map('trim', explode(',', $request->alias_hidden)));
 
             // Fetch existing Penlat_alias entries for this Penlat
             $existingAliases = Penlat_alias::where('penlat_id', $penlat->id)->pluck('alias')->toArray();

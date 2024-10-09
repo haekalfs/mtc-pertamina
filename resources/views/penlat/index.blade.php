@@ -232,20 +232,47 @@ font-weight-bold
                                                 <input type="text" class="form-control" name="kategori_program" required>
                                             </div>
                                         </div>
-                                        <div class="d-flex align-items-start mb-4">
-                                            <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Aliases :</p>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <div class='interface-top'>
-                                                    <input type='text' class='interface-input form-control' placeholder='Press enter after for each alias...'>
-                                                    <input type="hidden" name="alias" id="aliasInput">
+                                        <div class="row d-flex justify-content-right mb-1">
+                                            <div class="col-md-12">
+                                                <div class="row align-items-start">
+                                                    <div class="col-md-12">
+                                                        <div class="d-flex">
+                                                            <div style="width: 140px;" class="mr-2">
+                                                                <p style="margin: 0;">Aliases :</p>
+                                                            </div>
+                                                            <div class="flex-grow-1">
+                                                                <div class="form-group">
+                                                                    <div class="input-group">
+                                                                        <input type="text" class="form-control" id="aliasDisplay" placeholder="Add new aliases..."/>
+                                                                        <div class="input-group-addon" id="addAliasBtn"><i class="fa fa-plus"></i></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div class='interface-bottom mt-2'>
-                                            <ul class='interface-list'></ul>
+
+                                        <!-- Hidden input to store the comma-separated aliases for form submission -->
+                                        <input type="hidden" id="alias" name="alias" />
+
+                                        <div class="d-flex align-items-start mb-4 zoom90">
+                                            <table class="table table-bordered mt-3">
+                                                <thead class="thead-light">
+                                                    <tr>
+                                                        <th>Aliases</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="aliasesTableBody">
+                                                    <!-- Filled dynamically with aliases -->
+                                                    <tr id="no-data">
+                                                        <td colspan="2" class="text-center">No data available</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </div>
                                 </div>
@@ -312,16 +339,46 @@ font-weight-bold
                                                 <input type="text" class="form-control" id="edit_kategori_pelatihan" name="kategori_pelatihan" required>
                                             </div>
                                         </div>
-                                        <div class="d-flex align-items-start mb-4">
-                                            <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Aliases :</p>
+                                        <div class="row d-flex justify-content-right mb-1">
+                                            <div class="col-md-12">
+                                                <div class="row align-items-start">
+                                                    <div class="col-md-12">
+                                                        <div class="d-flex">
+                                                            <div style="width: 140px;" class="mr-2">
+                                                                <p style="margin: 0;">Aliases :</p>
+                                                            </div>
+                                                            <div class="flex-grow-1">
+                                                                <div class="form-group">
+                                                                    <div class="input-group">
+                                                                        <input type="text" class="form-control" id="edit_alias" name="alias" placeholder="Add new aliases..."/>
+                                                                        <div class="input-group-addon" id="addAliasesBtn"><i class="fa fa-plus"></i></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="flex-grow-1">
-                                                <textarea type="text" class="form-control" id="edit_alias" name="alias" required></textarea>
-                                                <small id="alias_help" class="help-block form-text text-danger d-none">
-                                                    Only letters (A-Z), dashes (-), and commas (,) are allowed. Example : R-PSRCB-NP,R-PSRCB
-                                                </small>
-                                            </div>
+                                        </div>
+
+                                        <!-- Hidden input to store the comma-separated aliases for form submission -->
+                                        <input type="hidden" id="alias_hidden" name="alias_hidden" />
+
+                                        <div class="d-flex align-items-start mb-4 zoom90">
+                                            <table class="table table-bordered mt-3">
+                                                <thead class="thead-light">
+                                                    <tr>
+                                                        <th>Aliases</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="aliasTableBody">
+                                                    <!-- Filled dynamically with aliases -->
+                                                    <tr id="no-data">
+                                                        <td colspan="2" class="text-center">No data available</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </div>
                                 </div>
@@ -339,25 +396,25 @@ font-weight-bold
 </div>
 
 <script>
-document.getElementById('edit_alias').addEventListener('input', function () {
-    const inputField = document.getElementById('edit_alias');
-    const helpBlock = document.getElementById('alias_help');
+// document.getElementById('edit_alias').addEventListener('input', function () {
+//     const inputField = document.getElementById('edit_alias');
+//     const helpBlock = document.getElementById('alias_help');
 
-    // Regular expression to allow any character except periods, and replace spaces with commas
-    const pattern = /^[^.,]+(?:,[^.,]+)*(?:,[^.,]+)*$/;
+//     // Regular expression to allow any character except periods, and replace spaces with commas
+//     const pattern = /^[^.,]+(?:,[^.,]+)*(?:,[^.,]+)*$/;
 
-    // Replace spaces with commas as the user types
-    inputField.value = inputField.value.replace(/ /g, ',');
+//     // Replace spaces with commas as the user types
+//     inputField.value = inputField.value.replace(/ /g, ',');
 
-    // If the input does not match the pattern
-    if (!pattern.test(inputField.value)) {
-        helpBlock.classList.remove('d-none'); // Show the warning message
-        // Remove invalid characters: periods, multiple commas
-        inputField.value = inputField.value.replace(/[.]+|,{2,}/g, '');
-    } else {
-        helpBlock.classList.add('d-none'); // Hide the warning message
-    }
-});
+//     // If the input does not match the pattern
+//     if (!pattern.test(inputField.value)) {
+//         helpBlock.classList.remove('d-none'); // Show the warning message
+//         // Remove invalid characters: periods, multiple commas
+//         inputField.value = inputField.value.replace(/[.]+|,{2,}/g, '');
+//     } else {
+//         helpBlock.classList.add('d-none'); // Hide the warning message
+//     }
+// });
 // Intercept form submission to show SweetAlert confirmation
 document.getElementById('submitEditForm').addEventListener('click', function (event) {
     event.preventDefault();  // Prevent form from submitting immediately
@@ -378,79 +435,60 @@ document.getElementById('submitEditForm').addEventListener('click', function (ev
         }
     });
 });
-const input = document.querySelector('.interface-input');
-const bottom = document.querySelector('.interface-bottom');
-const list = document.querySelector('.interface-list');
-const remaining = document.querySelector('.interface-remaining');
-const limit = 10;
+$(document).ready(function () {
+    let aliasArray = [];
 
-const totalTags = () => list.querySelectorAll('.interface-tag').length;
+    // Handle Add Alias Button Click
+    $('#addAliasBtn').on('click', function () {
+        let newAlias = $('#aliasDisplay').val().trim();
+        if (newAlias) {
+            aliasArray.push(newAlias);
+            updateAliasTable();
+            swal("Success", "Aliases inserted successfully!", "success");
+            updateHiddenInput();
+            $('#aliasDisplay').val(''); // Clear the input field
+        }
+    });
 
-function overLimit() {
-  input.value = '';
-  input.placeholder = totalTags() >= limit
-    ? `You've reached the limit of 10 tags`
-    : `Press enter or add a comma after each tag`;
-}
+    // Function to update the alias table dynamically
+    function updateAliasTable() {
+        let tableBody = $('#aliasesTableBody');
+        tableBody.empty(); // Clear existing table rows
 
-function clearTags() {
-  list.innerHTML = '';
-  input.value = '';
-  setTimeout(() => bottom.classList.remove('active'),500);
-}
+        if (aliasArray.length === 0) {
+            // Show 'No data available' if there are no aliases
+            tableBody.append(`<tr id="no-data">
+                                <td colspan="2" class="text-center">No data available</td>
+                              </tr>`);
+        } else {
+            // Populate table with aliases if available
+            aliasArray.forEach((alias, index) => {
+                let row = `<tr>
+                                <td>${alias}</td>
+                                <td class="text-center" style="width:5%">
+                                    <button type="button" class="btn btn-outline-danger btn-sm remove-alias" data-index="${index}">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>`;
+                tableBody.append(row);
+            });
+        }
+    }
 
-function updateAliasInput() {
-  const tagNames = Array.from(list.querySelectorAll('.interface-tagName')).map(tag => tag.textContent);
-  document.getElementById('aliasInput').value = tagNames.join(',');
-}
+    // Function to update the hidden input field
+    function updateHiddenInput() {
+        $('#alias').val(aliasArray.join(','));
+    }
 
-function showTags() {
-  if (!input.value.length) return;
-  bottom.classList.add('active');
-  list.innerHTML += createMarkup();
-  input.value = '';
-  updateAliasInput(); // Update hidden input
-}
-
-function closeTag(e) {
-  e.target.parentElement.remove();
-  totalTags() === 0 && clearTags();
-  overLimit();
-  updateAliasInput(); // Update hidden input
-}
-
-function isEnter(e) {
-  if (e.keyCode === 13) {
-    e.preventDefault(); // This will prevent the form submission
-    showTags();
-  }
-}
-
-function createMarkup() {
-  const tags = input.value.split(/[, ]/);
-  const markup = [];
-  if (totalTags() >= limit || !tags[0].length) overLimit();
-  for (let i = 0; i < limit - totalTags(); i++) {
-    if (!tags[i]) continue;
-    markup.push(`
-      <li class='interface-tag'>
-        <span class='interface-tagName'>${tags[i]}</span>
-        <span class='interface-close'>x</span>
-      </li>
-    `);
-  }
-  return markup.join('');
-}
-
-function init(e) {
-  e.target.matches('.interface-clear') && clearTags();
-  e.target.matches('.interface-close') && closeTag(e);
-  e.target.matches('.interface-btn') && showTags();
-}
-
-input.addEventListener('input',createMarkup,false);
-input.addEventListener('keydown',isEnter,false);
-document.addEventListener('click',init,false);
+    // Handle removing an alias from the table
+    $('#aliasTableBody').on('click', '.remove-alias', function () {
+        let index = $(this).data('index');
+        aliasArray.splice(index, 1);
+        updateAliasTable();
+        updateHiddenInput();
+    });
+});
 
 function previewImage(event) {
     const reader = new FileReader();
@@ -493,21 +531,82 @@ $(document).ready(function() {
     order: [[1, 'asc']]
     });
 
-    // Edit functionality
+    let aliasesArray = [];
+
+    // Load existing aliases when the edit button is clicked
     $('#penlatTables').on('click', '.edit-tool', function () {
         let id = $(this).data('id');
 
         $.get('/penlat/' + id + '/edit', function (data) {
+            // Prefill form fields
             $('#edit_id').val(data.id);
             $('#edit_nama_program').val(data.description);
-            $('#edit_alias').val(data.alias);
+            $('#edit_alias').val('');
             $('#edit_jenis_pelatihan').val(data.jenis_pelatihan);
             $('#edit_kategori_pelatihan').val(data.kategori_pelatihan);
             var imageUrl = data.image ? data.image : '{{ asset('img/default-img.png') }}';
             $('#edit-image-preview').attr('src', imageUrl);
             $('#editForm').attr('action', '/penlat-update/' + id);
+
+            // Populate the alias table and hidden input
+            aliasesArray = data.alias ? data.alias.split(',') : [];
+            updateAliasTable();
+            updateHiddenInput();
+
+            // Show the modal
             $('#editDataModal').modal('show');
         });
+    });
+
+    // Handle Add Alias Button Click
+    $('#addAliasesBtn').on('click', function () {
+        let newAlias = $('#edit_alias').val().trim();
+        if (newAlias) {
+            aliasesArray.push(newAlias);
+            updateAliasTable();
+            swal("Success", "Aliases inserted successfully!", "success");
+            updateHiddenInput();
+            $('#edit_alias').val(''); // Clear the input field
+        }
+    });
+
+    // Function to update the alias table dynamically
+    function updateAliasTable() {
+        let tableBody = $('#aliasTableBody');
+        tableBody.empty(); // Clear existing table rows
+
+        if (aliasesArray.length === 0) {
+            // Show 'No data available' if there are no aliases
+            tableBody.append(`<tr id="no-data">
+                                <td colspan="2" class="text-center">No data available</td>
+                              </tr>`);
+        } else {
+            // Populate table with aliases if available
+            aliasesArray.forEach((alias, index) => {
+                let row = `<tr>
+                                <td>${alias}</td>
+                                <td class="text-center" style="width:5%">
+                                    <button type="button" class="btn btn-outline-danger btn-sm remove-alias" data-index="${index}">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>`;
+                tableBody.append(row);
+            });
+        }
+    }
+
+    // Function to update the hidden input field
+    function updateHiddenInput() {
+        $('#alias_hidden').val(aliasesArray.join(','));
+    }
+
+    // Handle removing an alias from the table
+    $('#aliasTableBody').on('click', '.remove-alias', function () {
+        let index = $(this).data('index');
+        aliasesArray.splice(index, 1);
+        updateAliasTable();
+        updateHiddenInput();
     });
 
     // Delete functionality
