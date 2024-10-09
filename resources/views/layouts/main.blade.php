@@ -107,7 +107,7 @@
                         <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-penlat')">
                             <li><i class="fa fa-list-alt"></i><a href="{{ route('penlat') }}" class="@yield('penlat')">List Pelatihan</a></li>
                             <li class="pl-3"><i class="fa fa-folder pl-3"></i><a href="{{ route('batch-penlat') }}" class="@yield('batch-penlat')">Batch Program</a></li>
-                            <li><i class="fa fa-gears"></i><a href="{{ route('list-utilities') }}" class="@yield('list-utilitas')">List Utilitas</a></li>
+                            <li><i class="fa fa-gears"></i><a href="{{ route('on.development') }}" class="@yield('list-utilitas')">List Utilitas</a></li>
                         </ul>
                     </li>
                     @endusr_acc
