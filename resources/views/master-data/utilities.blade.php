@@ -105,6 +105,7 @@ font-weight-bold
                 <div class="card-body" style="background-color: rgb(247, 247, 247);">
                     <h6 class="h6 mb-2 font-weight-bold text-gray-800">Utility Management Guidelines</h6>
                     <ul class="ml-4">
+                        <li>Adding new utilities will affect the Utilitas Table.</li>
                         <li>Utilities must be registered manually based on operational requirements.</li>
                         <li>Ensure that you follow the correct procedure when registering utilities to avoid errors.</li>
                         <li>Users <span class="text-danger">should not delete utilities with IDs 1 to 6</span> as they are protected for system integrity.</li>

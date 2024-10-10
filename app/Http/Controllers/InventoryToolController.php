@@ -625,4 +625,48 @@ class InventoryToolController extends Controller
         // Optionally, add a success message or return a response
         return redirect()->back()->with('success', 'Asset condition updated successfully!');
     }
+
+    public function destroy_asset_per_item($id)
+    {
+        DB::beginTransaction();
+
+        try {
+            // Find the asset
+            $asset = Asset_item::findOrFail($id);
+
+            // Check if the asset is currently in use
+            if ($asset->isUsed) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cannot delete asset. It is currently in use.'
+                ], 403);  // Forbidden status code
+            }
+
+            // Find the associated Inventory Tool
+            $inventoryTool = $asset->tools;  // Access the related Inventory Tool via the relationship
+
+            if ($inventoryTool) {
+                // Reduce the initial_stock by 1
+                $inventoryTool->initial_stock = $inventoryTool->initial_stock - 1;
+                $inventoryTool->save();  // Save the updated inventory stock
+            }
+
+            // Proceed with deletion if the asset is not in use
+            $asset->delete();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Asset deleted successfully.'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting asset.'
+            ], 500);
+        }
+    }
 }

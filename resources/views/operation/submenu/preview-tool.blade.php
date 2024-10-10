@@ -52,73 +52,120 @@ font-weight-bold
 @endif
 
 <div class="row zoom90">
-    <div class="col-xl-9 col-lg-9">
-        <div class="card">
-            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold" id="judul">Detail Asset</h6>
-            </div>
-            <div class="card-body" style="position: relative;">
-                <a href="#" data-id="{{ $data->id }}" class="position-absolute edit-tool" style="top: 10px; right: 15px; z-index: 10;">
-                    <i class="fa fa-edit fa-lg ml-2" style="color: rgb(181, 181, 181);"></i>
-                </a>
-                <div class="row mt-3 mb-3">
-                    <div class="col-md-5 product_img d-flex justify-content-center align-items-center">
-                        <img src="{{ $data->img->filepath ? asset($data->img->filepath) : asset('img/default-img.png') }}" class="img-responsive">
+    <div class="col-md-9">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold" id="judul">Detail Asset</h6>
                     </div>
-                    <div class="col-md-7 product_content">
-                        <h3 class="card-title font-weight-bold">{{ $data->asset_name }}</h3>
-                        <table class="ml-3 table table-borderless table-sm">
-                            <tr>
-                                <th style="width: 200px;">Asset ID</th>
-                                <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $data->asset_id }}</span></td>
-                            </tr>
-                            <tr>
-                                <th>Maker</th>
-                                <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $data->asset_maker }}</span></td>
-                            </tr>
-                            <tr>
-                                <th>Location</th>
-                                <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $data->location->description }}</span></td>
-                            </tr>
-                            <tr>
-                                <th>Initial Stock</th>
-                                <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $data->initial_stock  }} Units</span></td>
-                            </tr>
-                            <tr>
-                                <th>Used</th>
-                                <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $data->used_amount ? $data->used_amount : '0' }} Units</span></td>
-                            </tr>
-                            <tr>
-                                <th>Current Stock</th>
-                                <td style="text-align: start; font-weight:500">:
-                                    <span class="ml-3">{{ $data->asset_stock }} Units
-                                        @if($data->asset_stock < 5) <span class="position-absolute top-0 ml-1 start-100 translate-middle badge bg-danger text-white">!</span>@endif
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th style="width: 200px;">Running Hours</th>
-                                @php
-                                    $purchaseDate = \Carbon\Carbon::parse($data->last_maintenance);
-                                    $currentDate = \Carbon\Carbon::now();
-                                    $hoursDifference = $currentDate->diffInHours($purchaseDate);
-                                @endphp
+                    <div class="card-body" style="position: relative;">
+                        <a href="#" data-id="{{ $data->id }}" class="position-absolute edit-tool" style="top: 10px; right: 15px; z-index: 10;">
+                            <i class="fa fa-edit fa-lg ml-2" style="color: rgb(181, 181, 181);"></i>
+                        </a>
+                        <div class="row mt-3 mb-3">
+                            <div class="col-md-5 product_img d-flex justify-content-center align-items-center">
+                                <img src="{{ $data->img->filepath ? asset($data->img->filepath) : asset('img/default-img.png') }}" class="img-responsive">
+                            </div>
+                            <div class="col-md-7 product_content">
+                                <h3 class="card-title font-weight-bold">{{ $data->asset_name }}</h3>
+                                <table class="ml-3 table table-borderless table-sm">
+                                    <tr>
+                                        <th style="width: 200px;">Asset ID</th>
+                                        <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $data->asset_id }}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Maker</th>
+                                        <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $data->asset_maker }}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Location</th>
+                                        <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $data->location->description }}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Initial Stock</th>
+                                        <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $data->initial_stock  }} Units</span></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Used</th>
+                                        <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $data->used_amount ? $data->used_amount : '0' }} Units</span></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Current Stock</th>
+                                        <td style="text-align: start; font-weight:500">:
+                                            <span class="ml-3">{{ $data->asset_stock }} Units
+                                                @if($data->asset_stock < 5) <span class="position-absolute top-0 ml-1 start-100 translate-middle badge bg-danger text-white">!</span>@endif
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th style="width: 200px;">Running Hours</th>
+                                        @php
+                                            $purchaseDate = \Carbon\Carbon::parse($data->last_maintenance);
+                                            $currentDate = \Carbon\Carbon::now();
+                                            $hoursDifference = $currentDate->diffInHours($purchaseDate);
+                                        @endphp
 
-                                <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $hoursDifference }} hours</span></td>
-                            </tr>
-                            <tr>
-                                <th>Last Maintenance At</th>
-                                <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ \Carbon\Carbon::parse($data->last_maintenance)->format('d-M-Y') }}</span></td>
-                            </tr>
-                            <tr>
-                                <th>Next Maintenance At</th>
-                                <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ \Carbon\Carbon::parse($data->next_maintenance)->format('d-M-Y') }}</span></td>
-                            </tr>
-                            <tr>
-                                <th>User Manual</th>
-                                <td style="text-align: start; font-weight:500">: @if($data->asset_guidance) <a href="{{ asset($data->asset_guidance) }}" target="_blank"><span class="ml-3 btn btn-sm btn-outline-secondary">Download File <i class="fa fa-download"></i></span></a> @else - @endif</td>
-                            </tr>
-                        </table>
+                                        <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $hoursDifference }} hours</span></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Last Maintenance At</th>
+                                        <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ \Carbon\Carbon::parse($data->last_maintenance)->format('d-M-Y') }}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Next Maintenance At</th>
+                                        <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ \Carbon\Carbon::parse($data->next_maintenance)->format('d-M-Y') }}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <th>User Manual</th>
+                                        <td style="text-align: start; font-weight:500">: @if($data->asset_guidance) <a href="{{ asset($data->asset_guidance) }}" target="_blank"><span class="ml-3 btn btn-sm btn-outline-secondary">Download File <i class="fa fa-download"></i></span></a> @else - @endif</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <span class="font-weight-bold">Asset Management</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered zoom90" id="listAsset" width="100%" cellspacing="0">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Asset Code</th>
+                                        <th>Asset Condition</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                </thead>@php $no = 1 @endphp
+                                    @foreach($data->items as $asset)
+                                    <tr>
+                                        <td>{{ $no++ }}</td>
+                                        <td class="font-weight-bold text-secondary">{{ $asset->asset_code }}</td>
+                                        <td><span class="ml-3">{{ $asset->condition->condition }}</span></td>
+                                        <td>@if($asset->isUsed) <i class="fa fa-lock text-danger"></i> @else <i class="fa fa-unlock text-primary"></i> @endif</td>
+                                        <td width='250' class="text-center">
+                                            <a class="btn btn-sm btn-secondary mr-2 edit-asset text-white"
+                                                data-asset-id="{{ $asset->id }}"
+                                                data-condition-id="{{ $asset->asset_condition_id }}"
+                                                data-is-used="{{ $asset->isUsed }}"
+                                                data-url-used="{{ route('inventory-tools.mark-as-used', $asset->id) }}"
+                                                data-url-unused="{{ route('inventory-tools.mark-as-unused', $asset->id) }}">
+                                                <i class="fa fa-fw fa-edit"></i> Edit
+                                            </a>
+                                            <a class="btn btn-sm btn-success mr-2 generateQR" data-id="{{ $asset->id }}" href="javascript:void(0)">
+                                                <i class="fa fa-qrcode"></i> Generate QR
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                <tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -157,64 +204,28 @@ font-weight-bold
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-    <div class="col-md-12">
-        <div class="card mb-4">
-            <div class="card-header">
-                <span class="font-weight-bold">Asset Management</span>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-bordered zoom90" id="listAsset" width="100%" cellspacing="0">
-                        <thead class="thead-light">
-                            <tr>
-                                <th>No</th>
-                                <th>Asset Code</th>
-                                <th>Asset Condition</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                        </thead>@php $no = 1 @endphp
-                            @foreach($data->items as $asset)
-                            <tr>
-                                <td>{{ $no++ }}</td>
-                                <td class="font-weight-bold text-secondary">{{ $asset->asset_code }}</td>
-                                <td><span class="ml-3">{{ $asset->condition->condition }}</span></td>
-                                <td>@if($asset->isUsed) <i class="fa fa-lock text-danger"></i> @else <i class="fa fa-unlock text-primary"></i> @endif</td>
-                                <td width='250' class="text-center">
-                                    <a class="btn btn-sm btn-secondary mr-2 edit-asset text-white"
-                                        data-asset-id="{{ $asset->id }}"
-                                        data-condition-id="{{ $asset->asset_condition_id }}"
-                                        data-is-used="{{ $asset->isUsed }}"
-                                        data-url-used="{{ route('inventory-tools.mark-as-used', $asset->id) }}"
-                                        data-url-unused="{{ route('inventory-tools.mark-as-unused', $asset->id) }}">
-                                        <i class="fa fa-fw fa-edit"></i> Edit
-                                    </a>
-                                    <a class="btn btn-sm btn-success mr-2 generateQR" data-id="{{ $asset->id }}" href="javascript:void(0)">
-                                        <i class="fa fa-qrcode"></i> Generate QR
-                                    </a>
-                                    {{-- @if($asset->isUsed)
-                                        <form action="{{ route('inventory-tools.mark-as-unused', $asset->id) }}" method="POST" style="display:inline;">
-                                            @csrf
-                                            @method('PATCH')
-                                            <button type="submit" class='btn btn-sm btn-danger mr-2'>
-                                                <i class="fa fa-fw fa-print"></i> Mark as Unused
-                                            </button>
-                                        </form>
-                                    @else
-                                        <form action="{{ route('inventory-tools.mark-as-used', $asset->id) }}" method="POST" style="display:inline;">
-                                            @csrf
-                                            @method('PATCH')
-                                            <button type="submit" class='btn btn-sm btn-primary mr-2'>
-                                                <i class="fa fa-fw fa-print"></i> Mark as Used
-                                            </button>
-                                        </form>
-                                    @endif --}}
-                                </td>
-                            </tr>
-                            @endforeach
-                        <tbody>
-                    </table>
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <span class="text-danger font-weight-bold">Notes</span>
+                    </div>
+                    <div class="card-body" style="background-color: rgb(247, 247, 247);">
+                        <h6 class="h6 mb-2 font-weight-bold text-gray-800">Asset Management Guidelines</h6>
+                        <ul class="ml-4">
+                            <li>Asset management impacts the overall inventory, reflecting changes directly in the system.</li>
+                            <li>Assets must be managed carefully, with updates to conditions and statuses performed manually to ensure accuracy.</li>
+                            <li>Legends :
+                                <ul>
+                                    <li><i class="fa fa-lock text-danger"></i> - Indicates the asset is currently in use and unavailable for allocation.</li>
+                                    <li><i class="fa fa-unlock text-primary"></i> - Indicates the asset is available and ready for use.</li>
+                                </ul>
+                            </li>
+                            <li>You can generate a QR Code for each asset, which encodes a link used for validating and verifying the asset information.</li>
+                            <li>Editing asset conditions is possible by selecting the appropriate action in the "Action" column. The system will reflect the asset’s updated status immediately after modification.</li>
+                            <li>The system displays a count of assets by their respective conditions, such as "Normal," "Damaged," or "Under Maintenance," giving you a quick overview of asset health.</li>
+                            <li>All images uploaded for assets must meet the required format and size specifications to maintain system standards.</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -256,7 +267,7 @@ font-weight-bold
                         <!-- The forms will be inserted dynamically here by JavaScript -->
                     </div>
                 </div>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" id="deleteAssetBtn">Delete Asset</button>
                 <button type="submit" form="editConditionForm" class="btn btn-primary">Save changes</button>
             </div>
         </div>
@@ -547,6 +558,9 @@ font-weight-bold
         // Set selected condition in the dropdown
         $('#edit_condition').val(conditionId);
 
+        // Update the delete button with the correct asset ID
+        $('#deleteAssetBtn').data('id', assetId);
+
         // Get route URLs from data attributes
         var usedRoute = $(this).data('url-used');
         var unusedRoute = $(this).data('url-unused');
@@ -578,6 +592,55 @@ font-weight-bold
 
         // Show the modal
         $('#editConditionModal').modal('show');
+    });
+
+    $('#deleteAssetBtn').on('click', function() {
+        var assetId = $(this).data('id');  // Get the asset ID dynamically
+
+        // Show SweetAlert confirmation dialog
+        swal({
+            title: "Delete this Asset?",
+            text: "This will reduce the initial stocks and once deleted, you will not be able to recover this asset!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+        .then((willDelete) => {
+            if (willDelete) {
+                // Perform AJAX request to delete the asset
+                $.ajax({
+                    url: '{{ route("inventory-tools.delete", ":id") }}'.replace(':id', assetId),  // Use route name dynamically
+                    type: 'DELETE',
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        // Handle success case
+                        if (response.success) {
+                            swal("Success", response.message, "success").then(() => {
+                                location.reload();  // Refresh the page after successful deletion
+                            });
+                        } else {
+                            // Display error message from the server
+                            swal("Error", response.message, "error");
+                        }
+                    },
+                    error: function(xhr) {
+                        // Handle different error statuses
+                        if (xhr.status === 404) {
+                            swal("Error!", "Asset not found.", "error");  // Asset not found
+                        } else if (xhr.status === 403) {
+                            swal("Error!", "Cannot delete asset. It is currently in use.", "error");  // Asset is in use
+                        } else if (xhr.status === 400) {
+                            var response = xhr.responseJSON;
+                            swal("Error!", response.error, "error");  // Custom error message
+                        } else {
+                            swal("Error!", "An error occurred while trying to delete the asset.", "error");  // General error
+                        }
+                    }
+                });
+            }
+        });
     });
 
     function printModalContent() {

@@ -53,7 +53,7 @@ Route::middleware('checkForErrors', 'suspiciousActivity', 'suspicious', 'auth')-
     //On Dev Notification
     Route::get('/closed-menu', function () {
         // Set the session flash message
-        Session::flash('warning', 'The menu you try to access is on development & testing, thank you for your patience.');
+        Session::flash('warning', 'The menu you try to access is locked 🔒, thank you for your patience.');
 
         // Redirect back to the current page or any other specific page
         return redirect()->back();
@@ -162,6 +162,7 @@ Route::middleware('checkForErrors', 'suspiciousActivity', 'suspicious', 'auth')-
             Route::patch('/inventory-tools-mark-as-unused/{id}', [InventoryToolController::class, 'markAsUnused'])->name('inventory-tools.mark-as-unused');
             Route::get('/tool-inventory-generate-qr/{id}', [InventoryToolController::class, 'generateQrCode'])->name('generate-qr');
             Route::post('/update-asset-condition', [InventoryToolController::class, 'updateAssetCondition'])->name('update-asset-condition');
+            Route::delete('/inventory-tools/delete/{id}', [InventoryToolController::class, 'destroy_asset_per_item'])->name('inventory-tools.delete');
 
 
             //inventaris ruangan
