@@ -70,8 +70,10 @@ font-weight-bold
                                     <td style="text-align: start; font-weight:500">: {{ $data->description }}</td>
                                 </tr>
                                 <tr>
-                                    <th style="width: 200px;">Alias</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $data->alias }}</td>
+                                    <th style="width: 200px;">Aliases</th>
+                                    <td style="text-align: start; font-weight:500">
+                                        : {{ $data->aliases->pluck('alias')->implode(', ') }}
+                                    </td>
                                 </tr>
                                 <tr>
                                     <th>Jenis Pelatihan</th>
@@ -117,7 +119,7 @@ font-weight-bold
                                         <td data-th="Product">
                                             <div class="row">
                                                 <div class="col-md-4 text-center d-flex justify-content-center align-items-center">
-                                                    <img src="{{ asset($tool->tools->img->filepath) }}" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow ">
+                                                    <img src="{{ $tool->tools->img->filepath ? asset($tool->tools->img->filepath) : asset('img/default-img.png') }}" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow ">
                                                 </div>
                                                 <div class="col-md-8 text-left mt-sm-2">
                                                     <h5>{{ $tool->tools->asset_name }}</h5>
@@ -138,7 +140,7 @@ font-weight-bold
                                             <a href="javascript:void(0)" class="btn btn-outline-danger btn-sm text-danger" onclick="confirmDelete({{ $tool->id }})">
                                                 <i class="fa fa-trash-o"></i> Delete
                                             </a>
-                                            <form id="delete-form-{{ $tool->id }}" action="{{ route('delete.item.requirement', $tool->id) }}" method="POST" style="display: none;">
+                                            <form id="delete-form-{{ $tool->id }}" action="{{ route('delete.item.requirement', $tool->id) }}" method="POST" style="display: none;" enctype="multipart/form-data">
                                                 @csrf
                                                 @method('DELETE')
                                             </form>

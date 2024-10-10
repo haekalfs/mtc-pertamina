@@ -503,9 +503,9 @@ class InventoryToolController extends Controller
             $asset = Inventory_tools::findOrFail($id);
 
             // Check if there are related asset items in the rooms_inventory relationship
-            if ($asset->rooms_inventory()->exists()) {
+            if ($asset->rooms_inventory()->exists() || $asset->penlat_requirement()->exists()) {
                 return response()->json([
-                    'error' => 'Cannot delete asset. Related asset items into room inventory exist.'
+                    'error' => 'This asset is related to room inventory... remove the items from room inventory then proceed the deletion.'
                 ], 400);  // Bad Request status code
             }
 

@@ -12,10 +12,10 @@ class Instructor_certificate extends Model
     protected $fillable = ["id", "instructor_id", 'certificates_catalog_id',"created_at", "updated_at"];
 
     public function catalog(){
-    	return $this->belongsTo('App\Models\Certificates_catalog', 'certificates_catalog_id', 'id');
+    	return $this->belongsTo('App\Models\Certificates_catalog', 'certificates_catalog_id', 'id')->withDefault();
     }
 
     public function instructor(){
-    	return $this->belongsTo('App\Models\Instructor', 'instructor_id', 'id');
+    	return $this->belongsTo('App\Models\Instructor', 'instructor_id', 'id')->withDefault();
     }
 }

@@ -18,6 +18,6 @@ class Penlat_requirement extends Model
 
     public function tools()
     {
-    	return $this->belongsTo('App\Models\Inventory_tools', 'inventory_tool_id', 'id');
+    	return $this->belongsTo('App\Models\Inventory_tools', 'inventory_tool_id', 'id')->withDefault();
     }
 }

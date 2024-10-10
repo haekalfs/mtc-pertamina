@@ -16,11 +16,11 @@ class User_pencapaian_akhlak extends Model
     }
 
     public function user(){
-    	return $this->belongsTo('App\Models\User');
+    	return $this->belongsTo('App\Models\User')->withDefault();
     }
 
     public function akhlak(){
-    	return $this->belongsTo('App\Models\Akhlak');
+    	return $this->belongsTo('App\Models\Akhlak')->withDefault();
     }
 
     public function quarter()

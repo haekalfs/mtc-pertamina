@@ -13,6 +13,6 @@ class Agreement extends Model
 
 
     public function statuses(){
-    	return $this->belongsTo('App\Models\Status', 'status', 'id');
+    	return $this->belongsTo('App\Models\Status', 'status', 'id')->withDefault();
     }
 }

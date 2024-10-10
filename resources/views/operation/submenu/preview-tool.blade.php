@@ -129,7 +129,7 @@ font-weight-bold
             <div class="col-md-12">
                 <div class="card mb-4">
                     <div class="card-header">
-                        <span class="font-weight-bold">Asset Management</span>
+                        <span class="font-weight-bold">Asset Stocks Management</span>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -151,6 +151,7 @@ font-weight-bold
                                         <td width='250' class="text-center">
                                             <a class="btn btn-sm btn-secondary mr-2 edit-asset text-white"
                                                 data-asset-id="{{ $asset->id }}"
+                                                data-asset-code="{{ $asset->asset_code }}"
                                                 data-condition-id="{{ $asset->asset_condition_id }}"
                                                 data-is-used="{{ $asset->isUsed }}"
                                                 data-url-used="{{ route('inventory-tools.mark-as-used', $asset->id) }}"
@@ -518,7 +519,7 @@ font-weight-bold
                             ? xhr.responseJSON.error
                             : "Oops! Something went wrong!";
 
-                        swal("Error!", errorMessage, "error");
+                        swal("Cannot Delete Asset!", errorMessage, "error");
                     }
                 });
             } else {
@@ -551,6 +552,7 @@ font-weight-bold
         var assetId = $(this).data('asset-id');  // Get asset ID
         var conditionId = $(this).data('condition-id');  // Get current condition ID
         var isUsed = $(this).data('is-used');  // Get the current used status
+        var assetCode = $(this).data('asset-code');  // Get the asset code
 
         // Set asset ID in hidden input
         $('#edit_asset_id').val(assetId);
@@ -560,6 +562,9 @@ font-weight-bold
 
         // Update the delete button with the correct asset ID
         $('#deleteAssetBtn').data('id', assetId);
+
+        //give asset code
+        $('#deleteAssetBtn').data('asset-code', assetCode);
 
         // Get route URLs from data attributes
         var usedRoute = $(this).data('url-used');
@@ -596,10 +601,11 @@ font-weight-bold
 
     $('#deleteAssetBtn').on('click', function() {
         var assetId = $(this).data('id');  // Get the asset ID dynamically
+        var assetCode = $(this).data('asset-code');  // Get the asset code
 
         // Show SweetAlert confirmation dialog
         swal({
-            title: "Delete this Asset?",
+            title: "Delete Asset: " + assetCode + "?",
             text: "This will reduce the initial stocks and once deleted, you will not be able to recover this asset!",
             icon: "warning",
             buttons: true,

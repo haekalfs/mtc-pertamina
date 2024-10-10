@@ -10,6 +10,7 @@ class MorningBriefing extends Model
     use HasFactory;
     protected $table = "morning_briefing";
     protected $fillable = ["id", "briefing_name", 'briefing_details', 'briefing_result', 'user_id', 'date', 'img_filepath',"created_at", "updated_at"];
+
     public function user(){
     	return $this->belongsTo('App\Models\User')->withDefault();
     }

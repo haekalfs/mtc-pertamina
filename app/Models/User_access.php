@@ -14,6 +14,6 @@ class User_access extends Model
     protected $fillable = ["id", "page_id", "role_id", "created_at", "updated_at"];
 
     public function role(){
-    	return $this->belongsTo('App\Models\Role');
+    	return $this->belongsTo('App\Models\Role')->withDefault();
     }
 }

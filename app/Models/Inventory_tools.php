@@ -32,11 +32,11 @@ class Inventory_tools extends Model
     ];
 
     public function img(){
-    	return $this->hasOne('App\Models\Tool_img', 'inventory_tool_id', 'id');
+    	return $this->hasOne('App\Models\Tool_img', 'inventory_tool_id', 'id')->withDefault();
     }
 
     public function condition(){
-    	return $this->belongsTo('App\Models\Asset_condition', 'asset_condition_id', 'id');
+    	return $this->belongsTo('App\Models\Asset_condition', 'asset_condition_id', 'id')->withDefault();
     }
 
     public function items()
@@ -52,5 +52,10 @@ class Inventory_tools extends Model
     public function rooms_inventory()
     {
         return $this->hasMany('App\Models\Inventory_room', 'inventory_tool_id', 'id');
+    }
+
+    public function penlat_requirement()
+    {
+        return $this->hasMany('App\Models\Penlat_requirement', 'inventory_tool_id', 'id');
     }
 }

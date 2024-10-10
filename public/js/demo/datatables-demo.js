@@ -25,8 +25,8 @@ $(document).ready(function() {
 $(document).ready(function() {
   $('#listAsset').DataTable({
     "order": [[ 1, "asc" ]],
-    "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
-    "pageLength": 25
+    "lengthMenu": [[5, 10, 20, 50, -1], [5, 10, 20, 50, "All"]],
+    "pageLength": 20
   } );
 } );
 // Call the dataTables jQuery plugin

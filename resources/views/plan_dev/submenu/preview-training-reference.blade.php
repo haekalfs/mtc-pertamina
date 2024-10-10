@@ -73,8 +73,10 @@ font-weight-bold
                                     <td style="text-align: start; font-weight:500">: {{ $data->description }}</td>
                                 </tr>
                                 <tr>
-                                    <th style="width: 200px;">Alias</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $data->alias }}</td>
+                                    <th style="width: 200px;">Aliases</th>
+                                    <td style="text-align: start; font-weight:500">
+                                        : {{ $data->aliases->pluck('alias')->implode(', ') }}
+                                    </td>
                                 </tr>
                                 <tr>
                                     <th>Jenis Pelatihan</th>
@@ -99,7 +101,7 @@ font-weight-bold
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-tag"></i> List Data</h6>
                     <div class="text-right">
-                        <button data-toggle="modal" data-target="#inputDataModal" class="btn btn-primary btn-md mb-2 mr-2 btn-sm">
+                        <button data-toggle="modal" data-target="#inputDataModal" class="btn btn-primary btn-sm">
                             <i class="fa fa-plus"></i> Add References
                         </button>
                     </div>

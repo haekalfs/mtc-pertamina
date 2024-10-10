@@ -12,10 +12,10 @@ class Asset_item extends Model
     protected $fillable = ["id", "asset_code", "asset_condition_id", "isUsed", 'inventory_tool_id',"created_at", "updated_at"];
 
     public function tools(){
-    	return $this->belongsTo('App\Models\Inventory_tools', 'inventory_tool_id', 'id');
+    	return $this->belongsTo('App\Models\Inventory_tools', 'inventory_tool_id', 'id')->withDefault();
     }
 
     public function condition(){
-    	return $this->belongsTo('App\Models\Asset_condition', 'asset_condition_id', 'id');
+    	return $this->belongsTo('App\Models\Asset_condition', 'asset_condition_id', 'id')->withDefault();
     }
 }
