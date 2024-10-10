@@ -502,7 +502,14 @@ class InventoryToolController extends Controller
             // Check if the asset exists in the Inventory_tools model
             $asset = Inventory_tools::findOrFail($id);
 
-            // Delete related image
+            // Check if there are related asset items in the rooms_inventory relationship
+            if ($asset->rooms_inventory()->exists()) {
+                return response()->json([
+                    'error' => 'Cannot delete asset. Related asset items into room inventory exist.'
+                ], 400);  // Bad Request status code
+            }
+
+            // Delete related image if it exists
             if ($asset->img) {
                 $asset->img->delete();
             }

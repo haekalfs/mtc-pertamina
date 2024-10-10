@@ -48,4 +48,9 @@ class Inventory_tools extends Model
     {
         return $this->belongsTo('App\Models\Location')->withDefault();
     }
+
+    public function rooms_inventory()
+    {
+        return $this->hasMany('App\Models\Inventory_room', 'inventory_tool_id', 'id');
+    }
 }
