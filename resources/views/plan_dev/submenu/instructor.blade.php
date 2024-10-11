@@ -204,7 +204,8 @@ $('#listInstructors').DataTable({
                 return '<div class="text-center">' + data + '</div>';
             }
         }
-    ]
+    ],
+    order: [[1, 'asc']]
 });
 
 // Reload table when filter is changed
