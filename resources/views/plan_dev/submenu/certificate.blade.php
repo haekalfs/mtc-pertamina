@@ -102,7 +102,7 @@ font-weight-bold
                         <thead class="thead-light">
                             <tr>
                                 <th>Nama Pelatihan</th>
-                                <th>Alias</th>
+                                <th>Jenis Pelatihan</th>
                                 <th>Batch</th>
                                 <th>Status</th>
                                 <th>Keterangan</th>
@@ -207,7 +207,7 @@ $(document).ready(function() {
         },
         columns: [
             { data: 'batch.penlat.description', name: 'batch.penlat.description' },
-            { data: 'batch.penlat.alias', name: 'batch.penlat.alias' },
+            { data: 'batch.penlat.jenis_pelatihan', name: 'batch.penlat.jenis_pelatihan' },
             { data: 'batch.batch', name: 'batch.batch' },
             { data: 'status', name: 'status' },
             { data: 'keterangan', name: 'keterangan' },

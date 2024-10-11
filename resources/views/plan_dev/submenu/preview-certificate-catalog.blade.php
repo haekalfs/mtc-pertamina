@@ -55,69 +55,42 @@ font-weight-bold
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-secondary" id="judul"><i class="fa fa-user"></i> List Holder</h6>
+                    <h6 class="m-0 font-weight-bold text-secondary" id="judul">List Holder</h6>
                     <div class="text-right">
                         {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Add Participant</a> --}}
                     </div>
                 </div>
                 <div class="card-body">
-                    <table id="dataTable" class="table table-bordered mt-4 zoom90">
-                        <thead class="thead-light">
+                    <table id="dataTable" class="table table-striped mt-4" style="border: 1px solid rgb(229, 229, 229);">
+                        <thead class="text-secondary" style="background-color: #ecedee;">
                             <tr>
-                                <th>Instructors</th>
+                                <th>Avatar</th>
+                                <th>Name</th>
+                                <th>Umur</th>
+                                <th>Gender</th>
+                                <th>Jam Mengajar</th>
+                                <th>Total Feedback</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($data->holder as $item)
                             <tr>
-                                <td data-th="Product">
-                                    <div class="row">
-                                        <div class="col-md-3 d-flex justify-content-center align-items-center text-center">
-                                            <img src="{{ $item->instructor->imgFilepath ? asset($item->instructor->imgFilepath) : asset('img/default-img.png') }}" style="height: 150px; width: 120px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
-                                        </div>
-                                        <div class="col-md-9 text-left mt-sm-2">
-                                            <h5 class="card-title font-weight-bold">{{ $item->instructor->instructor_name }}</h5>
-                                            <div class="ml-2">
-                                                <table class="table table-borderless table-sm">
-                                                    <tr>
-                                                        <td style="width: 180px;"><i class="fa fa-caret-right mr-2"></i> Email</td>
-                                                        <td style="text-align: start;">: {{ $item->instructor->instructor_email }}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><i class="fa fa-caret-right mr-2"></i> Umur</td>
-                                                        <td style="text-align: start;">: {{ \Carbon\Carbon::parse($item->instructor->instructor_dob)->age }} Tahun</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><i class="fa fa-caret-right mr-2"></i> Jam Mengajar</td>
-                                                        <td style="text-align: start;">: {{ $item->instructor->working_hours }}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td style="width: 180px;"><i class="fa fa-caret-right mr-2"></i> Avg Nilai Feedback</td>
-                                                        <td style="text-align: start;">:
-                                                            @php
-                                                                $roundedScore = round($item->instructor->average_feedback_score, 1); // Round to one decimal place
-                                                                $wholeStars = floor($roundedScore);
-                                                                $halfStar = ($roundedScore - $wholeStars) >= 0.5;
-                                                            @endphp
-
-                                                            @for ($i = 0; $i < 5; $i++)
-                                                                @if ($i < $wholeStars)
-                                                                    <i class="fa fa-star text-warning"></i>
-                                                                @elseif ($halfStar && $i == $wholeStars)
-                                                                    <i class="fa fa-star-half-o text-warning"></i>
-                                                                @else
-                                                                    <i class="fa fa-star-o text-warning"></i>
-                                                                @endif
-                                                            @endfor
-                                                            {{ $roundedScore ?? '-' }}
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <td>
+                                    <div class="round-img"><a href=""><img class="rounded-circle" src="{{ $item->instructor->imgFilepath ? asset($item->instructor->imgFilepath) : asset('img/default-img.png') }}" style="height: 70px; width: 70px; border: 1px solid rgb(202, 202, 202);"></a></div>
                                 </td>
+                                <td>
+                                    @php
+                                        $roundedScore = round($item->instructor->average_feedback_score, 1); // Round to one decimal place
+                                        $wholeStars = floor($roundedScore);
+                                        $halfStar = ($roundedScore - $wholeStars) >= 0.5;
+                                    @endphp
+                                    <div>{{ $item->instructor->instructor_name }}<div style="margin-top: 3px;"><span><i class="fa fa-star text-warning"></i> {{ $roundedScore ?? '-' }}</span></div></div>
+                                </td>
+                                <td>{{ \Carbon\Carbon::parse($item->instructor->instructor_dob)->age }} Tahun</td>
+                                <td>{{ $item->instructor->instructor_gender }}</td>
+                                <td>{{ $item->instructor->working_hours ? $item->instructor->working_hours : '-' }}</td>
+                                <td>{{ $item->instructor->feedbacks->count() / 5 }} Feedbacks</td>
                                 <td class="actions text-center">
                                     <div>
                                         <a class="btn btn-outline-secondary btn-sm mr-2" href="{{ route('preview-instructor', ['id' => $item->instructor->id, 'penlatId' => '0']) }}"><i class="menu-Logo fa fa-eye"></i> Preview</a>

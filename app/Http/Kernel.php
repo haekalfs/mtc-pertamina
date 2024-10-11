@@ -23,6 +23,7 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
         \App\Http\Middleware\ValidateRequest::class,
         \App\Http\Middleware\SuspiciousActivityDetection::class,
+        \App\Http\Middleware\SuspiciousTextCheck::class,
     ];
 
     /**
@@ -69,6 +70,7 @@ class Kernel extends HttpKernel
         'checkForErrors' => \App\Http\Middleware\CheckForErrors::class,
         'checkUserAccess' => \App\Http\Middleware\CheckUserAccess::class,
         'suspicious' => \App\Http\Middleware\SuspiciousFileCheck::class,
+        'suspiciousTexts' => \App\Http\Middleware\SuspiciousTextCheck::class,
         'restrictRequestbyRole' => \App\Http\Middleware\RestrictRequestRole::class,
         'encrypt.params' => \App\Http\Middleware\EncryptParams::class,
         'decrypt.params' => \App\Http\Middleware\DecryptParams::class,

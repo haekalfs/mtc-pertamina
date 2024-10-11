@@ -118,7 +118,7 @@ font-weight-bold
                                     </tr>
                                     <tr>
                                         <th>User Manual</th>
-                                        <td style="text-align: start; font-weight:500">: @if($data->asset_guidance) <a href="{{ asset($data->asset_guidance) }}" target="_blank"><span class="ml-3 btn btn-sm btn-outline-secondary">Download File <i class="fa fa-download"></i></span></a> @else - @endif</td>
+                                        <td style="text-align: start; font-weight:500">: @if($data->asset_guidance) <a href="{{ asset($data->asset_guidance) }}" target="_blank"><span class="ml-3 btn btn-sm btn-outline-secondary">Download File <i class="fa fa-download"></i></span></a> @else <span class="ml-3"> - </span> @endif</td>
                                     </tr>
                                 </table>
                             </div>
@@ -563,33 +563,25 @@ font-weight-bold
         // Update the delete button with the correct asset ID
         $('#deleteAssetBtn').data('id', assetId);
 
-        //give asset code
+        // Give asset code
         $('#deleteAssetBtn').data('asset-code', assetCode);
 
         // Get route URLs from data attributes
         var usedRoute = $(this).data('url-used');
         var unusedRoute = $(this).data('url-unused');
 
-        // Dynamically generate the Mark as Used/Unused buttons and forms
+        // Dynamically generate the Mark as Used/Unused buttons and forms with SweetAlert
         var markAsButtonHtml = '';
         if (isUsed) {
             markAsButtonHtml = `
-                <form action="${unusedRoute}" method="POST" style="display:inline;">
-                    @csrf
-                    @method('PATCH')
-                    <button type="submit" class='btn btn-primary mr-2'>
-                        <i class="fa fa-unlock"></i>
-                    </button>
-                </form>`;
+                <button type="button" class='btn btn-primary mr-2' onclick="confirmMarkAsUnused('${unusedRoute}', '${assetCode}')">
+                    <i class="fa fa-unlock"></i>
+                </button>`;
         } else {
             markAsButtonHtml = `
-                <form action="${usedRoute}" method="POST" style="display:inline;">
-                    @csrf
-                    @method('PATCH')
-                    <button type="submit" class='btn btn-danger mr-2'>
-                        <i class="fa fa-lock"></i>
-                    </button>
-                </form>`;
+                <button type="button" class='btn btn-danger mr-2' onclick="confirmMarkAsUsed('${usedRoute}', '${assetCode}')">
+                    <i class="fa fa-lock"></i>
+                </button>`;
         }
 
         // Insert the buttons into the modal footer
@@ -648,6 +640,48 @@ font-weight-bold
             }
         });
     });
+
+    function confirmMarkAsUsed(usedRoute, assetCode) {
+        swal({
+            title: "Mark asset " + assetCode + " to be used?",
+            text: "This will reduce the available stocks.",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+        .then((willMark) => {
+            if (willMark) {
+                // Create a form and submit it
+                var form = document.createElement('form');
+                form.method = 'POST';
+                form.action = usedRoute;
+                form.innerHTML = '@csrf @method("PATCH")';
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    }
+
+    function confirmMarkAsUnused(unusedRoute, assetCode) {
+        swal({
+            title: "Mark asset " + assetCode + " to be unused?",
+            text: "This will increase the stocks that available to use.",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+        .then((willMark) => {
+            if (willMark) {
+                // Create a form and submit it
+                var form = document.createElement('form');
+                form.method = 'POST';
+                form.action = unusedRoute;
+                form.innerHTML = '@csrf @method("PATCH")';
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    }
 
     function printModalContent() {
         var printContent = document.getElementById('printContainer').innerHTML; // Get the content inside printContainer

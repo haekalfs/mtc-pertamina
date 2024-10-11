@@ -546,8 +546,9 @@ class InventoryToolController extends Controller
             $tool->save();
         }
 
+        $message = "$item->asset_code | Asset marked as used successfully.";
         // Redirect back with success message
-        return redirect()->back()->with('success', 'Asset marked as used successfully.');
+        return redirect()->back()->with('success', $message);
     }
 
     public function markAsUnused($id)
@@ -569,8 +570,9 @@ class InventoryToolController extends Controller
             $tool->save();
         }
 
+        $message = "$item->asset_code | Asset marked as unused successfully.";
         // Redirect back with success message
-        return redirect()->back()->with('success', 'Asset marked as unused successfully.');
+        return redirect()->back()->with('success', $message);
     }
 
     public function generateQrCode($id)
