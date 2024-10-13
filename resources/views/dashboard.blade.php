@@ -5,10 +5,73 @@ active font-weight-bold
 @endsection
 
 @section('content')
-<div class="d-sm-flex align-items-center zoom90 justify-content-between mb-4">
-    <h1 class="h4 mb-0 font-weight-bold text-gray-800 text-secondary"><i class="far fa-smile-beam"></i> Welcome onboard, {{ Auth::user()->name }}!</h1>
-    {{-- <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-smile-beam fa-sm text-white-50"></i> Show Details</a> --}}
+<style>
+.welcome-container {
+    position: fixed;
+    bottom: 10px;
+    right: 5px;
+    z-index: 9999; /* Ensure it's above all other content */
+    display: flex;
+    align-items: flex-end;
+    padding-right: 20px; /* Add padding to prevent overlap */
+}
+
+.box3 {
+    width: 300px;
+    border-radius: 15px;
+    background: rgb(76, 132, 206);
+    color: #fff;
+    padding: 20px;
+    margin-bottom: 30px;
+    text-align: center;
+    font-weight: 900;
+    font-family: Arial;
+    position: relative;
+}
+
+.sb13:before {
+    content: "";
+    width: 0;
+    height: 0;
+    position: absolute;
+    border-left: 15px solid rgb(76, 132, 206);
+    border-right: 15px solid transparent;
+    border-top: 15px solid rgb(76, 132, 206);
+    border-bottom: 15px solid transparent;
+    right: -16px;
+    top: 20px;
+}
+
+.bottom-right-img {
+    width: 100px; /* Adjust the size as needed */
+    display: block;
+    margin-left: 10px; /* Add some spacing between the image and the bubble */
+}
+
+.close-btn {
+    position: absolute;
+    top: -10px; /* Move the button closer to the image */
+    right: -10px;
+    background-color: transparent;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #888;
+}
+
+.close-btn:hover {
+    color: #000;
+}
+</style>
+<div id="welcome-container" class="welcome-container">
+    <div class="box3 sb13">Welcome onboard, {{ Auth::user()->name }}!</div>
+    <button class="close-btn" onclick="closeImage()">&#10005;</button>
+    <img src="{{ asset('img/people-ptmc.png') }}" alt="Character" class="bottom-right-img">
 </div>
+{{-- <div class="d-sm-flex align-items-center zoom90 justify-content-between mb-4">
+    <h1 class="h4 mb-0 font-weight-bold text-gray-800 text-secondary"><i class="far fa-smile-beam"></i> Welcome onboard, {{ Auth::user()->name }}!</h1>
+    <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-smile-beam fa-sm text-white-50"></i> Show Details</a>
+</div> --}}
 <div class="animated fadeIn">
     <!-- Widgets  -->
     <div class="row">
@@ -466,6 +529,9 @@ function loadChartData() {
             });
             chartProfit.render();
         });
+}
+function closeImage() {
+    document.getElementById('welcome-container').style.display = 'none';
 }
 </script>
 @endsection

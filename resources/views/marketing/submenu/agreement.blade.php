@@ -155,13 +155,13 @@ font-weight-bold
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="post" enctype="multipart/form-data" action="{{ route('agreement.store') }}" onsubmit="return validateForm('png,jpeg,jpg,svg,gif,pdf,doc,docx,xls,xlsx,ppt,pptx,txt,odt,ods,odp,rtf', 'file-upload', 'spkFileInput')">
+            <form method="post" enctype="multipart/form-data" action="{{ route('agreement.store') }}" onsubmit="return validateForm('png,jpeg,jpg,gif,pdf,doc,docx,xls,xlsx,ppt,pptx,txt', 'file-upload', 'spkFileInput')">
                 @csrf
                 <div class="modal-body mr-2 ml-2">
                     <div class="row no-gutters">
                         <div class="col-md-3 d-flex align-items-top justify-content-center text-center">
                             <label for="file-upload" style="cursor: pointer;">
-                                <img id="image-preview" src="https://via.placeholder.com/50x50/5fa9f8/ffffff" style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
+                                <img id="image-preview" src="{{ asset('img/default-img.png') }}" style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
                                      <small style="font-size: 10px;"><i><u>Click above to upload image!</u></i></small>
                             </label>
                             <input id="file-upload" type="file" name="img" style="display: none;" accept="image/*" onchange="previewImage(event)">
@@ -279,27 +279,46 @@ function previewImage(event) {
     };
     reader.readAsDataURL(event.target.files[0]);
 }
-function validateForm(allowedExtensions, ...fileInputIds) {
+function validateForm(allowedExtensions, fileUploadId, spkFileInputId) {
     const allowedExtArray = allowedExtensions.split(',');
 
-    for (let i = 0; i < fileInputIds.length; i++) {
-        const fileInput = document.getElementById(fileInputIds[i]);
+    // Get the radio button states
+    const isSPK = document.getElementById('projectRadio').checked;
 
-        if (!fileInput || fileInput.files.length === 0) {
-            alert(`Please upload a file for ${fileInputIds[i]} before submitting.`);
-            return false; // Prevent form submission if no file is selected
+    // If SPK is selected, validate the SPK file input
+    if (isSPK) {
+        const spkFileInput = document.getElementById(spkFileInputId);
+
+        if (!spkFileInput || spkFileInput.files.length === 0) {
+            alert(`Please upload a file for ${spkFileInputId} before submitting.`);
+            return false; // Prevent form submission if no file is selected for SPK
         }
 
-        const fileName = fileInput.files[0].name;
-        const fileExtension = fileName.split('.').pop().toLowerCase();
+        const spkFileName = spkFileInput.files[0].name;
+        const spkFileExtension = spkFileName.split('.').pop().toLowerCase();
 
-        if (!allowedExtArray.includes(fileExtension)) {
-            alert(`Invalid file type for ${fileInputIds[i]}. Allowed file types are: ${allowedExtensions}`);
-            return false; // Prevent form submission if file type is invalid
+        if (!allowedExtArray.includes(spkFileExtension)) {
+            alert(`Invalid file type for ${spkFileInputId}. Allowed file types are: ${allowedExtensions}`);
+            return false; // Prevent form submission if SPK file type is invalid
         }
     }
 
-    return true; // Allow form submission if all file inputs have valid files
+    // Validate the image upload (common for both SPK and NON-SPK)
+    const fileUpload = document.getElementById(fileUploadId);
+    if (!fileUpload || fileUpload.files.length === 0) {
+        alert(`Please upload a file for ${fileUploadId} before submitting.`);
+        return false; // Prevent form submission if no image is uploaded
+    }
+
+    const fileName = fileUpload.files[0].name;
+    const fileExtension = fileName.split('.').pop().toLowerCase();
+
+    if (!allowedExtArray.includes(fileExtension)) {
+        alert(`Invalid file type for ${fileUploadId}. Allowed file types are: ${allowedExtensions}`);
+        return false; // Prevent form submission if file type is invalid
+    }
+
+    return true; // Allow form submission if all conditions are met
 }
 </script>
 @endsection

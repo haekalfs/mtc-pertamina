@@ -5,7 +5,17 @@ active font-weight-bold
 @endsection
 
 @section('content')
-
+<style>
+.bottom-right-img {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 100px; /* Adjust size as needed */
+    z-index: 9999; /* Very high value to ensure it is on top */
+    pointer-events: none; /* So the image won't block clicks on other elements */
+}
+</style>
+<img src="{{ asset('img/people-ptmc.png') }}" alt="Character" class="bottom-right-img">
 @if ($message = Session::get('success'))
 <div class="alert alert-success alert-block">
     <button type="button" class="close" data-dismiss="alert">×</button>

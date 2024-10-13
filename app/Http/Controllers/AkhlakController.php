@@ -31,9 +31,9 @@ class AkhlakController extends Controller
 
         // Validate the request inputs
         $validator = Validator::make($request->all(), [
-            'userId' => 'required',
-            'quarter' => 'required',
-            'year' => 'required'
+            'userId' => 'required', // Ensures the userId is an integer
+            'quarter' => 'required|integer|between:1,4', // Ensures quarter is an integer between 1 and 4
+            'year' => 'required|integer|digits:4', // Ensures the year is a 4-digit number
         ]);
 
         // Query to get User Pencapaian Akhlak with filters
@@ -151,16 +151,23 @@ class AkhlakController extends Controller
     public function store(Request $request)
     {
         // Validate the request data
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'userId' => 'required',
-            'activity_title' => 'required',
+            'activity_title' => 'required|string|max:255',
             'akhlak_points' => 'required|array',
-            'akhlak_points.*' => 'required',
+            'akhlak_points.*' => 'required|integer',
             'akhlak_value' => 'required|integer',
-            'evidence' => 'sometimes|file|mimes:pdf,docx,xlsx,xls,jpeg,png,jpg,gif',
+            'evidence' => 'sometimes|file|mimes:pdf,docx,xlsx,xls,jpeg,png,jpg|max:10240',
             'quarter' => 'required|integer|min:1|max:4',
-            'year' => 'required|integer',
+            'year' => 'required|integer|digits:4',
         ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput()
+                ->with('error', 'Validation failed. Please correct the highlighted errors.');
+        }
 
         // Handle the file upload
         $evidenceFile = $request->file('evidence');

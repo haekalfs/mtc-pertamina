@@ -117,7 +117,7 @@ font-weight-bold
                     </div>
                 </div>
                 <div class="card-body">
-                    <table id="docLetter" class="table table-bordered">
+                    <table class="table table-bordered">
                         <thead class="thead-light">
                             <tr>
                                 <th>Tool</th>
@@ -130,7 +130,7 @@ font-weight-bold
                             @if($data->penlat_usage->isNotEmpty())
                                 @foreach($data->penlat_usage as $tool)
                                     <tr>
-                                        <td data-th="Product">
+                                        <td>
                                             <div class="row">
                                                 <div class="col-md-4 text-left">
                                                     <img src="{{ asset($tool->utility->filepath) }}" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">

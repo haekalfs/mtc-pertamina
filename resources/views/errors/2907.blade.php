@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2029 - Access Denied</title>
+    <title>2907 - Suspicious Activity Detection</title>
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Arvo:wght@400;700&display=swap" rel="stylesheet">
@@ -24,12 +24,12 @@
           <div class="text-center">
             <img src="{{ asset('img/mtc-logo.png') }}" class="mb-2 mr-2" style="height: 40px; width: 40px;" /> <span class="font-weight-bold">MTC Performance</span>
             <h2 class="d-flex justify-content-center align-items-center gap-2 mb-4">
-              <span class="display-1 fw-bold">21</span>
-              <span class="display-1 fw-bold bsb-flip-h">01</span>
-              <span class="display-1 fw-bold bsb-flip-h">!</span>
+              <span class="display-1 fw-bold">4</span>
+              <span class="display-1 fw-bold bsb-flip-h">0</span>
+              <span class="display-1 fw-bold bsb-flip-h">3</span>
             </h2>
-            <h3 class="h2 mb-2">Suspicious Script Detected!</h3>
-            <p>Suspicous text has detected by system, some file type has been restricted to prevent unwanted access.</p>
+            <h3 class="h2 mb-2">Suspicious Activity Detected!</h3>
+            <p>This is not error from website, Suspicous user input has detected by system, some text style has been restricted to prevent unwanted access.</p>
             <p class="mb-5">Please do not input malicious script text string. Please contact the administrator if you believe this is an error.</p>
             <a class="btn bsb-btn-5xl btn-dark rounded-pill px-5 fs-6 m-0" href="{{ route('dashboard') }}" role="button">Back to Home</a>
           </div>
