@@ -13,6 +13,7 @@ use App\Models\Penlat_certificate;
 use App\Models\Penlat_requirement;
 use App\Models\Penlat_utility_usage;
 use App\Models\Profit;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -483,7 +484,7 @@ class PenlatController extends Controller
                     return $item->penlat->jenis_pelatihan;
                 })
                 ->addColumn('tgl_pelaksanaan', function($item) {
-                    return $item->date;
+                    return Carbon::parse($item->date)->format('d-M-Y');
                 })
                 ->addColumn('action', function($item) {
                     return '

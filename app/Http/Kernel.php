@@ -24,7 +24,9 @@ class Kernel extends HttpKernel
         \App\Http\Middleware\ValidateRequest::class,
         \App\Http\Middleware\SuspiciousActivityDetection::class,
         \App\Http\Middleware\SuspiciousTextCheck::class,
+        // \App\Http\Middleware\SanitizeGetRequests::class,
         \App\Http\Middleware\PreventDirectoryTraversal::class,
+        \App\Http\Middleware\PreventSSRFMiddleware::class,
     ];
 
     /**
