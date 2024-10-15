@@ -12,7 +12,7 @@
 
     <!-- Text Content Positioned on Top of Red Background -->
     <div class="login100-pic text-center pr-3">
-        <img src="img/MTC.png" style="zoom: 150%;" alt="IMG">
+        <img src="img/MTC.png" style="zoom: 150%; padding-top: 20px;" alt="IMG">
     </div>
 
     <form class="login100-form validate-form" method="POST" action="{{ route('login') }}">
