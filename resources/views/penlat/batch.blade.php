@@ -444,46 +444,54 @@ function validateForm() {
     return true; // Allow form submission
 }
 document.getElementById('refreshBatchBtn').addEventListener('click', function (event) {
-    // Prevent default behavior of the link
     event.preventDefault();
 
-    // Trigger SweetAlert confirmation
+    // Trigger SweetAlert with input for the year
     swal({
         title: "Refresh Data Batches?",
-        text: "This will register, updating and synchronize the batches data. if batches doesn't exist or if there's any batch that does not linked to Pelatihan, then you should proceed.",
+        text: "Enter the year to refresh batches data:",
+        content: {
+            element: "input",
+            attributes: {
+                type: "number",
+                placeholder: "Enter year",
+                min: "1900",
+                max: "2500",
+            },
+        },
         icon: "warning",
         buttons: true,
         dangerMode: true,
-    })
-    .then((willRefresh) => {
-        if (willRefresh) {
-            // Show a loading message before making the request
+    }).then((inputYear) => {
+        if (inputYear) {
+            // Show loading message before sending the request
             swal({
                 title: "Processing...",
-                text: "Refreshing Penlat batch data.",
+                text: "Refreshing Penlat batch data for year " + inputYear,
                 icon: "info",
                 buttons: false,
                 closeOnClickOutside: false
             });
 
-            // Send AJAX request to trigger the batch refresh job
+            // Send AJAX request to trigger the batch refresh job with the input year
             $.ajax({
                 url: "{{ route('refresh.batch') }}", // Your route to refresh data
-                method: "GET",
+                method: "POST", // Use POST to pass the year
                 headers: {
                     "X-CSRF-TOKEN": "{{ csrf_token() }}", // CSRF token for protection
                 },
+                data: {
+                    year: inputYear // Pass the input year to the server
+                },
                 success: function (data) {
-                    // Handle the success response
                     if (data.success) {
                         swal({
                             title: "Success!",
-                            text: "The Penlat batch data refresh has been started successfully.",
+                            text: "The Penlat batch data refresh has been started for year " + inputYear,
                             icon: "success",
                             button: "OK",
                         });
                     } else {
-                        // Handle any errors returned from the server
                         swal({
                             title: "Error!",
                             text: "Something went wrong while trying to refresh the data.",
@@ -493,7 +501,6 @@ document.getElementById('refreshBatchBtn').addEventListener('click', function (e
                     }
                 },
                 error: function (xhr, status, error) {
-                    // Handle AJAX errors
                     swal({
                         title: "Error!",
                         text: "There was an error processing the request: " + xhr.responseText,

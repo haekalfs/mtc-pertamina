@@ -13,17 +13,21 @@ class RefreshBatchData implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * Execute the job.
-     *
-     * @return void
-     */
+    protected $year;
+
+    // Constructor to accept the year
+    public function __construct($year)
+    {
+        $this->year = $year;
+    }
+
+    // Handle method to process the job
     public function handle()
     {
-        // Chunking the data to dispatch individual jobs for each chunk
-        Infografis_peserta::chunk(1000, function ($pesertaRecords) {
-            // For each chunk, dispatch a job to process that chunk
-            ProcessBatchChunk::dispatch($pesertaRecords);
+        // Chunking the data filtered by year and dispatch jobs for each chunk
+        Infografis_peserta::whereYear('tgl_pelaksanaan', $this->year)
+            ->chunk(1000, function ($pesertaRecords) {
+                ProcessBatchChunk::dispatch($pesertaRecords);
         });
     }
 }

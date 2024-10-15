@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\RefreshBatchData;
+use App\Jobs\RefreshExistingBatch;
 use App\Models\Inventory_tools;
 use App\Models\Location;
 use App\Models\Penlat;
@@ -677,26 +678,33 @@ class PenlatController extends Controller
         ]);
     }
 
-    public function refresh_batch_data()
+    public function refresh_batch_data(Request $request)
     {
         try {
-            // Dispatch the job to refresh the batch data
-            RefreshBatchData::dispatch();
+            // Validate the year input to ensure it's a 4-digit number
+            $request->validate([
+                'year' => ['required', 'digits:4', 'integer', 'min:1900', 'max:2500'],
+            ]);
 
-            // Set a cache indicating the job is processing, if it doesn't already exist
+            $year = $request->input('year'); // Get the sanitized year input
+
+            // Dispatch the job to refresh the batch data with the given year
+            RefreshBatchData::dispatch($year); // Pass the year to the job
+            RefreshExistingBatch::dispatch(); // Pass the year to the job
+
+            // Cache to indicate job is processing
             if (!Cache::has('jobs_processing')) {
-                Cache::put('jobs_processing', true, now()->addMinutes(3)); // Cache for 10 minutes
+                Cache::put('jobs_processing', true, now()->addMinutes(3));
             }
 
             return response()->json([
                 'success' => true,
-                'message' => 'Batch data refresh initiated successfully.'
+                'message' => 'Batch data refresh initiated successfully for year ' . $year,
             ]);
         } catch (\Exception $e) {
-            // Handle any exceptions that occur during dispatching
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to initiate batch data refresh.'
+                'message' => 'Failed to initiate batch data refresh.',
             ], 500);
         }
     }

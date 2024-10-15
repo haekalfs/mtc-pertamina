@@ -313,7 +313,7 @@ Route::middleware('checkForErrors', 'suspiciousActivity', 'suspicious', 'auth')-
         Route::put('/penlat-batch-update/{id}', [PenlatController::class, 'update_batch'])->name('batch.update');
         Route::delete('/penlat-batch-delete/{id}', [PenlatController::class, 'delete_batch'])->name('delete.batch');
         Route::get('/fetch-penlat-batches', [PenlatController::class, 'fetchBatches'])->name('batches.fetch');
-        Route::get('/penlat-batch/refresh', [PenlatController::class, 'refresh_batch_data'])->name('refresh.batch');
+        Route::post('/penlat-batch/refresh', [PenlatController::class, 'refresh_batch_data'])->name('refresh.batch');
 
         //Master Data
         Route::get('/utilities/list-utilities', [OperationController::class, 'list_utilities'])->name('list-utilities');
