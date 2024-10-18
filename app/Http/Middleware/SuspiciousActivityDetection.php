@@ -21,10 +21,17 @@ class SuspiciousActivityDetection
         $userAgent = $request->header('User-Agent');
         $ip = $request->ip();
         $requestUri = $request->getRequestUri();
+        $requestContent = $request->getContent();
 
         // Check for suspicious user agents
         if (!$userAgent || stripos($userAgent, 'curl') !== false || stripos($userAgent, 'bot') !== false) {
             Log::warning("Suspicious user agent detected from IP: $ip, URI: $requestUri, User Agent: $userAgent");
+            return response()->json(['message' => 'Suspicious activity detected'], 403);
+        }
+
+        // Detect malicious content (e.g., base64, shell commands)
+        if (preg_match('/(shell_exec|base64_decode|system|exec|passthru)/i', $requestContent)) {
+            Log::warning("Suspicious request blocked from IP: $ip, content: $requestContent");
             return response()->json(['message' => 'Suspicious activity detected'], 403);
         }
 

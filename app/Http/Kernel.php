@@ -77,6 +77,5 @@ class Kernel extends HttpKernel
         'restrictRequestbyRole' => \App\Http\Middleware\RestrictRequestRole::class,
         'encrypt.params' => \App\Http\Middleware\EncryptParams::class,
         'decrypt.params' => \App\Http\Middleware\DecryptParams::class,
-        'suspiciousActivity' => \App\Http\Middleware\SuspiciousActivityDetection::class,
     ];
 }
