@@ -24,8 +24,8 @@
           <div class="text-center">
             <img src="{{ asset('img/mtc-logo.png') }}" class="mb-2 mr-2" style="height: 40px; width: 40px;" /> <span class="font-weight-bold">MTC Performance</span>
             <h2 class="d-flex justify-content-center align-items-center gap-2 mb-4">
-              <span class="display-1 fw-bold">21</span>
-              <span class="display-1 fw-bold bsb-flip-h">01</span>
+              <span class="display-1 fw-bold">!</span>
+              <span class="display-1 fw-bold bsb-flip-h">!</span>
               <span class="display-1 fw-bold bsb-flip-h">!</span>
             </h2>
             <h3 class="h2 mb-2">Suspicious File Detected!</h3>

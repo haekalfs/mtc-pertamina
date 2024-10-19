@@ -60,7 +60,7 @@ class ValidateRequest
                 ]);
 
                 // Optionally return an error response
-                return response()->json(['message' => 'Invalid request content'], 400);
+                return response()->json(['message' => 'Invalid request content, Suspicious Activity Detected!'], 400);
             }
         }
 

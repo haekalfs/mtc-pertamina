@@ -54,7 +54,7 @@ class SuspiciousTextCheck
             // Script and HTML injection patterns
             '/<script.*?>.*?<\/script>/is', // Script tags
             '/<.*?(on\w+)\s*=\s*["\'].*?["\'].*?>/is', // Inline event handlers
-            '/(\%3C|\<).*?(\%3E|\>)/i', // Encoded HTML tags
+            // '/(\%3C|\<).*?(\%3E|\>)/i', // Encoded HTML tags
 
             // SQL injection patterns
             '/(select\s+\*\s+from|drop\s+table|union\s+select|insert\s+into)/i', // SQL injection
@@ -84,7 +84,7 @@ class SuspiciousTextCheck
             '/(\%3C|\%3E|\%3F|\%2F|\%3D|\%40)/i', // Encoded HTML/JS characters
 
             // Non-printable ASCII characters
-            // '/[\r\n\t\x00-\x1F\x7F-\x9F]/', // Non-printable ASCII characters make error
+            '/[\x00-\x1F\x7F-\x9F]/', // Non-printable ASCII characters make error
 
             // Additional patterns (if needed)
             '/document\.cookie/i', // Potential XSS via cookie manipulation
