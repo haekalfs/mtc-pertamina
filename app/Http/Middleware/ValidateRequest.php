@@ -29,7 +29,7 @@ class ValidateRequest
             '/https?:\/\//i',
 
             // Prevent SQL keywords commonly used in injection attacks
-            '/select\b|insert\b|update\b|delete\b|drop\b|truncate\b|exec\b|union\b/i',
+            '/select\b|insert\b|update\b|drop\b|truncate\b|exec\b|union\b/i',
 
             // Prevent dangerous HTML elements (iframe, object, embed, etc.)
             '/<(iframe|object|embed|applet|style|link)\b[^>]*>/i',

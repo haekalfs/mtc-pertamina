@@ -1,2 +1,14 @@
 User-agent: *
-Disallow:
+Disallow: /admin/
+Disallow: /login/
+Disallow: /register/
+Disallow: /manage/users/
+Disallow: /config/
+Disallow: /uploads/
+
+# Block access to sensitive file types
+Disallow: /*.php$
+Disallow: /*.env$
+Disallow: /*.sql$
+Disallow: /*.git$
+Disallow: /api/
