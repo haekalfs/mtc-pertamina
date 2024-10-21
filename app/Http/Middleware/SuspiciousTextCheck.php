@@ -84,7 +84,7 @@ class SuspiciousTextCheck
             '/(\%3C|\%3E|\%3F|\%2F|\%3D|\%40)/i', // Encoded HTML/JS characters
 
             // Non-printable ASCII characters
-            '/[\x00-\x1F\x7F-\x9F]/', // Non-printable ASCII characters make error
+            '/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/', // Non-printable ASCII characters make error
 
             // Additional patterns (if needed)
             '/document\.cookie/i', // Potential XSS via cookie manipulation
