@@ -26,13 +26,13 @@ class SuspiciousActivityDetection
         // Check for suspicious user agents
         if (!$userAgent || stripos($userAgent, 'curl') !== false || stripos($userAgent, 'bot') !== false) {
             Log::warning("Suspicious user agent detected from IP: $ip, URI: $requestUri, User Agent: $userAgent");
-            return response()->json(['message' => 'Suspicious activity detected'], 403);
+            return response()->json(['message' => 'Suspicious activity detected. Your IP address and other details have been logged even with servers and vpn. We are monitoring your actions.'], 403);
         }
 
         // Detect malicious content (e.g., base64, shell commands)
         if (preg_match('/(shell_exec|base64_decode|system|exec|passthru)/i', $requestContent)) {
             Log::warning("Suspicious request blocked from IP: $ip, content: $requestContent");
-            return response()->json(['message' => 'Suspicious activity detected'], 403);
+            return response()->json(['message' => 'Suspicious activity detected. Your IP address and other details have been logged even with servers and vpn. We are monitoring your actions.'], 403);
         }
 
         // Detect multiple failed login attempts (example for login route)
