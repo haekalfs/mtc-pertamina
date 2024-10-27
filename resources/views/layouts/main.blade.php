@@ -22,13 +22,12 @@
     <link rel="stylesheet" href="{{ asset('assets/css/cs-skin-elastic.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/lib/chosen/chosen.min.css') }}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@3.9.0/dist/fullcalendar.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
-    <!-- Fonts -->
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
+    {{-- Full Calendar --}}
+    <link href="{{ asset('assets/css/fullcalendar.min.css') }}" rel="stylesheet">
+    {{-- Xlsx --}}
+    <script src="{{ asset('assets/js/xlsx.full.min.js') }}"></script>
+    {{-- HTML to CANVAS --}}
+    <script src="{{ asset('assets/js/html2canvas.min.js') }}"></script>
 
     <!-- DataTables CSS -->
     <link href="{{ asset('vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
@@ -43,24 +42,34 @@
     <!-- Page Level Custom Scripts -->
     <script src="{{ asset('js/demo/datatables-demo.js') }}"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <!-- Popper.js -->
+    <script src="{{ asset('assets/js/popper.min.js') }}"></script>
+
     <!-- Bootstrap -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
-    <script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
+    <script src="{{ asset('assets/js/bootstrap.min.js') }}"></script>
+
+    <!-- SweetAlert -->
+    <script src="{{ asset('assets/js/sweetalert.min.js') }}"></script>
+
+    <!-- Summernote CSS and JS -->
+    <link href="{{ asset('assets/css/summernote-lite.min.css') }}" rel="stylesheet">
+    <script src="{{ asset('assets/js/summernote-lite.min.js') }}"></script>
+
+    <!-- CanvasJS -->
+    <script src="{{ asset('assets/js/canvasjs.min.js') }}"></script>
+
     <!-- Moment.js -->
     <script src="{{ asset('js/moment.min.js') }}"></script>
-    <!-- Include Date Range Picker CSS -->
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-    <!-- Include Date Range Picker JS -->
-    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-    <script src='https://cdn.plot.ly/plotly-2.35.2.min.js'></script>
-    {{-- TypeAHead --}}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/corejs-typeahead/1.3.1/typeahead.bundle.min.js"></script>
-    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+    <!-- Date Range Picker CSS and JS -->
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/daterangepicker.css') }}">
+    <script src="{{ asset('assets/js/daterangepicker.min.js') }}"></script>
+
+    <!-- Plotly -->
+    <script src="{{ asset('assets/js/plotly-2.35.2.min.js') }}"></script>
+
+    <!-- TypeAhead -->
+    <script src="{{ asset('assets/js/typeahead.bundle.min.js') }}"></script>
 </head>
 
 <body>
@@ -323,23 +332,26 @@
     </div>
     <script src="{{ asset('js/custom.js') }}"></script>
 
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <!-- Select2 CSS and JS -->
+    <link href="{{ asset('assets/css/select2.min.css') }}" rel="stylesheet">
+    <script src="{{ asset('assets/js/select2.min.js') }}"></script>
+
     <!-- jQuery -->
-    <script src="https://cdn.jsdelivr.net/npm/jquery@2.2.4/dist/jquery.min.js"></script>
+    <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
 
     <!-- Popper.js -->
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.4/dist/umd/popper.min.js"></script>
+    <script src="{{ asset('assets/js/popper1.14.4.min.js') }}"></script>
+
     <!-- Custom Scripts -->
     <script src="{{ asset('assets/js/main.js') }}"></script>
     <script src="{{ asset('assets/js/lib/chosen/chosen.jquery.min.js') }}"></script>
 
     <!-- FullCalendar -->
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@3.9.0/dist/fullcalendar.min.js"></script>
+    <script src="{{ asset('assets/js/fullcalendar.min.js') }}"></script>
     <script src="{{ asset('assets/js/init/fullcalendar-init.js') }}"></script>
 
     <!-- Match Height -->
-    <script src="https://cdn.jsdelivr.net/npm/jquery-match-height@0.7.2/dist/jquery.matchHeight.min.js"></script>
+    <script src="{{ asset('assets/js/jquery.matchHeight.min.js') }}"></script>
 
     <script>
         jQuery(document).ready(function() {

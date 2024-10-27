@@ -18,10 +18,19 @@ class SuspiciousActivityDetection
      */
     public function handle(Request $request, Closure $next)
     {
+        $whitelistedIps = [
+            '192.168.1.25', // Add your trusted IPs here
+        ];
+
         $userAgent = $request->header('User-Agent');
         $ip = $request->ip();
         $requestUri = htmlspecialchars($request->getRequestUri(), ENT_QUOTES, 'UTF-8'); // Sanitize URI
         $requestContent = $request->getContent();
+
+        // Check if the IP is whitelisted
+        if (in_array($ip, $whitelistedIps)) {
+            return $next($request); // Skip security checks for whitelisted IPs
+        }
 
         // Check for suspicious user agents
         if (!$userAgent || stripos($userAgent, 'curl') !== false || stripos($userAgent, 'bot') !== false) {
