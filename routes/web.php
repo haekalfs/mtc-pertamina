@@ -81,6 +81,7 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
             Route::get('/api/get-penlat-batch-events', [DashboardController::class, 'getEvents'])->name('penlat.batch.events');
             //will be used
             Route::get('/download-file/{filepath}', [DownloadController::class, 'downloadFile'])->name('download.file');
+            Route::get('/api/dashboard-chart-data', [DashboardController::class, 'getDashboardChartData']);
         });
 
         //Encrypt

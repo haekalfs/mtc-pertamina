@@ -75,222 +75,208 @@ active font-weight-bold
 <div class="animated fadeIn">
     <!-- Widgets  -->
     <div class="row">
-        <div class="col-lg-3 col-md-6 animateBox">
-            <a href="{{ route('operation') }}" class="clickable-card">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="stat-widget-five">
-                            <div class="stat-icon dib flat-color-1">
-                                <i class="ti-cup"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="text-left dib">
-                                    <div class="stat-text"><span class="count">{{ $getPesertaCount }}</span></div>
-                                    <div class="stat-heading">Realisasi Peserta</div>
+        <div class="col-md-12">
+            <div class="pb-2 mb-3 border-bottom h5">
+                Dashboard MTC
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="row align-items-center p-4">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="day">Day :</label>
+                                    <select class="form-control" id="day" name="day">
+                                        <option value="-1" selected>Show All</option>
+                                        @foreach(range(1, 31) as $day)
+                                            <option value="{{ $day }}">{{ $day }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </a>
-        </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="month">Month :</label>
+                                    <select class="form-control" id="month" name="month">
+                                        <option value="-1">Show All</option>
+                                        @foreach(range(1, 12) as $month)
+                                            <option value="{{ $month }}">
+                                                {{ date('F', mktime(0, 0, 0, $month, 1)) }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="email">Year :</label>
+                                    <select class="form-control" id="year" name="year">
+                                        <option value="-1" selected>Show All</option>
+                                        @foreach(range(date('Y'), date('Y') - 5) as $year)
+                                            <option value="{{ $year }}" @if ($year == date('Y')) selected @endif>{{ $year }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="category">Category :</label>
+                                    <select class="form-control" id="category" name="category">
+                                        <option value="-1" selected>Show All</option>
+                                        @foreach($infographicCategories as $category)
+                                            <option value="{{ $category->kategori_program }}">{{ $category->kategori_program }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
 
-        <div class="col-lg-3 col-md-6 animateBox">
-            <a href="{{ route('marketing') }}" class="clickable-card">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="stat-widget-five">
-                            <div class="stat-icon dib flat-color-2">
-                                <i class="ti-camera"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="text-left dib">
-                                    <div class="stat-text"><span class="count">{{ $countCampaign }}</span></div>
-                                    <div class="stat-heading">Campaign</div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="type">Type :</label>
+                                    <select class="form-control" id="type" name="type">
+                                        <option value="-1">Show All</option>
+                                        @foreach($infographicTypes as $type)
+                                            <option value="{{ $type->jenis_pelatihan }}">{{ $type->jenis_pelatihan }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </a>
-        </div>
-
-        <div class="col-lg-3 col-md-6 animateBox">
-            <a href="{{ route('plan-dev') }}" class="clickable-card">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="stat-widget-five">
-                            <div class="stat-icon dib flat-color-3">
-                                <i class="pe-7s-browser"></i>
+                <div class="col-md-12">
+                    <div class="row mt-2">
+                        <div class="col-lg-6">
+                            <div class="d-flex justify-content-center align-items-center">
+                                <div id='myDiv' class="shadow"><!-- Plotly chart will be drawn inside this DIV --></div>
                             </div>
-                            <div class="stat-content">
-                                <div class="text-left dib">
-                                    <div class="stat-text"><span><i class="fa fa-star text-warning"></i> {{ round($averageFeedbackScore, 2) ?? '-' }}</span></div>
-                                    <div class="stat-heading">Rekap Feedback</div>
-                                </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="d-flex justify-content-center align-items-center">
+                                <div id='myDiv2' class="shadow"><!-- Plotly chart will be drawn inside this DIV --></div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </a>
-        </div>
-
-        <div class="col-lg-3 col-md-6 animateBox">
-            <a href="{{ route('finance') }}" class="clickable-card">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="stat-widget-five">
-                            <div class="stat-icon dib flat-color-4">
-                                <i class="pe-7s-cash"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="text-left dib">
-                                    <div class="h6"><span>{{ number_format($rawProfits, 0, ',', '.') }}</span></div>
-                                    <div class="stat-heading">Revenue</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="col-md-12 pt-4">
+                    <div id="chartContainer" class="shadow" style="height: 200px; width: 100%;"></div>
                 </div>
-            </a>
+            </div>
         </div>
-        <div class="col-lg-3 col-md-6 animateBox">
-            <a href="{{ route('tool-inventory') }}" class="clickable-card">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="stat-widget-five">
-                            <div class="stat-icon dib flat-color-1">
-                                <i class="fa fa-fire-extinguisher"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="text-left dib">
-                                    <div class="h6">
-                                        <div class="h6 mb-0 text-gray-800"><span style="font-size: 14px;">{{ $getAssetCount }} Assets Registered</span></div>
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-lg-6 col-md-6 animateBox">
+                    <a href="{{ route('operation') }}" class="clickable-card">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="stat-widget-five">
+                                    <div class="stat-icon dib flat-color-1">
+                                        <i class="ti-cup"></i>
                                     </div>
-                                    <div class="stat-heading">Inventaris Alat</div>
+                                    <div class="stat-content">
+                                        <div class="text-left dib">
+                                            <div class="stat-text"><span id="pesertaCount">-</span></div>
+                                            <div class="stat-heading">Realisasi Peserta</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
-            </a>
+
+                <div class="col-lg-6 col-md-6 animateBox">
+                    <a href="{{ route('plan-dev') }}" class="clickable-card">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="stat-widget-five">
+                                    <div class="stat-icon dib flat-color-3">
+                                        <i class="pe-7s-browser"></i>
+                                    </div>
+                                    <div class="stat-content">
+                                        <div class="text-left dib">
+                                            <div class="stat-text"><span><i class="fa fa-star text-warning"></i> <span id="avgFeedbackScore">-</span></span></div>
+                                            <div class="stat-heading">Avg Trainer Feedback</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-lg-6 col-md-6 animateBox">
+                    <a href="{{ route('plan-dev') }}" class="clickable-card">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="stat-widget-five">
+                                    <div class="stat-icon dib flat-color-3">
+                                        <i class="pe-7s-browser"></i>
+                                    </div>
+                                    <div class="stat-content">
+                                        <div class="text-left dib">
+                                            <div class="stat-text"><span><i class="fa fa-star text-warning"></i> <span id="avgTrainingFeedbackScore">-</span></span></div>
+                                            <div class="stat-heading">Avg Training Feedback</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-lg-6 col-md-6 animateBox">
+                    <a href="{{ route('finance') }}" class="clickable-card">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="stat-widget-five">
+                                    <div class="stat-icon dib flat-color-4">
+                                        <i class="pe-7s-cash"></i>
+                                    </div>
+                                    <div class="stat-content">
+                                        <div class="text-left dib">
+                                            <div class="stat-text"><span id="totalRevenue" style="font-size: 15px;">-</span></div>
+                                            <div class="stat-heading">Total Revenue</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="row card-body bg-white shadow mb-4">
+                    <div id="trendRevenueChart" style="height: 370px; width: 100%;"></div>
+                </div>
+            </div>
         </div>
-        <div class="col-lg-3 col-md-6 animateBox">
-            <a href="{{ route('instructor') }}" class="clickable-card">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="stat-widget-five">
-                            <div class="stat-icon dib flat-color-5">
-                                <i class="fa fa-male"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="text-left dib">
-                                    <div class="h6"><span>{{ $instructorCount }}</span></div>
-                                    <div class="stat-heading">Jumlah Instruktur</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </a>
-        </div>
-        <div class="col-lg-3 col-md-6 animateBox">
-            <a href="{{ route('penlat') }}" class="clickable-card">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="stat-widget-five">
-                            <div class="stat-icon dib flat-color-6">
-                                <i class="fa fa-list-alt"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="text-left dib">
-                                    <div class="h6"><span>{{ number_format($penlatCount, 0, ',', '.') }}</span></div>
-                                    <div class="stat-heading">Jumlah Pelatihan</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </a>
-        </div>
-        <div class="col-lg-3 col-md-6 animateBox">
-            <a href="{{ route('batch-penlat') }}" class="clickable-card">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="stat-widget-five">
-                            <div class="stat-icon dib flat-color-7">
-                                <i class="fa fa-folder"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="text-left dib">
-                                    <div class="h6"><span>{{ number_format($batchCount, 0, ',', '.') }}</span></div>
-                                    <div class="stat-heading">Jumlah Batches Pelatihan</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </a>
+        <div class="col-lg-12">
         </div>
     </div>
     <!-- /Widgets -->
     <!--  Traffic  -->
 
     <div class="row">
-        <div class="col-xl-4 col-md-4 zoom90">
-            <div class="card">
-                <div class="col-md-12 sidebar-two">
-                    <h2>Regulations</h2>
-                    <ul class="">
-                        @foreach($regulations as $regulation)
-                        <li>
-                            <a href="{{ route('preview-regulation', $regulation->id) }}">
-                                <div>
-                                    <h3><i class="fa fa-info-circle mr-2"></i> {{ $regulation->description }}</h3>
-                                    @php
-                                        $created_at = \Carbon\Carbon::parse($regulation->created_at);
-                                        $now = \Carbon\Carbon::now();
-                                        $diffInDays = $created_at->diffInDays($now);
-                                    @endphp
-                                    <span>
-                                        @if($diffInDays < 7)
-                                            {{ $created_at->diffForHumans() }}
-                                        @else
-                                            a long time ago
-                                        @endif
-                                    </span>
-                                </div>
-                            </a>
-                        </li>
-                        @endforeach
-                    </ul>
-                </div>
-                <!-- Fix "Show More" to the right corner -->
-                <div class="text-right">
-                    <a class="btn btn-sm btn-default" href="{{ route('regulation') }}">
-                        <small>Show More...</small>
-                    </a>
-                </div>
+        <div class="col-md-12">
+            <div class="pb-2 mb-3 mt-1 border-bottom h5">
+                Calendar & Events
             </div>
         </div>
-        <div class="col-xl-8 col-md-8">
-            <div class="content card">
-                @if(!$morningBriefing || $morningBriefing->isEmpty())
-                <div class="desc mt-4">
-                    <h1>No Data Available</h1>
-                </div>
-                @else
-                @foreach($morningBriefing->chunk(3) as $index => $chunk)
-                    @foreach($chunk as $briefing)
-                    <img style="width: 100%; height: 300px;" src="{{ asset($briefing->img_filepath) }}" alt="Main Image">
-                    <div class="desc mt-4">
-                        <h1>{{ $briefing->briefing_name }}</h1>
-                        <p>{!! Str::limit($briefing->briefing_result, 1000, '...') !!}</p>
-                        <a class="mb-2 pt-0" href="{{ route('preview-briefing', $briefing->id) }}">Read more</a>
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card-header d-flex justify-content-start">
+                            <h6 class="m-0 font-weight-bold">Training Calendar</h6>
+                        </div>
+                        <div class="card-body d-flex justify-content-center align-items-center">
+                            <div id="calendar"></div>
+                        </div>
                     </div>
-                    @endforeach
-                @endforeach
-                @endif
+                </div> <!-- /.row -->
             </div>
         </div>
         <div class="col-xl-12 col-md-12 zoom90 mb-3">
@@ -358,180 +344,92 @@ active font-weight-bold
                 </div>
             </div>
         </div>
-        <div class="col-lg-12">
-            <div class="card">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="card-header d-flex justify-content-start">
-                            <h6 class="m-0 font-weight-bold">Kalender Pelatihan</h6>
-                        </div>
-                        <div class="card-body d-flex justify-content-center align-items-center">
-                            <div id="calendar"></div>
-                        </div>
-                    </div>
-                </div> <!-- /.row -->
-            </div>
-        </div><!-- /# column -->
-        <div class="col-lg-6">
-            <div class="card">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="card-header d-flex justify-content-end">
-                            <a href="{{ route('operation') }}" class="btn btn-primary btn-sm">Show More</a>
-                        </div>
-                        <div class="card-body d-flex justify-content-center align-items-center">
-                            <canvas id="lineChart"></canvas>
-                        </div>
-                        <div class="text-center mb-3">
-                            <span id="CountSTCW"></span><span> & </span>
-                            <span id="CountNonSTCW"></span>
-                        </div>
-                    </div>
-                </div> <!-- /.row -->
-            </div>
-        </div><!-- /# column -->
-        <div class="col-lg-6">
-            <div class="card">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="card-header d-flex justify-content-end">
-                            <a href="{{ route('plan-dev') }}" class="btn btn-primary btn-sm">Show More</a>
-                        </div>
-                        <div class="card-body d-flex justify-content-center align-items-center">
-                            <div id="chartContainerSpline2" style="height: 370px; width: 100%;"></div>
-                        </div>
-                    </div>
-                </div> <!-- /.row -->
-            </div>
-        </div>
     </div>
 </div>
 <script>
-window.onload = function() {
-    loadChartData();
-    var selectedOption = "{{ date('Y') }}";
-    fetch('/api/chart-data/' + selectedOption)
-        .then(response => response.json())
-        .then(data => {
-            // Map the labels to show month names and year
-            const labels = data.dataPointsSpline1.map(dp => {
-                const date = new Date(dp.x);
-                return date.toLocaleString('default', { month: 'short', year: 'numeric' }); // Show Month and Year
-            });
-
-            const dataset1 = {
-                label: "STCW Participants",
-                borderColor: "rgba(101, 153, 255, 0.9)",
-                borderWidth: 2,
-                backgroundColor: "rgba(101, 153, 255, 0.5)",
-                pointBorderColor: "rgba(101, 153, 255, 0.9)",
-                pointBackgroundColor: "rgba(101, 153, 255, 0.9)",
-                data: data.dataPointsSpline1.map(dp => dp.y),
-                fill: true,
-                tension: 0.4,
-            };
-
-            const dataset2 = {
-                label: "NON STCW Participants",
-                borderColor: "rgba(255, 99, 132, 0.9)",
-                borderWidth: 2,
-                backgroundColor: "rgba(255, 99, 132, 0.5)",
-                pointBorderColor: "rgba(255, 99, 132, 0.9)",
-                pointBackgroundColor: "rgba(255, 99, 132, 0.9)",
-                data: data.dataPointsSpline2.map(dp => dp.y),
-                fill: true,
-                tension: 0.4,
-            };
-
-            const ctx = document.getElementById("lineChart").getContext("2d");
-            const myChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,  // Monthly labels
-                    datasets: [dataset1, dataset2]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Month'  // Update the x-axis label to 'Month'
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Data Peserta Training'
-                            },
-                            suggestedMax: 200
-                        }
-                    },
-                    plugins: {
-                        annotation: {
-                            annotations: {
-                                targetLine: {
-                                    type: 'line',
-                                    scaleID: 'y',
-                                    value: 190,
-                                    borderColor: 'rgba(255, 0, 0, 0.75)',
-                                    borderWidth: 2,
-                                    label: {
-                                        content: 'Target 190 Peserta/Bulan',
-                                        enabled: true,
-                                        position: 'center',
-                                        backgroundColor: 'rgba(255, 0, 0, 0.75)',
-                                        color: '#fff'
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    interaction: {
-                        mode: 'index',
-                        intersect: false
-                    },
-                    hover: {
-                        mode: 'nearest',
-                        intersect: true
-                    }
-                }
-            });
-
-            document.getElementById("CountSTCW").innerText = `STCW: ${data.countSTCW} Peserta`;
-            document.getElementById("CountNonSTCW").innerText = `Non-STCW: ${data.countNonSTCW} Peserta`;
-        });
-}
-
-function loadChartData() {
-    var selectedOption = "{{ date('Y') }}";
-    fetch('/api/chart-data-profits/' + selectedOption) // Fixed concatenation
-        .then(response => response.json())
-        .then(data => {
-            var chartProfit = new CanvasJS.Chart("chartContainerSpline2", {
-                animationEnabled: true,
-                zoomEnabled: true,
-                theme: "light2",
-                title: { text: "Data Profits (Quarterly)" },
-                axisX: {
-                    interval: 1, // Ensure one label per point
-                    labelAngle: -45 // Rotate labels if necessary to fit
-                },
-                axisY: {
-                    includeZero: true
-                },
-                data: [{
-                    type: "splineArea",
-                    color: "#6599FF",
-                    yValueFormatString: "#,##0 Rupiah",
-                    dataPoints: data.profitDataPoints // Use the updated data points with label and y values
-                }]
-            });
-            chartProfit.render();
-        });
-}
 function closeImage() {
     document.getElementById('welcome-container').style.display = 'none';
 }
+</script>
+<script>
+function loadDashboardData() {
+    const selectedDay = document.getElementById("day").value;
+    const selectedMonth = document.getElementById("month").value;
+    const selectedYear = document.getElementById("year").value;
+    const selectedCategory = document.getElementById("category").value;
+    const selectedType = document.getElementById("type").value;
+
+    fetch(`/api/dashboard-chart-data?year=${selectedYear}&month=${selectedMonth}&day=${selectedDay}&category=${selectedCategory}&type=${selectedType}`)
+        .then(response => response.json())
+        .then(data => {
+            // 1. Location Chart
+            const locationChartData = data.locationData.map(item => ({
+                label: item.tempat_pelaksanaan,
+                y: item.total
+            }));
+            new CanvasJS.Chart("chartContainer", {
+                animationEnabled: true,
+                theme: "light2",
+                title: { text: `Training Sessions by Location` },
+                axisY: { title: "Total Trainings", includeZero: true },
+                data: [{ type: "column", dataPoints: locationChartData }]
+            }).render();
+
+            // 2. Trend Revenue Chart
+            var chartData = data.trendRevenueData.map(item => ({
+                label: item.description, // Use nama_pelatihan as label
+                y: parseInt(item.total_biaya)
+            }));
+
+            var chart = new CanvasJS.Chart("trendRevenueChart", {
+                animationEnabled: true,
+                theme: "light2",
+                title: {
+                    text: "Training Trend (Based on Revenue)",
+                    margin: 20
+                },
+                data: [{
+                    type: "column",
+                    dataPoints: chartData
+                }]
+            });
+
+            chart.render();
+
+            // 3. Gauge Charts for STCW and NON STCW
+            Plotly.newPlot('myDiv', [{
+                domain: { x: [0, 1], y: [0, 1] },
+                value: data.countSTCWGauge,
+                title: { text: "STCW" },
+                type: "indicator",
+                mode: "gauge+number+delta",
+                delta: { reference: data.stcwDelta, relative: true },
+                gauge: { axis: { range: [null, data.stcwDelta + 100] } }
+            }], { width: 280, height: 170, margin: { l: 40, r: 40, t: 40, b: 0 } });
+
+            Plotly.newPlot('myDiv2', [{
+                domain: { x: [0, 1], y: [0, 1] },
+                value: data.countNonSTCWGauge,
+                title: { text: "NON STCW" },
+                type: "indicator",
+                mode: "gauge+number+delta",
+                delta: { reference: data.nonStcwDelta, relative: true },
+                gauge: { axis: { range: [null, data.nonStcwDelta + 100] } }
+            }], { width: 280, height: 170, margin: { l: 40, r: 40, t: 40, b: 0 } });
+
+            document.getElementById("pesertaCount").textContent = data.getPesertaCount;
+            document.getElementById("totalRevenue").textContent = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data.rawProfits);
+            document.getElementById("avgFeedbackScore").textContent = data.averageFeedbackScore ?? '-';
+            document.getElementById("avgTrainingFeedbackScore").textContent = data.averageFeedbackTrainingScore ?? '-';
+        });
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', loadDashboardData);
+document.getElementById("year").addEventListener("change", loadDashboardData);
+document.getElementById("month").addEventListener("change", loadDashboardData);
+document.getElementById("day").addEventListener("change", loadDashboardData);
+document.getElementById("category").addEventListener("change", loadDashboardData);
+document.getElementById("type").addEventListener("change", loadDashboardData);
 </script>
 @endsection
