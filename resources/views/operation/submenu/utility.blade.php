@@ -81,7 +81,7 @@ font-weight-bold
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="namaPenlat">Nama Pelatihan :</label>
-                                        <select class="custom-select" id="namaPenlat" name="namaPenlat">
+                                        <select class="custom-select" id="namaPenlat" name="namaPenlat" onchange="updateHiddenFields()">
                                             <option value="-1">Show All</option>
                                             @foreach ($penlatList as $item)
                                             <option value="{{ $item->id }}">{{ $item->description }}</option>
@@ -89,21 +89,15 @@ font-weight-bold
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-6" id="batchSelectContainer">
                                     <div class="form-group">
                                         <label for="batch">Batch :</label>
-                                        <select name="batch" class="form-control" id="batch">
-                                            <option value="-1">Show All</option>
-                                            @foreach ($batchList as $item)
-                                            <option value="{{ $item->batch }}">{{ $item->batch }}</option>
-                                            @endforeach
-                                        </select>
+                                        <select id="batch" class="form-control" name="batch" onchange="updateHiddenFields()"></select>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
                     <table id="listUsages" class="table table-bordered">
                         <thead class="thead-light">
                             <tr>
@@ -122,6 +116,9 @@ font-weight-bold
         </div>
     </div>
 </div>
+
+<input type="hidden" id="pelatihanId" name="pelatihanId"/>
+<input type="hidden" id="batchId" name="batchId"/>
 
 <div class="modal fade" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" style="max-width: 950px;" role="document">
@@ -267,6 +264,28 @@ font-weight-bold
         </div>
     </div>
 </div>
+
+<style>
+    /* Custom CSS to align the Select2 container */
+    .select2-container--default .select2-selection--single {
+        height: calc(2.25rem + 2px); /* Adjust this value to match your input height */
+        padding: 0.375rem 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: calc(2.25rem + 2px); /* Adjust this to vertically align the text */
+    }
+
+    .select2-container .select2-selection--single {
+        height: 100% !important; /* Ensure the height is consistent */
+    }
+
+    .select2-container {
+        width: 100% !important; /* Ensure the width matches the form control */
+    }
+</style>
 <script>
 $(document).ready(function() {
     $('#listUsages').DataTable({
@@ -321,8 +340,68 @@ $(document).ready(function() {
 
     // Initialize Select2 with AJAX for the batch dropdown (default initialization)
     initSelect2WithAjax('mySelect2', '{{ route('batches.fetch') }}', 'Select or add a Batch', null);
+    initBatchWithAjax('batch', '{{ route('batches.fetch') }}', 'Select or add a Batch', null);
 });
 
+function initBatchWithAjax(elementId, ajaxUrl, placeholderText, penlatId = null) {
+    $('#' + elementId).select2({
+        ajax: {
+            url: ajaxUrl,
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    q: params.term, // search term
+                    page: params.page || 1, // pagination
+                    penlat_id: penlatId // pass penlat_id for filtering, if provided
+                };
+            },
+            processResults: function (data, params) {
+                params.page = params.page || 1;
+                return {
+                    results: $.map(data.items, function (item) {
+                        return {
+                            id: item.batch, // Use the 'batch' column for the option value
+                            text: item.batch, // Use the 'batch' column for the option label
+                            filepath: item.filepath, // Include filepath to use for image preview
+                            date: item.date // Include date to prefill the date input
+                        };
+                    }),
+                    pagination: {
+                        more: data.total_count > (params.page * 10) // Check if more results are available
+                    }
+                };
+            },
+            cache: true
+        },
+        placeholder: placeholderText,
+        minimumInputLength: 1, // Start searching after 1 character
+        dropdownParent: $('#batchSelectContainer'),
+        width: '100%',
+        tags: true, // Allow adding new tags
+        allowClear: true,
+        createTag: function (params) {
+            var term = $.trim(params.term);
+            if (term === '') {
+                return null;
+            }
+            return {
+                id: term,
+                text: term,
+                newTag: true // Mark as a new tag
+            };
+        },
+        templateResult: function (data) {
+            if (data.newTag) {
+                return $('<span><em>Add new: "' + data.text + '"</em></span>');
+            }
+            return data.text;
+        },
+        templateSelection: function (data) {
+            return data.text;
+        }
+    });
+}
 function initSelect2WithAjax(elementId, ajaxUrl, placeholderText, penlatId = null) {
     $('#' + elementId).select2({
         ajax: {
@@ -564,5 +643,14 @@ $(document).ready(function() {
         }
     });
 });
+function updateHiddenFields() {
+    // Get the selected values
+    var pelatihanId = document.getElementById("namaPenlat").value;
+    var batchId = document.getElementById("batch").value;
+
+    // Set the hidden input fields
+    document.getElementById("pelatihanId").value = pelatihanId;
+    document.getElementById("batchId").value = batchId;
+}
 </script>
 @endsection
