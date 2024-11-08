@@ -276,21 +276,21 @@ font-weight-bold
         </div>
         <div class="col-md-12">
             <div class="card2 shadow">
-                <h4 class="card-header2">Penlat with Most Revenue</h4>
+                <div class="card-header2 d-flex align-items-center">
+                    <h4 class="mb-0">Penlat with Most Revenue</h4>
+                    <select class="form-control ml-auto zoom90" id="revenueChartPeriode" name="revenueChartPeriode" style="width: 150px;">
+                        <option value="-1" selected disabled>Select Periode...</option>
+                        @foreach(range(date('Y'), date('Y') - 5) as $year)
+                            <option value="{{ $year }}" @if ($year == $currentYear) selected @endif>{{ $year }}</option>
+                        @endforeach
+                    </select>
+                </div>
                 <div class="card-block2 bg-white">
                     <div class="row">
-                        <div class="col-lg-12 d-flex justify-content-end align-items-end">
-                            <select class="form-control mt-3 mr-4 zoom90" id="revenueChartPeriode" name="revenueChartPeriode" style="width: 150px;">
-                                <option value="-1" selected disabled>Select Periode...</option>
-                                @foreach(range(date('Y'), date('Y') - 5) as $year)
-                                    <option value="{{ $year }}" @if ($year == $currentYear) selected @endif>{{ $year }}</option>
-                                @endforeach
-                            </select>
-                        </div>
                         <div class="col-lg-12">
                             <div class="card-body d-flex justify-content-center align-items-center">
                                 <!-- <canvas id="TrafficChart"></canvas>   -->
-                            <div id="trendRevenueChart" style="height: 370px; width: 100%;"></div>
+                                <div id="trendRevenueChart" style="height: 370px; width: 100%;"></div>
                             </div>
                         </div>
                     </div> <!-- /.row -->
@@ -299,75 +299,75 @@ font-weight-bold
         </div>
         <div class="col-md-6">
             <div class="card2 shadow">
-                <h4 class="card-header2">Revenue Per-Quarters</h4>
+                <div class="card-header2 d-flex align-items-center">
+                    <h4 class="mb-0">Revenue Per-Quarters</h4>
+                    <select class="form-control ml-auto zoom90" id="chartPeriode" name="chartPeriode" style="width: 150px;">
+                        <option value="-1" selected disabled>Select Periode...</option>
+                        @foreach(range(date('Y'), date('Y') - 5) as $year)
+                            <option value="{{ $year }}" @if ($year == $currentYear) selected @endif>{{ $year }}</option>
+                        @endforeach
+                    </select>
+                </div>
                 <div class="card-block2 bg-white">
                     <div class="row">
-                        <div class="col-lg-12 d-flex justify-content-end align-items-end">
-                            <select class="form-control mt-3 mr-4 zoom90" id="chartPeriode" name="chartPeriode" style="width: 150px;">
-                                <option value="-1" selected disabled>Select Periode...</option>
-                                @foreach(range(date('Y'), date('Y') - 5) as $year)
-                                    <option value="{{ $year }}" @if ($year == $currentYear) selected @endif>{{ $year }}</option>
-                                @endforeach
-                            </select>
-                        </div>
                         <div class="col-lg-12">
                             <div class="card-body d-flex justify-content-center align-items-center">
-                                <!-- <canvas id="TrafficChart"></canvas>   -->
                                 <div id="chartContainerSpline" style="height: 370px; width: 100%;"></div>
                             </div>
                         </div>
-                    </div> <!-- /.row -->
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-md-6">
             <div class="card2 shadow">
-                <h4 class="card-header2">Total Revenue <span class="badge bg-success" id="profitText"></span></h4>
+                <div class="card-header2 d-flex align-items-center">
+                    <h4 class="mb-0">Total Revenue <span class="badge bg-success" id="profitText"></span></h4>
+                    <select class="form-control ml-auto zoom90" id="pieChartPeriode" name="pieChartPeriode" style="width: 150px;">
+                        <option value="-1" selected disabled>Select Periode...</option>
+                        @foreach(range(date('Y'), date('Y') - 5) as $year)
+                            <option value="{{ $year }}" @if ($year == $currentYear) selected @endif>{{ $year }}</option>
+                        @endforeach
+                    </select>
+                </div>
                 <div class="card-block2 bg-white">
                     <div class="row">
-                        <div class="col-lg-12 d-flex justify-content-end align-items-end">
-                            <select class="form-control mt-3 mr-4 zoom90" id="pieChartPeriode" name="pieChartPeriode" style="width: 150px;">
-                                <option value="-1" selected disabled>Select Periode...</option>
-                                @foreach(range(date('Y'), date('Y') - 5) as $year)
-                                    <option value="{{ $year }}" @if ($year == $currentYear) selected @endif>{{ $year }}</option>
-                                @endforeach
-                            </select>
-                        </div>
                         <div class="col-lg-12">
                             <div class="card-body d-flex justify-content-center align-items-center">
                                 <div id="pieContainer" style="height: 370px; width: 100%;"></div>
                             </div>
                         </div>
-                    </div> <!-- /.row -->
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-md-12">
             <div class="card2 shadow">
-                <h4 class="card-header2">Revenue Comparison</h4>
+                <div class="card-header2 d-flex align-items-center">
+                    <h4 class="mb-0">Revenue Comparison</h4>
+                    <div class="ml-auto d-flex">
+                        <select class="form-control mr-2 zoom90" id="firstDataset" name="firstDataset" style="width: 150px;">
+                            <option value="-1" selected disabled>First Dataset...</option>
+                            @foreach(range(date('Y'), date('Y') - 5) as $year)
+                                <option value="{{ $year }}">{{ $year }}</option>
+                            @endforeach
+                        </select>
+                        <select class="form-control zoom90" id="secondDataset" name="secondDataset" style="width: 150px;">
+                            <option value="-1" selected disabled>Second Dataset...</option>
+                            @foreach(range(date('Y'), date('Y') - 5) as $year)
+                                <option value="{{ $year }}">{{ $year }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
                 <div class="card-block2 bg-white">
                     <div class="row">
-                        <div class="col-lg-12 d-flex justify-content-end align-items-end">
-                            <select class="form-control mt-3 mr-4 zoom90" id="firstDataset" name="firstDataset" style="width: 150px;">
-                                <option value="-1" selected disabled>First Dataset...</option>
-                                @foreach(range(date('Y'), date('Y') - 5) as $year)
-                                    <option value="{{ $year }}">{{ $year }}</option>
-                                @endforeach
-                            </select>
-                            <select class="form-control mt-3 mr-4 zoom90" id="secondDataset" name="secondDataset" style="width: 150px;">
-                                <option value="-1" selected disabled>Second Dataset...</option>
-                                @foreach(range(date('Y'), date('Y') - 5) as $year)
-                                    <option value="{{ $year }}">{{ $year }}</option>
-                                @endforeach
-                            </select>
-                        </div>
                         <div class="col-lg-12">
                             <div class="card-body d-flex justify-content-center align-items-center">
-                                <!-- <canvas id="TrafficChart"></canvas>   -->
-                            <div id="stackedArea" style="height: 370px; width: 100%;"></div>
+                                <div id="stackedArea" style="height: 370px; width: 100%;"></div>
                             </div>
                         </div>
-                    </div> <!-- /.row -->
+                    </div>
                 </div>
             </div>
         </div>

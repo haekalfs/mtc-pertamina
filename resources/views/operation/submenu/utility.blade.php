@@ -340,7 +340,7 @@ $(document).ready(function() {
 
     // Initialize Select2 with AJAX for the batch dropdown (default initialization)
     initSelect2WithAjax('mySelect2', '{{ route('batches.fetch') }}', 'Select or add a Batch', null);
-    initBatchWithAjax('batch', '{{ route('batches.fetch') }}', 'Select or add a Batch', null);
+    initBatchWithAjax('batch', '{{ route('batches.fetch') }}', 'Select a Batch', null);
 });
 
 function initBatchWithAjax(elementId, ajaxUrl, placeholderText, penlatId = null) {
