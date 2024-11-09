@@ -39,19 +39,26 @@ class RefreshExistingBatch implements ShouldQueue
 
         try {
             $getData = Penlat_batch::whereNull('penlat_id')->get();
-            //delete aliases that doesnt have relation to Penlat Table
+            // Delete aliases that don't have a relation to Penlat Table
             Penlat_alias::whereDoesntHave('penlat')->delete();
 
             foreach ($getData as $row) {
-                // Explode the 'batch' column value to get the first part
+                // Extract the alias part from 'batch' column value
                 $parts = explode('/', $row->batch);
                 $firstWord = trim($parts[0]);
 
+                // Check if it has '-REN' suffix and adjust the alias accordingly
+                if (str_ends_with($firstWord, '-REN')) {
+                    $alias = explode('-', $firstWord)[0]; // Get the part before "-REN"
+                } else {
+                    $alias = $firstWord;
+                }
+
                 // Check if the alias exists in the Penlat table
-                $checkPenlat = Penlat_alias::where('alias', $firstWord)->exists();
+                $checkPenlat = Penlat_alias::where('alias', $alias)->exists();
                 if ($checkPenlat) {
                     // Fetch the matching Penlat record
-                    $getPenlat = Penlat_alias::where('alias', $firstWord)->first();
+                    $getPenlat = Penlat_alias::where('alias', $alias)->first();
 
                     // Update or create the record in the Penlat_batch table
                     Penlat_batch::updateOrCreate(
