@@ -13,6 +13,7 @@ use App\Models\Penlat_batch;
 use App\Models\Profit;
 use App\Models\Regulation;
 use Carbon\Carbon;
+use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -77,7 +78,7 @@ class DashboardController extends Controller
         $regulations = Regulation::orderBy('created_at', 'desc')->take(6)->get();
         $morningBriefing = MorningBriefing::orderBy('updated_at', 'desc')->take(1)->get();
 
-        $infographicCategories = Infografis_peserta::select('kategori_program')->distinct()->get();
+        $infographicCategories = Infografis_peserta::select('subholding')->distinct()->get();
         $infographicTypes = Infografis_peserta::select('jenis_pelatihan')->distinct()->get();
 
         return view('dashboard', [
@@ -221,13 +222,6 @@ class DashboardController extends Controller
         if ($day && $day != '-1') {
             $trendRevenueQuery->whereDay('profits.tgl_pelaksanaan', $day);
         }
-        // if ($category && $category != '-1') {
-        //     $trendRevenueQuery->where('penlat.kategori_program', $category);
-        // }
-        // if ($type && $type != '-1') {
-        //     $trendRevenueQuery->where('penlat.jenis_pelatihan', $type);
-        // }
-
         // Execute the query and get results
         $trendRevenueData = $trendRevenueQuery->get();
 
@@ -329,6 +323,35 @@ class DashboardController extends Controller
             'rawProfits' => $rawProfits,
             'averageFeedbackScore' => round($averageFeedbackScore, 2),
             'averageFeedbackTrainingScore' => round($averageFeedbackTrainingScore, 2),
+        ]);
+    }
+
+    public function getTrendData(Request $request)
+    {
+        // Optional year filter from the request
+        $year = $request->input('year', date('Y'));
+
+        $monthlyData = Infografis_peserta::select(
+                DB::raw('MONTH(tgl_pelaksanaan) as month'),
+                DB::raw('COUNT(*) as total')
+            )
+            ->whereYear('tgl_pelaksanaan', $year) // Filter by year if specified
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+
+        // Prepare data for each month
+        $dataPoints = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $count = $monthlyData->firstWhere('month', $i)?->total ?? 0;
+            $dataPoints[] = [
+                "label" => DateTime::createFromFormat('!m', $i)->format('F'),
+                "y" => $count
+            ];
+        }
+
+        return response()->json([
+            'dataPoints' => $dataPoints,
         ]);
     }
 

@@ -82,6 +82,7 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
             //will be used
             Route::get('/download-file/{filepath}', [DownloadController::class, 'downloadFile'])->name('download.file');
             Route::get('/api/dashboard-chart-data', [DashboardController::class, 'getDashboardChartData']);
+            Route::get('/api/trend-chart-data', [DashboardController::class, 'getTrendData']);
         });
 
         //Encrypt
