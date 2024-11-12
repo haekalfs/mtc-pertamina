@@ -318,7 +318,7 @@ active font-weight-bold
                                     </div>
                                     <div class="stat-content">
                                         <div class="text-left dib">
-                                            <div class="stat-text"><span id="totalRevenue" style="font-size: 15px;">-</span></div>
+                                            <div class="stat-text"><span id="totalTraining">-</span></div>
                                             <div class="stat-heading">Total Training</div>
                                         </div>
                                     </div>
@@ -338,7 +338,7 @@ active font-weight-bold
                                     </div>
                                     <div class="stat-content">
                                         <div class="text-left dib">
-                                            <div class="stat-text"><span id="totalRevenue" style="font-size: 15px;">-</span></div>
+                                            <div class="stat-text"><span id="totalCost" style="font-size: 15px;">-</span></div>
                                             <div class="stat-heading">Total Cost</div>
                                         </div>
                                     </div>
@@ -540,7 +540,9 @@ function loadDashboardData() {
 
             document.getElementById("pesertaCount").textContent = data.getPesertaCount;
             document.getElementById("totalRevenue").textContent = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data.rawProfits);
+            document.getElementById("totalCost").textContent = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data.rawCosts);
             document.getElementById("avgFeedbackScore").textContent = data.averageFeedbackScore ?? '-';
+            document.getElementById("totalTraining").textContent = data.totalTraining ?? '-';
             document.getElementById("avgTrainingFeedbackScore").textContent = data.averageFeedbackTrainingScore ?? '-';
         });
 }

@@ -257,13 +257,18 @@ class DashboardController extends Controller
         if ($day && $day != '-1') {
             $rawProfitsQuery->whereDay('tgl_pelaksanaan', $day);
         }
-        // if ($category && $category != '-1') {
-        //     $rawProfitsQuery->where('kategori_program', $category);
-        // }
-        // if ($type && $type != '-1') {
-        //     $rawProfitsQuery->where('jenis_pelatihan', $type);
-        // }
         $rawProfits = $rawProfitsQuery->sum('total_biaya_pendaftaran_peserta');
+        $rawCosts = $rawProfitsQuery->get()->sum(function ($item) {
+            return (int) $item->biaya_instruktur +
+                   (int) $item->total_pnbp +
+                   (int) $item->penagihan_foto +
+                   (int) $item->biaya_transportasi_hari +
+                   (int) $item->penagihan_atk +
+                   (int) $item->penagihan_snack +
+                   (int) $item->penagihan_makan_siang +
+                   (int) $item->penlat_usage +
+                   (int) $item->penagihan_laundry;
+        });
 
         // 3. Average Feedback Score
         $averageFeedbackScoreQuery = DB::table('feedback_mtc')->select(DB::raw('
@@ -312,6 +317,8 @@ class DashboardController extends Controller
         }
         $averageFeedbackTrainingScore = $averageFeedbackTrainingScoreQuery->avg('score');
 
+        $totalTraining = Penlat_batch::count();
+
         return response()->json([
             'locationData' => $locationData,
             'countSTCWGauge' => $countSTCWGauge,
@@ -321,6 +328,8 @@ class DashboardController extends Controller
             'trendRevenueData' => $trendRevenueData,
             'getPesertaCount' => $getPesertaCount,
             'rawProfits' => $rawProfits,
+            'rawCosts' => $rawCosts,
+            'totalTraining' => $totalTraining,
             'averageFeedbackScore' => round($averageFeedbackScore, 2),
             'averageFeedbackTrainingScore' => round($averageFeedbackTrainingScore, 2),
         ]);
