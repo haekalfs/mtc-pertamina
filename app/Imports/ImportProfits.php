@@ -43,44 +43,25 @@ class ImportProfits implements ToCollection, SkipsEmptyRows, WithBatchInserts, W
             DB::beginTransaction();
 
             $currentDate = null;
-            // Loop through the rows and save the data to the database
+
             foreach ($rows as $row) {
-                $totalUsageCost = 0;
-                // Try to check if it's a date in 'd-M-Y' format (displayed format)
-                if ($this->getFormattedDate($row[0])) {
-                    $currentDate = $this->getFormattedDate($row[0]);
-                }
+                if ($row[0]) {
+                    $totalUsageCost = 0;
 
-                if (strpos($row[0], '/') !== false) {
+                    // Step 1: Clean up and separate text and number parts
+                    $batch = $this->extractBatch($row[0]);
 
-                    // Get penlat
-                    $parts = explode('/', $row[0]);
-                    $firstWord = $parts[0];
+                    // Step 2: Find or initialize batch record
+                    $findBatch = Penlat_batch::where('batch', 'like', "%$batch%")->first();
 
-                    // Make sure the batch doesn't already exist
-                    $checkBatch = Penlat_batch::where('batch', $row[0])->exists();
-                    if (!$checkBatch) {
-
-                        $checkPenlat = Penlat_alias::where('alias', $firstWord)->exists();
-                        if($checkPenlat){
-                            $getPenlat = Penlat_alias::where('alias', $firstWord)->first();
-                            Penlat_batch::updateOrCreate(
-                                [
-                                    'batch' => $row[0],
-                                ],
-                                [
-                                    'penlat_id' => $getPenlat->penlat->id,
-                                    'nama_program' => $getPenlat->penlat->description,
-                                    'date' => $currentDate,
-                                ]
-                            );
-                        }
-                    } else {
-                        $findBatch = Penlat_batch::where('batch', $row[0])->first();
-                        // Get the sum of all 'total' values from Penlat_utility_usage for the given batch
+                    if ($findBatch) {
+                        // Get the sum of all 'total' values for the given batch
                         $totalUsageCost = Penlat_utility_usage::where('penlat_batch_id', $findBatch->id)
                             ->sum('total');
                     }
+
+                    // Prepare data for the Profit table
+                    $profitData = $this->parseProfitData($row, $currentDate, $totalUsageCost);
 
                     Profit::updateOrCreate(
                         [
@@ -88,25 +69,10 @@ class ImportProfits implements ToCollection, SkipsEmptyRows, WithBatchInserts, W
                             'pelaksanaan' => $row[0],
                             'jumlah_peserta' => $row[2]
                         ],
-                        [
-                        'biaya_instruktur' => preg_replace('/[^0-9]/', '', $row[4]),
-                        'total_pnbp' => preg_replace('/[^0-9]/', '', $row[5]),
-                        'biaya_transportasi_hari' => preg_replace('/[^0-9]/', '', $row[6]),
-                        'honor_pnbp' => preg_replace('/[^0-9]/', '', $row[7]),
-                        'biaya_pendaftaran_peserta' => preg_replace('/[^0-9]/', '', $row[8]),
-                        'total_biaya_pendaftaran_peserta' => preg_replace('/[^0-9]/', '', $row[9]),
-                        'penagihan_foto' => preg_replace('/[^0-9]/', '', $row[10]),
-                        'penagihan_atk' => preg_replace('/[^0-9]/', '', $row[11]),
-                        'penagihan_snack' => preg_replace('/[^0-9]/', '', $row[12]),
-                        'penagihan_makan_siang' => preg_replace('/[^0-9]/', '', $row[13]),
-                        'penagihan_laundry' => preg_replace('/[^0-9]/', '', $row[14]),
-                        'penlat_usage' => preg_replace('/[^0-9]/', '', $totalUsageCost),
-                        'jumlah_biaya' => preg_replace('/[^0-9]/', '', str_replace(',00', '', $row[15])),
-                        'profit' => preg_replace('/[^0-9]/', '', $row[16])
-                        ]
+                        $profitData
                     );
                 } else {
-                    Log::warning('Skipped row due to missing or invalid date:');
+                    Log::warning('Skipped row due to missing or invalid date.');
                 }
             }
 
@@ -114,9 +80,51 @@ class ImportProfits implements ToCollection, SkipsEmptyRows, WithBatchInserts, W
 
         } catch (\Exception $e) {
             DB::rollBack();
-
             Log::error('Error processing the file: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Helper function to extract the batch text and number parts.
+     */
+    private function extractBatch($cell)
+    {
+        $cleanedCell = preg_replace('/\s+/', '', $cell);
+        preg_match_all('/([A-Za-z-\/]+)(\d+)/', $cleanedCell, $matches, PREG_SET_ORDER);
+
+        // Combine text and number to form batch if match exists
+        return $matches ? $matches[0][1] . '/' . $matches[0][2] : null;
+    }
+
+    /**
+     * Helper function to parse the row and prepare data for Profit table.
+     */
+    private function parseProfitData($row, $currentDate, $totalUsageCost)
+    {
+        return [
+            'biaya_instruktur' => $this->extractNumeric($row[4]),
+            'total_pnbp' => $this->extractNumeric($row[5]),
+            'biaya_transportasi_hari' => $this->extractNumeric($row[6]),
+            'honor_pnbp' => $this->extractNumeric($row[7]),
+            'biaya_pendaftaran_peserta' => $this->extractNumeric($row[8]),
+            'total_biaya_pendaftaran_peserta' => $this->extractNumeric($row[9]),
+            'penagihan_foto' => $this->extractNumeric($row[10]),
+            'penagihan_atk' => $this->extractNumeric($row[11]),
+            'penagihan_snack' => $this->extractNumeric($row[12]),
+            'penagihan_makan_siang' => $this->extractNumeric($row[13]),
+            'penagihan_laundry' => $this->extractNumeric($row[14]),
+            'penlat_usage' => $this->extractNumeric($totalUsageCost),
+            'jumlah_biaya' => $this->extractNumeric(str_replace(',00', '', $row[15])),
+            'profit' => $this->extractNumeric($row[16]),
+        ];
+    }
+
+    /**
+     * Helper function to remove non-numeric characters and return numeric value.
+     */
+    private function extractNumeric($value)
+    {
+        return (int) preg_replace('/[^0-9]/', '', $value);
     }
 
     public function batchSize(): int
@@ -132,33 +140,6 @@ class ImportProfits implements ToCollection, SkipsEmptyRows, WithBatchInserts, W
     public function startRow(): int
     {
         return 1;
-    }
-
-    /**
-     * Check if the given value is a valid date in the 'd-M-y' format.
-     */
-    private function isDate($value, $format)
-    {
-        $date = \DateTime::createFromFormat($format, $value);
-        return $date && $date->format($format) === $value;
-    }
-
-    // Define a method to handle date parsing safely
-    protected function getFormattedDate($dateValue)
-    {
-        // Check if the value is numeric (meaning it's an Excel date)
-        if (is_numeric($dateValue)) {
-            // Convert Excel serial date to DateTime object
-            return Date::excelToDateTimeObject($dateValue)->format('Y-m-d');
-        }
-
-        // If it's not numeric, assume it's in the format j-M-y and parse with Carbon
-        try {
-            return Carbon::createFromFormat('j-M-y', $dateValue)->format('Y-m-d');
-        } catch (\Exception $e) {
-            // Handle exception if date format is invalid
-            return null; // Or handle as needed (e.g., return a default date or throw an error)
-        }
     }
 
     /**

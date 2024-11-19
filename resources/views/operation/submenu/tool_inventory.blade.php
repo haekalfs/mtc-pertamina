@@ -141,6 +141,17 @@ font-weight-bold
                                             </select>
                                         </div>
                                     </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="conditionFilter">Filter by Condition:</label>
+                                            <select name="conditionFilter" id="conditionFilter" class="form-control" required>
+                                                <option value="-1" selected>Show All</option>
+                                                @foreach($assetCondition as $item)
+                                                <option value="{{ $item->id }}">{{ $item->condition }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
                                     <div class="col-md-1 d-flex align-self-end justify-content-start">
                                         <div class="form-group">
                                             <div class="align-self-center">
@@ -318,7 +329,7 @@ font-weight-bold
                     <div class="row no-gutters">
                         <div class="col-md-3 d-flex align-items-top justify-content-center text-center">
                             <label for="edit-file-upload" style="cursor: pointer;">
-                                <img id="edit-image-preview" src="https://via.placeholder.com/50x50/5fa9f8/ffffff" style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
+                                <img id="edit-image-preview" src="{{ asset('img/default-img.png') }}" style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
                                 <small style="font-size: 10px;"><i><u>Editing image is Optional!</u></i></small>
                             </label>
                             <input id="edit-file-upload" type="file" name="tool_image" style="display: none;" accept="image/*" onchange="previewImage(event)">
@@ -329,14 +340,25 @@ font-weight-bold
                                     <div class="col-md-12">
                                         <input type="text" class="form-control" name="stock" id="edit_initial_stock" hidden>
                                         <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 260px;" class="mr-2">
+                                            <div style="width: 160px;" class="mr-1">
                                                 <p style="margin: 0;">Used :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <div class="counter">
-                                                    <span class="down" onclick='decreaseCount(event, this)'><i class="fa fa-minus text-danger"></i></span>
-                                                    <input name="used_amount" id="edit_used_amount" type="text" min="0" style="border: 1px solid rgb(217, 217, 217); width: 1250px;">
-                                                    <span class="up" onclick='increaseCount(event, this)'><i class="fa fa-plus text-success"></i></span>
+                                                <div class="input-group">
+                                                    <!-- Left Icon -->
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text down" onclick="decreaseCount(event, this)">
+                                                            <i class="fa fa-minus text-danger"></i>
+                                                        </span>
+                                                    </div>
+                                                    <!-- Input Field -->
+                                                    <input name="used_amount" id="edit_used_amount" type="text" min="0" class="form-control" value="0">
+                                                    <!-- Right Icon -->
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text up" onclick="increaseCount(event, this)">
+                                                            <i class="fa fa-plus text-success"></i>
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -416,15 +438,17 @@ font-weight-bold
                 url: "{{ route('tool-inventory') }}",
                 data: function (d) {
                     d.locationFilter = $('#locationFilter').val(); // Pass location filter
+                    d.conditionFilter = $('#conditionFilter').val(); // Pass location filter
                 }
             },
             columns: [
-                { data: 'tool', name: 'tool', orderable: false, searchable: false },
-                { data: 'stock', name: 'stock' },
-                { data: 'used', name: 'used' },
-                { data: 'condition', name: 'condition', orderable: false, searchable: false },
+                { data: 'tool', name: 'tool', orderable: true, searchable: true },
+                { data: 'stock', name: 'stock', orderable: true, searchable: true },
+                { data: 'used', name: 'used', orderable: true, searchable: true },
+                { data: 'condition', name: 'condition', orderable: false, searchable: true },
                 { data: 'action', name: 'action', orderable: false, searchable: false }
-            ]
+            ],
+            order: [[0, 'desc']] // Default ordering
         });
 
         $('#filterForm').on('submit', function (e) {
@@ -550,22 +574,24 @@ $(document).on('click', '.edit-tool', function(e) {
     });
 });
 
-function increaseCount(a, b) {
-  var input = b.previousElementSibling;
-  var value = parseInt(input.value, 10);
-  value = isNaN(value) ? 0 : value;
-  value++;
-  input.value = value;
+function increaseCount(event, element) {
+    // Find the input field within the same parent (input-group)
+    var input = element.closest('.input-group').querySelector('input');
+    var value = parseInt(input.value, 10);
+    value = isNaN(value) ? 0 : value;
+    value++;
+    input.value = value;
 }
 
-function decreaseCount(a, b) {
-  var input = b.nextElementSibling;
-  var value = parseInt(input.value, 10);
-  if (value > 1) {
-    value = isNaN(value) ? 0 : value;
-    value--;
-    input.value = value;
-  }
+function decreaseCount(event, element) {
+    // Find the input field within the same parent (input-group)
+    var input = element.closest('.input-group').querySelector('input');
+    var value = parseInt(input.value, 10);
+    if (value > 0) {
+        value = isNaN(value) ? 0 : value;
+        value--;
+        input.value = value;
+    }
 }
 function validateForm(...fileInputIds) {
     for (let i = 0; i < fileInputIds.length; i++) {

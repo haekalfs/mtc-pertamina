@@ -22,14 +22,44 @@ class InventoryToolController extends Controller
     {
         $locations = Location::all(); // For filter dropdown
         $selectedLocation = $request->locationFilter ?? '-1';
+        $selectedCondition = $request->conditionFilter ?? '-1';
         $assetCondition = Asset_condition::all();
 
         // Check if it's an AJAX request for DataTables
         if ($request->ajax()) {
-            $query = Inventory_tools::with(['location', 'condition', 'img']);
+            $query = Inventory_tools::with(['location', 'condition', 'img', 'items']);
 
             if ($selectedLocation != '-1') {
                 $query->where('location_id', $selectedLocation);
+            }
+
+            if ($selectedCondition != '-1') {
+                // Filter based on the related 'items' table
+                $query->whereHas('items', function ($q) use ($selectedCondition) {
+                    $q->where('asset_condition_id', $selectedCondition);
+                });
+            }
+
+            if ($request->has('search') && !empty($request->search['value'])) {
+                $query->where(function ($q) use ($request) {
+                    $q->where('asset_name', 'like', '%' . $request->search['value'] . '%')
+                      ->orWhere('asset_id', 'like', '%' . $request->search['value'] . '%');
+                });
+            }
+
+            if ($request->has('order') && isset($request->order[0]['column'])) {
+                $columns = [
+                    'inventory_tools.asset_name',       // Column index 0
+                    'inventory_tools.asset_stock',     // Column index 1
+                    'inventory_tools.used_amount',     // Column index 2
+                ];
+
+                $columnIndex = $request->order[0]['column']; // Column index from DataTables
+                $sortDirection = $request->order[0]['dir']; // 'asc' or 'desc'
+
+                if (isset($columns[$columnIndex])) {
+                    $query->orderBy($columns[$columnIndex], $sortDirection);
+                }
             }
 
             return DataTables::of($query)
