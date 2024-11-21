@@ -302,7 +302,17 @@ $('#summernote').summernote({
         ['table', ['table']],
         ['insert', ['link', 'picture', 'video']],
         ['view', ['fullscreen', 'codeview', 'help']]
-    ]
+    ],
+    callbacks: {
+        onPaste: function(e) {
+            e.preventDefault();
+            // Get the plain text from the clipboard
+            const clipboardData = (e.originalEvent || e).clipboardData || window.clipboardData;
+            const plainText = clipboardData.getData('text/plain');
+            // Insert plain text into the editor
+            document.execCommand('insertText', false, plainText);
+        }
+    }
 });
 </script>
 <script>

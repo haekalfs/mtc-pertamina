@@ -73,7 +73,9 @@ font-weight-bold
                         {{ $date->format('d-M-Y') }}
                     </div>
                 </div>
-                <p>{!! $data->briefing_result !!}</p>
+                <div class="ml-4 mr-4">
+                    <p>{!! $data->briefing_result !!}</p>
+                </div>
                 <hr>
                 <div class="d-flex justify-content-between align-items-start" style="font-weight: 500;">
                     <!-- Jenis Kegiatan -->
@@ -267,7 +269,17 @@ $('#summernote').summernote({
         ['table', ['table']],
         ['insert', ['link', 'picture', 'video']],
         ['view', ['fullscreen', 'codeview', 'help']]
-    ]
+    ],
+    callbacks: {
+        onPaste: function(e) {
+            e.preventDefault();
+            // Get the plain text from the clipboard
+            const clipboardData = (e.originalEvent || e).clipboardData || window.clipboardData;
+            const plainText = clipboardData.getData('text/plain');
+            // Insert plain text into the editor
+            document.execCommand('insertText', false, plainText);
+        }
+    }
 });
 
 </script>
