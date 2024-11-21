@@ -785,7 +785,6 @@ class OperationController extends Controller
             'room_image' => 'nullable',
             'location' => 'required',
             'tool.*' => 'required',
-            'amount.*' => 'required',
         ]);
 
         // Handle the image upload
@@ -809,7 +808,6 @@ class OperationController extends Controller
             Inventory_room::create([
                 'room_id' => $inventoryRoom->id,
                 'inventory_tool_id' => $toolId,
-                'amount' => $validated['amount'][$key],
             ]);
         }
 
@@ -821,7 +819,6 @@ class OperationController extends Controller
         // Validate the request
         $validated = $request->validate([
             'tool.*' => 'required',
-            'amount.*' => 'required',
         ]);
 
          // Save the tools associated with this room
@@ -829,7 +826,6 @@ class OperationController extends Controller
             Inventory_room::create([
                 'room_id' => $roomId,
                 'inventory_tool_id' => $toolId,
-                'amount' => $validated['amount'][$key],
             ]);
         }
 
@@ -1110,12 +1106,163 @@ class OperationController extends Controller
         }
     }
 
-    public function preview_room($roomId)
+    public function preview_room(Request $request, $roomId)
     {
-        $data = Room::find($roomId);
         $assets = Inventory_tools::all();
         $locations = Location::all();
-        return view('operation.submenu.preview-room-inventory', ['assets' => $assets, 'data' => $data, 'locations' => $locations]);
+
+        $selectedLocation = $request->locationFilter ?? '-1';
+        $selectedCondition = $request->conditionFilter ?? '-1';
+        $assetCondition = Asset_condition::all();
+
+        $data = Room::with([
+            'list.tools.location',
+            'list.tools.condition',
+            'list.tools.img',
+            'list.tools.items.condition',
+            'list.tools.rooms_inventory' // Include the rooms_inventory relationship
+        ])->find($roomId);
+
+        // Check for AJAX request
+        if ($request->ajax()) {
+            // Extract tools data through relationships
+            $toolsQuery = $data->list->map->tools->filter(); // Collect all related tools
+
+            if ($request->has('search') && !empty($request->search['value'])) {
+                $searchValue = $request->search['value'];
+                $toolsQuery = $toolsQuery->filter(function ($tool) use ($searchValue) {
+                    return stripos($tool->asset_name, $searchValue) !== false ||
+                        stripos($tool->asset_id, $searchValue) !== false;
+                });
+            }
+
+            // Order the collection if requested
+            if ($request->has('order') && isset($request->order[0]['column'])) {
+                $columns = ['asset_name', 'asset_stock', 'used_amount'];
+                $columnIndex = $request->order[0]['column'];
+                $sortDirection = $request->order[0]['dir'] === 'asc' ? SORT_ASC : SORT_DESC;
+
+                if (isset($columns[$columnIndex])) {
+                    $toolsQuery = $toolsQuery->sortBy($columns[$columnIndex], SORT_REGULAR, $sortDirection === SORT_DESC);
+                }
+            }
+
+            // Process DataTables response
+            return DataTables::of($toolsQuery)
+                ->addColumn('tool', function ($item) {
+                    $hoursDifference = \Carbon\Carbon::now()->diffInHours(\Carbon\Carbon::parse($item->last_maintenance));
+
+                    $html = '
+                    <div class="row">
+                        <div class="col-md-4 d-flex justify-content-center align-items-start mt-2">
+                            <a class="animateBox" href="' . route('preview-asset', $item->id) . '">
+                                <img src="' . asset($item->img->filepath) . '" style="height: 150px; width: 160px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
+                            </a>
+                        </div>
+                        <div class="col-md-8 text-left mt-sm-2">
+                            <h5 class="card-title font-weight-bold">' . $item->asset_name . '</h5>
+                            <div class="ml-2">
+                                <table class="table table-borderless table-sm">
+                                    <tr>
+                                        <td style="width: 200px;" class="mb-2"><i class="fa fa-chevron-right mr-2"></i> Nomor Aset</td>
+                                        <td style="text-align: start;">: ' . $item->asset_id . '</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width: 200px;" class="mb-2"><i class="fa fa-chevron-right mr-2"></i> Location</td>
+                                        <td style="text-align: start;">: ' . $item->location->description . '</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width: 200px;" class="mb-2"><i class="fa fa-chevron-right mr-2"></i> Running Hour</td>
+                                        <td style="text-align: start;">: ' . $hoursDifference . ' hours</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width: 200px;" class="mb-2"><i class="fa fa-chevron-right mr-2"></i> Next Maintenance</td>
+                                        <td style="text-align: start;">: ' . \Carbon\Carbon::parse($item->next_maintenance)->format('d-M-Y') . '</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>';
+
+                    return $html;
+                })
+                ->addColumn('stock', function ($item) {
+                    return $item->asset_stock ? $item->asset_stock . ' Unit(s)' : 'Out of Stock';
+                })
+                ->addColumn('used', function ($item) {
+                    return $item->used_amount ? $item->used_amount . ' Unit(s)' : '0 Unit';
+                })
+                ->addColumn('condition', function ($item) {
+                    // Group asset items by condition and count them
+                    $itemConditions = $item->items->groupBy('asset_condition_id')->map(function ($group) {
+                        return [
+                            'count' => $group->count(),
+                            'condition' => $group->first()->condition->badge, // Assuming condition has a 'badge' field
+                        ];
+                    });
+
+                    // Start building the table HTML for the conditions
+                    $conditionHtml = '<table class="table table-borderless table-sm">';
+
+                    // Iterate through the grouped conditions and add each to the table
+                    foreach ($itemConditions as $condition) {
+                        $conditionHtml .= '
+                            <tr>
+                                <td><i class="ti-minus mr-2"></i>' . $condition['count'] . ' Items are ' . $condition['condition'] . '</td>
+                            </tr>';
+                    }
+
+                    // Check if maintenance is required and add it to the table
+                    $nextMaintenanceDate = strtotime($item->next_maintenance);
+                    $currentDate = strtotime(date('Y-m-d'));
+
+                    if ($nextMaintenanceDate < $currentDate) {
+                        $conditionHtml .= '
+                            <tr>
+                                <td><i class="ti-minus mr-2"></i><span class="badge out-of-stock">Maintenance Required</span></td>
+                            </tr>';
+                    }
+
+                    $conditionHtml .= '</table>';
+
+                    return $conditionHtml;
+                })
+                ->addColumn('action', function ($item) use ($roomId) {
+                    // Filter the Inventory_room records for the specific room
+                    $inventoryRoom = $item->rooms_inventory->where('room_id', $roomId)->first();
+
+                    // Generate the delete button using the filtered `inventory_room` id
+                    $deleteButton = $inventoryRoom
+                        ? '<a href="' . route('delete.item.room', $inventoryRoom->id) . '" class="btn btn-outline-danger btn-md text-danger">
+                                <i class="fa fa-trash-o"></i>
+                           </a>'
+                        : '<button class="btn btn-outline-danger btn-md text-danger" disabled>
+                                <i class="fa fa-trash-o"></i>
+                           </button>';
+
+                    // Generate the view button using the `inventory_tool` id
+                    $viewButton = '<button data-id="' . $item->id . '" class="btn btn-outline-secondary btn-md mr-2 view-tool">
+                                        <i class="fa fa-info-circle"></i>
+                                   </button>';
+
+                    // Return both buttons in a container
+                    return '
+                    <div class="text-center">
+                        ' . $viewButton . $deleteButton . '
+                    </div>';
+                })
+                ->rawColumns(['tool', 'condition', 'action']) // Indicate which columns contain HTML
+                ->make(true);
+        }
+
+        return view('operation.submenu.preview-room-inventory', [
+            'assets' => $assets,
+            'data' => $data,
+            'locations' => $locations,
+            'selectedLocation' => $selectedLocation,
+            'locations' => $locations,
+            'assetCondition' => $assetCondition,
+        ]);
     }
 
     public function preview_room_user($roomId)

@@ -101,7 +101,7 @@ font-weight-bold
                                 <td data-th="Product">
                                     <div class="row">
                                         <div class="col-md-4 d-flex justify-content-center align-items-start mt-2">
-                                            <a href="{{ route('preview-room', $item->id) }}" class="animateBox">
+                                            <a href="{{ route('preview-room-user', $item->id) }}" class="animateBox">
                                                 <img src="{{ $item->filepath ? asset($item->filepath) : asset('img/default-img.png') }}" style="height: 150px; width: 200px; border: 1px solid rgb(202, 202, 202);" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow">
                                             </a>
                                         </div>
@@ -124,7 +124,7 @@ font-weight-bold
                                                     @endforeach
                                                     @if($item->list->count() > 4)
                                                         <tr>
-                                                            <td style="width: 200px;" class="text-muted"><a href="{{ route('preview-room', $item->id) }}"><i>+ {{ $item->list->count() - 4 }} More</i></td>
+                                                            <td style="width: 200px;" class="text-muted"><a href="{{ route('preview-room-user', $item->id) }}"><i>+ {{ $item->list->count() - 4 }} More</i></td>
                                                         </tr>
                                                     @endif
                                                 </table>
@@ -217,7 +217,7 @@ font-weight-bold
                                 <div class="flex-grow-1 textarea-container mt-2" id="documents-list-container">
                                     <div class="document-item mb-3">
                                         <div class="row">
-                                            <div class="col-md-12 pr-0">
+                                            <div class="col-md-10 pr-0">
                                                 <!-- Ensure long text is truncated -->
                                                 <select class="form-control mb-2 select-tool underline-input" name="tool[]" style="width: 98%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" required>
                                                     <option disabled selected>Choose item...</option>
@@ -225,6 +225,9 @@ font-weight-bold
                                                         <option value="{{ $item->id }}">{{ $item->asset_name }}</option>
                                                     @endforeach
                                                 </select>
+                                            </div>
+                                            <div class="col-md-2 pl-0">
+                                                <input type="number" class="form-control underline-input" name="amount[]" placeholder="Amount" style="width: 100%;" min="1" required></input>
                                             </div>
                                         </div>
                                     </div>

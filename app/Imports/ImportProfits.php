@@ -14,6 +14,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Concerns\HasReferencesToOtherSheets;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
@@ -24,7 +25,7 @@ use Maatwebsite\Excel\Concerns\WithStartRow;
 use Maatwebsite\Excel\Events\AfterImport;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
-class ImportProfits implements ToCollection, SkipsEmptyRows, WithBatchInserts, WithChunkReading, ShouldQueue, WithStartRow, WithCalculatedFormulas, WithEvents
+class ImportProfits implements ToCollection, SkipsEmptyRows, WithBatchInserts, WithChunkReading, ShouldQueue, WithStartRow, WithEvents, HasReferencesToOtherSheets
 {
     protected $filePath;
     protected $userId;
@@ -42,37 +43,28 @@ class ImportProfits implements ToCollection, SkipsEmptyRows, WithBatchInserts, W
         try {
             DB::beginTransaction();
 
-            $currentDate = null;
-
             foreach ($rows as $row) {
-                if ($row[0]) {
-                    $totalUsageCost = 0;
+                $totalUsageCost = 0;
 
-                    // Step 1: Clean up and separate text and number parts
-                    $batch = $this->extractBatch($row[0]);
+                // Step 2: Find or initialize batch record
+                $findBatch = Penlat_batch::where('batch', $row[1])->first();
 
-                    // Step 2: Find or initialize batch record
-                    $findBatch = Penlat_batch::where('batch', 'like', "%$batch%")->first();
-
-                    if ($findBatch) {
-                        // Get the sum of all 'total' values for the given batch
-                        $totalUsageCost = Penlat_utility_usage::where('penlat_batch_id', $findBatch->id)
-                            ->sum('total');
-                    }
+                if ($findBatch) {
+                    // Get the sum of all 'total' values for the given batch
+                    $totalUsageCost = Penlat_utility_usage::where('penlat_batch_id', $findBatch->id)
+                        ->sum('total');
 
                     // Prepare data for the Profit table
-                    $profitData = $this->parseProfitData($row, $currentDate, $totalUsageCost);
+                    $profitData = $this->parseProfitData($row, $totalUsageCost);
 
                     Profit::updateOrCreate(
                         [
-                            'tgl_pelaksanaan' => $currentDate,
-                            'pelaksanaan' => $row[0],
+                            'tgl_pelaksanaan' => $findBatch->date,
+                            'pelaksanaan' => $row[1],
                             'jumlah_peserta' => $row[2]
                         ],
                         $profitData
                     );
-                } else {
-                    Log::warning('Skipped row due to missing or invalid date.');
                 }
             }
 
@@ -85,37 +77,23 @@ class ImportProfits implements ToCollection, SkipsEmptyRows, WithBatchInserts, W
     }
 
     /**
-     * Helper function to extract the batch text and number parts.
-     */
-    private function extractBatch($cell)
-    {
-        $cleanedCell = preg_replace('/\s+/', '', $cell);
-        preg_match_all('/([A-Za-z-\/]+)(\d+)/', $cleanedCell, $matches, PREG_SET_ORDER);
-
-        // Combine text and number to form batch if match exists
-        return $matches ? $matches[0][1] . '/' . $matches[0][2] : null;
-    }
-
-    /**
      * Helper function to parse the row and prepare data for Profit table.
      */
-    private function parseProfitData($row, $currentDate, $totalUsageCost)
+    private function parseProfitData($row, $totalUsageCost)
     {
         return [
             'biaya_instruktur' => $this->extractNumeric($row[4]),
             'total_pnbp' => $this->extractNumeric($row[5]),
             'biaya_transportasi_hari' => $this->extractNumeric($row[6]),
-            'honor_pnbp' => $this->extractNumeric($row[7]),
-            'biaya_pendaftaran_peserta' => $this->extractNumeric($row[8]),
-            'total_biaya_pendaftaran_peserta' => $this->extractNumeric($row[9]),
-            'penagihan_foto' => $this->extractNumeric($row[10]),
-            'penagihan_atk' => $this->extractNumeric($row[11]),
-            'penagihan_snack' => $this->extractNumeric($row[12]),
-            'penagihan_makan_siang' => $this->extractNumeric($row[13]),
-            'penagihan_laundry' => $this->extractNumeric($row[14]),
+            'total_biaya_pendaftaran_peserta' => $this->extractNumeric($row[3]),
+            'penagihan_foto' => $this->extractNumeric($row[7]),
+            'penagihan_atk' => $this->extractNumeric($row[8]),
+            'penagihan_snack' => $this->extractNumeric($row[9]),
+            'penagihan_makan_siang' => $this->extractNumeric($row[10]),
+            'penagihan_laundry' => $this->extractNumeric($row[11]),
             'penlat_usage' => $this->extractNumeric($totalUsageCost),
-            'jumlah_biaya' => $this->extractNumeric(str_replace(',00', '', $row[15])),
-            'profit' => $this->extractNumeric($row[16]),
+            'jumlah_biaya' => $this->extractNumeric(str_replace(',00', '', $row[12])),
+            'profit' => $this->extractNumeric($row[13]),
         ];
     }
 
@@ -139,7 +117,7 @@ class ImportProfits implements ToCollection, SkipsEmptyRows, WithBatchInserts, W
 
     public function startRow(): int
     {
-        return 1;
+        return 2;
     }
 
     /**

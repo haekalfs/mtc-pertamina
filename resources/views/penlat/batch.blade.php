@@ -20,7 +20,7 @@ font-weight-bold
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
         <a href="#" id="refreshBatchBtn" class="btn btn-sm btn-secondary shadow-sm text-white">
-            <i class="fa fa-refresh fa-sm"></i> Refresh Data
+            <i class="fa fa-refresh fa-sm"></i> Sync Data
         </a>
     </div>
 </div>

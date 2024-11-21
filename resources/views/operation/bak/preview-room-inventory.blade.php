@@ -105,17 +105,46 @@ font-weight-bold
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table id="listInventory" class="table table-bordered mt-4">
+                        <table id="listUtilities" class="table table-bordered mt-4">
                             <thead class="thead-light">
                                 <tr>
-                                    <th>Asset</th>
-                                    <th>Stock</th>
-                                    <th>Used</th>
-                                    <th>Kondisi Alat</th>
+                                    <th>Tool</th>
+                                    <th>Quantity</th>
+                                    <th>Satuan</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody></tbody>
+                            <tbody>
+                                @foreach($data->list as $tool)
+                                    <tr>
+                                        <td data-th="Product">
+                                            <div class="row">
+                                                <div class="col-md-3 text-left">
+                                                    <img src="{{ asset($tool->tools->img->filepath) }}" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow ">
+                                                </div>
+                                                <div class="col-md-8 text-left mt-sm-2">
+                                                    <h5>{{ $tool->tools->asset_name }}</h5>
+                                                    {{-- <p class="font-weight-light">Satuan Default ({{$tool->tools->utility_unit}})</p> --}}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td data-th="Quantity" style="width:10%">
+                                            <input type="number" class="form-control form-control-md text-center underline-input" name="amount_{{ $tool->id }}" value="{{ $tool->amount }}">
+                                        </td>
+                                        <td data-th="Price" style="width:10%" class="text-center">
+                                            Pcs
+                                        </td>
+                                        <td class="actions text-center">
+                                            <button class="btn btn-outline-secondary btn-sm mr-2 update-amount" data-id="{{ $tool->id }}">
+                                                <i class="fa fa-save"></i> Update
+                                            </button>
+                                            <a href="{{ route('delete.item.room', $tool->id) }}" class="btn btn-outline-danger btn-sm text-danger">
+                                                <i class="fa fa-trash-o"></i> Delete
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -147,12 +176,15 @@ font-weight-bold
                                         <div class="flex-grow-1 textarea-container" id="documents-list-container">
                                             <div class="document-item mb-2">
                                                 <div class="row">
-                                                    <div class="col-md-12">
+                                                    <div class="col-md-10">
                                                         <select class="form-control mb-2" name="tool[]" required>
                                                             @foreach ($assets as $item)
                                                                 <option value="{{ $item->id }}">{{ $item->asset_name }}</option>
                                                             @endforeach
                                                         </select>
+                                                    </div>
+                                                    <div class="col-md-2 p-0">
+                                                        <input type="number" class="form-control" name="amount[]" placeholder="Pcs" required></input>
                                                     </div>
                                                 </div>
                                             </div>
@@ -236,129 +268,6 @@ font-weight-bold
         </div>
     </div>
 </div>
-
-<div class="modal fade zoom90" id="viewToolModal" tabindex="-1" role="dialog" aria-labelledby="viewToolModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header d-flex flex-row align-items-center justify-content-between">
-                <h5 class="modal-title" id="viewToolModalLabel">Asset Information</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body mr-2 ml-2">
-                <div class="row">
-                    <div class="col-md-6 product_img">
-                        <img id="view-image-preview" src="" class="img-responsive">
-                    </div>
-                    <div class="col-md-6 product_content">
-                        <p><strong>Asset ID:</strong> <span id="view_asset_number"></span></p>
-                        <p><strong>Asset Name:</strong> <span id="view_asset_name"></span></p>
-                        <p><strong>Maker:</strong> <span id="view_maker"></span></p>
-                        <p><strong>Location:</strong> <span id="view_location"></span></p>
-                        <p><strong>Stock:</strong> <span id="view_stock"></span></p>
-                        <p><strong>Used:</strong> <span id="view_used_amount"></span></p>
-                        <p><strong>Last Maintenance:</strong> <span id="view_last_maintenance"></span></p>
-                        <p><strong>Next Maintenance:</strong> <span id="view_next_maintenance"></span></p>
-                        <p><strong>Guide:</strong> <span id="view_maintenance_guide"></span></p>
-                        <div class="space-ten"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<script type="text/javascript">
-    $(document).ready(function () {
-        var table = $('#listInventory').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: {
-                url: "{{ route('preview-room', $data->id) }}",
-                data: function (d) {
-                    d.locationFilter = $('#locationFilter').val(); // Pass location filter
-                    d.conditionFilter = $('#conditionFilter').val(); // Pass location filter
-                }
-            },
-            columns: [
-                { data: 'tool', name: 'tool', orderable: true, searchable: true },
-                { data: 'stock', name: 'stock', orderable: true, searchable: true },
-                { data: 'used', name: 'used', orderable: true, searchable: true },
-                { data: 'condition', name: 'condition', orderable: false, searchable: true },
-                { data: 'action', name: 'action', orderable: false, searchable: false }
-            ],
-            order: [[0, 'desc']] // Default ordering
-        });
-
-        $('#filterForm').on('submit', function (e) {
-            e.preventDefault();
-            table.draw(); // Redraw the table when the filter is applied
-        });
-
-
-        $('#editToolForm').on('submit', function(e) {
-            e.preventDefault();
-
-            var toolId = $('#tool_id').val();
-            var formData = new FormData(this);
-
-            var routeUrl = "{{ route('update.asset.partially', ':id') }}";
-            routeUrl = routeUrl.replace(':id', toolId);
-
-            $.ajax({
-                url: routeUrl,
-                method: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    // Show success alert dynamically
-                    alert(response.message);
-                    $('#editToolModal').modal('hide');
-                    table.draw();
-                },
-                error: function(xhr) {
-                    // Show error message dynamically
-                    var errorMessage = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Failed to update the tool. Please check the input and try again.';
-                    alert(errorMessage);
-                }
-            });
-        });
-    });
-</script>
-<script>
-$(document).on('click', '.view-tool', function(e) {
-    e.preventDefault();
-    var toolId = $(this).data('id');
-
-    $.ajax({
-        url: '/inventory-tools-view-info/' + toolId,
-        method: 'GET',
-        success: function(response) {
-            // Populate the modal fields with the asset data
-            $('#view_asset_name').text(response.asset_name);
-            $('#view_asset_number').text(response.asset_id);
-            $('#view_maker').text(response.asset_maker);
-            $('#view_location').text(response.location);
-            $('#view_stock').text(response.asset_stock + ' Items out of ' + response.initial_stock);
-            $('#view_used_amount').text(response.used_amount ? response.used_amount + ' Items' : '0 Items');
-            $('#view_last_maintenance').text(response.last_maintenance);
-            $('#view_next_maintenance').text(response.next_maintenance);
-            $('#view-image-preview').attr('src', response.tool_image ? response.tool_image : 'https://via.placeholder.com/150x150');
-
-            // Handle guide download link
-            if(response.asset_guidance) {
-                $('#view_maintenance_guide').html(`<a href="${response.asset_guidance}" target="_blank"><i class="fa fa-download"></i><u> Download Guide</u></a>`);
-            } else {
-                $('#view_maintenance_guide').text('No guide available');
-            }
-
-            // Show the modal
-            $('#viewToolModal').modal('show');
-        }
-    });
-});
-</script>
 <script>
     $(document).ready(function () {
         // Handle click event for the "Add More" button
