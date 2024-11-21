@@ -289,6 +289,24 @@ font-weight-bold
         </div>
     </div>
 </div>
+<style>
+.note-editor.fullscreen {
+    z-index: 1055 !important; /* Ensure it's above the modal (Bootstrap modal z-index is 1050) */
+    background-color: #fff; /* Prevent transparency */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Fix for modal backdrop */
+.modal-backdrop {
+    z-index: 1049; /* Ensure backdrop stays below Summernote */
+}
+</style>
 <script>
 $('#summernote').summernote({
     placeholder: 'Hasil Kegiatan...',
