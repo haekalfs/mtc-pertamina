@@ -8,6 +8,7 @@ use App\Imports\ImportFeedback as ImportsImportFeedback;
 use App\Imports\ImportProfits;
 use App\Imports\InfografisImport;
 use App\Imports\PenlatImport;
+use App\Imports\ProfitSelectSheet;
 use App\Imports\VendorPaymentImport;
 use App\Jobs\ConvertXlsxToCsv;
 use App\Jobs\ImportFeedback;

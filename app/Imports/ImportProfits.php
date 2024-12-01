@@ -25,7 +25,7 @@ use Maatwebsite\Excel\Concerns\WithStartRow;
 use Maatwebsite\Excel\Events\AfterImport;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
-class ImportProfits implements ToCollection, SkipsEmptyRows, WithBatchInserts, WithChunkReading, ShouldQueue, WithStartRow, WithEvents, HasReferencesToOtherSheets
+class ImportProfits implements ToCollection, WithCalculatedFormulas, SkipsEmptyRows, WithBatchInserts, WithChunkReading, ShouldQueue, WithStartRow, WithEvents, HasReferencesToOtherSheets
 {
     protected $filePath;
     protected $userId;
@@ -46,26 +46,17 @@ class ImportProfits implements ToCollection, SkipsEmptyRows, WithBatchInserts, W
             foreach ($rows as $row) {
                 $totalUsageCost = 0;
 
-                // Step 2: Find or initialize batch record
-                $findBatch = Penlat_batch::where('batch', $row[1])->first();
 
-                if ($findBatch) {
-                    // Get the sum of all 'total' values for the given batch
-                    $totalUsageCost = Penlat_utility_usage::where('penlat_batch_id', $findBatch->id)
-                        ->sum('total');
+                // Prepare data for the Profit table
+                $profitData = $this->parseProfitData($row, $totalUsageCost);
 
-                    // Prepare data for the Profit table
-                    $profitData = $this->parseProfitData($row, $totalUsageCost);
-
-                    Profit::updateOrCreate(
-                        [
-                            'tgl_pelaksanaan' => $findBatch->date,
-                            'pelaksanaan' => $row[1],
-                            'jumlah_peserta' => $row[2]
-                        ],
-                        $profitData
-                    );
-                }
+                Profit::updateOrCreate(
+                    [
+                        'pelaksanaan' => $row[1],
+                        'jumlah_peserta' => $row[2]
+                    ],
+                    $profitData
+                );
             }
 
             DB::commit();
@@ -102,7 +93,7 @@ class ImportProfits implements ToCollection, SkipsEmptyRows, WithBatchInserts, W
      */
     private function extractNumeric($value)
     {
-        return (int) preg_replace('/[^0-9]/', '', $value);
+        return preg_replace('/[^0-9]/', '', $value);
     }
 
     public function batchSize(): int
@@ -117,7 +108,7 @@ class ImportProfits implements ToCollection, SkipsEmptyRows, WithBatchInserts, W
 
     public function startRow(): int
     {
-        return 2;
+        return 4;
     }
 
     /**

@@ -328,6 +328,7 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
 
                 Route::get('/finances/profits-loss', [FinanceController::class, 'profits'])->name('profits');
                 Route::get('/finances/costs/{penlatId}/{month}/{year}', [FinanceController::class, 'costs'])->name('cost');
+                Route::get('/finances/profit-loss', [FinanceController::class, 'profit_loss'])->name('profit-loss');
                 Route::get('/finances/import-profits-loss-page', [FinanceController::class, 'profits_import'])->name('costs.import');
                 Route::post('/import-profits-loss', [ImportController::class, 'import_profits'])->name('profits.import');
                 Route::get('/finances/costs/preview-item/{id}', [FinanceController::class, 'preview_costs'])->name('preview-costs');

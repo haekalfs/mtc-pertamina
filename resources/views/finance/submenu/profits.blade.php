@@ -83,9 +83,9 @@ font-weight-bold
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-md-3">
                                     <div class="form-group">
-                                        <label for="jenisPenlat">Jenis Penlat :</label>
+                                        <label for="jenisPenlat">Jenis Pelatihan :</label>
                                         <select class="form-control" id="jenisPenlat" name="jenisPenlat">
                                             <option value="-1" selected>Show All</option>
                                             @foreach($penlatList->unique('jenis_pelatihan') as $penlat)
@@ -94,18 +94,7 @@ font-weight-bold
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <label for="stcw">STCW/Non :</label>
-                                        <select name="stcw" class="form-control" id="stcw">
-                                            <option value="-1">Show All</option>
-                                            @foreach($penlatList->unique('kategori_pelatihan') as $penlat)
-                                                <option value="{{ $penlat->kategori_pelatihan }}">{{ $penlat->kategori_pelatihan }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label for="status">Month :</label>
                                         <select class="form-control" id="month" name="month" required>
@@ -130,11 +119,14 @@ font-weight-bold
                             </div>
                         </div>
                     </div>
-                    <table id="penlatTables" class="table table-bordered">
+                    <table id="profitsTable" class="table table-bordered">
                         <thead class="thead-light">
                             <tr>
-                                <th>Display</th>
+                                <th>Tanggal Pelaksanaan</th>
                                 <th>Nama Pelatihan</th>
+                                <th>Batch</th>
+                                <th>Jumlah Peserta</th>
+                                <th>Jumlah Peserta (Master Data)</th>
                                 <th>Revenue &nbsp;<i class="fa fa-plus text-success"></i></th>
                                 <th>Cost &nbsp;<i class="fa fa-minus text-danger"></i></th>
                                 <th>Profit</th>
@@ -145,7 +137,7 @@ font-weight-bold
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
+        {{-- <div class="col-md-6">
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold" id="judul">Summary <span id="tahunSummary"></span></h6>
@@ -244,6 +236,77 @@ font-weight-bold
                     </div>
                 </div>
             </div>
+        </div> --}}
+    </div>
+</div>
+
+<div class="modal fade" id="createBatchModal" tabindex="-1" role="dialog" aria-labelledby="createBatchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 900px;" role="document">
+        <div class="modal-content">
+            <div class="modal-header d-flex flex-row align-items-center justify-content-between">
+                <h5 class="modal-title" id="createBatchModalLabel">Register Batch</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" enctype="multipart/form-data" action="{{ route('batch.store') }}">
+                @csrf
+                <div class="modal-body mr-2 ml-2">
+                    <div class="row no-gutters mb-3">
+                        <div class="col-md-3 d-flex align-items-top justify-content-center text-center">
+                            <label for="file-upload" style="cursor: pointer;">
+                                <img id="image-preview" src="{{ asset('img/default-img.png') }}"
+                                     style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
+                                     <small style="font-size: 10px;"><i><u>Click above to upload image!</u></i></small>
+                            </label>
+                            <input id="file-upload" type="file" name="image" style="display: none;" accept="image/*" onchange="previewImage(event)">
+                        </div>
+                        <div class="col-md-9">
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Nama Pelatihan :</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <select id="penlatSelect" class="form-control select2" name="penlat">
+                                        <option selected disabled>Select Pelatihan...</option>
+                                        @foreach ($penlatList as $item)
+                                        <option value="{{ $item->id }}">{{ $item->description }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Nama Program :</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="text" id="programInput" class="form-control" name="program">
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Batch :</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="text" class="form-control" id="batch" name="batch">
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Tgl Pelaksanaan :</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="date" class="form-control" name="date">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Submit Request</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -317,33 +380,66 @@ function formatCurrency(value) {
 </script>
 
 <script>
-$(document).ready(function() {
-    var table = $('#penlatTables').DataTable({
-        processing: true,
-        serverSide: true,
-        ajax: {
-            url: "{{ route('profits') }}",
-            data: function (d) {
-                d.namaPenlat = $('#namaPenlat').val();
-                d.jenisPenlat = $('#jenisPenlat').val();
-                d.stcw = $('#stcw').val();
-                d.periode = $('#periode').val();
-                d.month = $('#month').val();
-            }
-        },
-        columns: [
-            { data: 'display', name: 'display', orderable: false, searchable: false },
-            { data: 'description', name: 'description' },
-            { data: 'revenue', name: 'revenue' },  // Updated column
-            { data: 'cost', name: 'cost' },  // Updated column
-            { data: 'nett_income', name: 'nett_income' }  // Updated column
-        ]
+    $('#createBatchModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget); // Button that triggered the modal
+        var batch = button.data('batch'); // Extract batch info from data-* attributes
+        var id = button.data('id'); // Extract id info
+        var tgl = button.data('tgl'); // Extract tgl_pelaksanaan info
+
+        var modal = $(this);
+        modal.find('.modal-body #batch').val(batch);
+        modal.find('.modal-body #item-id').val(id);
+        modal.find('.modal-body input[name="date"]').val(tgl); // Pre-fill the date field
     });
-    // Redraw the table based on filter changes
-    $('#namaPenlat, #jenisPenlat, #stcw, #periode, #month').change(function() {
-        table.draw();
+    $(document).ready(function() {
+        var table = $('#profitsTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "{{ route('profits') }}",
+                data: function(d) {
+                    d.namaPenlat = $('#namaPenlat').val();
+                    d.jenisPenlat = $('#jenisPenlat').val();
+                    d.month = $('#month').val();
+                    d.periode = $('#periode').val();
+                }
+            },
+            lengthMenu: [
+                [10, 25, 50, 100, -1], // Values for page length
+                [10, 25, 50, 100, "All"] // Labels displayed in the dropdown
+            ],
+            pageLength: 10, // Default page length
+            columns: [
+                { data: 'tgl_pelaksanaan', name: 'tgl_pelaksanaan' },
+                { data: 'description', name: 'batch.penlat.description', orderable: false, searchable: false },
+                { data: 'pelaksanaan', name: 'pelaksanaan' },
+                { data: 'jumlah_peserta', name: 'jumlah_peserta' },
+                { data: 'jumlah_actual_peserta', name: 'jumlah_actual_peserta' },
+                { data: 'revenue', name: 'revenue' },
+                { data: 'cost', name: 'cost' },
+                { data: 'nett_income', name: 'nett_income' }
+            ]
+        });
+
+        $('#namaPenlat, #jenisPenlat, #periode, #month').change(function() {
+            table.draw();
+        });
+
+        // Initialize Select2
+        $('#penlatSelect').select2({
+            dropdownParent: $('#createBatchModal'),
+            theme: "classic",
+            placeholder: "Select Pelatihan...",
+            width: '100%',
+            tags: true,
+        });
+
+        // Event listener for change event
+        $('#penlatSelect').on('change', function() {
+            var selectedOption = $(this).find('option:selected').text();
+            $('#programInput').val(selectedOption);
+        });
     });
-});
 </script>
 <script>
     function previewImage(event) {

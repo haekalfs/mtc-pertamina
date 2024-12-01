@@ -108,7 +108,7 @@ font-weight-bold
                                 <th>Aliases</th>
                                 <th>Jenis Pelatihan</th>
                                 <th>Kategori</th>
-                                <th width="100px">Action</th>
+                                <th width="115px">Action</th>
                             </tr>
                         </thead>
                         <tbody></tbody>

@@ -120,6 +120,22 @@ active font-weight-bold
                 <div class="col-md-12">
                     <div class="card">
                         <div class="row align-items-center p-4">
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <label for="daterange">Date Range :</label>
+                                    <input type="text" class="form-control underline-input" name="daterange" id="daterange" autocomplete="off" required/>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="day">STCW/Non :</label>
+                                    <select class="form-control" id="day" name="day">
+                                        <option value="-1" selected>Show All</option>
+                                        <option value="1">STCW</option>
+                                        <option value="0">Non STCW</option>
+                                    </select>
+                                </div>
+                            </div>
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="day">Day :</label>
@@ -182,47 +198,10 @@ active font-weight-bold
                     </div>
                 </div>
                 <div class="col-md-12">
-                    <div class="card2 shadow">
-                        <div class="card-header2 d-flex align-items-center">
-                            <h4 class="mb-0">Increase Amount</h4>
-                        </div>
-                        <div class="card-block2 bg-white">
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <div class="card-body d-flex justify-content-center align-items-center">
-                                        <div class="row mt-2">
-                                            <div class="col-lg-6">
-                                                <div class="d-flex justify-content-center align-items-center">
-                                                    <div id='myDiv'><!-- Plotly chart will be drawn inside this DIV --></div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <div class="d-flex justify-content-center align-items-center">
-                                                    <div id='myDiv2'><!-- Plotly chart will be drawn inside this DIV --></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> <!-- /.row -->
-                        </div>
-                    </div>
+
                 </div>
                 <div class="col-md-12">
-                    <div class="card2 shadow">
-                        <div class="card-header2 d-flex align-items-center">
-                            <h4 class="mb-0">Training Session by Location</h4>
-                        </div>
-                        <div class="card-block2 bg-white">
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <div class="card-body d-flex justify-content-center align-items-center">
-                                        <div id="chartContainer" style="height: 200px; width: 100%;"></div>
-                                    </div>
-                                </div>
-                            </div> <!-- /.row -->
-                        </div>
-                    </div>
+
                 </div>
             </div>
         </div>
@@ -377,6 +356,51 @@ active font-weight-bold
                             </div>
                         </div>
                     </div> <!-- /.row -->
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card2 shadow">
+                        <div class="card-header2 d-flex align-items-center">
+                            <h4 class="mb-0">Increase Amount</h4>
+                        </div>
+                        <div class="card-block2 bg-white">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="card-body d-flex justify-content-center align-items-center">
+                                        <div class="row mt-2">
+                                            <div class="col-lg-6">
+                                                <div class="d-flex justify-content-center align-items-center">
+                                                    <div id='myDiv'><!-- Plotly chart will be drawn inside this DIV --></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="d-flex justify-content-center align-items-center">
+                                                    <div id='myDiv2'><!-- Plotly chart will be drawn inside this DIV --></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> <!-- /.row -->
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card2 shadow">
+                        <div class="card-header2 d-flex align-items-center">
+                            <h4 class="mb-0">Training Session by Location</h4>
+                        </div>
+                        <div class="card-block2 bg-white">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="card-body d-flex justify-content-center align-items-center">
+                                        <div id="chartContainer" style="height: 200px; width: 100%;"></div>
+                                    </div>
+                                </div>
+                            </div> <!-- /.row -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -589,5 +613,25 @@ document.addEventListener("DOMContentLoaded", () => {
     loadTrendData(selectedYear);
 });
 document.getElementById("year").addEventListener("change", loadTrendData);
+</script>
+<script>
+
+$(function() {
+    $('input[name="daterange"]').daterangepicker({
+        // Setup options as needed
+        autoUpdateInput: false,
+        locale: {
+            cancelLabel: 'Clear'
+        }
+    });
+
+    $('input[name="daterange"]').on('apply.daterangepicker', function(ev, picker) {
+        $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+    });
+
+    $('input[name="daterange"]').on('cancel.daterangepicker', function(ev, picker) {
+        $(this).val('');
+    });
+});
 </script>
 @endsection

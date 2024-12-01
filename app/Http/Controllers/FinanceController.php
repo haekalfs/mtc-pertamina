@@ -287,125 +287,69 @@ class FinanceController extends Controller
     public function profits(Request $request)
     {
         if ($request->ajax()) {
-            $query = Penlat::query();
+            $query = Profit::with(['batch.penlat']);
 
             // Apply filters based on the selected values from the dropdowns
             if ($request->namaPenlat && $request->namaPenlat != '-1') {
-                $query->where('id', $request->namaPenlat);
+                $query->whereHas('batch.penlat', function ($subQuery) use ($request) {
+                    $subQuery->where('id', $request->namaPenlat);
+                });
             }
 
             if ($request->jenisPenlat && $request->jenisPenlat != '-1') {
-                $query->where('jenis_pelatihan', $request->jenisPenlat);
+                $query->whereHas('batch.penlat', function ($subQuery) use ($request) {
+                    $subQuery->where('jenis_pelatihan', $request->jenisPenlat);
+                });
             }
 
             if ($request->stcw && $request->stcw != '-1') {
-                $query->where('kategori_pelatihan', $request->stcw);
+                $query->whereHas('batch.penlat', function ($subQuery) use ($request) {
+                    $subQuery->where('kategori_pelatihan', $request->stcw);
+                });
             }
 
             if ($request->month && $request->month != '-1') {
-                $query->whereHas('batch.profits', function ($query) use ($request) {
-                    $query->whereMonth('tgl_pelaksanaan', $request->month);
+                $query->whereHas('batch', function ($subQuery) use ($request) {
+                    $subQuery->whereMonth('date', $request->month);
                 });
             }
 
-            // Apply the periode filter to the 'batch.tgl_pelaksanaan' field
             if ($request->periode && $request->periode != '-1') {
-                $query->whereHas('batch', function ($query) use ($request) {
-                    $query->whereYear('date', $request->periode);
+                $query->whereHas('batch', function ($subQuery) use ($request) {
+                    $subQuery->whereYear('date', $request->periode);
                 });
             }
 
-            // Filter to include only Penlat that has related profits
-            $query->whereHas('batch.profits');
-
-            // Fetch data with filtered batches
-            $data = $query->with(['batch' => function($query) use ($request) {
-                $query->with(['profits' => function($query) use ($request) {
-                    // Apply filters to the profits relationship based on tgl_pelaksanaan
-                    if ($request->month && $request->month != '-1') {
-                        $query->whereMonth('tgl_pelaksanaan', $request->month);
-                    }
-                    if ($request->periode && $request->periode != '-1') {
-                        $query->whereYear('tgl_pelaksanaan', $request->periode);
-                    }
-                }]);
-            }])->get();
+            $data = $query->get();
 
             return DataTables::of($data)
+                ->addColumn('tgl_pelaksanaan', function($item) {
+                    return $item->batch->date ? Carbon::parse($item->batch->date)->format('d-M-Y') : '-';
+                })
                 ->addColumn('description', function($item) {
-                    // Return the description with alias below it
-                    return '<span>' . $item->description . '</span><br><span class="text-muted">' . $item->kategori_pelatihan . '</span>';
+                    return $item->batch->penlat->description ?:
+                        '<a href="" data-toggle="modal" data-target="#createBatchModal" data-id="' . $item->id .
+                        '" data-batch="' . $item->pelaksanaan . '" data-tgl="' . $item->tgl_pelaksanaan .
+                        '" class="text-danger">Batch Not Found or Not Registered!</a>';
                 })
-                ->addColumn('display', function($item) use ($request) {
-                    $filePath = $item->filepath;
-                    $imageUrl = $filePath ? asset($item->filepath) : asset('img/default-img.png');
-                    return '<a href="'.route('cost', ['penlatId' => $item->id, 'month' => $request->month, 'year' => $request->periode]).'"><img src="' . $imageUrl . '" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow animateBox"></a>';
+                ->addColumn('jumlah_actual_peserta', function($item) {
+                    return $item->batch->infografis_peserta->count();
                 })
-                ->addColumn('cost', function($item) {
-                    $totalCost = $item->batch->sum(function($batch) {
-                        // Function to safely sum a field, ensuring it's an integer and not null
-                        $safeSum = function ($field) use ($batch) {
-                            return (int) $batch->profits->sum(function ($profit) use ($field) {
-                                // Check if the value is numeric and not an empty string
-                                return is_numeric($profit->$field) && $profit->$field !== '' ? $profit->$field : 0;
-                            });
-                        };
-
-                        // Summing up the relevant income fields safely
-                        $totalCost = $safeSum('biaya_instruktur') +
-                                    $safeSum('total_pnbp') +
-                                    $safeSum('biaya_transportasi_hari') +
-                                    $safeSum('penagihan_foto') +
-                                    $safeSum('penagihan_atk') +
-                                    $safeSum('penagihan_snack') +
-                                    $safeSum('penagihan_makan_siang') +
-                                    $safeSum('penlat_usage') +
-                                    $safeSum('penagihan_laundry');
-
-                        return $totalCost;
-                    });
-                    return 'Rp ' . number_format($totalCost, 0, ',', '.');
+                ->addColumn('pelaksanaan', function($item) {
+                    return $item->pelaksanaan ?
+                        '<div class="animateBox"><a class="text-primary" href="' . route('preview-costs', $item->batch->id) . '"><u>' . $item->pelaksanaan . '</u></a></div>' : '-';
                 })
                 ->addColumn('revenue', function($item) {
-                    // Sum the 'profit' column from all related Profit models
-                    $totalRevenue = $item->batch->sum(function($batch) {
-                        return $batch->profits->sum('total_biaya_pendaftaran_peserta');
-                    });
-                    return 'Rp ' . number_format($totalRevenue, 0, ',', '.');
+                    return $item->total_biaya_pendaftaran_peserta ? 'Rp ' . number_format($item->total_biaya_pendaftaran_peserta, 0, ',', '.') : '-';
+                })
+                ->addColumn('cost', function($item) {
+                    return 'Rp ' . number_format($this->calculateTotalCost($item), 0, ',', '.');
                 })
                 ->addColumn('nett_income', function($item) {
-                    $totalNettIncome = $item->batch->sum(function($batch) {
-                        // Function to safely sum a field, ensuring it's an integer and not null
-                        $safeSum = function ($field) use ($batch) {
-                            return (int) $batch->profits->sum(function ($profit) use ($field) {
-                                // Check if the value is numeric and not an empty string
-                                return is_numeric($profit->$field) && $profit->$field !== '' ? $profit->$field : 0;
-                            });
-                        };
-
-                        // Summing up the relevant income fields safely
-                        $totalIncome = $safeSum('biaya_instruktur') +
-                                    $safeSum('total_pnbp') +
-                                    $safeSum('biaya_transportasi_hari') +
-                                    $safeSum('penagihan_foto') +
-                                    $safeSum('penagihan_atk') +
-                                    $safeSum('penagihan_snack') +
-                                    $safeSum('penagihan_makan_siang') +
-                                    $safeSum('penlat_usage') +
-                                    $safeSum('penlat_usage') +
-                                    $safeSum('penagihan_laundry');
-
-                        // Summing up the cost-related field safely
-                        $totalCost = $safeSum('total_biaya_pendaftaran_peserta');
-
-                        // Calculate net income
-                        $nettIncome = $totalIncome - $totalCost;
-
-                        return str_replace('-', '', $nettIncome);
-                    });
-                    return 'Rp ' . number_format($totalNettIncome, 0, ',', '.');
+                    $nettIncome = (int) $item->total_biaya_pendaftaran_peserta - $this->calculateTotalCost($item);
+                    return 'Rp ' . number_format($nettIncome, 0, ',', '.');
                 })
-                ->rawColumns(['display', 'description'])
+                ->rawColumns(['description', 'pelaksanaan'])
                 ->make(true);
         }
 
