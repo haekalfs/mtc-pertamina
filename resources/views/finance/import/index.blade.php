@@ -88,7 +88,7 @@ font-weight-bold
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <span class="text-danger font-weight-bold">Data Import Guidelines</span>
                     <div class="text-right">
-                        <a class="btn btn-primary btn-sm text-white" download href="{{ asset('uploads/template/template_profit.xlsx') }}"><i class="menu-Logo fa fa-download"></i> Download Example</a>
+                        <a class="btn btn-primary btn-sm text-white" download href="{{ asset('uploads/template/template_profits_rev.xlsx') }}"><i class="menu-Logo fa fa-download"></i> Download Example</a>
                     </div>
                 </div>
                 <div class="card-body" style="background-color: rgb(247, 247, 247);">
@@ -101,7 +101,7 @@ font-weight-bold
                         <li>Unauthorized changes to import files or procedures are strictly prohibited.</li>
                         <li class="text-danger">Double-check the mapping of data fields to ensure they align with the database schema, the layout of the data should look like below image.</li>
                     </ul>
-                    <img src="{{ asset('uploads/example3.jpeg') }}" class="img-fluid" style="padding: 1rem;">
+                    <img src="{{ asset('uploads/example3.1.png') }}" class="img-fluid" style="padding: 1rem;">
                 </div>
             </div>
         </div>

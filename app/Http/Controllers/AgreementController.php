@@ -14,13 +14,13 @@ class AgreementController extends Controller
     {
         // Validate the input
         $request->validate([
-            'company_name' => 'required|string|max:255',
+            'company_name' => 'required|string',
             'company_details' => 'required|string|max:65535', // Max size for 'longtext' field in MySQL
-            'status' => 'nullable|string|max:255',
-            'agreement_date' => 'required|date',
-            'spk_file' => 'sometimes|file|max:10240', // Max file size is 10MB (10240 KB)
-            'non_spk_details' => 'sometimes|string|max:65535', // Prevent dangerous tags
-            'img' => 'sometimes|file|mimes:png,jpg,jpeg|max:10240', // Image validation for png, jpg, jpeg, max 10MB
+            'status' => 'nullable',
+            'agreement_date' => 'required',
+            'spk_file' => 'sometimes|file|max:100240', // Max file size is 10MB (10240 KB)
+            'non_spk_details' => 'sometimes|string', // Prevent dangerous tags
+            'img' => 'sometimes|file|mimes:png,jpg,jpeg|max:100240', // Image validation for png, jpg, jpeg, max 10MB
         ]);
 
         // Create new agreement

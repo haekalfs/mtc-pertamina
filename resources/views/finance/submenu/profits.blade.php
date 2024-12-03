@@ -137,7 +137,7 @@ font-weight-bold
                 </div>
             </div>
         </div>
-        {{-- <div class="col-md-6">
+        <div class="col-md-6">
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold" id="judul">Summary <span id="tahunSummary"></span></h6>
@@ -236,7 +236,7 @@ font-weight-bold
                     </div>
                 </div>
             </div>
-        </div> --}}
+        </div>
     </div>
 </div>
 
