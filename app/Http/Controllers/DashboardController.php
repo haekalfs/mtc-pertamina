@@ -13,7 +13,6 @@ use App\Models\Penlat_batch;
 use App\Models\Profit;
 use App\Models\Regulation;
 use Carbon\Carbon;
-use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -99,271 +98,6 @@ class DashboardController extends Controller
         ]);
     }
 
-    public function getDashboardChartData(Request $request)
-    {
-        $day = $request->input('day');
-        $month = $request->input('month');
-        $year = $request->input('year');
-        $category = $request->input('category');
-        $type = $request->input('type');
-
-        // 1. Location Chart Data
-        $locationDataQuery = Infografis_peserta::select('tempat_pelaksanaan', DB::raw('count(*) as total'))
-            ->whereYear('tgl_pelaksanaan', $year)
-            ->groupBy('tempat_pelaksanaan');
-
-        if ($day && $day != '-1') {
-            $locationDataQuery->whereDay('tgl_pelaksanaan', $day);
-        }
-        if ($month && $month != '-1') {
-            $locationDataQuery->whereMonth('tgl_pelaksanaan', $month);
-        }
-        if ($year && $year != '-1') {
-            $locationDataQuery->whereYear('tgl_pelaksanaan', $year);
-        }
-        if ($category && $category != '-1') {
-            $locationDataQuery->where('kategori_program', $category);
-        }
-        if ($type && $type != '-1') {
-            $locationDataQuery->where('jenis_pelatihan', $type);
-        }
-
-        $locationData = $locationDataQuery->get();
-
-        // Gauge Chart Data for STCW and NON STCW
-        $latestMonthRecordQuery = Infografis_peserta::query();
-
-        if ($year && $year != '-1') {
-            $latestMonthRecordQuery->whereYear('tgl_pelaksanaan', $year);
-        }
-        $latestMonthRecord = $latestMonthRecordQuery->orderBy('tgl_pelaksanaan', 'desc')->first();
-
-        $countSTCWGauge = 0;
-        $countNonSTCWGauge = 0;
-        $stcwDelta = 0;
-        $nonStcwDelta = 0;
-
-        if ($latestMonthRecord) {
-            $latestMonth = Carbon::parse($latestMonthRecord->tgl_pelaksanaan)->month ?? null;
-
-            // Count for STCW in the latest month
-            $countSTCWGaugeQuery = Infografis_peserta::query();
-            if ($year && $year != '-1') {
-                $countSTCWGaugeQuery->whereYear('tgl_pelaksanaan', $year);
-            }
-            if ($latestMonth) {
-                $countSTCWGaugeQuery->whereMonth('tgl_pelaksanaan', $latestMonth);
-            }
-            if ($category && $category != '-1') {
-                $countSTCWGaugeQuery->where('kategori_program', $category);
-            }
-            $countSTCWGauge = $countSTCWGaugeQuery->where('kategori_program', 'STCW')->count() ?? 0;
-
-            // Count for NON STCW in the latest month
-            $countNonSTCWGaugeQuery = Infografis_peserta::query();
-            if ($year && $year != '-1') {
-                $countNonSTCWGaugeQuery->whereYear('tgl_pelaksanaan', $year);
-            }
-            if ($latestMonth) {
-                $countNonSTCWGaugeQuery->whereMonth('tgl_pelaksanaan', $latestMonth);
-            }
-            if ($category && $category != '-1') {
-                $countNonSTCWGaugeQuery->where('kategori_program', $category);
-            }
-            $countNonSTCWGauge = $countNonSTCWGaugeQuery->where('kategori_program', 'NON STCW')->count() ?? 0;
-
-            // Calculate previous month (for delta)
-            $previousMonth = ($latestMonth == 1) ? 12 : $latestMonth - 1;
-
-            // STCW Delta in previous month
-            $stcwDeltaQuery = Infografis_peserta::query();
-            if ($year && $year != '-1') {
-                $stcwDeltaQuery->whereYear('tgl_pelaksanaan', $year);
-            }
-            if ($previousMonth) {
-                $stcwDeltaQuery->whereMonth('tgl_pelaksanaan', $previousMonth);
-            }
-            if ($category && $category != '-1') {
-                $stcwDeltaQuery->where('kategori_program', $category);
-            }
-            $stcwDelta = $stcwDeltaQuery->where('kategori_program', 'STCW')->count() ?? 0;
-
-            // NON STCW Delta in previous month
-            $nonStcwDeltaQuery = Infografis_peserta::query();
-            if ($year && $year != '-1') {
-                $nonStcwDeltaQuery->whereYear('tgl_pelaksanaan', $year);
-            }
-            if ($previousMonth) {
-                $nonStcwDeltaQuery->whereMonth('tgl_pelaksanaan', $previousMonth);
-            }
-            if ($category && $category != '-1') {
-                $nonStcwDeltaQuery->where('kategori_program', $category);
-            }
-            $nonStcwDelta = $nonStcwDeltaQuery->where('kategori_program', 'NON STCW')->count() ?? 0;
-        }
-
-        // 3. Trend Revenue Chart Data
-        $trendRevenueQuery = Profit::select(
-                'penlat.description', // Get the description from Penlat
-                DB::raw('SUM(CAST(profits.total_biaya_pendaftaran_peserta AS UNSIGNED)) as total_biaya')
-            )
-            ->join('penlat_batch', 'profits.pelaksanaan', '=', 'penlat_batch.batch') // Join with penlat_batch
-            ->join('penlat', 'penlat_batch.penlat_id', '=', 'penlat.id') // Join with penlat
-            ->groupBy('penlat_batch.penlat_id', 'penlat.description') // Group by penlat ID and description
-            ->orderByDesc('total_biaya'); // Order by total_biaya
-
-        // Apply filters based on request inputs
-        if ($year && $year != '-1') {
-            $trendRevenueQuery->whereYear('profits.tgl_pelaksanaan', $year);
-        }
-        if ($month && $month != '-1') {
-            $trendRevenueQuery->whereMonth('profits.tgl_pelaksanaan', $month);
-        }
-        if ($day && $day != '-1') {
-            $trendRevenueQuery->whereDay('profits.tgl_pelaksanaan', $day);
-        }
-        // Execute the query and get results
-        $trendRevenueData = $trendRevenueQuery->get();
-
-        // 1. Count of Peserta
-        $getPesertaCountQuery = Infografis_peserta::query();
-
-        if ($year && $year != '-1') {
-            $getPesertaCountQuery->whereYear('tgl_pelaksanaan', $year);
-        }
-        if ($month && $month != '-1') {
-            $getPesertaCountQuery->whereMonth('tgl_pelaksanaan', $month);
-        }
-        if ($day && $day != '-1') {
-            $getPesertaCountQuery->whereDay('tgl_pelaksanaan', $day);
-        }
-        if ($category && $category != '-1') {
-            $getPesertaCountQuery->where('kategori_program', $category);
-        }
-        if ($type && $type != '-1') {
-            $getPesertaCountQuery->where('jenis_pelatihan', $type);
-        }
-        $getPesertaCount = $getPesertaCountQuery->count();
-
-        // 2. Sum of Profits
-        $rawProfitsQuery = Profit::query();
-
-        if ($year && $year != '-1') {
-            $rawProfitsQuery->whereYear('tgl_pelaksanaan', $year);
-        }
-        if ($month && $month != '-1') {
-            $rawProfitsQuery->whereMonth('tgl_pelaksanaan', $month);
-        }
-        if ($day && $day != '-1') {
-            $rawProfitsQuery->whereDay('tgl_pelaksanaan', $day);
-        }
-        $rawProfits = $rawProfitsQuery->sum('total_biaya_pendaftaran_peserta');
-        $rawCosts = $rawProfitsQuery->get()->sum(function ($item) {
-            return (int) $item->biaya_instruktur +
-                   (int) $item->total_pnbp +
-                   (int) $item->penagihan_foto +
-                   (int) $item->biaya_transportasi_hari +
-                   (int) $item->penagihan_atk +
-                   (int) $item->penagihan_snack +
-                   (int) $item->penagihan_makan_siang +
-                   (int) $item->penlat_usage +
-                   (int) $item->penagihan_laundry;
-        });
-
-        // 3. Average Feedback Score
-        $averageFeedbackScoreQuery = DB::table('feedback_mtc')->select(DB::raw('
-            avg(
-                (
-                    COALESCE(relevansi_materi, 0) +
-                    COALESCE(manfaat_training, 0) +
-                    COALESCE(durasi_training, 0) +
-                    COALESCE(sistematika_penyajian, 0) +
-                    COALESCE(tujuan_tercapai, 0) +
-                    COALESCE(kedisiplinan_steward, 0) +
-                    COALESCE(fasilitasi_steward, 0) +
-                    COALESCE(layanan_pelaksana, 0) +
-                    COALESCE(proses_administrasi, 0) +
-                    COALESCE(kemudahan_registrasi, 0) +
-                    COALESCE(kondisi_peralatan, 0) +
-                    COALESCE(kualitas_boga, 0) +
-                    COALESCE(media_online, 0) +
-                    COALESCE(rekomendasi, 0)
-                ) / 14
-            ) as average_score
-        '));
-
-        if ($year && $year != '-1') {
-            $averageFeedbackScoreQuery->whereYear('tgl_pelaksanaan', $year);
-        }
-        if ($month && $month != '-1') {
-            $averageFeedbackScoreQuery->whereMonth('tgl_pelaksanaan', $month);
-        }
-        if ($day && $day != '-1') {
-            $averageFeedbackScoreQuery->whereDay('tgl_pelaksanaan', $day);
-        }
-        $averageFeedbackScore = $averageFeedbackScoreQuery->value('average_score');
-
-        // 4. Average Feedback Training Score
-        $averageFeedbackTrainingScoreQuery = Feedback_report::query();
-
-        if ($year && $year != '-1') {
-            $averageFeedbackTrainingScoreQuery->whereYear('tgl_pelaksanaan', $year);
-        }
-        if ($month && $month != '-1') {
-            $averageFeedbackTrainingScoreQuery->whereMonth('tgl_pelaksanaan', $month);
-        }
-        if ($day && $day != '-1') {
-            $averageFeedbackTrainingScoreQuery->whereDay('tgl_pelaksanaan', $day);
-        }
-        $averageFeedbackTrainingScore = $averageFeedbackTrainingScoreQuery->avg('score');
-
-        $totalTraining = Penlat_batch::count();
-
-        return response()->json([
-            'locationData' => $locationData,
-            'countSTCWGauge' => $countSTCWGauge,
-            'countNonSTCWGauge' => $countNonSTCWGauge,
-            'stcwDelta' => $stcwDelta,
-            'nonStcwDelta' => $nonStcwDelta,
-            'trendRevenueData' => $trendRevenueData,
-            'getPesertaCount' => $getPesertaCount,
-            'rawProfits' => $rawProfits,
-            'rawCosts' => $rawCosts,
-            'totalTraining' => $totalTraining,
-            'averageFeedbackScore' => round($averageFeedbackScore, 2),
-            'averageFeedbackTrainingScore' => round($averageFeedbackTrainingScore, 2),
-        ]);
-    }
-
-    public function getTrendData(Request $request)
-    {
-        // Optional year filter from the request
-        $year = $request->input('year', date('Y'));
-
-        $monthlyData = Infografis_peserta::select(
-                DB::raw('MONTH(tgl_pelaksanaan) as month'),
-                DB::raw('COUNT(*) as total')
-            )
-            ->whereYear('tgl_pelaksanaan', $year) // Filter by year if specified
-            ->groupBy('month')
-            ->orderBy('month')
-            ->get();
-
-        // Prepare data for each month
-        $dataPoints = [];
-        for ($i = 1; $i <= 12; $i++) {
-            $count = $monthlyData->firstWhere('month', $i)?->total ?? 0;
-            $dataPoints[] = [
-                "label" => DateTime::createFromFormat('!m', $i)->format('F'),
-                "y" => $count
-            ];
-        }
-
-        return response()->json([
-            'dataPoints' => $dataPoints,
-        ]);
-    }
-
     public function getEvents(Request $request)
     {
         $currentYear = date('Y');
@@ -383,5 +117,259 @@ class DashboardController extends Controller
         }
 
         return response()->json($events);
+    }
+
+    public function fetchChartsData(Request $request)
+    {
+        $periode = $request->input('periode', '2024-01-01 - 2024-12-31');
+        $type = $request->input('type', '-1');
+        [$startDate, $endDate] = explode(' - ', $periode);
+
+        // Parse the start and end dates
+        $start = Carbon::parse($startDate);
+        $end = Carbon::parse($endDate);
+
+        // Generate dynamic months between the range
+        $months = collect();
+        while ($start <= $end) {
+            $months->push($start->format('Y-m'));
+            $start->addMonth();
+        }
+
+        // Fetch and map STCW data
+        $dataByMonthSTCW = Infografis_peserta::select(DB::raw('DATE_FORMAT(tgl_pelaksanaan, "%Y-%m") as month'), DB::raw('count(*) as total'))
+            ->whereBetween('tgl_pelaksanaan', [$startDate, $endDate])
+            ->where('kategori_program', 'STCW')
+            ->groupBy('month')
+            ->pluck('total', 'month')
+            ->toArray();
+
+        // Fetch and map NON STCW data
+        $dataByMonthNonSTCW = Infografis_peserta::select(DB::raw('DATE_FORMAT(tgl_pelaksanaan, "%Y-%m") as month'), DB::raw('count(*) as total'))
+            ->whereBetween('tgl_pelaksanaan', [$startDate, $endDate])
+            ->where('kategori_program', 'NON STCW')
+            ->groupBy('month')
+            ->pluck('total', 'month')
+            ->toArray();
+
+        // Map data into dynamic months
+        $dataPoints1 = [];
+        $dataPoints2 = [];
+        foreach ($months as $month) {
+            $dataPoints1[] = [
+                "label" => Carbon::createFromFormat('Y-m', $month)->format('M Y'),
+                "y" => $dataByMonthSTCW[$month] ?? 0
+            ];
+            $dataPoints2[] = [
+                "label" => Carbon::createFromFormat('Y-m', $month)->format('M Y'),
+                "y" => $dataByMonthNonSTCW[$month] ?? 0
+            ];
+        }
+
+        return response()->json([
+            "dataPoints1" => $dataPoints1, // STCW Data
+            "dataPoints2" => $dataPoints2  // NON STCW Data
+        ]);
+    }
+
+    public function fetchTrendRevenueData(Request $request)
+    {
+        $periode = $request->input('periode', '2024-01-01 - 2024-12-31'); // Default range
+        [$startDate, $endDate] = explode(' - ', $periode); // Split into start and end dates
+
+        // Query profits within the selected date range
+        $profits = Profit::select(
+                'penlat.description', // Get the description from Penlat
+                DB::raw('SUM(CAST(profits.total_biaya_pendaftaran_peserta AS UNSIGNED)) as total_biaya')
+            )
+            ->join('penlat_batch', 'profits.pelaksanaan', '=', 'penlat_batch.batch') // Join with penlat_batch
+            ->join('penlat', 'penlat_batch.penlat_id', '=', 'penlat.id') // Join with penlat
+            ->whereBetween('profits.tgl_pelaksanaan', [$startDate, $endDate]) // Filter by date range
+            ->groupBy('penlat_batch.penlat_id', 'penlat.description') // Group by penlat_id and description
+            ->orderByDesc('total_biaya') // Order by total_biaya
+            ->get();
+
+        // Map results for JSON response
+        $chartData = $profits->map(function ($item) {
+            return [
+                "label" => $item->description,
+                "y" => (int) $item->total_biaya
+            ];
+        });
+
+        return response()->json($chartData);
+    }
+
+    public function fetchLocationChartData(Request $request)
+    {
+        $periode = $request->input('periode', '2024-01-01 - 2024-12-31'); // Default date range
+        [$startDate, $endDate] = explode(' - ', $periode); // Split into start and end dates
+
+        // Query the number of participants by location
+        $locationData = Infografis_peserta::select(
+                'tempat_pelaksanaan', // Location
+                DB::raw('count(*) as total') // Count participants
+            )
+            ->whereBetween('tgl_pelaksanaan', [$startDate, $endDate]) // Filter by date range
+            ->groupBy('tempat_pelaksanaan') // Group by location
+            ->orderByDesc('total') // Order by total in descending order
+            ->get();
+
+        // Map results for JSON response
+        $chartData = $locationData->map(function ($item) {
+            return [
+                "label" => $item->tempat_pelaksanaan, // Location name
+                "y" => (int) $item->total // Number of participants
+            ];
+        });
+
+        return response()->json($chartData);
+    }
+
+    public function fetchTrainingTypeChartData(Request $request)
+    {
+        $periode = $request->input('periode', '2024-01-01 - 2024-12-31'); // Default date range
+        [$startDate, $endDate] = explode(' - ', $periode); // Split into start and end dates
+
+        // Query the number of participants grouped by training type
+        $trainingTypeData = Infografis_peserta::select(
+                'jenis_pelatihan', // Training type
+                DB::raw('count(*) as total') // Count participants
+            )
+            ->whereBetween('tgl_pelaksanaan', [$startDate, $endDate]) // Filter by date range
+            ->groupBy('jenis_pelatihan') // Group by training type
+            ->orderByDesc('total') // Order by total in descending order
+            ->get();
+
+        // Map results for JSON response
+        $chartData = $trainingTypeData->map(function ($item) {
+            return [
+                "label" => $item->jenis_pelatihan, // Training type name
+                "y" => (int) $item->total // Number of participants
+            ];
+        });
+
+        return response()->json($chartData);
+    }
+
+    public function fetchOverallData(Request $request)
+    {
+        $periode = $request->input('periode', '2024-01-01 - 2024-12-31');
+        [$startDate, $endDate] = explode(' - ', $periode);
+
+        // Parse the start and end dates
+        $start = Carbon::parse($startDate);
+        $end = Carbon::parse($endDate);
+
+        // Generate dynamic months between the range
+        $months = collect();
+        while ($start <= $end) {
+            $months->push($start->format('Y-m'));
+            $start->addMonth();
+        }
+
+        // Fetch overall participant data
+        $dataByMonth = Infografis_peserta::select(DB::raw('DATE_FORMAT(tgl_pelaksanaan, "%Y-%m") as month'), DB::raw('count(*) as total'))
+            ->whereBetween('tgl_pelaksanaan', [$startDate, $endDate])
+            ->groupBy('month')
+            ->pluck('total', 'month')
+            ->toArray();
+
+        // Map results into dynamic months
+        $dataPoints = [];
+        foreach ($months as $month) {
+            $dataPoints[] = [
+                "label" => Carbon::createFromFormat('Y-m', $month)->format('M Y'),
+                "y" => $dataByMonth[$month] ?? 0
+            ];
+        }
+
+        return response()->json([
+            "dataPoints" => $dataPoints
+        ]);
+    }
+
+    public function fetchAmountData(Request $request)
+    {
+        $periode = $request->input('periode', "2024-01-03 - 2024-12-21");
+        $type = $request->input('type');
+        [$startDate, $endDate] = explode(' - ', $periode);
+
+        // Common filters
+        $filters = function ($query) use ($startDate, $endDate, $type) {
+            $query->whereBetween('tgl_pelaksanaan', [$startDate, $endDate]);
+        };
+        $filterBatch = function ($query) use ($startDate, $endDate, $type) {
+            $query->whereBetween('date', [$startDate, $endDate]);
+        };
+        $filtersType = function ($query) use ($startDate, $endDate, $type) {
+            if ($type && $type != '-1') {
+                $query->where('jenis_pelatihan', $type);
+            }
+        };
+
+        // 1. Count of Peserta
+        $getPesertaCount = Infografis_peserta::query()
+            ->where($filters)->where($filtersType)
+            ->count();
+
+        // 2. Sum of Profits and Costs
+        $profitQuery = Profit::query();
+
+        $rawProfits = $profitQuery->where($filters)->sum('total_biaya_pendaftaran_peserta');
+        $rawCosts = $profitQuery->where($filters)->get()->sum(function ($item) {
+            return (int) $item->biaya_instruktur +
+                (int) $item->total_pnbp +
+                (int) $item->penagihan_foto +
+                (int) $item->biaya_transportasi_hari +
+                (int) $item->penagihan_atk +
+                (int) $item->penagihan_snack +
+                (int) $item->penagihan_makan_siang +
+                (int) $item->penlat_usage +
+                (int) $item->penagihan_laundry;
+        });
+
+        // 3. Average Feedback Score
+        $averageFeedbackScore = DB::table('feedback_mtc')
+            ->whereBetween('tgl_pelaksanaan', [$startDate, $endDate])
+            ->selectRaw('
+                avg(
+                    (
+                        COALESCE(relevansi_materi, 0) +
+                        COALESCE(manfaat_training, 0) +
+                        COALESCE(durasi_training, 0) +
+                        COALESCE(sistematika_penyajian, 0) +
+                        COALESCE(tujuan_tercapai, 0) +
+                        COALESCE(kedisiplinan_steward, 0) +
+                        COALESCE(fasilitasi_steward, 0) +
+                        COALESCE(layanan_pelaksana, 0) +
+                        COALESCE(proses_administrasi, 0) +
+                        COALESCE(kemudahan_registrasi, 0) +
+                        COALESCE(kondisi_peralatan, 0) +
+                        COALESCE(kualitas_boga, 0) +
+                        COALESCE(media_online, 0) +
+                        COALESCE(rekomendasi, 0)
+                    ) / 14
+                ) as average_score
+            ')
+            ->value('average_score');
+
+        // 4. Average Feedback Training Score
+        $averageFeedbackTrainingScore = Feedback_report::query()
+            ->where($filters)
+            ->avg('score');
+
+        // 5. Total Training Count
+        $totalTraining = Penlat_batch::where($filterBatch)->count();
+
+        // Return data as JSON
+        return response()->json([
+            'peserta_count' => $getPesertaCount,
+            'raw_profits' => $rawProfits,
+            'raw_costs' => $rawCosts,
+            'average_feedback_score' => $averageFeedbackScore,
+            'average_feedback_training_score' => $averageFeedbackTrainingScore,
+            'total_training' => $totalTraining,
+        ]);
     }
 }

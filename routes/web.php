@@ -81,8 +81,12 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
             Route::get('/api/get-penlat-batch-events', [DashboardController::class, 'getEvents'])->name('penlat.batch.events');
             //will be used
             Route::get('/download-file/{filepath}', [DownloadController::class, 'downloadFile'])->name('download.file');
-            Route::get('/api/dashboard-chart-data', [DashboardController::class, 'getDashboardChartData']);
-            Route::get('/api/trend-chart-data', [DashboardController::class, 'getTrendData']);
+            Route::post('/api/fetchAmountData', [DashboardController::class, 'fetchAmountData'])->name('fetchAmountData');
+            Route::post('/api/chart-bar-data', [DashboardController::class, 'fetchChartsData'])->name('fetchChartData');
+            Route::post('/api/chart-trend-revenue-data', [DashboardController::class, 'fetchTrendRevenueData']);
+            Route::post('/api/chart-location-data', [DashboardController::class, 'fetchLocationChartData']);
+            Route::post('/api/chart-training-type-data', [DashboardController::class, 'fetchTrainingTypeChartData']);
+            Route::post('/api/chart-overall-data', [DashboardController::class, 'fetchOverallData']);
         });
 
         //Encrypt

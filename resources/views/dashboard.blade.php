@@ -120,65 +120,19 @@ active font-weight-bold
                 <div class="col-md-12">
                     <div class="card">
                         <div class="row align-items-center p-4">
-                            <div class="col-md-9">
+                            <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="daterange">Date Range :</label>
                                     <input type="text" class="form-control underline-input" name="daterange" id="daterange" autocomplete="off" required/>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="day">STCW/Non :</label>
-                                    <select class="form-control" id="day" name="day">
+                                    <label for="stcw">STCW/Non :</label>
+                                    <select class="form-control" id="stcw" name="stcw">
                                         <option value="-1" selected>Show All</option>
                                         <option value="1">STCW</option>
                                         <option value="0">Non STCW</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="day">Day :</label>
-                                    <select class="form-control" id="day" name="day">
-                                        <option value="-1" selected>Show All</option>
-                                        @foreach(range(1, 31) as $day)
-                                            <option value="{{ $day }}">{{ $day }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="month">Month :</label>
-                                    <select class="form-control" id="month" name="month">
-                                        <option value="-1">Show All</option>
-                                        @foreach(range(1, 12) as $month)
-                                            <option value="{{ $month }}">
-                                                {{ date('F', mktime(0, 0, 0, $month, 1)) }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="email">Year :</label>
-                                    <select class="form-control" id="year" name="year">
-                                        <option value="-1" selected>Show All</option>
-                                        @foreach(range(date('Y'), date('Y') - 5) as $year)
-                                            <option value="{{ $year }}" @if ($year == date('Y')) selected @endif>{{ $year }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="category">Subholding :</label>
-                                    <select class="form-control" id="category" name="category">
-                                        <option value="-1" selected>Show All</option>
-                                        @foreach($infographicCategories as $category)
-                                            <option value="{{ $category->subholding }}">{{ $category->subholding }}</option>
-                                        @endforeach
                                     </select>
                                 </div>
                             </div>
@@ -196,12 +150,35 @@ active font-weight-bold
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-12">
-
-                </div>
-                <div class="col-md-12">
-
+                    <div class="card2 shadow">
+                        <div class="card-header2 d-flex align-items-center">
+                            <h4 class="mb-0">Training Trend by Type</h4>
+                        </div>
+                        <div class="card-block2 bg-white">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="card-body d-flex justify-content-center align-items-center">
+                                        <div id="trainingTypeChart" style="height: 370px; width: 100%;"></div>
+                                    </div>
+                                </div>
+                            </div> <!-- /.row -->
+                        </div>
+                    </div>
+                    <div class="card2 shadow">
+                        <div class="card-header2 d-flex align-items-center">
+                            <h4 class="mb-0">STCW & NON</h4>
+                        </div>
+                        <div class="card-block2 bg-white">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="card-body d-flex justify-content-center align-items-center">
+                                        <div id="barChart" style="height: 600px; width: 100%;"></div>
+                                        <div id="loader" style="display: none;">Loading...</div>
+                                    </div>
+                                </div>
+                            </div> <!-- /.row -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -335,7 +312,21 @@ active font-weight-bold
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="card-body d-flex justify-content-center align-items-center">
-                                <div id="trendRevenueChart" style="height: 200px; width: 100%;"></div>
+                                <div id="trendRevenueChart" style="height: 400px; width: 100%;"></div>
+                            </div>
+                        </div>
+                    </div> <!-- /.row -->
+                </div>
+            </div>
+            <div class="card2 shadow">
+                <div class="card-header2 d-flex align-items-center">
+                    <h4 class="mb-0">Training Session by Location</h4>
+                </div>
+                <div class="card-block2 bg-white">
+                    <div class="row">
+                        <div class="col-lg-12 zoom90">
+                            <div class="card-body d-flex justify-content-center align-items-center">
+                                <div id="locationChart" style="height: 200px; width: 100%;"></div>
                             </div>
                         </div>
                     </div> <!-- /.row -->
@@ -351,7 +342,7 @@ active font-weight-bold
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="card-body d-flex justify-content-center align-items-center">
-                                <div id="trainingTrendChart" style="height: 200px; width: 100%;"></div>
+                                <div id="overallChart" style="height: 200px; width: 100%;"></div>
                                 <div id="loader" style="display: none;">Loading...</div>
                             </div>
                         </div>
@@ -360,47 +351,10 @@ active font-weight-bold
             </div>
             <div class="row">
                 <div class="col-md-6">
-                    <div class="card2 shadow">
-                        <div class="card-header2 d-flex align-items-center">
-                            <h4 class="mb-0">Increase Amount</h4>
-                        </div>
-                        <div class="card-block2 bg-white">
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <div class="card-body d-flex justify-content-center align-items-center">
-                                        <div class="row mt-2">
-                                            <div class="col-lg-6">
-                                                <div class="d-flex justify-content-center align-items-center">
-                                                    <div id='myDiv'><!-- Plotly chart will be drawn inside this DIV --></div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <div class="d-flex justify-content-center align-items-center">
-                                                    <div id='myDiv2'><!-- Plotly chart will be drawn inside this DIV --></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> <!-- /.row -->
-                        </div>
-                    </div>
+
                 </div>
                 <div class="col-md-6">
-                    <div class="card2 shadow">
-                        <div class="card-header2 d-flex align-items-center">
-                            <h4 class="mb-0">Training Session by Location</h4>
-                        </div>
-                        <div class="card-block2 bg-white">
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <div class="card-body d-flex justify-content-center align-items-center">
-                                        <div id="chartContainer" style="height: 200px; width: 100%;"></div>
-                                    </div>
-                                </div>
-                            </div> <!-- /.row -->
-                        </div>
-                    </div>
+
                 </div>
             </div>
         </div>
@@ -496,142 +450,360 @@ active font-weight-bold
     </div>
 </div>
 <script>
+$(document).ready(function () {
+
+    $(function() {
+        $('input[name="daterange"]').daterangepicker({
+            autoUpdateInput: false,
+            locale: {
+                cancelLabel: 'Clear'
+            }
+        });
+
+        // When a date range is applied, update the input and call updateDashboard
+        $('input[name="daterange"]').on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+            updateDashboard(); // Call updateDashboard here
+            refreshChart();
+            refreshTrendRevenueChart();
+            refreshLocationChart();
+            refreshTrainingTypeChart();
+            refreshOverallChart();
+            swal("Success! The Filter is applied successfully!", {
+                icon: "success",
+            });
+        });
+
+        // When canceled, clear the input
+        $('input[name="daterange"]').on('cancel.daterangepicker', function(ev, picker) {
+            $(this).val('');
+            updateDashboard(); // Call updateDashboard to reflect changes
+            refreshChart();
+            refreshTrendRevenueChart();
+            refreshLocationChart();
+            refreshTrainingTypeChart();
+            refreshOverallChart();
+        });
+    });
+
+    const dateRangeInput = $("#daterange");
+    const typeSelect = $("#type");
+
+    const elementsToUpdate = {
+        pesertaCount: $("#pesertaCount"),
+        avgFeedbackScore: $("#avgFeedbackScore"),
+        avgTrainingFeedbackScore: $("#avgTrainingFeedbackScore"),
+        totalRevenue: $("#totalRevenue"),
+        totalTraining: $("#totalTraining"),
+        totalCost: $("#totalCost"),
+    };
+
+    const updateDashboard = () => {
+        const dateRange = dateRangeInput.val() || "2024-01-03 - 2024-12-21"; // Default date range
+        const type = typeSelect.val() || "-1"; // Default type to "Show All"
+
+        $.ajax({
+            url: "/api/fetchAmountData",
+            type: "POST",
+            data: JSON.stringify({ _token: '{{ csrf_token() }}', periode: dateRange, type }),
+            contentType: "application/json",
+            success: function (data) {
+                // Update DOM elements
+                elementsToUpdate.pesertaCount.text(data.peserta_count ?? "-");
+                elementsToUpdate.avgFeedbackScore.text(
+                    data.average_feedback_score?.toFixed(2) ?? "-"
+                );
+                elementsToUpdate.avgTrainingFeedbackScore.text(
+                    data.average_feedback_training_score?.toFixed(2) ?? "-"
+                );
+                elementsToUpdate.totalRevenue.text(
+                    data.raw_profits?.toLocaleString("en-US", {
+                        style: "currency",
+                        currency: "USD",
+                    }) ?? "-"
+                );
+                elementsToUpdate.totalTraining.text(data.total_training ?? "-");
+                elementsToUpdate.totalCost.text(
+                    data.raw_costs?.toLocaleString("en-US", {
+                        style: "currency",
+                        currency: "USD",
+                    }) ?? "-"
+                );
+            },
+            error: function (xhr, status, error) {
+                console.error("Error updating dashboard:", error);
+            },
+        });
+    };
+
+    // Trigger default data load
+    updateDashboard();
+    refreshChart();
+    refreshTrendRevenueChart();
+    refreshLocationChart();
+    refreshTrainingTypeChart();
+    refreshOverallChart();
+
+    function refreshChart() {
+        const dateRange = $('#daterange').val() || "2024-01-01 - 2024-12-31"; // Default date range
+        const type = $('#type').val() || "-1"; // Default type (show all)
+
+        // Prepare request payload
+        const payload = {
+            periode: dateRange,
+            type: type,
+            _token: '{{ csrf_token() }}' // Include CSRF token for Laravel
+        };
+
+        // Send data via AJAX POST request
+        $.ajax({
+            url: "/api/chart-bar-data",
+            type: "POST",
+            data: JSON.stringify(payload),
+            contentType: "application/json",
+            success: function (data) {
+                const chart = new CanvasJS.Chart("barChart", {
+                animationEnabled: true,
+                theme: "light2",
+                axisX: {
+                    interval: 1,
+                    labelAngle: -45, // Rotate labels for better readability
+                    labelFontSize: 12 // Reduce font size of X-axis labels
+                },
+                axisY: {
+                    title: "Participants",
+                    includeZero: true,
+                    titleFontSize: 14, // Reduce font size of Y-axis title
+                    labelFontSize: 12 // Reduce font size of Y-axis labels
+                },
+                legend: {
+                    cursor: "pointer",
+                    verticalAlign: "top",
+                    horizontalAlign: "center",
+                    dockInsidePlotArea: true,
+                    fontSize: 12 // Reduce font size of legend
+                },
+                data: [
+                    {
+                        type: "bar",
+                        name: "STCW Participants",
+                        showInLegend: true,
+                        legendText: "STCW Participants",
+                        dataPoints: data.dataPoints1 // Updated data for STCW
+                    },
+                    {
+                        type: "bar",
+                        name: "NON STCW Participants",
+                        showInLegend: true,
+                        legendText: "NON STCW Participants",
+                        dataPoints: data.dataPoints2 // Updated data for NON STCW
+                    }
+                ]
+            });
+            chart.render();
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching data:", status, error);
+            }
+        });
+    }
+
+    function refreshTrendRevenueChart() {
+        const dateRange = $('#daterange').val() || "2024-01-01 - 2024-12-31"; // Default date range
+
+        // Prepare request payload
+        const payload = {
+            periode: dateRange,
+            _token: '{{ csrf_token() }}' // Include CSRF token for Laravel
+        };
+
+        // Send data via AJAX POST request
+        $.ajax({
+            url: "/api/chart-trend-revenue-data",
+            type: "POST",
+            data: JSON.stringify(payload),
+            contentType: "application/json",
+            success: function (data) {
+                // Preprocess data for X-axis and tooltips
+                const chartData = data.map(item => ({
+                    label: shortenLabel(item.label), // Shorten label for display on X-axis
+                    y: item.y, // Use total_biaya as value
+                    fullLabel: item.label // Store full label for tooltip
+                }));
+
+                // Create and render the chart
+                const chart = new CanvasJS.Chart("trendRevenueChart", {
+                    animationEnabled: true,
+                    theme: "light2",
+                    axisY: {
+                        title: "Revenue"
+                    },
+                    data: [{
+                        type: "column",
+                        toolTipContent: "{fullLabel}: {y}", // Tooltip shows full label
+                        dataPoints: chartData
+                    }]
+                });
+
+                chart.render();
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching data:", status, error);
+            }
+        });
+    }
+
+    function refreshLocationChart() {
+        const dateRange = $('#daterange').val() || "2024-01-01 - 2024-12-31"; // Default date range
+
+        // Prepare request payload
+        const payload = {
+            periode: dateRange,
+            _token: '{{ csrf_token() }}' // Include CSRF token for Laravel
+        };
+
+        // Send data via AJAX POST request
+        $.ajax({
+            url: "/api/chart-location-data",
+            type: "POST",
+            data: JSON.stringify(payload),
+            contentType: "application/json",
+            success: function (data) {
+                // Map data to CanvasJS format
+                const chartData = data.map(item => ({
+                    label: item.label, // Location name
+                    y: item.y // Total participants
+                }));
+
+                // Create and render the chart
+                const chart = new CanvasJS.Chart("locationChart", {
+                    animationEnabled: true,
+                    theme: "light2",
+                    axisY: {
+                        title: "Number of Participants",
+                        includeZero: true
+                    },
+                    data: [{
+                        type: "column",
+                        dataPoints: chartData
+                    }]
+                });
+
+                chart.render();
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching data:", status, error);
+            }
+        });
+    }
+
+    function refreshTrainingTypeChart() {
+        const dateRange = $('#daterange').val() || "2024-01-01 - 2024-12-31"; // Default date range
+
+        // Prepare request payload
+        const payload = {
+            periode: dateRange,
+            _token: '{{ csrf_token() }}' // Include CSRF token for Laravel
+        };
+
+        // Send data via AJAX POST request
+        $.ajax({
+            url: "/api/chart-training-type-data",
+            type: "POST",
+            data: JSON.stringify(payload),
+            contentType: "application/json",
+            success: function (data) {
+                // Map data to CanvasJS format
+                const chartData = data.map(item => ({
+                    label: item.label, // Training type name
+                    y: item.y // Total participants
+                }));
+
+                // Create and render the pie chart
+                const chart = new CanvasJS.Chart("trainingTypeChart", {
+                    animationEnabled: true,
+                    theme: "light2",
+                    data: [{
+                        type: "pie",
+                        showInLegend: true,
+                        legendText: "{label}",
+                        indexLabel: "{label} - #percent%",
+                        yValueFormatString: "#,##0",
+                        dataPoints: chartData
+                    }]
+                });
+
+                chart.render();
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching data:", status, error);
+            }
+        });
+    }
+
+    function refreshOverallChart() {
+        const dateRange = $('#daterange').val() || "2024-01-01 - 2024-12-31"; // Default date range
+
+        // Prepare request payload
+        const payload = {
+            periode: dateRange,
+            _token: '{{ csrf_token() }}' // Include CSRF token for Laravel
+        };
+
+        // Send data via AJAX POST request
+        $.ajax({
+            url: "/api/chart-overall-data",
+            type: "POST",
+            data: JSON.stringify(payload),
+            contentType: "application/json",
+            success: function (data) {
+                const chart = new CanvasJS.Chart("overallChart", {
+                    animationEnabled: true,
+                    theme: "light2",
+                    axisX: {
+                        title: "Month",
+                        interval: 1,
+                        labelAngle: -45 // Rotate labels for better readability
+                    },
+                    axisY: {
+                        title: "Total Participants",
+                        includeZero: true,
+                    },
+                    legend: {
+                        cursor: "pointer",
+                        verticalAlign: "top",
+                        horizontalAlign: "center",
+                        dockInsidePlotArea: true
+                    },
+                    data: [
+                        {
+                            type: "spline", // Spline chart for smooth lines
+                            name: "Overall Participants",
+                            showInLegend: true,
+                            legendText: "Overall Participants",
+                            dataPoints: data.dataPoints // Overall data
+                        }
+                    ]
+                });
+                chart.render();
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching overall data:", status, error);
+            }
+        });
+    }
+
+    function shortenLabel(label) {
+        const words = label.split(" "); // Split label into words
+        if (words.length > 2) {
+            return words.slice(0, 2).join(" ") + "..."; // Keep only first 2 words and append "..."
+        }
+        return label; // Return the original label if it's 2 words or less
+    }
+});
+
 function closeImage() {
     document.getElementById('welcome-container').style.display = 'none';
 }
-</script>
-<script>
-function loadDashboardData() {
-    const selectedDay = document.getElementById("day").value;
-    const selectedMonth = document.getElementById("month").value;
-    const selectedYear = document.getElementById("year").value;
-    const selectedCategory = document.getElementById("category").value;
-    const selectedType = document.getElementById("type").value;
-
-    fetch(`/api/dashboard-chart-data?year=${selectedYear}&month=${selectedMonth}&day=${selectedDay}&category=${selectedCategory}&type=${selectedType}`)
-        .then(response => response.json())
-        .then(data => {
-            // 1. Location Chart
-            const locationChartData = data.locationData.map(item => ({
-                label: item.tempat_pelaksanaan,
-                y: item.total
-            }));
-
-            new CanvasJS.Chart("chartContainer", {
-                animationEnabled: true,
-                theme: "light2",
-                axisY: { title: "Total Trainings", includeZero: true },
-                data: [{ type: "column", dataPoints: locationChartData }]
-            }).render();
-
-            // 2. Trend Revenue Chart
-            var chartData = data.trendRevenueData.map(item => ({
-                label: item.description, // Use nama_pelatihan as label
-                y: parseInt(item.total_biaya)
-            }));
-
-            var chart = new CanvasJS.Chart("trendRevenueChart", {
-                animationEnabled: true,
-                theme: "light2",
-                data: [{
-                    type: "column",
-                    dataPoints: chartData
-                }]
-            });
-
-            chart.render();
-
-            // 3. Gauge Charts for STCW and NON STCW
-            Plotly.newPlot('myDiv', [{
-                domain: { x: [0, 1], y: [0, 1] },
-                value: data.countSTCWGauge,
-                title: { text: "STCW" },
-                type: "indicator",
-                mode: "gauge+number+delta",
-                delta: { reference: data.stcwDelta, relative: true },
-                gauge: { axis: { range: [null, data.stcwDelta + 100] } }
-            }], { width: 280, height: 170, margin: { l: 40, r: 40, t: 40, b: 0 } });
-
-            Plotly.newPlot('myDiv2', [{
-                domain: { x: [0, 1], y: [0, 1] },
-                value: data.countNonSTCWGauge,
-                title: { text: "NON STCW" },
-                type: "indicator",
-                mode: "gauge+number+delta",
-                delta: { reference: data.nonStcwDelta, relative: true },
-                gauge: { axis: { range: [null, data.nonStcwDelta + 100] } }
-            }], { width: 280, height: 170, margin: { l: 40, r: 40, t: 40, b: 0 } });
-
-            document.getElementById("pesertaCount").textContent = data.getPesertaCount;
-            document.getElementById("totalRevenue").textContent = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data.rawProfits);
-            document.getElementById("totalCost").textContent = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data.rawCosts);
-            document.getElementById("avgFeedbackScore").textContent = data.averageFeedbackScore ?? '-';
-            document.getElementById("totalTraining").textContent = data.totalTraining ?? '-';
-            document.getElementById("avgTrainingFeedbackScore").textContent = data.averageFeedbackTrainingScore ?? '-';
-        });
-}
-
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', loadDashboardData);
-document.getElementById("year").addEventListener("change", loadDashboardData);
-document.getElementById("month").addEventListener("change", loadDashboardData);
-document.getElementById("day").addEventListener("change", loadDashboardData);
-document.getElementById("category").addEventListener("change", loadDashboardData);
-document.getElementById("type").addEventListener("change", loadDashboardData);
-</script>
-<script>
-// Function to fetch data and render the chart
-async function loadTrendData() {
-    try {
-        const selectedYear = document.getElementById("year").value;
-        // Fetch data from the API
-        const response = await fetch(`/api/trend-chart-data?year=${selectedYear}`);
-        const result = await response.json();
-
-        // Initialize CanvasJS chart with the data points from API
-        const chart = new CanvasJS.Chart("trainingTrendChart", {
-            animationEnabled: true,
-            theme: "light2",
-            axisY: {
-                title: "Total Participants",
-                includeZero: true
-            },
-            data: [{
-                type: "spline",
-                dataPoints: result.dataPoints
-            }]
-        });
-
-        chart.render();
-    } catch (error) {
-        console.error("Error fetching or rendering data:", error);
-    }
-}
-// Load the chart for the current year when the page loads
-document.addEventListener("DOMContentLoaded", () => {
-    const selectedYear = document.getElementById("year").value;
-    loadTrendData(selectedYear);
-});
-document.getElementById("year").addEventListener("change", loadTrendData);
-</script>
-<script>
-
-$(function() {
-    $('input[name="daterange"]').daterangepicker({
-        // Setup options as needed
-        autoUpdateInput: false,
-        locale: {
-            cancelLabel: 'Clear'
-        }
-    });
-
-    $('input[name="daterange"]').on('apply.daterangepicker', function(ev, picker) {
-        $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
-    });
-
-    $('input[name="daterange"]').on('cancel.daterangepicker', function(ev, picker) {
-        $(this).val('');
-    });
-});
 </script>
 @endsection
