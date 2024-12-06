@@ -144,7 +144,7 @@
                     <li class="menu-item-has-children dropdown @yield('active-marketing') @yield('show-marketing')">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-suitcase"></i>Marketing</a>
                         <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-marketing')">
-                            <li><i class="menu-icon fa fa-tachometer"></i><a href="{{ route('marketing') }}" class="@yield('marketing')">Dashboard</a></li>
+                            {{-- <li><i class="menu-icon fa fa-tachometer"></i><a href="{{ route('marketing') }}" class="@yield('marketing')">Dashboard</a></li> --}}
                             <li><i class="fa fa-bullhorn"></i><a href="{{ route('marketing-campaign') }}" class="@yield('marketing-campaign')">Campaign</a></li>
                             {{-- <li><i class="fa fa-instagram"></i><a href="{{ route('insight-socmed') }}" class="@yield('socmed')">Social Media Enggagement</a></li> --}}
                             <li><i class="fa fa-sitemap"></i><a href="{{ route('company-agreement') }}" class="@yield('company-agreement')">Company Agreement</a></li>
@@ -205,7 +205,7 @@
                     @endusr_acc
 
                     <li class="@yield('active-refractor')">
-                        <a href="{{ route('refractor') }}"><i class="menu-icon fa fa-trash-o"></i>Refractor Data</a>
+                        <a href="{{ route('refractor') }}"><i class="menu-icon fa fa-trash-o"></i>Data Cleansing</a>
                     </li>
 
                     <li style="padding-bottom: 15%;">

@@ -125,6 +125,18 @@ class DashboardController extends Controller
         $type = $request->input('type', '-1');
         [$startDate, $endDate] = explode(' - ', $periode);
 
+        $filtersType = function ($query) use ($startDate, $endDate, $type) {
+            if ($type && $type != '-1') {
+                $query->where('jenis_pelatihan', $type);
+            }
+        };
+
+        $filtersType = function ($query) use ($startDate, $endDate, $type) {
+            if ($type && $type != '-1') {
+                $query->where('jenis_pelatihan', $type);
+            }
+        };
+
         // Parse the start and end dates
         $start = Carbon::parse($startDate);
         $end = Carbon::parse($endDate);
@@ -139,6 +151,7 @@ class DashboardController extends Controller
         // Fetch and map STCW data
         $dataByMonthSTCW = Infografis_peserta::select(DB::raw('DATE_FORMAT(tgl_pelaksanaan, "%Y-%m") as month'), DB::raw('count(*) as total'))
             ->whereBetween('tgl_pelaksanaan', [$startDate, $endDate])
+            ->where($filtersType)
             ->where('kategori_program', 'STCW')
             ->groupBy('month')
             ->pluck('total', 'month')
@@ -147,6 +160,7 @@ class DashboardController extends Controller
         // Fetch and map NON STCW data
         $dataByMonthNonSTCW = Infografis_peserta::select(DB::raw('DATE_FORMAT(tgl_pelaksanaan, "%Y-%m") as month'), DB::raw('count(*) as total'))
             ->whereBetween('tgl_pelaksanaan', [$startDate, $endDate])
+            ->where($filtersType)
             ->where('kategori_program', 'NON STCW')
             ->groupBy('month')
             ->pluck('total', 'month')
@@ -175,6 +189,7 @@ class DashboardController extends Controller
     public function fetchTrendRevenueData(Request $request)
     {
         $periode = $request->input('periode', '2024-01-01 - 2024-12-31'); // Default range
+        $type = $request->input('type');
         [$startDate, $endDate] = explode(' - ', $periode); // Split into start and end dates
 
         // Query profits within the selected date range
@@ -185,6 +200,10 @@ class DashboardController extends Controller
             ->join('penlat_batch', 'profits.pelaksanaan', '=', 'penlat_batch.batch') // Join with penlat_batch
             ->join('penlat', 'penlat_batch.penlat_id', '=', 'penlat.id') // Join with penlat
             ->whereBetween('profits.tgl_pelaksanaan', [$startDate, $endDate]) // Filter by date range
+            ->when($type && $type != '-1', function ($query) use ($type) {
+                // Apply type filter if a valid type is selected
+                $query->where('penlat.jenis_pelatihan', $type);
+            })
             ->groupBy('penlat_batch.penlat_id', 'penlat.description') // Group by penlat_id and description
             ->orderByDesc('total_biaya') // Order by total_biaya
             ->get();
@@ -203,7 +222,14 @@ class DashboardController extends Controller
     public function fetchLocationChartData(Request $request)
     {
         $periode = $request->input('periode', '2024-01-01 - 2024-12-31'); // Default date range
+        $type = $request->input('type');
         [$startDate, $endDate] = explode(' - ', $periode); // Split into start and end dates
+
+        $filtersType = function ($query) use ($startDate, $endDate, $type) {
+            if ($type && $type != '-1') {
+                $query->where('jenis_pelatihan', $type);
+            }
+        };
 
         // Query the number of participants by location
         $locationData = Infografis_peserta::select(
@@ -211,6 +237,7 @@ class DashboardController extends Controller
                 DB::raw('count(*) as total') // Count participants
             )
             ->whereBetween('tgl_pelaksanaan', [$startDate, $endDate]) // Filter by date range
+            ->where($filtersType)
             ->groupBy('tempat_pelaksanaan') // Group by location
             ->orderByDesc('total') // Order by total in descending order
             ->get();
@@ -229,7 +256,14 @@ class DashboardController extends Controller
     public function fetchTrainingTypeChartData(Request $request)
     {
         $periode = $request->input('periode', '2024-01-01 - 2024-12-31'); // Default date range
+        $type = $request->input('type');
         [$startDate, $endDate] = explode(' - ', $periode); // Split into start and end dates
+
+        $filtersType = function ($query) use ($startDate, $endDate, $type) {
+            if ($type && $type != '-1') {
+                $query->where('jenis_pelatihan', $type);
+            }
+        };
 
         // Query the number of participants grouped by training type
         $trainingTypeData = Infografis_peserta::select(
@@ -237,6 +271,7 @@ class DashboardController extends Controller
                 DB::raw('count(*) as total') // Count participants
             )
             ->whereBetween('tgl_pelaksanaan', [$startDate, $endDate]) // Filter by date range
+            ->where($filtersType)
             ->groupBy('jenis_pelatihan') // Group by training type
             ->orderByDesc('total') // Order by total in descending order
             ->get();
@@ -255,6 +290,7 @@ class DashboardController extends Controller
     public function fetchOverallData(Request $request)
     {
         $periode = $request->input('periode', '2024-01-01 - 2024-12-31');
+        $type = $request->input('type');
         [$startDate, $endDate] = explode(' - ', $periode);
 
         // Parse the start and end dates
@@ -268,9 +304,16 @@ class DashboardController extends Controller
             $start->addMonth();
         }
 
+        $filtersType = function ($query) use ($startDate, $endDate, $type) {
+            if ($type && $type != '-1') {
+                $query->where('jenis_pelatihan', $type);
+            }
+        };
+
         // Fetch overall participant data
         $dataByMonth = Infografis_peserta::select(DB::raw('DATE_FORMAT(tgl_pelaksanaan, "%Y-%m") as month'), DB::raw('count(*) as total'))
             ->whereBetween('tgl_pelaksanaan', [$startDate, $endDate])
+            ->where($filtersType)
             ->groupBy('month')
             ->pluck('total', 'month')
             ->toArray();
@@ -314,10 +357,24 @@ class DashboardController extends Controller
             ->count();
 
         // 2. Sum of Profits and Costs
-        $profitQuery = Profit::query();
+        $filtersType2 = function ($query) use ($type, $filters) {
+            // Apply filters for Penlat or other relationships dynamically
+            $query->where($filters);
+            if ($type && $type != '-1') {
+                $query->whereHas('batch.penlat', function ($subQuery) use ($type) {
+                    $subQuery->where('jenis_pelatihan', $type);
+                });
+            }
+        };
 
-        $rawProfits = $profitQuery->where($filters)->sum('total_biaya_pendaftaran_peserta');
-        $rawCosts = $profitQuery->where($filters)->get()->sum(function ($item) {
+        // Sum of Profits and Costs
+        $profitQuery = Profit::query()->where($filtersType2);
+
+        // Calculate raw profits
+        $rawProfits = $profitQuery->sum('total_biaya_pendaftaran_peserta');
+
+        // Calculate raw costs
+        $rawCosts = $profitQuery->get()->sum(function ($item) {
             return (int) $item->biaya_instruktur +
                 (int) $item->total_pnbp +
                 (int) $item->penagihan_foto +
@@ -360,6 +417,22 @@ class DashboardController extends Controller
             ->avg('score');
 
         // 5. Total Training Count
+        $filterDateBatch = function ($query) use ($startDate, $endDate, $type) {
+            $query->whereBetween('date', [$startDate, $endDate]);
+        };
+        $filterBatch = function ($query) use ($type, $filterDateBatch) {
+            // Apply the base filters
+            $query->where($filterDateBatch);
+
+            // Apply type filter if provided
+            if ($type && $type != '-1') {
+                $query->whereHas('penlat', function ($subQuery) use ($type) {
+                    $subQuery->where('jenis_pelatihan', $type);
+                });
+            }
+        };
+
+        // Calculate total training with filters applied
         $totalTraining = Penlat_batch::where($filterBatch)->count();
 
         // Return data as JSON

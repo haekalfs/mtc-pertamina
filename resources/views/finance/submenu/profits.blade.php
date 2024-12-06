@@ -63,9 +63,8 @@ font-weight-bold
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold" id="judul">List Data <span id="tahun"></span></h6>
-                    <div class="d-flex">
-                        {{-- <a id="addApproversBtn" class="btn btn-sm btn-primary shadow-sm text-white"><i class="fa fa-file-text fa-sm"></i> Filter</a>
-                        <a id="hideApproversBtn" class="btn btn-sm btn-secondary shadow-sm text-white" style="display: none;"><i class="fa fa-backward fa-sm"></i> Cancel</a> --}}
+                    <div class="text-right">
+                        <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Register Profit</a>
                     </div>
                 </div>
                 <div class="card-body zoom80">
@@ -413,7 +412,7 @@ function formatCurrency(value) {
                 { data: 'tgl_pelaksanaan', name: 'tgl_pelaksanaan' },
                 { data: 'description', name: 'batch.penlat.description', orderable: false, searchable: false },
                 { data: 'pelaksanaan', name: 'pelaksanaan' },
-                { data: 'jumlah_peserta', name: 'jumlah_peserta' },
+                { data: 'jumlah_peserta_1', name: 'jumlah_peserta_1' },
                 { data: 'jumlah_actual_peserta', name: 'jumlah_actual_peserta' },
                 { data: 'revenue', name: 'revenue' },
                 { data: 'cost', name: 'cost' },
