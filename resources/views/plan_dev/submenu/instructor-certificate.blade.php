@@ -102,7 +102,7 @@ font-weight-bold
                                 <th>Related To</th>
                                 <th>Keterangan</th>
                                 <th>Total</th>
-                                <th width="160px">Action</th>
+                                <th width="200px">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -121,7 +121,7 @@ font-weight-bold
                                 </td>
                                 <td>{{ $item->keterangan }}</td>
                                 <td>{{ $item->total_issued }}</td>
-                                <td>
+                                <td class="text-center">
                                     <a class="btn btn-outline-secondary btn-sm mr-2" href="{{ route('preview-certificate-catalog', $item->id) }}"><i class="menu-Logo fa fa-eye"></i> View</a>
                                     <a class="btn btn-outline-danger text-danger btn-sm delete-instructor-certificate" data-id="{{ $item->id }}">
                                         <i class="fa fa-trash-o"></i> Delete

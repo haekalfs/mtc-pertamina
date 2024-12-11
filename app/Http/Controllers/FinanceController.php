@@ -332,6 +332,15 @@ class FinanceController extends Controller
                         '" data-batch="' . $item->pelaksanaan . '" data-tgl="' . $item->tgl_pelaksanaan .
                         '" class="text-danger">Batch Not Found or Not Registered!</a>';
                 })
+                ->addColumn('jumlah_peserta_1', function ($item) {
+                    // Check if jumlah_peserta and jumlah_actual_peserta are not the same
+                    $isMismatch = $item->jumlah_peserta != $item->batch->infografis_peserta->count();
+                    $style = $isMismatch ? 'text-danger' : '';
+                    $icon = $isMismatch ? '<i class="fa fa-exclamation"></i>' : '';
+
+                    // Return the value wrapped with conditional styling and icon
+                    return '<span class="' . $style . '">' . $item->jumlah_peserta . ' ' . $icon . '</span>';
+                })
                 ->addColumn('jumlah_actual_peserta', function($item) {
                     return $item->batch->infografis_peserta->count();
                 })
@@ -349,7 +358,7 @@ class FinanceController extends Controller
                     $nettIncome = (int) $item->total_biaya_pendaftaran_peserta - $this->calculateTotalCost($item);
                     return 'Rp ' . number_format($nettIncome, 0, ',', '.');
                 })
-                ->rawColumns(['description', 'pelaksanaan'])
+                ->rawColumns(['description', 'jumlah_peserta_1', 'pelaksanaan'])
                 ->make(true);
         }
 

@@ -546,6 +546,13 @@ class PenlatController extends Controller
                 ]
             );
 
+            // Update related profits
+            $profits = $penlatUtility->profits;
+            foreach ($profits as $profit) {
+                $profit->tgl_pelaksanaan = $request->date;
+                $profit->save();
+            }
+
             DB::commit(); // Commit the transaction
 
             // Redirect back with a success message

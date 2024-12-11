@@ -103,16 +103,17 @@ active font-weight-bold
     <button class="close-btn" onclick="closeImage()">&#10005;</button>
     <img src="{{ asset('img/people-ptmc.png') }}" alt="Character" class="bottom-right-img">
 </div>
-{{-- <div class="d-sm-flex align-items-center zoom90 justify-content-between mb-4">
-    <h1 class="h4 mb-0 font-weight-bold text-gray-800 text-secondary"><i class="far fa-smile-beam"></i> Welcome onboard, {{ Auth::user()->name }}!</h1>
-    <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-smile-beam fa-sm text-white-50"></i> Show Details</a>
-</div> --}}
 <div class="animated fadeIn">
     <!-- Widgets  -->
-    <div class="row">
+    <div class="row" id="dashboard">
         <div class="col-md-12">
-            <div class="pb-2 mb-3 border-bottom h5">
-                Dashboard MTC
+            <div class="d-flex justify-content-between align-items-center pb-2 mb-3 border-bottom">
+                <div class="h5 m-0">
+                    Dashboard MTC
+                </div>
+                <small><a href="#" id="fullscreenButton" onclick="toggleFullScreen('dashboard')">
+                    <i class="fa fa-arrows-alt"></i> Fullscreen
+                </a></small>
             </div>
         </div>
         <div class="col-md-6">
@@ -123,7 +124,7 @@ active font-weight-bold
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="daterange">Date Range :</label>
-                                    <input type="text" class="form-control underline-input" name="daterange" id="daterange" autocomplete="off" required/>
+                                    <input type="text" class="form-control underline-input" name="daterange" id="daterange" value="{{ date('Y') }}-01-01 - {{ date('Y') }}-12-31" autocomplete="off" required/>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -452,18 +453,38 @@ active font-weight-bold
 <script>
 $(document).ready(function () {
 
+    // Attach change event listeners to the dropdowns
+    $('#stcw, #type').on('change', function () {
+        // Call the necessary functions when a value is selected
+        updateDashboard();
+        refreshChart();
+        refreshTrendRevenueChart();
+        refreshLocationChart();
+        refreshTrainingTypeChart();
+        refreshOverallChart();
+
+        // Show success message
+        swal("Success! The Filter is applied successfully!", {
+            icon: "success",
+        });
+    });
+
     $(function() {
+        // Initialize daterangepicker with default start and end dates from Blade
         $('input[name="daterange"]').daterangepicker({
-            autoUpdateInput: false,
+            startDate: moment("{{ date('Y') }}-01-01"),
+            endDate: moment("{{ date('Y') }}-12-31"),
+            autoUpdateInput: true, // Automatically update input
             locale: {
-                cancelLabel: 'Clear'
+                cancelLabel: 'Clear',
+                format: 'YYYY-MM-DD' // Display format for dates
             }
         });
 
-        // When a date range is applied, update the input and call updateDashboard
+        // Apply the daterangepicker actions
         $('input[name="daterange"]').on('apply.daterangepicker', function(ev, picker) {
             $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
-            updateDashboard(); // Call updateDashboard here
+            updateDashboard();
             refreshChart();
             refreshTrendRevenueChart();
             refreshLocationChart();
@@ -474,10 +495,9 @@ $(document).ready(function () {
             });
         });
 
-        // When canceled, clear the input
         $('input[name="daterange"]').on('cancel.daterangepicker', function(ev, picker) {
             $(this).val('');
-            updateDashboard(); // Call updateDashboard to reflect changes
+            updateDashboard();
             refreshChart();
             refreshTrendRevenueChart();
             refreshLocationChart();
@@ -499,7 +519,7 @@ $(document).ready(function () {
     };
 
     const updateDashboard = () => {
-        const dateRange = dateRangeInput.val() || "2024-01-03 - 2024-12-21"; // Default date range
+        const dateRange = dateRangeInput.val(); // Default date range
         const type = typeSelect.val() || "-1"; // Default type to "Show All"
 
         $.ajax({
@@ -545,7 +565,7 @@ $(document).ready(function () {
     refreshOverallChart();
 
     function refreshChart() {
-        const dateRange = $('#daterange').val() || "2024-01-01 - 2024-12-31"; // Default date range
+        const dateRange = $('#daterange').val(); // Default date range
         const type = $('#type').val() || "-1"; // Default type (show all)
 
         // Prepare request payload
@@ -609,11 +629,13 @@ $(document).ready(function () {
     }
 
     function refreshTrendRevenueChart() {
-        const dateRange = $('#daterange').val() || "2024-01-01 - 2024-12-31"; // Default date range
+        const dateRange = $('#daterange').val(); // Default date range
+        const type = $('#type').val() || "-1"; // Default type (show all)
 
         // Prepare request payload
         const payload = {
             periode: dateRange,
+            type: type,
             _token: '{{ csrf_token() }}' // Include CSRF token for Laravel
         };
 
@@ -654,11 +676,13 @@ $(document).ready(function () {
     }
 
     function refreshLocationChart() {
-        const dateRange = $('#daterange').val() || "2024-01-01 - 2024-12-31"; // Default date range
+        const dateRange = $('#daterange').val(); // Default date range
+        const type = $('#type').val() || "-1"; // Default type (show all)
 
         // Prepare request payload
         const payload = {
             periode: dateRange,
+            type: type,
             _token: '{{ csrf_token() }}' // Include CSRF token for Laravel
         };
 
@@ -698,11 +722,13 @@ $(document).ready(function () {
     }
 
     function refreshTrainingTypeChart() {
-        const dateRange = $('#daterange').val() || "2024-01-01 - 2024-12-31"; // Default date range
+        const dateRange = $('#daterange').val(); // Default date range
+        const type = $('#type').val() || "-1"; // Default type (show all)
 
         // Prepare request payload
         const payload = {
             periode: dateRange,
+            type: type,
             _token: '{{ csrf_token() }}' // Include CSRF token for Laravel
         };
 
@@ -742,11 +768,13 @@ $(document).ready(function () {
     }
 
     function refreshOverallChart() {
-        const dateRange = $('#daterange').val() || "2024-01-01 - 2024-12-31"; // Default date range
+        const dateRange = $('#daterange').val(); // Default date range
+        const type = $('#type').val() || "-1"; // Default type (show all)
 
         // Prepare request payload
         const payload = {
             periode: dateRange,
+            type: type,
             _token: '{{ csrf_token() }}' // Include CSRF token for Laravel
         };
 
@@ -804,6 +832,40 @@ $(document).ready(function () {
 
 function closeImage() {
     document.getElementById('welcome-container').style.display = 'none';
+}
+
+function toggleFullScreen(elementId) {
+    var element = document.getElementById(elementId);
+
+    if (!document.fullscreenElement) {
+        // Request fullscreen
+        if (element.requestFullscreen) {
+            element.requestFullscreen();
+        } else if (element.mozRequestFullScreen) { // Firefox
+            element.mozRequestFullScreen();
+        } else if (element.webkitRequestFullscreen) { // Chrome, Safari and Opera
+            element.webkitRequestFullscreen();
+        } else if (element.msRequestFullscreen) { // IE/Edge
+            element.msRequestFullscreen();
+        }
+
+        // Set scrolling styles
+        element.style.overflow = 'auto'; // Enable scrolling if needed
+    } else {
+        // Exit fullscreen
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) { // Firefox
+            document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) { // Chrome, Safari and Opera
+            document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) { // IE/Edge
+            document.msExitFullscreen();
+        }
+
+        // Reset scrolling styles
+        element.style.overflow = ''; // Reset to default
+    }
 }
 </script>
 @endsection
