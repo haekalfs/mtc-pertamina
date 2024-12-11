@@ -3875,3 +3875,27 @@ a.spam-button:link {
   span.twitter-typeahead .tt-suggestion:last-child { border-bottom:0px; }
   .bgColor {max-width: 440px;height: 200px;background-color: #c3e8cb;padding: 40px 70px;border-radius:4px;margin:20px auto;}
   .demo-label {font-size:1.5em;color: #686868;font-weight: 500;}
+
+
+#loadingIndicator {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Greyed-out background */
+    z-index: 9999; /* Ensure it's above all content */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-overlay {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.loading-spinner {
+    color: white; /* Spinner color */
+}

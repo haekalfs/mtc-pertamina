@@ -319,6 +319,14 @@
         </div>
         <!-- /.content -->
         <div class="clearfix"></div>
+
+        <div id="loadingIndicator" style="display: none;">
+            <div class="loading-overlay">
+                <div class="loading-spinner">
+                    <i class="fa fa-spinner fa-spin fa-3x"></i>
+                </div>
+            </div>
+        </div>
         <!-- Footer -->
         <footer class="site-footer">
             <div class="footer-inner bg-white">
@@ -354,6 +362,11 @@
     <script src="{{ asset('assets/js/jquery.matchHeight.min.js') }}"></script>
 
     <script>
+        $(document).ajaxStart(function () {
+            $('#loadingIndicator').fadeIn(); // Show loading spinner
+        }).ajaxStop(function () {
+            $('#loadingIndicator').fadeOut(); // Hide loading spinner
+        });
         jQuery(document).ready(function() {
             jQuery(".standardSelect").chosen({
                 disable_search_threshold: 10,
