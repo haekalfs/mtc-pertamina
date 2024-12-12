@@ -311,7 +311,27 @@ font-weight-bold
         </div>
     </div>
 </div>
+
+<style>
+.note-editor.fullscreen {
+    z-index: 1055 !important; /* Ensure it's above the modal (Bootstrap modal z-index is 1050) */
+    background-color: #fff; /* Prevent transparency */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Fix for modal backdrop */
+.modal-backdrop {
+    z-index: 1049; /* Ensure backdrop stays below Summernote */
+}
+</style>
 <script>
+
 $('#summernote').summernote({
     placeholder: 'Hasil Kegiatan...',
     tabsize: 2,
@@ -324,7 +344,17 @@ $('#summernote').summernote({
         ['table', ['table']],
         ['insert', ['link', 'picture', 'video']],
         ['view', ['fullscreen', 'codeview', 'help']]
-    ]
+    ],
+    callbacks: {
+        onPaste: function(e) {
+            e.preventDefault();
+            // Get the plain text from the clipboard
+            const clipboardData = (e.originalEvent || e).clipboardData || window.clipboardData;
+            const plainText = clipboardData.getData('text/plain');
+            // Insert plain text into the editor
+            document.execCommand('insertText', false, plainText);
+        }
+    }
 });
 </script>
 <script>
