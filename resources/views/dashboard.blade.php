@@ -671,6 +671,12 @@ $(document).ready(function () {
             },
             error: function (xhr, status, error) {
                 console.error("Error fetching data:", status, error);
+                // Generic error message for other errors
+                swal({
+                    title: "An Error Occurred",
+                    text: "Something went wrong. Please refresh your browser.",
+                    icon: "error",
+                });
             }
         });
     }
@@ -717,6 +723,12 @@ $(document).ready(function () {
             },
             error: function (xhr, status, error) {
                 console.error("Error fetching data:", status, error);
+                // Generic error message for other errors
+                swal({
+                    title: "An Error Occurred",
+                    text: "Something went wrong. Please refresh your browser.",
+                    icon: "error",
+                });
             }
         });
     }
@@ -763,6 +775,12 @@ $(document).ready(function () {
             },
             error: function (xhr, status, error) {
                 console.error("Error fetching data:", status, error);
+                // Generic error message for other errors
+                swal({
+                    title: "An Error Occurred",
+                    text: "Something went wrong. Please refresh your browser.",
+                    icon: "error",
+                });
             }
         });
     }
@@ -817,6 +835,12 @@ $(document).ready(function () {
             },
             error: function (xhr, status, error) {
                 console.error("Error fetching overall data:", status, error);
+                // Generic error message for other errors
+                swal({
+                    title: "An Error Occurred",
+                    text: "Something went wrong. Please refresh your browser.",
+                    icon: "error",
+                });
             }
         });
     }

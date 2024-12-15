@@ -22,19 +22,6 @@ font-weight-bold
         <a href="{{ route('profits') }}" class="btn btn-sm btn-secondary shadow-sm text-white"><i class="fa fa-backward"></i> Go Back</a>
     </div>
 </div>
-<div class="overlay overlay-mid" style="display: none;"></div>
-
-<div class="alert alert-danger alert-success-delete-mid" role="alert" style="display: none;">
-</div>
-
-<div class="alert alert-success alert-success-saving-mid" role="alert" style="display: none;">
-    Your entry has been saved successfully.
-</div>
-
-<div class="alert alert-warning alert-block">
-    <button type="button" class="close" data-dismiss="alert">×</button>
-    <strong>Importing Profits & Loss will also generate new batches in it along with the profits data.</strong>
-</div>
 @if ($message = Session::get('success'))
 <div class="alert alert-success alert-block">
     <button type="button" class="close" data-dismiss="alert">×</button>
@@ -55,6 +42,13 @@ font-weight-bold
     <strong>{{ $message }}</strong>
 </div>
 @endif
+
+@if ($message = Session::get('error_log'))
+<div class="alert alert-danger alert-block">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>{!! $message !!}</strong>
+</div>
+@endif
 <div class="animated fadeIn zoom90">
     <div class="row">
         <div class="col-md-12">
@@ -63,21 +57,21 @@ font-weight-bold
                     <h6 class="m-0 font-weight-bold text-secondary" id="judul">Upload File</h6>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('profits.import') }}" method="POST" enctype="multipart/form-data">
+                    <form id="importForm" action="{{ route('profits.import') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="row">
                             <div class="col-md-11">
                                 <div class="form-group">
                                     <label for="file">Xlsx File :</label>
                                     <div class="custom-file">
-                                        <input type="file" class="custom-file-input" id="file" name="file" aria-describedby="file" onchange="displayFileName()">
+                                        <input type="file" class="custom-file-input" id="file" name="file" aria-describedby="file" onchange="displayFileName()" required>
                                         <label class="custom-file-label" for="file" id="file-label">Choose file</label>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-1 d-flex justify-content-center align-items-end">
                                 <div class="form-group">
-                                    <button type="submit" class="btn btn-primary">Import</button>
+                                    <button type="button" class="btn btn-primary" id="submitButton">Import</button>
                                 </div>
                             </div>
                         </div>
@@ -109,6 +103,57 @@ font-weight-bold
 </div>
 
 <script>
+    document.getElementById('submitButton').addEventListener('click', function (e) {
+        e.preventDefault(); // Prevent the default form submission
+
+        swal({
+            title: "Confirm Import",
+            text: "Please check the following before proceeding:",
+            content: {
+                element: "div",
+                attributes: {
+                    innerHTML: `
+                        <div style="text-align: left;">
+                            <label><input type="checkbox" id="checkbox1"> The Column Starts on A</label><br>
+                            <label><input type="checkbox" id="checkbox2"> The Row Starts on 2</label><br>
+                            <label><input type="checkbox" id="checkbox3"> I Already Converted All Formulas to Actual Values</label><br>
+                            <label><input type="checkbox" id="checkbox4"> The sheets is only 1, no hidden sheets!</label><br>
+                            <label>To be sure, please check the layout picture below!</label>
+                        </div>
+                    `
+                }
+            },
+            buttons: {
+                cancel: {
+                    text: "Cancel",
+                    value: false,
+                    visible: true,
+                    className: "btn btn-danger",
+                    closeModal: true,
+                },
+                confirm: {
+                    text: "Proceed",
+                    value: true,
+                    visible: true,
+                    className: "btn btn-primary",
+                },
+            },
+        }).then((value) => {
+            if (value) {
+                // Check if all checkboxes are checked
+                if (document.getElementById('checkbox1').checked && document.getElementById('checkbox2').checked && document.getElementById('checkbox3').checked && document.getElementById('checkbox4').checked) {
+                    document.getElementById('importForm').submit(); // Submit the form
+                } else {
+                    swal({
+                        title: "Warning",
+                        text: "You must check all the boxes before proceeding!",
+                        icon: "warning",
+                        button: "Okay",
+                    });
+                }
+            }
+        });
+    });
     function displayFileName() {
         const input = document.getElementById('file');
         const label = document.getElementById('file-label');

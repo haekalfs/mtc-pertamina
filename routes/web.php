@@ -336,6 +336,9 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
                 Route::get('/finances/import-profits-loss-page', [FinanceController::class, 'profits_import'])->name('costs.import');
                 Route::post('/import-profits-loss', [ImportController::class, 'import_profits'])->name('profits.import');
                 Route::get('/finances/costs/preview-item/{id}', [FinanceController::class, 'preview_costs'])->name('preview-costs');
+
+                //Error Log
+                Route::get('/finances/error-log', [FinanceController::class, 'error_log'])->name('finance.error.log');
             });
 
 

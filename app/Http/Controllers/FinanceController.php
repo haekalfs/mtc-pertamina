@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Error_log_import;
 use App\Models\Penlat;
 use App\Models\Penlat_batch;
 use App\Models\Penlat_utility_usage;
@@ -10,6 +11,7 @@ use App\Models\Vendor_payment;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use Yajra\DataTables\Facades\DataTables;
 
 class FinanceController extends Controller
@@ -364,6 +366,14 @@ class FinanceController extends Controller
 
         $penlatList = Penlat::all();
 
+        $checkIfAnyError = Error_log_import::where('import_id', 4)
+            ->where('created_at', '>=', now()->subWeek())
+            ->count();
+
+        if ($checkIfAnyError) {
+            Session::flash('error_log', "There are " . $checkIfAnyError . " errors since the last import! Click <a href='" . route('finance.error.log') . "'>here</a> to view details.");
+        }
+
         return view('finance.submenu.profits', ['penlatList' => $penlatList]);
     }
 
@@ -523,6 +533,14 @@ class FinanceController extends Controller
 
     public function profits_import()
     {
+        $checkIfAnyError = Error_log_import::where('import_id', 4)
+            ->where('created_at', '>=', now()->subWeek())
+            ->count();
+
+        if ($checkIfAnyError) {
+            Session::flash('error_log', "There are " . $checkIfAnyError . " errors since the last import! Click <a href='" . route('finance.error.log') . "'>here</a> to view details.");
+        }
+
         return view('finance.import.index');
     }
 
@@ -626,5 +644,31 @@ class FinanceController extends Controller
             'dataPoints' => $dataPoints,
             'profitsValue' => $profitsValue
         ]);
+    }
+
+    public function error_log(Request $request)
+    {
+        // Delete rows older than 1 week
+        Error_log_import::where('created_at', '<', now()->subWeek())->delete();
+
+        $errors = Error_log_import::with('user') // Eager load the user relationship
+            ->where('import_id', 4)
+            ->where('created_at', '>=', now()->subWeek())
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        if ($request->ajax()) {
+            return DataTables::of($errors)
+                ->addIndexColumn() // Automatically add index column
+                ->addColumn('importer', function ($error) {
+                    return $error->user ? $error->user->name : 'Unknown'; // Get user name or default
+                })
+                ->editColumn('created_at', function ($error) {
+                    return $error->created_at->format('Y-m-d H:i:s'); // Format the date
+                })
+                ->make(true);
+        }
+
+        return view('finance.import.error_log');
     }
 }

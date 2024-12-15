@@ -2,6 +2,7 @@
 
 namespace App\Imports;
 
+use App\Models\Error_log_import;
 use App\Models\Notification;
 use App\Models\Penlat;
 use App\Models\Penlat_alias;
@@ -24,6 +25,7 @@ use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 use Maatwebsite\Excel\Events\AfterImport;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
+use Illuminate\Support\Facades\Validator;
 
 class ImportProfits implements ToCollection, WithCalculatedFormulas, SkipsEmptyRows, WithBatchInserts, WithChunkReading, ShouldQueue, WithStartRow, WithEvents, HasReferencesToOtherSheets
 {
@@ -44,8 +46,20 @@ class ImportProfits implements ToCollection, WithCalculatedFormulas, SkipsEmptyR
             DB::beginTransaction();
 
             $currentDate = null;
-            foreach ($rows as $row) {
+            foreach ($rows as $index => $row) { // Use $index to track the loop iteration
+
+                $startRow = $this->startRow(); // Get the starting row number
                 $totalUsageCost = 0;
+
+                if(strpos($row[1], '/') == false){
+                    Error_log_import::create([
+                        'description' => 'Invalid row or the batch does not exist ' . $row[1],
+                        'row' => $index + $startRow, // Calculate the actual row number
+                        'import_id' => 4, // Example ID, replace with a dynamic value if necessary
+                        'user_id' => $this->userId,
+                    ]);
+                    continue;
+                }
 
                 // Make sure the batch doesn't already exist
                 $checkBatch = Penlat_batch::where('batch', $row[1])->exists();
@@ -56,6 +70,8 @@ class ImportProfits implements ToCollection, WithCalculatedFormulas, SkipsEmptyR
                         ->sum('total');
 
                     $currentDate = $findBatch->date;
+                } else {
+                    $currentDate = null; // Reset to null if batch doesn't exist
                 }
 
                 Profit::updateOrCreate(
