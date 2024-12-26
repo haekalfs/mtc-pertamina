@@ -63,7 +63,7 @@ font-weight-bold
                     <h6 class="m-0 font-weight-bold text-secondary" id="judul">Upload File</h6>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('infografis_peserta.import') }}" method="POST" enctype="multipart/form-data">
+                    <form id="importForm" action="{{ route('infografis_peserta.import') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="row">
                             <div class="col-md-11">

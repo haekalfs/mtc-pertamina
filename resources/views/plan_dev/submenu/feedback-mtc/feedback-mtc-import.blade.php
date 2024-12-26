@@ -61,7 +61,7 @@ font-weight-bold
                     </div>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('feedback.mtc.import') }}" method="POST" enctype="multipart/form-data">
+                    <form id="importForm" action="{{ route('feedback.mtc.import') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="row">
                             <div class="col-md-11">

@@ -1,25 +1,25 @@
 @extends('layouts.main')
 
-@section('active-finance')
+@section('active-operation')
 active font-weight-bold
 @endsection
 
-@section('show-finance')
+@section('show-operation')
 show
 @endsection
 
-@section('cost')
+@section('participant-infographics')
 font-weight-bold
 @endsection
 
 @section('content')
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
-        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="menu-icon ti-stats-down"></i> Error Log Profit Imports</h1>
+        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="menu-icon fa fa-users"></i> Error Log Infographics Imports</h1>
         <p class="mb-4">Error Log from Excel Imports.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
-        <a href="{{ route('costs.import') }}" class="btn btn-sm btn-primary shadow-sm text-white"><i class="fa fa-file-text fa-sm"></i> Import Data</a>
+        <a href="{{ route('participant-infographics-import-page') }}" class="btn btn-sm btn-primary shadow-sm text-white"><i class="fa fa-file-text fa-sm"></i> Import Data</a>
     </div>
 </div>
 <div class="overlay overlay-mid" style="display: none;"></div>
@@ -111,7 +111,7 @@ $(document).ready(function () {
     $('#errorTable').DataTable({
         processing: true,
         serverSide: true,
-        ajax: "{{ route('finance.error.log') }}",
+        ajax: "{{ route('infographics.error.log') }}",
         columns: [
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false }, // Auto-increment index
             { data: 'description', name: 'description' },

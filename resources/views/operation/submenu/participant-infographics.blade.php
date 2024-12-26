@@ -50,6 +50,13 @@ font-weight-bold
     <strong>{{ $message }}</strong>
 </div>
 @endif
+
+@if ($message = Session::get('error_log'))
+<div class="alert alert-danger alert-block">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>{!! $message !!}</strong>
+</div>
+@endif
 <div class="animated fadeIn zoom90">
     <div class="row">
         <div class="col-md-12">

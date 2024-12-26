@@ -2,6 +2,7 @@
 
 namespace App\Imports;
 
+use App\Models\Error_log_import;
 use App\Models\Infografis_peserta;
 use App\Models\Penlat;
 use App\Models\Penlat_batch;
@@ -41,10 +42,24 @@ class InfografisImport implements ToCollection, SkipsEmptyRows, WithBatchInserts
             DB::beginTransaction();
 
             // Loop through the rows and save the data to the database
-            foreach ($rows as $row) {
+            foreach ($rows as $index => $row) { // Use $index to track the loop iteration
+
+                $startRow = $this->startRow(); // Get the starting row number
 
                 if (empty($row[2]) || empty($row[11]) || empty($row[12]) || empty($row[13]) || empty($row[14])) {
                     continue; // Skip rows with empty required fields
+                }
+
+                // Check for a valid batch format (must contain a slash '/')
+                if (strpos($row[10], '/') === false) {
+                    // Log the error with meaningful details
+                    Error_log_import::create([
+                        'description' => 'Invalid row or the batch does not exist: ' . $row[10],
+                        'row' => $index + $startRow, // Calculate the actual row number
+                        'import_id' => 1, // Replace with the dynamic value for import_id
+                        'user_id' => $this->userId, // Use the dynamic user ID
+                    ]);
+                    continue;
                 }
 
                 Infografis_peserta::updateOrCreate(

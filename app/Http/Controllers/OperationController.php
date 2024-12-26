@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Asset_condition;
+use App\Models\Error_log_import;
 use App\Models\Infografis_peserta;
 use App\Models\Inventory_room;
 use App\Models\Inventory_tools;
@@ -354,6 +355,14 @@ class OperationController extends Controller
 
         $batches = Penlat_batch::all();
         $penlatList = Penlat::all();
+
+        $checkIfAnyError = Error_log_import::where('import_id', 1)
+            ->where('created_at', '>=', now()->subWeek())
+            ->count();
+
+        if ($checkIfAnyError) {
+            Session::flash('error_log', "There are " . $checkIfAnyError . " errors since the last import! Click <a href='" . route('infographics.error.log') . "'>here</a> to view details.");
+        }
 
         return view('operation.submenu.participant-infographics', [
             'yearsBefore' => $yearsBefore,
@@ -1413,5 +1422,31 @@ class OperationController extends Controller
         $utility->save();
 
         return response()->json(['success' => 'Utility updated successfully.']);
+    }
+
+    public function error_log(Request $request)
+    {
+        // Delete rows older than 1 week
+        Error_log_import::where('created_at', '<', now()->subWeek())->delete();
+
+        $errors = Error_log_import::with('user') // Eager load the user relationship
+            ->where('import_id', 1)
+            ->where('created_at', '>=', now()->subWeek())
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        if ($request->ajax()) {
+            return DataTables::of($errors)
+                ->addIndexColumn() // Automatically add index column
+                ->addColumn('importer', function ($error) {
+                    return $error->user ? $error->user->name : 'Unknown'; // Get user name or default
+                })
+                ->editColumn('created_at', function ($error) {
+                    return $error->created_at->format('Y-m-d H:i:s'); // Format the date
+                })
+                ->make(true);
+        }
+
+        return view('operation.import.error_log');
     }
 }

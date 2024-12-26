@@ -115,7 +115,7 @@ font-weight-bold
                     innerHTML: `
                         <div style="text-align: left;">
                             <label><input type="checkbox" id="checkbox1"> The Column Starts on A</label><br>
-                            <label><input type="checkbox" id="checkbox2"> The Row Starts on 2</label><br>
+                            <label><input type="checkbox" id="checkbox2"> The Row Starts on 4</label><br>
                             <label><input type="checkbox" id="checkbox3"> I Already Converted All Formulas to Actual Values</label><br>
                             <label><input type="checkbox" id="checkbox4"> The sheets is only 1, no hidden sheets!</label><br>
                             <label>To be sure, please check the layout picture below!</label>

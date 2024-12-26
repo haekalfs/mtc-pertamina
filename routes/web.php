@@ -147,6 +147,9 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
                 Route::put('/infografis-peserta/{id}', [OperationController::class, 'update']);
                 Route::delete('/infografis-peserta-delete-data/{id}', [OperationController::class, 'delete_data_peserta']);
 
+                //Error Log
+                Route::get('/operation/participant-infographics/error-log', [OperationController::class, 'error_log'])->name('infographics.error.log');
+
                 //inventaris Alat
                 Route::get('/tool-inventory', [InventoryToolController::class, 'tool_inventory'])->name('tool-inventory');
                 Route::get('/tool-inventory/preview/{id}', [InventoryToolController::class, 'preview_asset'])->name('preview-asset');
