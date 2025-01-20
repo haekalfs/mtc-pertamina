@@ -23,7 +23,7 @@ class BarcodeController extends Controller
         // Generate the QR Code
         $qrCodeData = QrCode::format('png')
             ->size(200)
-            ->merge('/storage/app/MTC.jpeg', 0.3)
+            ->merge('/storage/app/MTC.png', 0.3)
             ->errorCorrection('H') // High error correction level
             ->generate($qrText);
 
