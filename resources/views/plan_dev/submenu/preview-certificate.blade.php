@@ -158,7 +158,7 @@ font-weight-bold
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-secondary" id="judul">List Participants</h6>
                     <div class="text-right">
-                        <input type="text" name="formId" id="formId" value="" />
+                        <input type="hidden" name="formId" id="formId" value="" />
                     </div>
                 </div>
                 <div class="card-body">
