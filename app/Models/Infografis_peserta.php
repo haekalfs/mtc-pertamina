@@ -30,7 +30,10 @@ class Infografis_peserta extends Model
         'realisasi',
         'isDuplicate',
         'participant_id',
-        'seafarer_code'
+        'seafarer_code',
+        'registration_number',
+        'birth_place',
+        'birth_date'
     ];
 
     public function certificate(){

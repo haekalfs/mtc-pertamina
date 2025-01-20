@@ -1027,23 +1027,25 @@ class OperationController extends Controller
     public function delete_item_room($id)
     {
         try {
-            // Check if the Penlat is used in the Penlat_batch table
-            $isItemExist = Inventory_room::where('id', $id)->exists();
+            // Check if the Inventory_room exists
+            $item = Inventory_room::find($id);
 
-            if (!$isItemExist) {
-                return redirect()->back()->with('success', 'Failed to delete record due to unexist item.');
+            // If the item does not exist, return a not found response
+            if (!$item) {
+                return response()->json(['error' => 'Item not found.'], 404);
             }
 
-            $item = Inventory_room::where('id', $id);
+            // Delete the item
             $item->delete();
 
-            return redirect()->back()->with('success', 'Deleted Successfully.');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return redirect()->back()->with('success', 'Deleted Successfully.');
+            // Return a success response for AJAX
+            return response()->json(['success' => 'Deleted Successfully.']);
         } catch (\Exception $e) {
             // Log the exception for debugging
-            Log::error('Failed to delete Penlat: ' . $e->getMessage());
-            return response()->json(['error' => 'Record not found.'], 404);
+            Log::error('Failed to delete Inventory Room: ' . $e->getMessage());
+
+            // Return a generic error message
+            return response()->json(['error' => 'Failed to delete record. Please try again later.'], 500);
         }
     }
 
@@ -1240,11 +1242,11 @@ class OperationController extends Controller
                     // Filter the Inventory_room records for the specific room
                     $inventoryRoom = $item->rooms_inventory->where('room_id', $roomId)->first();
 
-                    // Generate the delete button using the filtered `inventory_room` id
+                    // Generate the delete button with a `data-id` attribute for AJAX
                     $deleteButton = $inventoryRoom
-                        ? '<a href="' . route('delete.item.room', $inventoryRoom->id) . '" class="btn btn-outline-danger btn-md text-danger">
+                        ? '<button class="btn btn-outline-danger btn-md text-danger delete-item" data-id="' . $inventoryRoom->id . '">
                                 <i class="fa fa-trash-o"></i>
-                           </a>'
+                           </button>'
                         : '<button class="btn btn-outline-danger btn-md text-danger" disabled>
                                 <i class="fa fa-trash-o"></i>
                            </button>';

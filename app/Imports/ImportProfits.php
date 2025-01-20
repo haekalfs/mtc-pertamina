@@ -76,7 +76,7 @@ class ImportProfits implements ToCollection, WithCalculatedFormulas, SkipsEmptyR
 
                 Profit::updateOrCreate(
                     [
-                        'pelaksanaan' => $row[1],
+                        'pelaksanaan' => trim($row[1]),
                         'jumlah_peserta' => $row[2]
                     ],
                     [

@@ -332,7 +332,7 @@ font-weight-bold
                                 <img id="edit-image-preview" src="{{ asset('img/default-img.png') }}" style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
                                 <small style="font-size: 10px;"><i><u>Editing image is Optional!</u></i></small>
                             </label>
-                            <input id="edit-file-upload" type="file" name="tool_image" style="display: none;" accept="image/*" onchange="previewImage(event)">
+                            <input id="edit-file-upload" type="file" name="tool_image" style="display: none;" accept="image/*" onchange="previewImageEditor(event)">
                         </div>
                         <div class="col-md-9">
                             <div class="card-body text-secondary">
@@ -500,6 +500,14 @@ function previewImage(event) {
     const reader = new FileReader();
     reader.onload = function(){
         const output = document.getElementById('image-preview');
+        output.src = reader.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+}
+function previewImageEditor(event) {
+    const reader = new FileReader();
+    reader.onload = function(){
+        const output = document.getElementById('edit-image-preview');
         output.src = reader.result;
     };
     reader.readAsDataURL(event.target.files[0]);

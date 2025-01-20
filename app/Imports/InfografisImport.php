@@ -79,6 +79,9 @@ class InfografisImport implements ToCollection, SkipsEmptyRows, WithBatchInserts
                         'participant_id' => $row[1]
                     ],
                     [
+                        'registration_number' => $row[7],
+                        'birth_place' => $row[3],
+                        'birth_date' => $this->getFormattedDate($row[4]),
                         'isDuplicate' => false
                     ]
                 );

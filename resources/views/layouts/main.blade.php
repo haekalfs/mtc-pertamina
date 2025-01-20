@@ -135,7 +135,7 @@
                             {{-- <li><i class="fa fa-cog"></i><a href="#">Monitoring Approval</a></li> --}}
                             <li><i class="fa fa-male"></i><a href="{{ route('instructor') }}" class="@yield('instructor')">Instruktur</a></li>
                             <li><i class="fa fa-certificate"></i><a href="{{ route('certificate-main') }}" class="@yield('certificate')">Certification</a></li>
-                            <li><i class="fa fa-file-text"></i><a href="{{ route('monitoring-approval') }}" class="@yield('monitoring-approval')">Monitoring Approvals</a></li>
+                            <li><i class="fa fa-file-text"></i><a href="{{ route('monitoring-approval') }}" class="@yield('monitoring-approval')">Monitoring Approvals<span class="badge badge-danger badge-counter">2</span></a></li>
                             <li><i class="fa fa-warning"></i><a href="{{ route('regulation') }}" class="@yield('regulation')">Regulasi</a></li>
                         </ul>
                     </li>
@@ -208,6 +208,10 @@
                         <a href="{{ route('refractor') }}"><i class="menu-icon fa fa-trash-o"></i>Data Cleansing</a>
                     </li>
 
+                    <li class="menu-title">Tools</li><!-- /.menu-title -->
+                    <li class="@yield('active-barcode_page')">
+                        <a href="{{ route('barcode_page') }}"><i class="menu-icon fa fa-qrcode"></i>QR Code Generator </a>
+                    </li>
                     <li style="padding-bottom: 15%;">
                         <a href="/telescope"><i class="menu-icon fa fa-signal"></i>Web Monitoring</a>
                     </li>

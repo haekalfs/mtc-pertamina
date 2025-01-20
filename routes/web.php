@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AgreementController;
 use App\Http\Controllers\AkhlakController;
+use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentPositionController;
@@ -52,6 +53,10 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 
 Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
     Route::middleware('suspiciousTexts')->group(function () {
+
+        Route::get('/certificate-validation/qr-code/preview-certificate/{id}', [PDController::class, 'validate_certificate'])->name('validate-certificate');
+        Route::get('/certificate-generate-qr/{id}', [PDController::class, 'generateQrCode'])->name('generate-qr-certificate');
+
         //On Dev Notification
         Route::get('/closed-menu', function () {
             // Set the session flash message
@@ -176,7 +181,7 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
                 Route::delete('/room-delete/{id}', [OperationController::class, 'delete_room'])->name('delete.room');
                 Route::get('/operation/room-inventory/preview-item/{id}', [OperationController::class, 'preview_room'])->name('preview-room');
                 Route::get('/operation/room-inventory/preview-room/{id}', [OperationController::class, 'preview_room_user'])->name('preview-room-user');
-                Route::get('/room-item-delete/{id}', [OperationController::class, 'delete_item_room'])->name('delete.item.room');
+                Route::delete('/room-item-delete/{id}', [OperationController::class, 'delete_item_room'])->name('delete.item.room');
                 Route::post('/room-data-update/{roomId}', [OperationController::class, 'update_room_data'])->name('room.data.update');
                 Route::put('/room-item-update/{id}', [OperationController::class, 'update_room_item'])->name('room.item.update');
 
@@ -230,6 +235,16 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
                 Route::get('/planning-development/certification/instructors-certificate', [PDController::class, 'certificate_instructor'])->name('certificate-instructor');
 
                 Route::post('/store-certificates', [PDController::class, 'certificate_store'])->name('certificate.store');
+                Route::post('/mark-certificate-received', [PDController::class, 'markCertificateAsReceived'])->name('mark.received');
+                Route::post('/mark-certificate-expire', [PDController::class, 'markCertificateAsExpire'])->name('mark.expired');
+                Route::post('/certificate/{id}/update', [PDController::class, 'updateCertificate'])->name('certificate.list.update');
+                Route::get('/certificates/{id}', [PDController::class, 'getCertificates'])->name('certificates.get');
+                Route::post('/certificates/export/selected-items', [PDController::class, 'export_selected'])->name('certificate.export.selected');
+
+                Route::get('/regulators/fetch', [PDController::class, 'fetchRegulators'])->name('regulators.fetch');
+                Route::post('/regulators/store', [PDController::class, 'storeRegulator'])->name('regulators.store');
+                Route::get('/generateExcelWithQrCode/{id}', [PDController::class, 'generateExcelWithQrCode'])->name('test');
+
                 Route::post('/planning-development/certificate-update/{certId}', [PDController::class, 'certificate_update'])->name('certificate.update');
                 Route::post('/certificate/delete', [PDController::class, 'delete_certificate'])->name('certificate.delete');
                 Route::post('/store-certificate-catalog', [PDController::class, 'certificate_catalog_store'])->name('certificate-catalog.store');
@@ -316,6 +331,7 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
             Route::put('/penlat-batch-update/{id}', [PenlatController::class, 'update_batch'])->name('batch.update');
             Route::delete('/penlat-batch-delete/{id}', [PenlatController::class, 'delete_batch'])->name('delete.batch');
             Route::get('/fetch-penlat-batches', [PenlatController::class, 'fetchBatches'])->name('batches.fetch');
+            Route::get('/fetch-certificate-batches', [PenlatController::class, 'fetchBatchesCertificates'])->name('batches.fetch.certificate');
             Route::post('/penlat-batch/refresh', [PenlatController::class, 'refresh_batch_data'])->name('refresh.batch');
 
             //Master Data
@@ -395,6 +411,10 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
         Route::put('/update-briefing/{itemId}', [MorningBriefingController::class, 'update'])->name('briefing.update');
         Route::delete('/marketing-briefing/delete-item/{id}', [MorningBriefingController::class, 'delete_briefing'])->name('delete-briefing');
     });
+
+
+    Route::get('/qr-code-generator', [BarcodeController::class, 'index'])->name('barcode_page');
+    Route::post('/generate-qr-code', [BarcodeController::class, 'generateQR'])->name('generate.Qr');
 
 
     Route::middleware(['restrictRequestbyRole', 'checkUserAccess:104'])->group(function () {

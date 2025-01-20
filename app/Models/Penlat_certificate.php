@@ -9,10 +9,14 @@ class Penlat_certificate extends Model
 {
     use HasFactory;
     protected $table = "penlat_certificates";
-    protected $fillable = ["id", "penlat_batch_id", "keterangan", "status", "total_issued","created_at", "updated_at"];
+    protected $fillable = ["id", "penlat_batch_id", "keterangan", "status", "total_issued", "start_date", "end_date", "regulator","created_at", "updated_at"];
 
     public function batch(){
     	return $this->belongsTo('App\Models\Penlat_batch', 'penlat_batch_id', 'id')->withDefault();
+    }
+
+    public function regulation(){
+    	return $this->belongsTo('App\Models\Regulator', 'regulator', 'id')->withDefault();
     }
 
     public function participant()

@@ -536,7 +536,7 @@ class PenlatController extends Controller
             // Create or update the entry
             $penlatUtility = Penlat_batch::updateOrCreate(
                 [
-                    'batch' => $request->batch,
+                    'batch' => trim($request->batch),
                 ],
                 [
                     'penlat_id' => $request->penlat,
@@ -682,6 +682,37 @@ class PenlatController extends Controller
         // Return the results in the format expected by Select2
         return response()->json([
             'items' => $batches->items(),
+            'total_count' => $batches->total()
+        ]);
+    }
+
+    public function fetchBatchesCertificates(Request $request)
+    {
+        $search = $request->input('q');
+        $penlat_id = $request->input('penlat_id');
+        $page = $request->input('page', 1);
+        $perPage = 10;
+
+        $query = Penlat_batch::query();
+
+        if ($penlat_id) {
+            $query->where('penlat_id', $penlat_id);
+        }
+
+        if ($search) {
+            $query->where('batch', 'like', '%' . $search . '%');
+        }
+
+        $batches = $query->paginate($perPage, ['*'], 'page', $page);
+
+        return response()->json([
+            'items' => $batches->map(function ($batch) {
+                return [
+                    'id' => $batch->batch,
+                    'text' => $batch->batch,
+                    'date' => $batch->date, // Include the 'date' column
+                ];
+            }),
             'total_count' => $batches->total()
         ]);
     }

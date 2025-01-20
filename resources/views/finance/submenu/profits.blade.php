@@ -80,8 +80,8 @@ font-weight-bold
                             <div class="row align-items-center">
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label for="namaPenlat">Nama Pelatihan :</label>
-                                        <select class="custom-select" id="namaPenlat" name="namaPenlat">
+                                        <label for="namaPenlat">Nama Pelatihan:</label>
+                                        <select class="custom-select select2" id="namaPenlat" name="namaPenlat">
                                             <option value="-1" selected>Show All</option>
                                             @foreach($penlatList as $penlat)
                                                 <option value="{{ $penlat->id }}">{{ $penlat->description }}</option>
@@ -91,8 +91,8 @@ font-weight-bold
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label for="jenisPenlat">Jenis Pelatihan :</label>
-                                        <select class="form-control" id="jenisPenlat" name="jenisPenlat">
+                                        <label for="jenisPenlat">Jenis Pelatihan:</label>
+                                        <select class="form-control select2" id="jenisPenlat" name="jenisPenlat">
                                             <option value="-1" selected>Show All</option>
                                             @foreach($penlatList->unique('jenis_pelatihan') as $penlat)
                                                 <option value="{{ $penlat->jenis_pelatihan }}">{{ $penlat->jenis_pelatihan }}</option>
@@ -102,8 +102,8 @@ font-weight-bold
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label for="status">Month :</label>
-                                        <select class="form-control" id="month" name="month" required>
+                                        <label for="month">Month:</label>
+                                        <select class="form-control select2" id="month" name="month" required>
                                             <option value="-1" selected>Show All</option>
                                             @foreach(range(1, 12) as $month)
                                                 <option value="{{ $month }}">{{ date("F", mktime(0, 0, 0, $month, 1)) }}</option>
@@ -113,8 +113,8 @@ font-weight-bold
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label for="position_id">Year :</label>
-                                        <select name="periode" class="form-control" id="periode">
+                                        <label for="periode">Year:</label>
+                                        <select name="periode" class="form-control select2" id="periode">
                                             <option value="-1" selected>Show All</option>
                                             @foreach(range(date('Y'), date('Y') - 5) as $year)
                                                 <option value="{{ $year }}">{{ $year }}</option>
@@ -316,6 +316,27 @@ font-weight-bold
         </div>
     </div>
 </div>
+<style>
+    /* Custom CSS to align the Select2 container */
+    .select2-container--default .select2-selection--single {
+        height: calc(2.25rem + 2px); /* Adjust this value to match your input height */
+        padding: 0.375rem 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: calc(2.25rem + 2px); /* Adjust this to vertically align the text */
+    }
+
+    .select2-container .select2-selection--single {
+        height: 100% !important; /* Ensure the height is consistent */
+    }
+
+    .select2-container {
+        width: 100% !important; /* Ensure the width matches the form control */
+    }
+</style>
 <script>
 window.onload = function () {
     // Get the current year
@@ -444,6 +465,16 @@ function formatCurrency(value) {
         $('#penlatSelect').on('change', function() {
             var selectedOption = $(this).find('option:selected').text();
             $('#programInput').val(selectedOption);
+        });
+
+        $('#namaPenlat').select2({
+            placeholder: "Select Nama Pelatihan",
+            allowClear: true
+        });
+
+        $('#jenisPenlat').select2({
+            placeholder: "Select Jenis Pelatihan",
+            allowClear: true
         });
     });
 </script>

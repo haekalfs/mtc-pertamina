@@ -17,6 +17,7 @@ use App\Models\Penlat_certificate;
 use App\Models\Position;
 use App\Models\Receivables_participant_certificate;
 use App\Models\Regulation;
+use App\Models\Regulator;
 use App\Models\Role;
 use App\Models\Status;
 use App\Models\Training_reference;
@@ -24,10 +25,19 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use Yajra\DataTables\Facades\DataTables;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use ZipArchive;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
+use Illuminate\Support\Facades\File;
+use PhpOffice\PhpSpreadsheet\Worksheet\MemoryDrawing;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 
 class PDController extends Controller
 {
@@ -328,6 +338,7 @@ class PDController extends Controller
     {
         $penlatList = Penlat::all();
         $listBatch = Penlat_batch::all();
+        $listRegulator = Regulator::all();
 
         if ($request->ajax()) {
             $query = Penlat_certificate::with(['batch.penlat']);
@@ -361,7 +372,8 @@ class PDController extends Controller
         // If it's not an AJAX request, return the view with necessary data
         return view('plan_dev.submenu.certificate', [
             'penlatList' => $penlatList,
-            'listBatch' => $listBatch
+            'listBatch' => $listBatch,
+            'listRegulator' => $listRegulator
         ]);
     }
 
@@ -627,7 +639,10 @@ class PDController extends Controller
             'batch' => 'required',
             'status' => 'required',
             'keterangan' => 'required',
-            'program' => 'sometimes'
+            'program' => 'sometimes',
+            'startDate' => 'required',
+            'endDate' => 'required',
+            'regulator' => 'required'
         ]);
 
         // Store the current timestamp
@@ -675,6 +690,9 @@ class PDController extends Controller
                 ],
                 [
                     'status' => $validated['status'],
+                    'start_date' => $validated['startDate'],
+                    'end_date' => $validated['endDate'],
+                    'regulator' => $validated['regulator'],
                     'keterangan' => $validated['keterangan'],
                     'total_issued' => $participants->count(),
                     'updated_at' => $currentTimestamp,
@@ -689,6 +707,7 @@ class PDController extends Controller
                         'penlat_certificate_id' => $penlatCertificate->id,
                     ],
                     [
+                        'status' => 'true',
                         'updated_at' => $currentTimestamp,
                     ]
                 );
@@ -716,6 +735,61 @@ class PDController extends Controller
     {
         $data = Penlat_certificate::find($id);
         return view('plan_dev.submenu.preview-certificate', ['data' => $data]);
+    }
+
+    public function getCertificates(Request $request, $id)
+    {
+        // Fetch the certificates with the required relationships
+        $certificates = Receivables_participant_certificate::with(['peserta', 'penlatCertificate'])
+            ->where('penlat_certificate_id', $id)
+            ->get();
+
+        return DataTables::of($certificates)
+            ->addColumn('participant_registration_number', function ($row) {
+                return $row->peserta ? $row->peserta->registration_number : '-';
+            })
+            ->addColumn('participant_name', function ($row) {
+                return $row->peserta ? $row->peserta->nama_peserta : '-';
+            })
+            ->addColumn('status', function ($row) {
+                return $row->status == 'true'
+                    ? '<i class="fa fa-check"></i>'
+                    : '<i class="fa fa-ban"></i>';
+            })
+            ->addColumn('actions', function ($row) {
+                return '<button class="btn btn-outline-secondary btn-md mb-2 mr-2 edit-button"
+                            data-id="' . $row->id . '"
+                            data-participant-name="' . ($row->peserta ? $row->peserta->nama_peserta : '-') . '"
+                            data-expire-date="' . $row->expire_date . '"
+                            data-received-date="' . $row->date_received . '"
+                            data-certificate-number="' . $row->certificate_number . '">
+                            <i class="fa fa-edit"></i>
+                        </button>
+                        <a class="btn btn-outline-success btn-md mb-2 mr-2 generateQR" href="javascript:void(0)"
+                            data-id="' . $row->id . '">
+                            <i class="fa fa-qrcode"></i>
+                        </a>';
+            })
+            ->editColumn('certificate_number', function ($row) {
+                return $row->certificate_number ?? '-';
+            })
+            ->editColumn('date_received', function ($row) {
+                return $row->date_received
+                    ? \Carbon\Carbon::parse($row->date_received)->format('d-M-Y')
+                    : '-';
+            })
+            ->editColumn('expire_date', function ($row) {
+                return $row->expire_date
+                    ? \Carbon\Carbon::parse($row->expire_date)->format('d-M-Y')
+                    : '-';
+            })
+            ->editColumn('issued_date', function ($row) {
+                return $row->issued_date
+                    ? \Carbon\Carbon::parse($row->issued_date)->format('d-M-Y')
+                    : '-';
+            })
+            ->rawColumns(['status', 'actions'])
+            ->make(true);
     }
 
     public function preview_certificate_catalog($id)
@@ -1034,8 +1108,13 @@ class PDController extends Controller
 
     public function delete_receivable(Request $request)
     {
-        $participant = Receivables_participant_certificate::find($request->id);
-        $participant->delete();
+        $ids = $request->input('ids'); // Array of IDs to delete
+
+        if (empty($ids)) {
+            return response()->json(['status' => 'error', 'message' => 'No IDs provided for deletion.']);
+        }
+
+        Receivables_participant_certificate::whereIn('id', $ids)->delete();
 
         return response()->json(['status' => 'success']);
     }
@@ -1129,5 +1208,331 @@ class PDController extends Controller
         $certificate->delete();
 
         return response()->json(['success' => 'Certificate and related data deleted successfully.']);
+    }
+
+    public function markCertificateAsExpire(Request $request)
+    {
+        // Validate the incoming request
+        $request->validate([
+            'formIds' => 'required', // Ensure formIds is provided
+            'dateReceived' => 'required|date', // Ensure the date is valid
+        ]);
+
+        try {
+            // Retrieve the formIds and date from the request
+            $formIds = $request->input('formIds');
+            $dateReceived = $request->input('dateReceived');
+
+            $isExpire = Carbon::parse($dateReceived)->format('Y-m-d') < now() ? 'false' : 'true';
+
+            // Convert formIds to an array if it's a string
+            if (!is_array($formIds)) {
+                $formIds = explode(',', $formIds); // Split by commas into an array
+            }
+
+            // Update the expire_date for the selected IDs
+            Receivables_participant_certificate::whereIn('id', $formIds)
+                ->update(['expire_date' => $dateReceived, 'status' => $isExpire]);
+
+            // Return a JSON response
+            return response()->json(['success' => true, 'message' => 'Certificates marked as expired successfully.']);
+        } catch (\Exception $e) {
+            // Handle errors and return a JSON error response
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function markCertificateAsReceived(Request $request)
+    {
+        // Validate the incoming request
+        $request->validate([
+            'formIds' => 'required', // Ensure formIds is provided
+            'dateReceived' => 'required|date', // Ensure the date is valid
+        ]);
+
+        try {
+            // Retrieve the formIds and date from the request
+            $formIds = $request->input('formIds');
+            $dateReceived = $request->input('dateReceived');
+
+            // Convert formIds to an array if it's a string
+            if (!is_array($formIds)) {
+                $formIds = explode(',', $formIds); // Split by commas into an array
+            }
+
+            // Update the date_received column for the selected IDs
+            Receivables_participant_certificate::whereIn('id', $formIds)
+                ->update(['date_received' => $dateReceived]);
+
+            // Return a JSON response
+            return response()->json(['success' => true, 'message' => 'Certificates marked as received successfully.']);
+        } catch (\Exception $e) {
+            // Handle errors and return a JSON error response
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function updateCertificate(Request $request, $id)
+    {
+        // Validate the incoming request
+        $request->validate([
+            'receivedDate' => 'sometimes',
+            'expireDate' => 'sometimes',
+            'certificateNumber' => 'required',
+        ]);
+
+        try {
+            // Find the record by ID
+            $certificate = Receivables_participant_certificate::findOrFail($id);
+
+            $isExpire = Carbon::parse($request->expireDate)->format('Y-m-d') < now() ? 'false' : 'true';
+
+            // Update the record
+            $certificate->update([
+                'date_received' => $request->receivedDate,
+                'expire_date' => $request->expireDate,
+                'certificate_number' => $request->certificateNumber,
+                'status' => $isExpire
+            ]);
+
+            // Return a JSON response
+            return response()->json(['success' => true, 'message' => 'Certificate data updated successfully.']);
+        } catch (\Exception $e) {
+            // Handle errors and return a JSON error response
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function validate_certificate($encryptedId)
+    {
+        try {
+            // Decrypt the asset ID
+            $id = Crypt::decryptString($encryptedId);
+
+            $data = Receivables_participant_certificate::with(['peserta', 'penlatCertificate'])->findOrFail($id);
+
+            return view('plan_dev.submenu.validate-certificate', ['data' => $data]);
+        } catch (\Exception $e) {
+            // Handle errors (e.g., invalid decryption or asset not found)
+            return redirect()->route('certificate', $id)->withErrors(['error' => 'Invalid QR code or asset not found.']);
+        }
+    }
+
+    public function generateQrCode($id)
+    {
+        $item = Receivables_participant_certificate::findOrFail($id);
+
+        // Encrypt the asset ID
+        $encryptedId = Crypt::encryptString($item->id);
+
+        // Generate the QR code for the validate-asset route with the encrypted ID
+        $qrCodeData = QrCode::format('png')
+            ->size(200)
+            ->generate(route('validate-certificate', $encryptedId));
+
+        // Encode the QR code as base64
+        $base64QrCode = base64_encode($qrCodeData);
+
+        return response()->json([
+            'nama_peserta' => $item->peserta->nama_peserta,
+            'link' => route('validate-certificate', $encryptedId),
+            'qr_code' => 'data:image/png;base64,' . $base64QrCode
+        ]);
+    }
+
+    public function export_selected(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'formIds' => 'required', // Ensure formIds is provided
+            'dateReceived' => 'required|date', // Ensure the date is valid
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed. Ensure all required fields are filled.']);
+        }
+        $formIds = explode(',', $request->input('formIds'));
+
+        // Create a unique name for the zip file
+        $zipFileName = 'certificates_' . time() . '.zip';
+        $zipFilePath = public_path('uploads/certificates/' . $zipFileName);
+
+        $zip = new ZipArchive;
+        if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
+            foreach ($formIds as $formId) {
+                $templatePath = public_path('uploads/template/template_certificate.xlsx');
+                $spreadsheet = IOFactory::load($templatePath);
+                $sheet = $spreadsheet->getActiveSheet();
+
+                $data = Receivables_participant_certificate::find($formId);
+
+                if ($data) {
+                    // Save the issued date
+                    $data->update(['issued_date' => $request->dateReceived]);
+                }
+
+                // Modify the spreadsheet
+                $certificateNumber = $data->certificate_number;
+                $batchParts = explode('/', $data->penlatCertificate->batch->batch);
+
+                $formattedCertificate = sprintf(
+                    '%s / %s / PMTC / %s / %s',
+                    $certificateNumber,
+                    $batchParts[0],
+                    $batchParts[2],
+                    $batchParts[3]
+                );
+                $birthInfo = $data->peserta->birth_place . ', ' . Carbon::parse($data->peserta->birth_date)->format('d F Y');
+                $sheet->setCellValueByColumnAndRow(16, 11, $data->peserta->nama_peserta);
+                $sheet->setCellValueByColumnAndRow(16, 14, $birthInfo);
+                $sheet->setCellValueByColumnAndRow(35, 9, $formattedCertificate);
+
+                // Get the description
+                $description = $data->penlatCertificate->batch->penlat->description;
+
+                // Set a maximum character count for normal font size
+                $maxCharCount = 40; // Example breakpoint
+
+                // Calculate font size based on the length
+                $fontSize = (strlen($description) > $maxCharCount) ? 20 : 28;
+
+                // Set the cell value
+                $cellCoordinates = 'F19'; // Use 'F19' instead of byColumnAndRow for simplicity
+                $sheet->setCellValue($cellCoordinates, $description);
+
+                // Apply the dynamic font size
+                $sheet->getStyle($cellCoordinates)->getFont()->setSize($fontSize);
+
+                // Optionally, align text to wrap within the cell
+                $sheet->getStyle($cellCoordinates)->getAlignment()->setWrapText(true);
+                $sheet->getStyle($cellCoordinates)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle($cellCoordinates)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+
+
+                //periode
+                $sheet->setCellValueByColumnAndRow(16, 23, Carbon::parse($data->penlatCertificate->start_date)->format('d F Y'));
+                $sheet->setCellValueByColumnAndRow(25, 23, Carbon::parse($data->penlatCertificate->end_date)->format('d F Y'));
+
+                //regulator
+                $sheet->setCellValueByColumnAndRow(25, 26, $data->penlatCertificate->regulation->description);
+
+                // Generate the QR code
+                $encryptedId = Crypt::encryptString($data->id);
+                $qrCodeData = QrCode::format('png')
+                    ->size(200)
+                    ->merge('/storage/app/MTC.png', 0.3) // Merge with a 30% size of the QR code
+                    ->errorCorrection('H') // Use high error correction level
+                    ->generate(route('validate-certificate', $encryptedId));
+
+                // Embed the QR Code in the template
+                $drawing = new MemoryDrawing();
+                $drawing->setName('QR Code');
+                $drawing->setDescription('QR Code');
+                $drawing->setImageResource(imagecreatefromstring($qrCodeData)); // Load QR as an image resource
+                $drawing->setRenderingFunction(MemoryDrawing::RENDERING_PNG);
+                $drawing->setMimeType(MemoryDrawing::MIMETYPE_PNG);
+                $drawing->setHeight(100); // Set image height
+                $drawing->setCoordinates('AO32'); // Specify the cell for placement
+                $drawing->setWorksheet($sheet); // Attach to the worksheet
+
+                // Set the date issued in the Excel sheet
+                $sheet->setCellValueByColumnAndRow(27, 29, 'Jakarta, ' . Carbon::parse($data->issued_date)->format('d F Y'));
+
+                // Generate a unique filename for the Excel file
+                $excelFileName = 'certificates_' . $formId . '.xlsx';
+                $excelFilePath = public_path('uploads/certificates/' . $excelFileName);
+
+                // Save the spreadsheet to a temporary file
+                $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+                $writer->save($excelFilePath);
+
+                // Add the Excel file to the zip archive
+                $zip->addFile($excelFilePath, $excelFileName);
+            }
+
+            // Close the zip archive
+            $zip->close();
+
+            // Return the path to the ZIP file as a response
+            return response()->json(['success' => true, 'fileUrl' => asset('uploads/certificates/' . $zipFileName)]);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Failed to create zip file']);
+        }
+    }
+
+    public function fetchRegulators(Request $request)
+    {
+        $search = $request->input('q');
+        $page = $request->input('page', 1);
+        $perPage = 10;
+
+        $query = Regulator::query();
+
+        if ($search) {
+            $query->where('description', 'like', '%' . $search . '%');
+        }
+
+        $regulators = $query->paginate($perPage, ['*'], 'page', $page);
+
+        return response()->json([
+            'items' => $regulators->map(function ($regulator) {
+                return [
+                    'id' => $regulator->id,
+                    'description' => $regulator->description,
+                ];
+            }),
+            'total_count' => $regulators->total(),
+        ]);
+    }
+
+    public function storeRegulator(Request $request)
+    {
+        $request->validate([
+            'description' => 'required|string|max:255',
+        ]);
+
+        $regulator = Regulator::create([
+            'description' => $request->description,
+        ]);
+
+        return response()->json([
+            'id' => $regulator->id,
+            'description' => $regulator->description,
+        ]);
+    }
+
+    public function generateExcelWithQrCode($id)
+    {
+        $data = Receivables_participant_certificate::find($id);
+        // Path to the template file
+        $templatePath = public_path('uploads/template/template_certificate.xlsx');
+        $spreadsheet = IOFactory::load($templatePath);
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Generate the QR code
+        $encryptedId = Crypt::encryptString($data->id);
+        $qrCodeData = QrCode::format('png')
+            ->size(200)
+            ->merge('/storage/app/MTC.jpeg', 0.3) // Merge with a 30% size of the QR code
+            ->errorCorrection('H') // Use high error correction level
+            ->generate(route('validate-certificate', $encryptedId));
+
+        // Embed the QR Code in the template
+        $drawing = new MemoryDrawing();
+        $drawing->setName('QR Code');
+        $drawing->setDescription('QR Code');
+        $drawing->setImageResource(imagecreatefromstring($qrCodeData)); // Load QR as an image resource
+        $drawing->setRenderingFunction(MemoryDrawing::RENDERING_PNG);
+        $drawing->setMimeType(MemoryDrawing::MIMETYPE_PNG);
+        $drawing->setHeight(100); // Set image height
+        $drawing->setCoordinates('AO32'); // Specify the cell for placement
+        $drawing->setWorksheet($sheet); // Attach to the worksheet
+
+        // Save the modified file
+        $outputPath = public_path('uploads/certificates/certificate_with_qr_' . $data->id . '.xlsx');
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save($outputPath);
+
+        // Return the file for download
+        return response()->download($outputPath);
     }
 }

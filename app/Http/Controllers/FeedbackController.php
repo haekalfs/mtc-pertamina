@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Feedback_mtc;
 use App\Models\Feedback_report;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
@@ -15,15 +16,33 @@ class FeedbackController extends Controller
         if ($request->ajax()) {
             $query = Feedback_mtc::query();
 
+            // Filter by nama_pelatihan if provided
+            if ($request->nama_pelatihan && $request->nama_pelatihan != '-1') {
+                $query->where('judul_pelatihan', $request->nama_pelatihan);
+            }
+
+            // Filter by date range if provided
+            if ($request->has('daterange') && !empty($request->daterange)) {
+                // Explode the daterange into start_date and end_date
+                [$startDate, $endDate] = explode(' - ', $request->daterange);
+
+                $startDate = Carbon::createFromFormat('Y-m-d', $startDate)->startOfDay();
+                $endDate = Carbon::createFromFormat('Y-m-d', $endDate)->endOfDay();
+
+                $query->whereBetween('tgl_pelaksanaan', [$startDate, $endDate]);
+            }
+
             return DataTables::of($query)
-                ->addColumn('action', function($row){
-                    return '<button class="btn btn-outline-secondary btn-sm edit-feedback" data-id="'.$row->id.'"><i class="fa fa-edit"></i> Edit</button>';
+                ->addColumn('action', function ($row) {
+                    return '<button class="btn btn-outline-secondary btn-sm edit-feedback" data-id="' . $row->id . '"><i class="fa fa-edit"></i> Edit</button>';
                 })
                 ->rawColumns(['action']) // Make the action column HTML-safe
                 ->make(true);
         }
 
-        return view('plan_dev.submenu.feedback-mtc.index');
+        $listFeedback = Feedback_mtc::groupBy('judul_pelatihan')->pluck('judul_pelatihan');
+
+        return view('plan_dev.submenu.feedback-mtc.index', compact('listFeedback'));
     }
 
     public function feedback_mtc_import()

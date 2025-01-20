@@ -67,24 +67,19 @@ font-weight-bold
                             <div class="row align-items-center">
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label for="email">Nama Penlat :</label>
-                                        <select class="custom-select" id="nama_pelatihan" name="nama_pelatihan">
+                                        <label for="nama_pelatihan">Nama Penlat:</label>
+                                        <select class="custom-select select2" id="nama_pelatihan" name="nama_pelatihan" style="width: 100%;">
                                             <option value="-1" selected>Show All</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <label for="position_id">Kelompok :</label>
-                                        <select name="kelompok" class="form-control" id="kelompok">
-                                            <option value="-1">Show All</option>
+                                            @foreach ($listFeedback as $id => $judul)
+                                                <option value="{{ $judul }}">{{ $judul }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <label for="status">Tanggal :</label>
-                                        <input type="text" class="form-control" name="daterange" id="daterange"/>
+                                        <input type="text" class="form-control" name="daterange" id="daterange" autocomplete="off"/>
                                     </div>
                                 </div>
                                 <div class="col-md-1 d-flex align-self-end justify-content-start">
@@ -336,8 +331,37 @@ font-weight-bold
         </div>
     </div>
 </div>
+
+<style>
+    /* Custom CSS to align the Select2 container */
+    .select2-container--default .select2-selection--single {
+        height: calc(2.25rem + 2px); /* Adjust this value to match your input height */
+        padding: 0.375rem 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: calc(2.25rem + 2px); /* Adjust this to vertically align the text */
+    }
+
+    .select2-container .select2-selection--single {
+        height: 100% !important; /* Ensure the height is consistent */
+    }
+
+    .select2-container {
+        width: 100% !important; /* Ensure the width matches the form control */
+    }
+</style>
 <script>
 $(document).ready(function() {
+
+    $('#nama_pelatihan').select2({
+        placeholder: "Select a training program",
+        allowClear: true
+    });
+
+    // DataTable Initialization
     var table = $('#listFeedbackMTC').DataTable({
         processing: true,
         serverSide: true,
@@ -345,7 +369,7 @@ $(document).ready(function() {
             url: "{{ route('feedback-mtc') }}",
             data: function (d) {
                 d.nama_pelatihan = $('#nama_pelatihan').val();
-                d.periode = $('#periode').val();
+                d.daterange = $('#daterange').val(); // Pass daterange directly
             }
         },
         columns: [
@@ -363,8 +387,9 @@ $(document).ready(function() {
         ],
     });
 
-    // Re-draw the table when filters are changed
-    $('#nama_pelatihan, #periode').change(function(){
+    // Re-draw the table when the search button is clicked
+    $('#searchBtn').on('click', function (e) {
+        e.preventDefault(); // Prevent default form submission if within a form
         table.draw();
     });
 

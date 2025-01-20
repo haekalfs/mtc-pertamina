@@ -179,19 +179,12 @@ active font-weight-bold
             <form method="POST" action="{{ route('change.profile.picture') }}" enctype="multipart/form-data" id="profilForm">
                 @csrf
                 <div class="modal-body">
-                    <div class="col-md-12 zoom90">
-                        <div class="form-group d-flex align-items-center">
-                            <label for="email" style="margin-bottom: 0;">
-                                <span class="text-danger"><i>File :</i></span>
-                            </label>
-                        </div>
-                        <div class="form-group">
-                            <div class="custom-file">
-                                <input type="file" class="custom-file-input" id="picture" name="picture" accept="image/*" onchange="changeFileName('picture', 'picture-label')">
-                                <label class="custom-file-label" for="picture" id="picture-label">Choose file</label>
-                            </div>
+                    <div class="col-md-12 zoom90 text-center">
+                        <label for="edit-file-upload" style="cursor: pointer;">
+                            <img id="image-preview" src="{{ asset('img/default-img.png') }}" style="height: 150px; width: 150px; border-radius: 15px; border: 2px solid #8d8d8d;" class="card-img shadow" alt="..."><br>
                             <small style="color: red;"><i>Only picture type allowed!</i></small>
-                        </div>
+                        </label>
+                        <input id="edit-file-upload" type="file" name="picture" style="display: none;" accept="image/*" onchange="previewImage(event)">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -280,9 +273,16 @@ document.addEventListener('DOMContentLoaded', function () {
             errorElement.style.display = 'block';
         }
     });
-
 });
 
+function previewImage(event) {
+    const reader = new FileReader();
+    reader.onload = function(){
+        const output = document.getElementById('image-preview');
+        output.src = reader.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+}
 function changeFileName(inputId, labelId) {
     var input = document.getElementById(inputId);
     var label = document.getElementById(labelId);

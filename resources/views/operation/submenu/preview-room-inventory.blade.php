@@ -393,6 +393,42 @@ $(document).on('click', '.view-tool', function(e) {
     });
 
 
+    $('#listInventory').on('click', '.delete-item', function () {
+        let id = $(this).data('id'); // Get the ID of the inventory_room
+
+        swal({
+            title: "Are you sure?",
+            text: "Once deleted, you will not be able to recover this record!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then((willDelete) => {
+            if (willDelete) {
+                $.ajax({
+                    url: '{{ route("delete.item.room", ":id") }}'.replace(':id', id),
+                    type: 'DELETE',
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function (result) {
+                        swal("Poof! Your record has been deleted!", {
+                            icon: "success",
+                        });
+                        $('#listInventory').DataTable().ajax.reload(); // Reload the DataTable
+                    },
+                    error: function (xhr, status, error) {
+                        let errorMessage = xhr.responseJSON && xhr.responseJSON.error
+                            ? xhr.responseJSON.error
+                            : "Oops! Something went wrong!";
+                        swal("Error!", errorMessage, "error");
+                    }
+                });
+            } else {
+                swal("Your record is safe!");
+            }
+        });
+    });
+
     $(document).on('click', '.update-amount', function(e) {
         e.preventDefault();
         let toolId = $(this).data('id');

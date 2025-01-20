@@ -77,7 +77,7 @@ font-weight-bold
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label for="batch">Batch :</label>
                                         <select name="batch" class="form-control" id="batch">
@@ -101,12 +101,14 @@ font-weight-bold
                     <table id="listIssuedCertificates" class="table table-bordered">
                         <thead class="thead-light">
                             <tr>
+                                <th>Tgl Pelaksanaan</th>
                                 <th>Nama Pelatihan</th>
                                 <th>Jenis Pelatihan</th>
                                 <th>Batch</th>
                                 <th>Status</th>
                                 <th>Keterangan</th>
                                 <th>Total</th>
+                                <th>Created At</th>
                                 <th width="225px">Action</th>
                             </tr>
                         </thead>
@@ -121,7 +123,7 @@ font-weight-bold
 </div>
 
 <div class="modal fade" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 900px;" role="document">
         <div class="modal-content">
             <div class="modal-header d-flex flex-row align-items-center justify-content-between">
                 <h5 class="modal-title" id="inputDataModalLabel">Input Data</h5>
@@ -133,8 +135,8 @@ font-weight-bold
                 @csrf
                 <div class="modal-body mr-2 ml-2">
                     <div class="d-flex align-items-center mb-4">
-                        <div style="width: 140px;" class="mr-2">
-                            <p style="margin: 0;">Nama Pelatihan :</p>
+                        <div style="width: 160px;" class="mr-2">
+                            <p style="margin: 0;">Nama Pelatihan <span class="text-danger">*</span> :</p>
                         </div>
                         <div class="flex-grow-1">
                             <select id="penlatSelect" class="form-control" name="penlat">
@@ -146,24 +148,34 @@ font-weight-bold
                         </div>
                     </div>
                     <div class="d-flex align-items-center mb-4">
-                        <div style="width: 140px;" class="mr-2">
-                            <p style="margin: 0;">Nama Program :</p>
+                        <div style="width: 160px;" class="mr-2">
+                            <p style="margin: 0;">Nama Program <span class="text-danger">*</span> :</p>
                         </div>
                         <div class="flex-grow-1">
-                            <input type="text" id="programInput" class="form-control" name="program">
+                            <input type="text" id="programInput" class="form-control" name="program" required>
                         </div>
                     </div>
                     <div class="d-flex align-items-center mb-4">
-                        <div style="width: 140px;" class="mr-2">
-                            <p style="margin: 0;">Batch :</p>
+                        <div style="width: 160px;" class="mr-2">
+                            <p style="margin: 0;">Batch <span class="text-danger">*</span> :</p>
                         </div>
                         <div class="flex-grow-1">
                             <select id="mySelect2" class="form-control" name="batch"></select>
                         </div>
                     </div>
                     <div class="d-flex align-items-center mb-4">
-                        <div style="width: 140px;" class="mr-2">
-                            <p style="margin: 0;">Status :</p>
+                        <div style="width: 160px; margin-right: 10px;">
+                            <p style="margin: 0;">Periode <span class="text-danger">*</span> :</p>
+                        </div>
+                        <div class="d-flex flex-grow-1 align-items-center">
+                            <input type="date" id="startDate" class="form-control mr-2" name="startDate" style="max-width: 200px;" required>
+                            <span style="margin: 0 10px;">to</span>
+                            <input type="date" id="endDate" class="form-control" name="endDate" style="max-width: 200px;" required>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-4">
+                        <div style="width: 160px;" class="mr-2">
+                            <p style="margin: 0;">Status <span class="text-danger">*</span> :</p>
                         </div>
                         <div class="flex-grow-1">
                             <select class="form-control" id="status" name="status">
@@ -172,12 +184,20 @@ font-weight-bold
                             </select>
                         </div>
                     </div>
-                    <div class="d-flex align-items-start mb-4">
-                        <div style="width: 140px;" class="mr-2">
-                            <p style="margin: 0;">Keterangan :</p>
+                    <div class="d-flex align-items-center mb-4">
+                        <div style="width: 160px;" class="mr-2">
+                            <p style="margin: 0;">Regulator <span class="text-danger">*</span> :</p>
                         </div>
                         <div class="flex-grow-1">
-                            <textarea class="form-control" rows="3" name="keterangan"></textarea>
+                            <select class="form-control" id="regulator" name="regulator"></select>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-start mb-4">
+                        <div style="width: 160px;" class="mr-2">
+                            <p style="margin: 0;">Keterangan <span class="text-danger">*</span> :</p>
+                        </div>
+                        <div class="flex-grow-1">
+                            <textarea class="form-control" rows="3" name="keterangan" required></textarea>
                         </div>
                     </div>
                     <div class="alert alert-warning alert-block">
@@ -193,6 +213,28 @@ font-weight-bold
         </div>
     </div>
 </div>
+
+<style>
+    /* Custom CSS to align the Select2 container */
+    .select2-container--default .select2-selection--single {
+        height: calc(2.25rem + 2px); /* Adjust this value to match your input height */
+        padding: 0.375rem 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: calc(2.25rem + 2px); /* Adjust this to vertically align the text */
+    }
+
+    .select2-container .select2-selection--single {
+        height: 100% !important; /* Ensure the height is consistent */
+    }
+
+    .select2-container {
+        width: 100% !important; /* Ensure the width matches the form control */
+    }
+</style>
 <script>
 $(document).ready(function() {
     var table = $('#listIssuedCertificates').DataTable({
@@ -206,12 +248,14 @@ $(document).ready(function() {
             }
         },
         columns: [
+            { data: 'batch.date', name: 'batch.date' },
             { data: 'batch.penlat.description', name: 'batch.penlat.description' },
             { data: 'batch.penlat.jenis_pelatihan', name: 'batch.penlat.jenis_pelatihan' },
             { data: 'batch.batch', name: 'batch.batch' },
             { data: 'status', name: 'status' },
             { data: 'keterangan', name: 'keterangan' },
             { data: 'total_issued', name: 'total_issued' },
+            { data: 'created_at', name: 'created_at' },
             { data: 'action', name: 'action', orderable: false, searchable: false, className: 'text-center' }
         ]
     });
@@ -260,6 +304,17 @@ $(document).ready(function() {
 
 $(document).ready(function() {
     // Initialize Select2 for Penlat
+    $('#penlat').select2({
+        placeholder: "Select Pelatihan...",
+        width: '100%',
+        allowClear: true,
+        language: {
+            noResults: function() {
+                return "No result match your request... Create new in Master Data Menu!"; // Customize this message as needed
+            }
+        }
+    });
+
     $('#penlatSelect').select2({
         dropdownParent: $('#inputDataModal'),
         theme: "classic",
@@ -279,11 +334,20 @@ $(document).ready(function() {
         $('#programInput').val(selectedOption);
 
         // Reinitialize the batch select dropdown, passing the selected penlat_id
-        initSelect2WithAjax('mySelect2', '{{ route('batches.fetch') }}', 'Select or add a Batch', $(this).val());
+        initSelect2WithAjax('mySelect2', '{{ route('batches.fetch.certificate') }}', 'Select or add a Batch', $(this).val());
     });
 
+    $('#penlat').on('change', function() {
+        var selectedOption = $(this).find('option:selected').text();
+        $('#programInput').val(selectedOption);
+
+        // Reinitialize the batch select dropdown, passing the selected penlat_id
+        initSelectFilter('batch', '{{ route('batches.fetch.certificate') }}', 'Select or add a Batch', $(this).val());
+    });
     // Initialize Select2 with AJAX for the batch dropdown (default initialization)
-    initSelect2WithAjax('mySelect2', '{{ route('batches.fetch') }}', 'Select or add a Batch', null);
+    initSelect2WithAjax('mySelect2', '{{ route('batches.fetch.certificate') }}', 'Select or add a Batch', null);
+    initSelectFilter('batch', '{{ route('batches.fetch.certificate') }}', 'Select or add a Batch', null);
+    initSelect2WithRegulators();
 });
 
 function initSelect2WithAjax(elementId, ajaxUrl, placeholderText, penlatId = null) {
@@ -294,9 +358,9 @@ function initSelect2WithAjax(elementId, ajaxUrl, placeholderText, penlatId = nul
             delay: 250,
             data: function (params) {
                 return {
-                    q: params.term, // search term
-                    page: params.page || 1, // pagination
-                    penlat_id: penlatId // pass penlat_id for filtering, if provided
+                    q: params.term,
+                    page: params.page || 1,
+                    penlat_id: penlatId
                 };
             },
             processResults: function (data, params) {
@@ -304,24 +368,24 @@ function initSelect2WithAjax(elementId, ajaxUrl, placeholderText, penlatId = nul
                 return {
                     results: $.map(data.items, function (item) {
                         return {
-                            id: item.batch, // Use the 'batch' column for the option value
-                            text: item.batch, // Use the 'batch' column for the option label
-                            date: item.date // Include date to prefill the date input
+                            id: item.id,
+                            text: item.text,
+                            date: item.date // Include the date in the item object
                         };
                     }),
                     pagination: {
-                        more: data.total_count > (params.page * 10) // Check if more results are available
+                        more: data.total_count > (params.page * 10)
                     }
                 };
             },
             cache: true
         },
         placeholder: placeholderText,
-        minimumInputLength: 1, // Start searching after 1 character
+        minimumInputLength: 1,
         dropdownParent: $('#inputDataModal'),
         theme: 'classic',
         width: '100%',
-        tags: true, // Allow adding new tags
+        tags: true,
         allowClear: true,
         createTag: function (params) {
             var term = $.trim(params.term);
@@ -331,7 +395,7 @@ function initSelect2WithAjax(elementId, ajaxUrl, placeholderText, penlatId = nul
             return {
                 id: term,
                 text: term,
-                newTag: true // Mark as a new tag
+                newTag: true
             };
         },
         templateResult: function (data) {
@@ -346,16 +410,159 @@ function initSelect2WithAjax(elementId, ajaxUrl, placeholderText, penlatId = nul
     });
 
     $('#' + elementId).on('select2:select', function (e) {
-        if (e.params.data.newTag) {
-            var newOption = new Option(e.params.data.text, e.params.data.id, true, true);
+        var selectedBatch = e.params.data;
+
+        if (selectedBatch.newTag) {
+            var newOption = new Option(selectedBatch.text, selectedBatch.id, true, true);
             $(this).append(newOption).trigger('change');
         }
 
-        // Check if the selected batch has a valid date and prefill the date input
+        // Prefill the date input if the selected batch has a date
         if (selectedBatch.date) {
-            $('input[name="date"]').val(selectedBatch.date);
+            $('#startDate').val(selectedBatch.date);
         } else {
-            $('input[name="date"]').val(''); // Clear the input if no date is provided
+            $('#startDate').val(''); // Clear the input if no date is provided
+        }
+    });
+}
+
+function initSelectFilter(elementId, ajaxUrl, placeholderText, penlatId = null) {
+    $('#' + elementId).select2({
+        ajax: {
+            url: ajaxUrl,
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    q: params.term,
+                    page: params.page || 1,
+                    penlat_id: penlatId
+                };
+            },
+            processResults: function (data, params) {
+                params.page = params.page || 1;
+                return {
+                    results: $.map(data.items, function (item) {
+                        return {
+                            id: item.id,
+                            text: item.text,
+                            date: item.date // Include the date in the item object
+                        };
+                    }),
+                    pagination: {
+                        more: data.total_count > (params.page * 10)
+                    }
+                };
+            },
+            cache: true
+        },
+        placeholder: placeholderText,
+        minimumInputLength: 1,
+        width: '100%',
+        tags: true,
+        allowClear: true,
+        createTag: function (params) {
+            var term = $.trim(params.term);
+            if (term === '') {
+                return null;
+            }
+            return {
+                id: term,
+                text: term,
+                newTag: true
+            };
+        },
+        templateResult: function (data) {
+            if (data.newTag) {
+                return $('<span><em>Add new: "' + data.text + '"</em></span>');
+            }
+            return data.text;
+        },
+        templateSelection: function (data) {
+            return data.text;
+        }
+    });
+}
+function initSelect2WithRegulators() {
+    $('#regulator').select2({
+        ajax: {
+            url: '{{ route('regulators.fetch') }}', // Define the route for fetching regulators
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    q: params.term, // Search query
+                    page: params.page || 1, // Pagination
+                };
+            },
+            processResults: function (data, params) {
+                params.page = params.page || 1;
+                return {
+                    results: $.map(data.items, function (item) {
+                        return {
+                            id: item.id,
+                            text: item.description,
+                        };
+                    }),
+                    pagination: {
+                        more: data.total_count > (params.page * 10),
+                    },
+                };
+            },
+            cache: true,
+        },
+        placeholder: 'Select or add a Regulator',
+        minimumInputLength: 1,
+        theme: 'classic',
+        width: '100%',
+        dropdownParent: $('#inputDataModal'),
+        tags: true, // Enable tagging for new entries
+        allowClear: true,
+        createTag: function (params) {
+            var term = $.trim(params.term);
+            if (term === '') {
+                return null;
+            }
+            return {
+                id: term,
+                text: term,
+                newTag: true, // Mark as new
+            };
+        },
+        templateResult: function (data) {
+            if (data.newTag) {
+                return $('<span><em>Add new: "' + data.text + '"</em></span>');
+            }
+            return data.text;
+        },
+        templateSelection: function (data) {
+            return data.text;
+        },
+    });
+
+    // Listen for selection and handle new tag creation
+    $('#regulator').on('select2:select', function (e) {
+        var selectedData = e.params.data;
+        if (selectedData.newTag) {
+            // If it's a new entry, save it to the database
+            $.ajax({
+                url: '{{ route('regulators.store') }}', // Define the route to save the new regulator
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}', // CSRF protection
+                },
+                data: {
+                    description: selectedData.text, // New regulator description
+                },
+                success: function (response) {
+                    // Replace the temporary new tag ID with the real one from the database
+                    var newOption = new Option(response.description, response.id, false, true);
+                    $('#regulator').append(newOption).trigger('change');
+                },
+                error: function () {
+                    alert('Failed to save the new regulator.');
+                },
+            });
         }
     });
 }

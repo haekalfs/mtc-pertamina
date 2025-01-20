@@ -261,10 +261,21 @@ font-weight-bold
                                 <p style="margin: 0;">Update Hours :</p>
                             </div>
                             <div class="flex-grow-1 ml-4">
-                                <div class="counter">
-                                    <span class="down" onclick='decreaseCount(event, this)'><i class="fa fa-minus text-danger"></i></span>
-                                    <input class="form-control" name="working_hours" type="text" value="{{ $data->working_hours }}" min="0" style="border: 1px solid rgb(217, 217, 217); width: 1200px;">
-                                    <span class="up" onclick='increaseCount(event, this)'><i class="fa fa-plus text-success"></i></span>
+                                <div class="input-group">
+                                    <!-- Left Icon -->
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text down" onclick="decreaseCount(event, this)">
+                                            <i class="fa fa-minus text-danger"></i>
+                                        </span>
+                                    </div>
+                                    <!-- Input Field -->
+                                    <input name="working_hours" id="working_hours" value="{{ $data->working_hours }}" type="text" min="0" class="form-control" value="0">
+                                    <!-- Right Icon -->
+                                    <div class="input-group-append">
+                                        <span class="input-group-text up" onclick="increaseCount(event, this)">
+                                            <i class="fa fa-plus text-success"></i>
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -279,22 +290,24 @@ font-weight-bold
 	</div>
 </div>
 <script>
-function increaseCount(a, b) {
-  var input = b.previousElementSibling;
-  var value = parseInt(input.value, 10);
-  value = isNaN(value) ? 0 : value;
-  value++;
-  input.value = value;
+function increaseCount(event, element) {
+    // Find the input field within the same parent (input-group)
+    var input = element.closest('.input-group').querySelector('input');
+    var value = parseInt(input.value, 10);
+    value = isNaN(value) ? 0 : value;
+    value++;
+    input.value = value;
 }
 
-function decreaseCount(a, b) {
-  var input = b.nextElementSibling;
-  var value = parseInt(input.value, 10);
-  if (value > 1) {
-    value = isNaN(value) ? 0 : value;
-    value--;
-    input.value = value;
-  }
+function decreaseCount(event, element) {
+    // Find the input field within the same parent (input-group)
+    var input = element.closest('.input-group').querySelector('input');
+    var value = parseInt(input.value, 10);
+    if (value > 0) {
+        value = isNaN(value) ? 0 : value;
+        value--;
+        input.value = value;
+    }
 }
 </script>
 @endsection
