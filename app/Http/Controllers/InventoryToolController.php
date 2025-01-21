@@ -615,6 +615,8 @@ class InventoryToolController extends Controller
         // Generate the QR code for the validate-asset route with the encrypted ID
         $qrCodeData = QrCode::format('png')
             ->size(200)
+            ->merge('/storage/app/MTC.png', 0.3) // Merge with a 30% size of the QR code
+            ->errorCorrection('H') // Use high error correction level
             ->generate(route('validate-asset', $encryptedId));
 
         // Encode the QR code as base64
