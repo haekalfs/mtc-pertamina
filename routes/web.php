@@ -44,6 +44,9 @@ use Illuminate\Support\Facades\Session;
 |
 */
 
+Route::middleware('checkForErrors', 'suspiciousTexts', 'suspicious', 'throttle:60,1')->group(function () {
+    Route::get('/certificate-validation/qr-code/preview-certificate/{id}', [PDController::class, 'validate_certificate'])->name('validate-certificate');
+});
 // Throttle middleware for 10 requests per minute
 Route::get('/', function () {
     return redirect('/dashboard');
@@ -56,7 +59,6 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
     Route::middleware('suspiciousTexts')->group(function () {
 
-        Route::get('/certificate-validation/qr-code/preview-certificate/{id}', [PDController::class, 'validate_certificate'])->name('validate-certificate');
         Route::get('/certificate-generate-qr/{id}', [PDController::class, 'generateQrCode'])->name('generate-qr-certificate');
 
         //On Dev Notification
