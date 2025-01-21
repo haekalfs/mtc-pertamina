@@ -107,8 +107,11 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="menu-icon ti-layout-list-thumb-alt"></i> Master Data</a>
                         <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-penlat')">
                             <li><i class="fa fa-list-alt"></i><a href="{{ route('penlat') }}" class="@yield('penlat')">List Pelatihan</a></li>
-                            <li class="pl-3"><i class="fa fa-folder pl-3"></i><a href="{{ route('batch-penlat') }}" class="@yield('batch-penlat')">Batch Program</a></li>
+                            <li class="pl-3"><i class="fa fa-folder pl-3"></i><a href="{{ route('batch-penlat') }}" class="@yield('batch-penlat')">Batch Pelatihan</a></li>
+                            <li><i class="fa fa-users"></i><a href="{{ route('participant-infographics') }}" class="@yield('participant-infographics')">Realisasi Peserta</a></li>
+                            <li><i class="fa fa-certificate"></i><a href="{{ route('certificate-number') }}" class="@yield('list-certificates')">Certificates Number</a></li>
                             <li><i class="fa fa-gears"></i><a href="{{ route('list-utilities') }}" class="@yield('list-utilitas')">List Utilitas</a></li>
+                            <li><i class="fa fa-map-marker"></i><a href="{{ route('list-location') }}" class="@yield('list-lokasi')">List Lokasi</a></li>
                         </ul>
                     </li>
                     @endusr_acc
@@ -117,7 +120,6 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="menu-icon fa fa-cogs"></i> Operasi</a>
                         <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-operation')">
                             <li><i class="fa fa-tachometer"></i><a href="{{ route('operation') }}" class="@yield('operation')">Dashboard</a></li>
-                            <li><i class="fa fa-users"></i><a href="{{ route('participant-infographics') }}" class="@yield('participant-infographics')">Infografis Peserta</a></li>
                             <li><i class="fa fa-fire-extinguisher"></i><a href="{{ route('tool-inventory') }}" class="@yield('tool-inventory')">Inventaris Alat</a></li>
                             <li><i class="fa fa-building-o"></i><a href="{{ route('room-inventory') }}" class="@yield('room-inventory')">Inventaris Ruangan</a></li>
                             <li><i class="fa fa-check-square-o"></i><a href="{{ route('tool-requirement-penlat') }}" class="@yield('tool-requirement-penlat')">Kebutuhan Alat Penlat</a></li>

@@ -4,6 +4,7 @@ use App\Http\Controllers\AgreementController;
 use App\Http\Controllers\AkhlakController;
 use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\CampaignController;
+use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentPositionController;
 use App\Http\Controllers\DownloadController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\ImportController;
 use App\Http\Controllers\InstructorController;
 use App\Http\Controllers\InventoryToolController;
 use App\Http\Controllers\KPIController;
+use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ManageAccessController;
 use App\Http\Controllers\MarketingController;
 use App\Http\Controllers\MonitoringApprovalController;
@@ -92,6 +94,7 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
             Route::post('/api/chart-location-data', [DashboardController::class, 'fetchLocationChartData']);
             Route::post('/api/chart-training-type-data', [DashboardController::class, 'fetchTrainingTypeChartData']);
             Route::post('/api/chart-overall-data', [DashboardController::class, 'fetchOverallData']);
+            Route::post('/api/chart-issued-certificate-data', [DashboardController::class, 'getIssuedCertificateData']);
         });
 
         //Encrypt
@@ -240,10 +243,12 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
                 Route::post('/certificate/{id}/update', [PDController::class, 'updateCertificate'])->name('certificate.list.update');
                 Route::get('/certificates/{id}', [PDController::class, 'getCertificates'])->name('certificates.get');
                 Route::post('/certificates/export/selected-items', [PDController::class, 'export_selected'])->name('certificate.export.selected');
+                Route::post('/refresh-participants-certificate', [PDController::class, 'refreshParticipants'])->name('refresh.participants');
+
 
                 Route::get('/regulators/fetch', [PDController::class, 'fetchRegulators'])->name('regulators.fetch');
                 Route::post('/regulators/store', [PDController::class, 'storeRegulator'])->name('regulators.store');
-                Route::get('/generateExcelWithQrCode/{id}', [PDController::class, 'generateExcelWithQrCode'])->name('test');
+                Route::get('/generateExcelWithQrCode/{id}', [PDController::class, 'generateExcelWithQrCode']);
 
                 Route::post('/planning-development/certificate-update/{certId}', [PDController::class, 'certificate_update'])->name('certificate.update');
                 Route::post('/certificate/delete', [PDController::class, 'delete_certificate'])->name('certificate.delete');
@@ -340,6 +345,16 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
             Route::delete('/delete-utility-data', [OperationController::class, 'deleteUtility'])->name('delete-utility');
             Route::get('/get-utility/{id}', [OperationController::class, 'getUtility'])->name('get-utility');
             Route::post('/update-utility', [OperationController::class, 'updateUtility'])->name('update-utility');
+
+            Route::get('/master-data/list-location', [LocationController::class, 'index'])->name('list-location');
+            Route::post('/store-data-location', [LocationController::class, 'store'])->name('store-new-location');
+            Route::delete('/locations/{id}', [LocationController::class, 'destroy'])->name('locations.destroy');
+            Route::put('/locations/{id}', [LocationController::class, 'update'])->name('locations.update');
+            Route::get('/locations/{id}/edit', [LocationController::class, 'edit'])->name('locations.edit');
+
+            //Certificate Number
+            Route::get('/master-data/certificates-numbers', [CertificateController::class, 'index'])->name('certificate-number');
+
 
             //Finance
             Route::middleware(['checkUserAccess:102'])->group(function () {

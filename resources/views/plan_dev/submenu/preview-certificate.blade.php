@@ -158,6 +158,14 @@ font-weight-bold
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-secondary" id="judul">List Participants</h6>
                     <div class="text-right">
+                        <form id="refreshBatchForm">
+                            @csrf
+                            <input type="hidden" name="batchInput" id="batchInput" value="{{ $data->batch->batch }}" />
+                            <input type="hidden" name="penlatCertificateId" id="penlatCertificateId" value="{{ $data->id }}" />
+                            <button type="button" id="refreshBatchBtn" class="btn btn-sm btn-secondary shadow-sm text-white">
+                                <i class="fa fa-refresh fa-sm"></i> Refresh Data
+                            </button>
+                        </form>
                         <input type="hidden" name="formId" id="formId" value="" />
                     </div>
                 </div>
@@ -464,6 +472,48 @@ font-weight-bold
                 },
                 error: function() {
                     alert('Failed to generate QR code.');
+                }
+            });
+        });
+
+        $('#refreshBatchBtn').on('click', function () {
+            const batch = $('#batchInput').val();
+            const penlatCertificateId = $('#penlatCertificateId').val();
+
+            swal({
+                title: "Are you sure?",
+                text: "This will refresh the data for the selected batch.",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            }).then((willRefresh) => {
+                if (willRefresh) {
+                    // Send AJAX request
+                    $.ajax({
+                        url: "{{ route('refresh.participants') }}",
+                        type: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            batch: batch,
+                            penlatCertificateId: penlatCertificateId,
+                        },
+                        success: function (response) {
+                            swal({
+                                title: "Success!",
+                                text: response.message,
+                                icon: "success",
+                            }).then(() => {
+                                tableCertificate.draw();
+                            });
+                        },
+                        error: function (xhr, status, error) {
+                            swal({
+                                title: "Error!",
+                                text: "An error occurred while refreshing the data. Please try again.",
+                                icon: "error",
+                            });
+                        },
+                    });
                 }
             });
         });

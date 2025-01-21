@@ -153,13 +153,14 @@ active font-weight-bold
                     </div>
                     <div class="card2 shadow">
                         <div class="card-header2 d-flex align-items-center">
-                            <h4 class="mb-0">Training Trend by Type</h4>
+                            <h4 class="mb-0">STCW & NON</h4>
                         </div>
                         <div class="card-block2 bg-white">
                             <div class="row">
                                 <div class="col-lg-12">
                                     <div class="card-body d-flex justify-content-center align-items-center">
-                                        <div id="trainingTypeChart" style="height: 370px; width: 100%;"></div>
+                                        <div id="barChart" style="height: 700px; width: 100%;"></div>
+                                        <div id="loader" style="display: none;">Loading...</div>
                                     </div>
                                 </div>
                             </div> <!-- /.row -->
@@ -167,14 +168,13 @@ active font-weight-bold
                     </div>
                     <div class="card2 shadow">
                         <div class="card-header2 d-flex align-items-center">
-                            <h4 class="mb-0">STCW & NON</h4>
+                            <h4 class="mb-0">Training Trend by Type</h4>
                         </div>
                         <div class="card-block2 bg-white">
                             <div class="row">
                                 <div class="col-lg-12">
                                     <div class="card-body d-flex justify-content-center align-items-center">
-                                        <div id="barChart" style="height: 600px; width: 100%;"></div>
-                                        <div id="loader" style="display: none;">Loading...</div>
+                                        <div id="trainingTypeChart" style="height: 370px; width: 100%;"></div>
                                     </div>
                                 </div>
                             </div> <!-- /.row -->
@@ -307,20 +307,6 @@ active font-weight-bold
             </div>
             <div class="card2 shadow">
                 <div class="card-header2 d-flex align-items-center">
-                    <h4 class="mb-0">Training Trend by Revenue</h4>
-                </div>
-                <div class="card-block2 bg-white">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="card-body d-flex justify-content-center align-items-center">
-                                <div id="trendRevenueChart" style="height: 400px; width: 100%;"></div>
-                            </div>
-                        </div>
-                    </div> <!-- /.row -->
-                </div>
-            </div>
-            <div class="card2 shadow">
-                <div class="card-header2 d-flex align-items-center">
                     <h4 class="mb-0">Training Session by Location</h4>
                 </div>
                 <div class="card-block2 bg-white">
@@ -328,6 +314,35 @@ active font-weight-bold
                         <div class="col-lg-12 zoom90">
                             <div class="card-body d-flex justify-content-center align-items-center">
                                 <div id="locationChart" style="height: 200px; width: 100%;"></div>
+                            </div>
+                        </div>
+                    </div> <!-- /.row -->
+                </div>
+            </div>
+            <div class="card2 shadow">
+                <div class="card-header2 d-flex align-items-center">
+                    <h4 class="mb-0">Certificate Status</h4>
+                </div>
+                <div class="card-block2 bg-white">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="card-body d-flex justify-content-center align-items-center">
+                                <div id="certificateChart" style="height: 300px; width: 100%;"></div>
+                                <div id="loader" style="display: none;">Loading...</div>
+                            </div>
+                        </div>
+                    </div> <!-- /.row -->
+                </div>
+            </div>
+            <div class="card2 shadow">
+                <div class="card-header2 d-flex align-items-center">
+                    <h4 class="mb-0">Training Trend by Revenue</h4>
+                </div>
+                <div class="card-block2 bg-white">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="card-body d-flex justify-content-center align-items-center">
+                                <div id="trendRevenueChart" style="height: 400px; width: 100%;"></div>
                             </div>
                         </div>
                     </div> <!-- /.row -->
@@ -343,19 +358,11 @@ active font-weight-bold
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="card-body d-flex justify-content-center align-items-center">
-                                <div id="overallChart" style="height: 200px; width: 100%;"></div>
+                                <div id="overallChart" style="height: 300px; width: 100%;"></div>
                                 <div id="loader" style="display: none;">Loading...</div>
                             </div>
                         </div>
                     </div> <!-- /.row -->
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-
-                </div>
-                <div class="col-md-6">
-
                 </div>
             </div>
         </div>
@@ -462,6 +469,7 @@ $(document).ready(function () {
         refreshLocationChart();
         refreshTrainingTypeChart();
         refreshOverallChart();
+        refreshCertificateData();
 
         // Show success message
         swal("Success! The Filter is applied successfully!", {
@@ -490,6 +498,7 @@ $(document).ready(function () {
             refreshLocationChart();
             refreshTrainingTypeChart();
             refreshOverallChart();
+            refreshCertificateData();
             swal("Success! The Filter is applied successfully!", {
                 icon: "success",
             });
@@ -503,11 +512,13 @@ $(document).ready(function () {
             refreshLocationChart();
             refreshTrainingTypeChart();
             refreshOverallChart();
+            refreshCertificateData();
         });
     });
 
     const dateRangeInput = $("#daterange");
     const typeSelect = $("#type");
+    const stcwSelect = $("#stcw");
 
     const elementsToUpdate = {
         pesertaCount: $("#pesertaCount"),
@@ -521,11 +532,12 @@ $(document).ready(function () {
     const updateDashboard = () => {
         const dateRange = dateRangeInput.val(); // Default date range
         const type = typeSelect.val() || "-1"; // Default type to "Show All"
+        const stcw = stcwSelect.val() || "-1"; // Default type to "Show All"
 
         $.ajax({
             url: "/api/fetchAmountData",
             type: "POST",
-            data: JSON.stringify({ _token: '{{ csrf_token() }}', periode: dateRange, type }),
+            data: JSON.stringify({ _token: '{{ csrf_token() }}', periode: dateRange, type, stcw }),
             contentType: "application/json",
             success: function (data) {
                 // Update DOM elements
@@ -563,15 +575,18 @@ $(document).ready(function () {
     refreshLocationChart();
     refreshTrainingTypeChart();
     refreshOverallChart();
+    refreshCertificateData();
 
     function refreshChart() {
         const dateRange = $('#daterange').val(); // Default date range
         const type = $('#type').val() || "-1"; // Default type (show all)
+        const stcw = $('#stcw').val() || "-1"; // Default type to "Show All"
 
         // Prepare request payload
         const payload = {
             periode: dateRange,
             type: type,
+            stcw: stcw,
             _token: '{{ csrf_token() }}' // Include CSRF token for Laravel
         };
 
@@ -598,10 +613,10 @@ $(document).ready(function () {
                 },
                 legend: {
                     cursor: "pointer",
-                    verticalAlign: "top",
-                    horizontalAlign: "center",
-                    dockInsidePlotArea: true,
-                    fontSize: 12 // Reduce font size of legend
+                    verticalAlign: "top", // Place the legend at the top
+                    horizontalAlign: "center", // Center the legend horizontally
+                    fontSize: 12, // Adjust the font size
+                    itemWidth: 150, // Add space for the legend text to prevent overlap
                 },
                 data: [
                     {
@@ -631,11 +646,13 @@ $(document).ready(function () {
     function refreshTrendRevenueChart() {
         const dateRange = $('#daterange').val(); // Default date range
         const type = $('#type').val() || "-1"; // Default type (show all)
+        const stcw = $('#stcw').val() || "-1"; // Default type to "Show All"
 
         // Prepare request payload
         const payload = {
             periode: dateRange,
             type: type,
+            stcw: stcw,
             _token: '{{ csrf_token() }}' // Include CSRF token for Laravel
         };
 
@@ -684,11 +701,13 @@ $(document).ready(function () {
     function refreshLocationChart() {
         const dateRange = $('#daterange').val(); // Default date range
         const type = $('#type').val() || "-1"; // Default type (show all)
+        const stcw = $('#stcw').val() || "-1"; // Default type to "Show All"
 
         // Prepare request payload
         const payload = {
             periode: dateRange,
             type: type,
+            stcw: stcw,
             _token: '{{ csrf_token() }}' // Include CSRF token for Laravel
         };
 
@@ -736,11 +755,13 @@ $(document).ready(function () {
     function refreshTrainingTypeChart() {
         const dateRange = $('#daterange').val(); // Default date range
         const type = $('#type').val() || "-1"; // Default type (show all)
+        const stcw = $('#stcw').val() || "-1"; // Default type to "Show All"
 
         // Prepare request payload
         const payload = {
             periode: dateRange,
             type: type,
+            stcw: stcw,
             _token: '{{ csrf_token() }}' // Include CSRF token for Laravel
         };
 
@@ -788,11 +809,13 @@ $(document).ready(function () {
     function refreshOverallChart() {
         const dateRange = $('#daterange').val(); // Default date range
         const type = $('#type').val() || "-1"; // Default type (show all)
+        const stcw = $('#stcw').val() || "-1"; // Default type to "Show All"
 
         // Prepare request payload
         const payload = {
             periode: dateRange,
             type: type,
+            stcw: stcw,
             _token: '{{ csrf_token() }}' // Include CSRF token for Laravel
         };
 
@@ -817,9 +840,10 @@ $(document).ready(function () {
                     },
                     legend: {
                         cursor: "pointer",
-                        verticalAlign: "top",
-                        horizontalAlign: "center",
-                        dockInsidePlotArea: true
+                        verticalAlign: "top", // Place the legend at the top
+                        horizontalAlign: "center", // Center the legend horizontally
+                        fontSize: 12, // Adjust the font size
+                        itemWidth: 150, // Add space for the legend text to prevent overlap
                     },
                     data: [
                         {
@@ -836,6 +860,81 @@ $(document).ready(function () {
             error: function (xhr, status, error) {
                 console.error("Error fetching overall data:", status, error);
                 // Generic error message for other errors
+                swal({
+                    title: "An Error Occurred",
+                    text: "Something went wrong. Please refresh your browser.",
+                    icon: "error",
+                });
+            }
+        });
+    }
+
+    function refreshCertificateData() {
+        const dateRange = $('#daterange').val(); // Default date range
+        const type = $('#type').val() || "-1"; // Default type (show all)
+        const stcw = $('#stcw').val() || "-1"; // Default type to "Show All"
+
+        // Prepare request payload
+        const payload = {
+            periode: dateRange,
+            type: type,
+            stcw: stcw,
+            _token: '{{ csrf_token() }}' // Include CSRF token for Laravel
+        };
+
+        // Send data via AJAX POST request
+        $.ajax({
+            url: "/api/chart-issued-certificate-data",
+            type: "POST", // Correct HTTP method
+            data: JSON.stringify(payload),
+            contentType: "application/json",
+            success: function (data) {
+                const chart = new CanvasJS.Chart("certificateChart", {
+                    animationEnabled: true,
+                    theme: "light2",
+                    axisX: {
+                        title: "Month",
+                        interval: 1,
+                        labelAngle: -45
+                    },
+                    axisY: {
+                        title: "Total Participants",
+                        includeZero: true,
+                    },
+                    legend: {
+                        verticalAlign: "top",
+                        horizontalAlign: "center",
+                        fontSize: 14,
+                        itemWidth: 150,
+                    },
+                    data: [
+                        {
+                            type: "stackedColumn",
+                            name: "Registered but Not Yet Issued",
+                            showInLegend: true,
+                            legendText: "Registered but Not Yet Issued",
+                            dataPoints: data.dataPointsRegisteredButNotYetIssued
+                        },
+                        {
+                            type: "stackedColumn",
+                            name: "Issued Certificates",
+                            showInLegend: true,
+                            legendText: "Issued Certificates",
+                            dataPoints: data.dataPointsIssued // Add truly issued data here
+                        },
+                        {
+                            type: "stackedColumn",
+                            name: "Pending Participants",
+                            showInLegend: true,
+                            legendText: "Pending Participants",
+                            dataPoints: data.dataPointsPending
+                        }
+                    ]
+                });
+                chart.render();
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching overall data:", status, error);
                 swal({
                     title: "An Error Occurred",
                     text: "Something went wrong. Please refresh your browser.",

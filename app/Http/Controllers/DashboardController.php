@@ -445,4 +445,90 @@ class DashboardController extends Controller
             'total_training' => $totalTraining,
         ]);
     }
+
+    public function getIssuedCertificateData(Request $request)
+    {
+        $periode = $request->input('periode', '2024-01-01 - 2024-12-31');
+        $type = $request->input('type');
+        $stcw = $request->input('stcw');
+        [$startDate, $endDate] = explode(' - ', $periode);
+
+        // Parse the start and end dates
+        $start = Carbon::parse($startDate);
+        $end = Carbon::parse($endDate);
+
+        // Generate dynamic months between the range
+        $months = collect();
+        while ($start <= $end) {
+            $months->push($start->format('Y-m'));
+            $start->addMonth();
+        }
+
+        // Filter by type if provided
+        $filtersType = function ($query) use ($type, $stcw) {
+            if ($type && $type != '-1') {
+                $query->where('jenis_pelatihan', $type);
+            }
+            if ($stcw && $stcw != '-1') {
+                $query->where('kategori_program', $stcw);
+            }
+        };
+
+        // Fetch data and group by month
+        $dataByMonth = Infografis_peserta::with('certificateCheck')
+            ->select(DB::raw('DATE_FORMAT(tgl_pelaksanaan, "%Y-%m") as month'))
+            ->whereBetween('tgl_pelaksanaan', [$startDate, $endDate])
+            ->where($filtersType)
+            ->get()
+            ->groupBy('month')
+            ->map(function ($items, $month) {
+                $registeredButNotYetIssued = $items->sum(function ($item) {
+                    // Check if the certificateCheck relationship exists
+                    return $item->certificateCheck ? 1 : 0;
+                });
+
+                $issued = $items->sum(function ($item) {
+                    // Check if the certificateCheck relationship exists and status is "Issued"
+                    return $item->certificateCheck && $item->certificateCheck->penlatCertificate->status == 'Issued' ? 1 : 0;
+                });
+
+                $pending = $items->count() - $registeredButNotYetIssued; // Remaining items are pending
+
+                return [
+                    'registeredButNotYetIssued' => $registeredButNotYetIssued,
+                    'issued' => $issued,
+                    'pending' => $pending,
+                ];
+            });
+
+        // Map results into dynamic months
+        $dataPointsRegisteredButNotYetIssued = [];
+        $dataPointsPending = [];
+        $dataPointsIssued = []; // New data points for truly issued certificates
+
+        foreach ($months as $month) {
+            $registeredButNotYetIssued = $dataByMonth[$month]['registeredButNotYetIssued'] ?? 0;
+            $issued = $dataByMonth[$month]['issued'] ?? 0;
+            $pending = $dataByMonth[$month]['pending'] ?? 0;
+
+            $dataPointsRegisteredButNotYetIssued[] = [
+                "label" => Carbon::createFromFormat('Y-m', $month)->format('M Y'),
+                "y" => $registeredButNotYetIssued,
+            ];
+            $dataPointsIssued[] = [
+                "label" => Carbon::createFromFormat('Y-m', $month)->format('M Y'),
+                "y" => $issued,
+            ];
+            $dataPointsPending[] = [
+                "label" => Carbon::createFromFormat('Y-m', $month)->format('M Y'),
+                "y" => $pending,
+            ];
+        }
+
+        return response()->json([
+            "dataPointsRegisteredButNotYetIssued" => $dataPointsRegisteredButNotYetIssued,
+            "dataPointsIssued" => $dataPointsIssued, // Include truly issued data
+            "dataPointsPending" => $dataPointsPending,
+        ]);
+    }
 }

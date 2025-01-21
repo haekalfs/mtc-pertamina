@@ -1,10 +1,10 @@
 @extends('layouts.main')
 
-@section('active-operation')
+@section('active-penlat')
 active font-weight-bold
 @endsection
 
-@section('show-operation')
+@section('show-penlat')
 show
 @endsection
 

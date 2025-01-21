@@ -66,7 +66,7 @@ class InfografisImport implements ToCollection, SkipsEmptyRows, WithBatchInserts
                     [
                         'nama_peserta' => $row[2],
                         'nama_program' => $row[11],
-                        'batch' => $row[10],
+                        'batch' => trim($row[10]),
                         'tgl_pelaksanaan' => $this->getFormattedDate($row[12]), // Handle date parsing
                         'tempat_pelaksanaan' => $row[13],
                         'jenis_pelatihan' => $row[14],
@@ -88,10 +88,10 @@ class InfografisImport implements ToCollection, SkipsEmptyRows, WithBatchInserts
 
                 if (strpos($row[10], '/') !== false) {
                     // Check if the batch already exists
-                    $checkBatch = Penlat_batch::where('batch', $row[10])->exists();
+                    $checkBatch = Penlat_batch::where('batch', trim($row[10]))->exists();
                     if (!$checkBatch) {
                         // Get penlat
-                        $parts = explode('/', $row[10]);
+                        $parts = explode('/', trim($row[10]));
                         $firstWord = $parts[0];
 
                         $checkPenlat = Penlat_alias::where('alias', $firstWord)->exists();
@@ -99,7 +99,7 @@ class InfografisImport implements ToCollection, SkipsEmptyRows, WithBatchInserts
                             $getPenlat = Penlat_alias::where('alias', $firstWord)->first();
                             Penlat_batch::updateOrCreate(
                                 [
-                                    'batch' => $row[10],
+                                    'batch' => trim($row[10]),
                                 ],
                                 [
                                     'penlat_id' => $getPenlat->penlat->id,

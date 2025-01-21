@@ -355,11 +355,24 @@ class PDController extends Controller
                 });
             }
 
+            if ($request->periode && $request->periode != '-1') {
+                $query->whereYear('start_date', $request->periode);
+            }
+
             // Fetch the correct records
             $certificates = $query->get();
 
             // Manually build the DataTables response
             return DataTables::of($certificates)
+                ->addColumn('tgl_pelaksanaan', function($item) {
+                    return Carbon::parse($item->batch->date)->format('d-M-Y');
+                })
+                ->addColumn('created_by', function($item) {
+                    return $item->created_by;
+                })
+                ->addColumn('created_at', function($item) {
+                    return $item->created_at->format('d-M-Y');
+                })
                 ->addColumn('action', function($item) {
                     return '
                         <a class="btn btn-outline-secondary mr-2 btn-sm" href="'.route('preview-certificate', $item->id).'"><i class="menu-Logo fa fa-eye"></i> Preview</a>
@@ -695,6 +708,7 @@ class PDController extends Controller
                     'regulator' => $validated['regulator'],
                     'keterangan' => $validated['keterangan'],
                     'total_issued' => $participants->count(),
+                    'created_by' => Auth::id(),
                     'updated_at' => $currentTimestamp,
                 ]
             );
@@ -717,7 +731,7 @@ class PDController extends Controller
             DB::commit();
 
             // Redirect or return a response with a success message
-            return redirect()->back()->with('success', 'Certificate data stored successfully.');
+            return redirect()->route('preview-certificate', $penlatCertificate->id)->with('success', 'Certificate data stored successfully.');
 
         } catch (Exception $e) {
             // Rollback the transaction in case of an error
@@ -1314,7 +1328,7 @@ class PDController extends Controller
             return view('plan_dev.submenu.validate-certificate', ['data' => $data]);
         } catch (\Exception $e) {
             // Handle errors (e.g., invalid decryption or asset not found)
-            return redirect()->route('certificate', $id)->withErrors(['error' => 'Invalid QR code or asset not found.']);
+            return redirect()->route('certificate', $id)->withErrors(['error' => 'Invalid QR code not found.']);
         }
     }
 
@@ -1353,7 +1367,12 @@ class PDController extends Controller
         $formIds = explode(',', $request->input('formIds'));
 
         // Create a unique name for the zip file
-        $zipFileName = 'certificates_' . time() . '.zip';
+        $firstRecord = $formIds[0];
+        $getPenlatDetail = Receivables_participant_certificate::find($firstRecord);
+
+        $explodeBatch = explode('/', $getPenlatDetail->penlatCertificate->batch->batch);
+
+        $zipFileName = 'certificates_' . str_replace('/', '_', $explodeBatch[0]) . '_' . $getPenlatDetail->penlatCertificate->batch->date . '.zip';
         $zipFilePath = public_path('uploads/certificates/' . $zipFileName);
 
         $zip = new ZipArchive;
@@ -1438,7 +1457,9 @@ class PDController extends Controller
                 $sheet->setCellValueByColumnAndRow(27, 29, 'Jakarta, ' . Carbon::parse($data->issued_date)->format('d F Y'));
 
                 // Generate a unique filename for the Excel file
-                $excelFileName = 'certificates_' . $formId . '.xlsx';
+                $namaPesertaFormatted = str_replace(' ', '_', strtolower($data->peserta->nama_peserta));
+                $excelFileName = 'certificates_' . $namaPesertaFormatted . '_' . $certificateNumber . '.xlsx';
+
                 $excelFilePath = public_path('uploads/certificates/' . $excelFileName);
 
                 // Save the spreadsheet to a temporary file
@@ -1497,6 +1518,37 @@ class PDController extends Controller
         return response()->json([
             'id' => $regulator->id,
             'description' => $regulator->description,
+        ]);
+    }
+
+    public function refreshParticipants(Request $request)
+    {
+        $validated = $request->validate([
+            'batch' => 'required',
+            'penlatCertificateId' => 'required'
+        ]);
+
+        $currentTimestamp = now();
+
+        // Fetch participants by batch
+        $participants = Infografis_peserta::where('batch', $validated['batch'])->get();
+
+        // Iterate over participants and update or create their certificates
+        foreach ($participants as $participant) {
+            Receivables_participant_certificate::updateOrCreate(
+                [
+                    'infografis_peserta_id' => $participant->id,
+                    'penlat_certificate_id' => $request->penlatCertificateId,
+                ],
+                [
+                    'status' => 'true',
+                    'updated_at' => $currentTimestamp,
+                ]
+            );
+        }
+
+        return response()->json([
+            'message' => 'Participants refreshed successfully!',
         ]);
     }
 

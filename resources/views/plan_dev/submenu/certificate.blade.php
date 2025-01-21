@@ -88,6 +88,17 @@ font-weight-bold
                                         </select>
                                     </div>
                                 </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="email">Tahun :</label>
+                                        <select class="form-control" id="periode" name="periode">
+                                            <option value="-1" selected>Show All</option>
+                                            @foreach(range(date('Y'), date('Y') - 5) as $year)
+                                                <option value="{{ $year }}">{{ $year }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
                                 <div class="col-md-1 d-flex align-self-end justify-content-start">
                                     <div class="form-group">
                                         <div class="align-self-center">
@@ -103,11 +114,11 @@ font-weight-bold
                             <tr>
                                 <th>Tgl Pelaksanaan</th>
                                 <th>Nama Pelatihan</th>
-                                <th>Jenis Pelatihan</th>
                                 <th>Batch</th>
                                 <th>Status</th>
                                 <th>Keterangan</th>
                                 <th>Total</th>
+                                <th>Dibuat Oleh</th>
                                 <th>Created At</th>
                                 <th width="225px">Action</th>
                             </tr>
@@ -245,16 +256,17 @@ $(document).ready(function() {
             data: function(d) {
                 d.penlat = $('#penlat').val();
                 d.batch = $('#batch').val();
+                d.periode = $('#periode').val();
             }
         },
         columns: [
-            { data: 'batch.date', name: 'batch.date' },
+            { data: 'tgl_pelaksanaan', name: 'tgl_pelaksanaan' },
             { data: 'batch.penlat.description', name: 'batch.penlat.description' },
-            { data: 'batch.penlat.jenis_pelatihan', name: 'batch.penlat.jenis_pelatihan' },
             { data: 'batch.batch', name: 'batch.batch' },
             { data: 'status', name: 'status' },
             { data: 'keterangan', name: 'keterangan' },
             { data: 'total_issued', name: 'total_issued' },
+            { data: 'created_by', name: 'created_by' },
             { data: 'created_at', name: 'created_at' },
             { data: 'action', name: 'action', orderable: false, searchable: false, className: 'text-center' }
         ]
