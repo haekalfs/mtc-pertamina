@@ -9,7 +9,7 @@ class Receivables_participant_certificate extends Model
 {
     use HasFactory;
     protected $table = "receivables_participant_certificates";
-    protected $fillable = ["id", "penlat_certificate_id", "infografis_peserta_id", "status", "date_received", "expire_date", "certificate_number", "issued_date","created_at", "updated_at"];
+    protected $fillable = ["id", "penlat_certificate_id", "infografis_peserta_id", "status", "date_received", "expire_date", "certificate_number", "isInternal", "issued_date","created_at", "updated_at"];
 
 
     public function peserta(){

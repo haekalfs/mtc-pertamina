@@ -58,38 +58,66 @@ font-weight-bold
                     </div>
                 </div>
                 <div class="card-body zoom90">
-                    <table id="docLetter" class="table table-bordered">
+                    <div class="row d-flex justify-content-start mb-4">
+                        <div class="col-md-12">
+                            <div class="row align-items-center">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="penlat">Nama Pelatihan:</label>
+                                        <select class="form-control" name="penlat" id="penlat">
+                                            <option value="">Show All</option>
+                                            @foreach ($penlatList as $item)
+                                                <option value="{{ $item->id }}">{{ $item->description }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="batch">Kategori Pelatihan:</label>
+                                        <select name="kategori_pelatihan" class="form-control" id="kategori_pelatihan">
+                                            <option value="">Show All</option>
+                                            @foreach ($penlatList->unique('kategori_pelatihan') as $item)
+                                                <option value="{{ $item->kategori_pelatihan }}">{{ $item->kategori_pelatihan }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="periode">Tahun:</label>
+                                        <select class="form-control" id="periode" name="periode">
+                                            <option value="-1" selected>Show All</option>
+                                            @foreach(range(date('Y'), date('Y') - 5) as $year)
+                                                <option value="{{ $year }}">{{ $year }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-1 d-flex align-self-end justify-content-start">
+                                    <div class="form-group">
+                                        <div class="align-self-center">
+                                            <button id="filterButton" class="btn btn-primary"><i class="ti-search"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table id="listCertificatesMaster" class="table table-bordered">
                         <thead class="thead-light">
                             <tr>
                                 <th>Nomor Sertifikat</th>
                                 <th>Tgl Terbit</th>
                                 <th>Nama Pelatihan</th>
                                 <th>Batch</th>
-                                <th width="250px">Certificate</th>
+                                <th>Certificate</th>
                                 <th>Nama Peserta</th>
                                 <th>Dibuat Oleh</th>
-                                <th width="50px">Action</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @foreach($listCertificates as $certificate)
-                            <tr>
-                                <td>{{ $certificate->certificate_number }}</td>
-                                <td>{{ \Carbon\Carbon::parse($certificate->issued_date)->format('d-M-Y') }}</td>
-                                <td>{{ $certificate->penlatCertificate->batch->penlat->description }}</td>
-                                <td>{{ $certificate->penlatCertificate->batch->batch }}</td>
-                                <td>{{ $certificate->certificate_number }} / {{ explode('/', $certificate->penlatCertificate->batch->batch)[0] }} / PMTC / {{ explode('/', $certificate->penlatCertificate->batch->batch)[2] }} / {{ explode('/', $certificate->penlatCertificate->batch->batch)[3] }}</td>
-                                <td>{{ $certificate->peserta->nama_peserta }}</td>
-                                <td>{{ $certificate->penlatCertificate->created_by }}</td>
-                                <td class="text-center">
-                                    <a class="btn btn-outline-success btn-md mb-2 mr-2 generateQR" href="javascript:void(0)"
-                                        data-id="{{ $certificate->id }}">
-                                        <i class="fa fa-qrcode"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
                     </table>
                 </div>
             </div>
@@ -133,9 +161,70 @@ font-weight-bold
         </div>
     </div>
 </div>
+<style>
+    /* Custom CSS to align the Select2 container */
+    .select2-container--default .select2-selection--single {
+        height: calc(2.25rem + 2px); /* Adjust this value to match your input height */
+        padding: 0.375rem 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: calc(2.25rem + 2px); /* Adjust this to vertically align the text */
+    }
+
+    .select2-container .select2-selection--single {
+        height: 100% !important; /* Ensure the height is consistent */
+    }
+
+    .select2-container {
+        width: 100% !important; /* Ensure the width matches the form control */
+    }
+</style>
 <script>
     $(document).ready(function () {
-        $('#docLetter').on('click', '.generateQR', function () {
+        $('#penlat').select2({
+            placeholder: "Select Pelatihan...",
+            width: '100%',
+            allowClear: true,
+            language: {
+                noResults: function() {
+                    return "No result match your request... Create new in Master Data Menu!"; // Customize this message as needed
+                }
+            }
+        });
+
+        const table = $('#listCertificatesMaster').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "{{ route('certificate-number') }}",
+                data: function (d) {
+                    d.penlat = $('#penlat').val();
+                    d.kategori_pelatihan = $('#kategori_pelatihan').val();
+                    d.periode = $('#periode').val();
+                }
+            },
+            columns: [
+                { data: 'certificate_number', name: 'certificate_number' },
+                { data: 'issued_date', name: 'issued_date' },
+                { data: 'penlatDescription', name: 'penlatDescription' },
+                { data: 'penlatBatch', name: 'penlatBatch' },
+                { data: 'certificate', name: 'certificate' },
+                { data: 'nama_peserta', name: 'nama_peserta' },
+                { data: 'created_by', name: 'created_by' },
+                { data: 'action', name: 'action', orderable: false, searchable: false, className: 'text-center' },
+            ],
+            order: [[0, 'desc']],
+        });
+
+        $('#filterButton').on('click', function (e) {
+            e.preventDefault();
+            table.draw();
+        });
+
+        $('#listCertificatesMaster').on('click', '.generateQR', function () {
             var certficateId = $(this).data('id');
             $.ajax({
                 url: '{{ route("generate-qr-certificate", "") }}/' + certficateId,

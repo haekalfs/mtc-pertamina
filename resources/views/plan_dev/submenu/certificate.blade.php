@@ -186,6 +186,17 @@ font-weight-bold
                     </div>
                     <div class="d-flex align-items-center mb-4">
                         <div style="width: 160px;" class="mr-2">
+                            <p style="margin: 0;">Cert. Numbering <span class="text-danger">*</span> :</p>
+                        </div>
+                        <div class="flex-grow-1">
+                            <select class="form-control" id="numbering" name="numbering">
+                                <option value="1" selected>Get From Master Data</option>
+                                <option value="0">Manually Adding</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-4">
+                        <div style="width: 160px;" class="mr-2">
                             <p style="margin: 0;">Status <span class="text-danger">*</span> :</p>
                         </div>
                         <div class="flex-grow-1">

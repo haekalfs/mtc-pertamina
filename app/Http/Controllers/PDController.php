@@ -392,17 +392,28 @@ class PDController extends Controller
 
     public function certificate_update(Request $request, $certId)
     {
+        // Validate input data
         $validatedData = $request->validate([
-            'keterangan' => 'required',
+            'keterangan' => 'required|max:255',
             'status' => 'required',
+            'startDate' => 'required|date',
+            'endDate' => 'required|date',
+            'regulator' => 'required', // Ensure regulator ID exists
         ]);
 
+        // Find the certificate by ID
         $penlat = Penlat_certificate::findOrFail($certId);
-        $penlat->keterangan = $request->input('keterangan');
-        $penlat->status = $request->input('status');
 
-        $penlat->save();
+        // Update the certificate fields
+        $penlat->update([
+            'keterangan' => $validatedData['keterangan'],
+            'status' => $validatedData['status'],
+            'start_date' => $validatedData['startDate'],
+            'end_date' => $validatedData['endDate'],
+            'regulator' => $validatedData['regulator'],
+        ]);
 
+        // Redirect back with success message
         return redirect()->back()->with('success', 'Program data updated successfully.');
     }
 
@@ -655,6 +666,7 @@ class PDController extends Controller
             'program' => 'sometimes',
             'startDate' => 'required',
             'endDate' => 'required',
+            'numbering' => 'required',
             'regulator' => 'required'
         ]);
 
@@ -666,6 +678,7 @@ class PDController extends Controller
         try {
             // Check if the batch already exists
             $checkData = Penlat_batch::where('batch', $request->batch)->exists();
+            $isInternal = true;
 
             if(!$checkData) {
                 // Create or update the Penlat_batch entry
@@ -693,8 +706,12 @@ class PDController extends Controller
                 }
             }
 
+            if($penlatBatch->penlat->kategori_pelatihan == 'NON STCW'){
+                $isInternal = false;
+            }
+
             // Retrieve all participants for the specified batch
-            $participants = Infografis_peserta::where('batch', $validated['batch'])->get();
+            $participants = Infografis_peserta::where('batch', $validated['batch'])->orderBy('nama_peserta', 'asc')->get();
 
             // Create or update the Penlat_certificate entry
             $penlatCertificate = Penlat_certificate::updateOrCreate(
@@ -715,15 +732,23 @@ class PDController extends Controller
 
             // Iterate over participants and update or create their certificates
             foreach ($participants as $participant) {
+                $data = [
+                    'status' => 'true',
+                    'isInternal' => $isInternal,
+                    'updated_at' => $currentTimestamp,
+                ];
+
+                // Add certificate_number only if numbering is 1
+                if ($validated['numbering'] == 1) {
+                    $data['certificate_number'] = $this->getNumberCerticates($isInternal);
+                }
+
                 Receivables_participant_certificate::updateOrCreate(
                     [
                         'infografis_peserta_id' => $participant->id,
                         'penlat_certificate_id' => $penlatCertificate->id,
                     ],
-                    [
-                        'status' => 'true',
-                        'updated_at' => $currentTimestamp,
-                    ]
+                    $data
                 );
             }
 
@@ -1402,6 +1427,8 @@ class PDController extends Controller
                     $batchParts[2],
                     $batchParts[3]
                 );
+                $sheet->setCellValue('B41', $batchParts[1]);
+
                 $birthInfo = $data->peserta->birth_place . ', ' . Carbon::parse($data->peserta->birth_date)->format('d F Y');
                 $sheet->setCellValueByColumnAndRow(16, 11, $data->peserta->nama_peserta);
                 $sheet->setCellValueByColumnAndRow(16, 14, $birthInfo);
@@ -1531,9 +1558,15 @@ class PDController extends Controller
         ]);
 
         $currentTimestamp = now();
+        $isInternal = true;
 
         // Fetch participants by batch
-        $participants = Infografis_peserta::where('batch', $validated['batch'])->get();
+        $participants = Infografis_peserta::where('batch', $validated['batch'])->orderBy('nama_peserta', 'asc')->get();
+        $penlatBatch = Penlat_batch::where('batch', $validated['batch'])->first();
+
+        if(trim($penlatBatch->penlat->kategori_pelatihan) == trim('NON STCW')){
+            $isInternal = false;
+        }
 
         // Iterate over participants and update or create their certificates
         foreach ($participants as $participant) {
@@ -1543,6 +1576,7 @@ class PDController extends Controller
                     'penlat_certificate_id' => $request->penlatCertificateId,
                 ],
                 [
+                    'isInternal' => $isInternal,
                     'status' => 'true',
                     'updated_at' => $currentTimestamp,
                 ]
@@ -1588,5 +1622,58 @@ class PDController extends Controller
 
         // Return the file for download
         return response()->download($outputPath);
+    }
+
+    public function getNumberCertificate($id)
+    {
+        date_default_timezone_set("Asia/Jakarta");
+        $year = date('Y');
+        $nextID = '1'; // Default next ID if no existing ID is found
+        $existingID = null;
+
+        try {
+            $getStatus = Receivables_participant_certificate::find($id);
+
+            $query = Receivables_participant_certificate::whereYear('created_at', $year)
+                ->where('isInternal', $getStatus->isInternal);
+
+            $existingID = $query->orderBy('certificate_number', 'desc')->lockForUpdate()->pluck('certificate_number')->first();
+
+            if ($existingID !== null) {
+                $nextID = sprintf('%05d', $existingID + 1);
+            }
+        } catch (\Exception $e) {
+            // Log the error or handle the exception as needed
+            // Log::error('Error fetching document number: ' . $e->getMessage());
+            return response()->json(['error' => 'An error occurred while fetching the next ID'], 500);
+        }
+
+        return response()->json(['nextID' => $nextID, 'existingID' => $existingID]);
+    }
+
+    private function getNumberCerticates($type)
+    {
+        date_default_timezone_set("Asia/Jakarta");
+        $year = date('Y');
+        $nextID = '1'; // Default next ID if no existing ID is found
+        $existingID = null;
+
+        try {
+
+            $query = Receivables_participant_certificate::whereYear('created_at', $year)
+                ->where('isInternal', $type);
+
+            $existingID = $query->orderBy('certificate_number', 'desc')->lockForUpdate()->pluck('certificate_number')->first();
+
+            if ($existingID !== null) {
+                $nextID = sprintf('%05d', $existingID + 1);
+            }
+        } catch (\Exception $e) {
+            // Log the error or handle the exception as needed
+            // Log::error('Error fetching document number: ' . $e->getMessage());
+            return response()->json(['error' => 'An error occurred while fetching the next ID'], 500);
+        }
+
+        return $nextID;
     }
 }

@@ -121,7 +121,7 @@ font-weight-bold
                                 </tr>
                                 <tr>
                                     <th>Batch</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $data->batch->batch }}</td>
+                                    <td style="text-align: start; font-weight:500">: {{ $data->batch->penlat->kategori_pelatihan }}</td>
                                 </tr>
                                 <tr>
                                     <th>Tanggal Pelaksanaan</th>
@@ -183,7 +183,7 @@ font-weight-bold
                                             <option value="4">Mark as Expire</option>
                                             <option value="5">Delete Permanently</option>
                                         </select>
-                                        <button class="apply-btn">Apply</button>
+                                        <button class="apply-btn">Execute</button>
                                     </div>
                                 </div>
                                 <div class="col-md-9 text-right">
@@ -305,8 +305,18 @@ font-weight-bold
                 @csrf
                 <div class="modal-body mr-2 ml-2">
                     <div class="d-flex align-items-center mb-4">
+                        <div style="width: 140px; margin-right: 10px;">
+                            <p style="margin: 0;">Periode <span class="text-danger">*</span> :</p>
+                        </div>
+                        <div class="d-flex flex-grow-1 align-items-center">
+                            <input type="date" id="startDate" class="form-control mr-2" name="startDate" style="max-width: 200px;" value="{{ $data->start_date }}" required>
+                            <span style="margin: 0 10px;">to</span>
+                            <input type="date" id="endDate" class="form-control" name="endDate" style="max-width: 200px;" value="{{ $data->end_date }}" required>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-4">
                         <div style="width: 140px;" class="mr-2">
-                            <p style="margin: 0;">Status :</p>
+                            <p style="margin: 0;">Status <span class="text-danger">*</span> :</p>
                         </div>
                         <div class="flex-grow-1">
                             <select class="form-control" id="status" name="status">
@@ -315,9 +325,17 @@ font-weight-bold
                             </select>
                         </div>
                     </div>
+                    <div class="d-flex align-items-center mb-4">
+                        <div style="width: 140px;" class="mr-2">
+                            <p style="margin: 0;">Regulator <span class="text-danger">*</span> :</p>
+                        </div>
+                        <div class="flex-grow-1">
+                            <select class="form-control" id="regulator" name="regulator"></select>
+                        </div>
+                    </div>
                     <div class="d-flex align-items-start mb-4">
                         <div style="width: 140px;" class="mr-2">
-                            <p style="margin: 0;">Keterangan :</p>
+                            <p style="margin: 0;">Keterangan <span class="text-danger">*</span> :</p>
                         </div>
                         <div class="flex-grow-1">
                             <textarea class="form-control" rows="3" name="keterangan">{{ $data->keterangan }}</textarea>
@@ -383,7 +401,7 @@ font-weight-bold
                     className: 'text-center' // Add this line
                 },
             ],
-            order: [[1, 'asc']],
+            order: [[2, 'asc']],
             lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, 'All']],
             pageLength: 25,
         });
@@ -393,7 +411,6 @@ font-weight-bold
             $('#checkAll').on('change', toggleCheckboxes);
         });
 
-        // Edit button click handler
         $('#listCertificates').on('click', '.edit-button', function () {
             var id = $(this).data('id');
             var participantName = $(this).data('participant-name');
@@ -405,7 +422,26 @@ font-weight-bold
             $('#participantName').text(participantName);
             $('#expireDate').val(expireDate);
             $('#receivedDate').val(receivedDate);
-            $('#certificateNumber').val(certificateNumber);
+
+            if (!certificateNumber || certificateNumber.trim() === '') {
+                // If certificateNumber is empty, fetch the next available number
+                $.ajax({
+                    url: '/get-next-certificate-number/' + id,
+                    type: 'GET',
+                    success: function (response) {
+                        if (response.nextID) {
+                            $('#certificateNumber').val(response.nextID); // Set the fetched number
+                        } else {
+                            alert('Failed to fetch certificate number.');
+                        }
+                    },
+                    error: function (xhr) {
+                        alert('An error occurred while fetching the certificate number.');
+                    }
+                });
+            } else {
+                $('#certificateNumber').val(certificateNumber);
+            }
 
             $('#editItemModal').modal('show');
         });
@@ -517,7 +553,92 @@ font-weight-bold
                 }
             });
         });
+        initSelect2WithRegulators();
     });
+
+    function initSelect2WithRegulators() {
+        $('#regulator').select2({
+            ajax: {
+                url: '{{ route('regulators.fetch') }}', // Define the route for fetching regulators
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        q: params.term, // Search query
+                        page: params.page || 1, // Pagination
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: $.map(data.items, function (item) {
+                            return {
+                                id: item.id,
+                                text: item.description,
+                            };
+                        }),
+                        pagination: {
+                            more: data.total_count > (params.page * 10),
+                        },
+                    };
+                },
+                cache: true,
+            },
+            placeholder: 'Select or add a Regulator',
+            minimumInputLength: 1,
+            theme: 'classic',
+            width: '100%',
+            dropdownParent: $('#editDataModal'),
+            tags: true, // Enable tagging for new entries
+            allowClear: true,
+            createTag: function (params) {
+                var term = $.trim(params.term);
+                if (term === '') {
+                    return null;
+                }
+                return {
+                    id: term,
+                    text: term,
+                    newTag: true, // Mark as new
+                };
+            },
+            templateResult: function (data) {
+                if (data.newTag) {
+                    return $('<span><em>Add new: "' + data.text + '"</em></span>');
+                }
+                return data.text;
+            },
+            templateSelection: function (data) {
+                return data.text;
+            },
+        });
+
+        // Listen for selection and handle new tag creation
+        $('#regulator').on('select2:select', function (e) {
+            var selectedData = e.params.data;
+            if (selectedData.newTag) {
+                // If it's a new entry, save it to the database
+                $.ajax({
+                    url: '{{ route('regulators.store') }}', // Define the route to save the new regulator
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}', // CSRF protection
+                    },
+                    data: {
+                        description: selectedData.text, // New regulator description
+                    },
+                    success: function (response) {
+                        // Replace the temporary new tag ID with the real one from the database
+                        var newOption = new Option(response.description, response.id, false, true);
+                        $('#regulator').append(newOption).trigger('change');
+                    },
+                    error: function () {
+                        alert('Failed to save the new regulator.');
+                    },
+                });
+            }
+        });
+    }
 
     function updateSelectedCount(count) {
         const badge = document.getElementById('selectedCountBadge');

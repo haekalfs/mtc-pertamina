@@ -47,6 +47,7 @@
         .content {
             margin-top: 20px;
             margin-left: 25px;
+            margin-bottom: 70px;
         }
 
         .content table {
@@ -119,7 +120,13 @@
                         <span class="english">No Certificate of Proficiency</span>
                     </td>
                     <td class="separator">:</td>
-                    <td class="label">{{ $data->certificate_number }} / {{ explode('/', $data->penlatCertificate->batch->batch)[0] }} / PMTC / {{ explode('/', $data->penlatCertificate->batch->batch)[2] }} / {{ explode('/', $data->penlatCertificate->batch->batch)[3] }}</td>
+                    <td class="label">
+                        @if (empty($data->certificate_number))
+                            <span style="font-style: italic; color: red;">Missing Number</span> / {{ explode('/', $data->penlatCertificate->batch->batch)[0] }} / PMTC / {{ explode('/', $data->penlatCertificate->batch->batch)[2] }} / {{ explode('/', $data->penlatCertificate->batch->batch)[3] }}
+                        @else
+                            {{ $data->certificate_number }} / {{ explode('/', $data->penlatCertificate->batch->batch)[0] }} / PMTC / {{ explode('/', $data->penlatCertificate->batch->batch)[2] }} / {{ explode('/', $data->penlatCertificate->batch->batch)[3] }}
+                        @endif
+                    </td>
                 </tr>
                 <tr>
                     <td class="value">
@@ -135,7 +142,7 @@
                         <span class="english">Issued Date</span>
                     </td>
                     <td class="separator">:</td>
-                    <td class="label">17 January 2025</td>
+                    <td class="label">{{ $data->issued_date ? \Carbon\Carbon::parse($data->issued_date)->format('d F Y') : '-' }}</td>
                 </tr>
                 <tr>
                     <td class="value">
@@ -152,12 +159,11 @@
                     </td>
                     <td class="separator">:</td>
                     <td class="label">
-                        {{ is_null($data->expire_date) || \Carbon\Carbon::parse($data->expire_date)->format('Y-m-d') >= now()->format('Y-m-d') ? 'Active' : 'Non Active' }}
+                        {{ is_null($data->expire_date) || \Carbon\Carbon::parse($data->expire_date)->format('Y-m-d') >= now()->format('Y-m-d') ? 'Valid' : 'Expire' }}
                     </td>
                 </tr>
             </table>
-        </div><br>
-        <small>This certificate's authenticity can only be validated through the official domain</small> <small style="color: red;"><i>mtc-pertaminacorpu.com</i></small><small> Any verification attempt through other sources is not authorized and may lead to invalid results. For more information, please contact the Pertamina Maritime Training Center at our official channels.</small>
+        </div>
     </div>
 </body>
 </html>

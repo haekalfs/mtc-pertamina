@@ -60,6 +60,7 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
     Route::middleware('suspiciousTexts')->group(function () {
 
         Route::get('/certificate-generate-qr/{id}', [PDController::class, 'generateQrCode'])->name('generate-qr-certificate');
+        Route::get('/get-next-certificate-number/{id}', [PDController::class, 'getNumberCertificate'])->name('getCertificateNumber');
 
         //On Dev Notification
         Route::get('/closed-menu', function () {
@@ -250,7 +251,7 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
 
                 Route::get('/regulators/fetch', [PDController::class, 'fetchRegulators'])->name('regulators.fetch');
                 Route::post('/regulators/store', [PDController::class, 'storeRegulator'])->name('regulators.store');
-                Route::get('/generateExcelWithQrCode/{id}', [PDController::class, 'generateExcelWithQrCode']);
+                // Route::get('/generateExcelWithQrCode/{id}', [PDController::class, 'generateExcelWithQrCode']);
 
                 Route::post('/planning-development/certificate-update/{certId}', [PDController::class, 'certificate_update'])->name('certificate.update');
                 Route::post('/certificate/delete', [PDController::class, 'delete_certificate'])->name('certificate.delete');
