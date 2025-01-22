@@ -65,6 +65,7 @@ class CertificateController extends Controller
                         : '<span class="text-danger" style="font-style: italic;">Missing Number</span>';
                     return $formattedNumber . ' / ' . $batchParts[0] . ' / PMTC / ' . $batchParts[2] . ' / ' . $batchParts[3];
                 })
+                ->rawColumns(['action', 'certificate'])
                 ->make(true);
         }
 
