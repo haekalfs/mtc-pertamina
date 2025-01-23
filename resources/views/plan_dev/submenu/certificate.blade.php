@@ -177,7 +177,7 @@ font-weight-bold
                                     <p style="margin: 0;">Judul Sertifikat <span class="text-danger">*</span> :</p>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <input type="text" id="programInput" class="form-control" name="program" required>
+                                    <textarea id="programInput" class="form-control" name="program" required></textarea>
                                 </div>
                             </div>
                             <div class="d-flex align-items-center mb-4">
