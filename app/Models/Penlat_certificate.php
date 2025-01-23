@@ -18,6 +18,7 @@ class Penlat_certificate extends Model
         'start_date',
         'end_date',
         'regulator',
+        'certificate_title'
     ];
 
     public function batch(){

@@ -33,7 +33,9 @@ class Infografis_peserta extends Model
         'seafarer_code',
         'registration_number',
         'birth_place',
-        'birth_date'
+        'birth_date',
+        'harga_pelatihan',
+        'tgl_pendaftaran'
     ];
 
     public function certificate(){

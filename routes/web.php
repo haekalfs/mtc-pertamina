@@ -246,6 +246,7 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
                 Route::post('/certificate/{id}/update', [PDController::class, 'updateCertificate'])->name('certificate.list.update');
                 Route::get('/certificates/{id}', [PDController::class, 'getCertificates'])->name('certificates.get');
                 Route::post('/certificates/export/selected-items', [PDController::class, 'export_selected'])->name('certificate.export.selected');
+                Route::post('/certificates/set-as-issued/selected-items', [PDController::class, 'markAsIssued'])->name('set-as-issued');
                 Route::post('/refresh-participants-certificate', [PDController::class, 'refreshParticipants'])->name('refresh.participants');
 
 

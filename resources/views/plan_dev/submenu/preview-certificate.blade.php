@@ -124,6 +124,10 @@ font-weight-bold
                                     <td style="text-align: start; font-weight:500">: {{ $data->batch->batch }}</td>
                                 </tr>
                                 <tr>
+                                    <th>Kategori Pelatihan</th>
+                                    <td style="text-align: start; font-weight:500">: {{ $data->batch->penlat->kategori_pelatihan }}</td>
+                                </tr>
+                                <tr>
                                     <th>Tanggal Pelaksanaan</th>
                                     <td style="text-align: start; font-weight:500">: {{ \Carbon\Carbon::parse($data->batch->date)->format('d F Y') }} - {{ \Carbon\Carbon::parse($data->end_date)->format('d F Y') }}</td>
                                 </tr>
@@ -179,7 +183,7 @@ font-weight-bold
                                             <option value="bulk-actions" selected disabled>Bulk Actions</option>
                                             <option value="1">Export Certificate</option>
                                             <option value="2">Mark as Received</option>
-                                            {{-- <option value="3">Edit</option> --}}
+                                            <option value="3">Mark as Issued</option>
                                             <option value="4">Mark as Expire</option>
                                             <option value="5">Delete Permanently</option>
                                         </select>
@@ -203,10 +207,10 @@ font-weight-bold
                                 <th>No. Registrasi</th>
                                 <th>Nama Peserta</th>
                                 <th width="150px">Cert No.</th>
-                                <th width="50px">Status</th>
                                 <th width="150px">Tgl Terbit</th>
                                 <th width="150px">Tgl Expire</th>
                                 <th width="150px">Tgl Diterima</th>
+                                <th width="50px">Status</th>
                                 <th width="150px">Action</th>
                             </tr>
                         </thead>
@@ -237,10 +241,10 @@ font-weight-bold
                     </div>
                     <div class="d-flex align-items-center mb-4">
                         <div style="width: 140px;" class="mr-2">
-                            <p style="margin: 0;">Tgl Diterima :</p>
+                            <p style="margin: 0;">Tgl Terbit :</p>
                         </div>
                         <div class="flex-grow-1">
-                            <input type="date" id="receivedDate" class="form-control" name="receivedDate">
+                            <input type="date" id="issuedDate" class="form-control" name="issuedDate">
                         </div>
                     </div>
                     <div class="d-flex align-items-center mb-4">
@@ -253,10 +257,30 @@ font-weight-bold
                     </div>
                     <div class="d-flex align-items-center mb-4">
                         <div style="width: 140px;" class="mr-2">
+                            <p style="margin: 0;">Tgl Diterima :</p>
+                        </div>
+                        <div class="flex-grow-1">
+                            <input type="date" id="receivedDate" class="form-control" name="receivedDate">
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-4">
+                        <div style="width: 140px;" class="mr-2">
                             <p style="margin: 0;">Nomor Certificate :</p>
                         </div>
                         <div class="flex-grow-1">
                             <input type="text" id="certificateNumber" class="form-control" name="certificateNumber" required>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-4">
+                        <div style="width: 140px;" class="mr-2">
+                            <p style="margin: 0;">Status <span class="text-danger">*</span> :</p>
+                        </div>
+                        <div class="flex-grow-1">
+                            <select class="form-control" id="certificateStatus" name="certificateStatus" required>
+                                <option selected disabled>Select Status...</option>
+                                <option value="0">Pending</option>
+                                <option value="1">Issued</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -314,7 +338,7 @@ font-weight-bold
                             <input type="date" id="endDate" class="form-control" name="endDate" style="max-width: 200px;" value="{{ $data->end_date }}" required>
                         </div>
                     </div>
-                    <div class="d-flex align-items-center mb-4">
+                    {{-- <div class="d-flex align-items-center mb-4">
                         <div style="width: 140px;" class="mr-2">
                             <p style="margin: 0;">Status <span class="text-danger">*</span> :</p>
                         </div>
@@ -324,7 +348,7 @@ font-weight-bold
                                 <option value="Issued" @if($data->status == 'Issued') selected @endif>Issued</option>
                             </select>
                         </div>
-                    </div>
+                    </div> --}}
                     <div class="d-flex align-items-center mb-4">
                         <div style="width: 140px;" class="mr-2">
                             <p style="margin: 0;">Regulator <span class="text-danger">*</span> :</p>
@@ -380,7 +404,6 @@ font-weight-bold
                     data: 'certificate_number',
                     name: 'certificate_number',
                 },
-                { data: 'status', name: 'status', orderable: false, searchable: false, className: 'text-center' },
                 {
                     data: 'issued_date',
                     name: 'issued_date',
@@ -393,6 +416,7 @@ font-weight-bold
                     data: 'date_received',
                     name: 'date_received',
                 },
+                { data: 'status', name: 'status', orderable: false, searchable: false, className: 'text-center' },
                 {
                     data: 'actions',
                     name: 'actions',
@@ -416,12 +440,20 @@ font-weight-bold
             var participantName = $(this).data('participant-name');
             var expireDate = $(this).data('expire-date');
             var receivedDate = $(this).data('received-date');
+            var issuedDate = $(this).data('issued-date');
             var certificateNumber = $(this).data('certificate-number');
+            var status = $(this).data('certificate-status');
 
             $('#participantId').val(id);
             $('#participantName').text(participantName);
             $('#expireDate').val(expireDate);
             $('#receivedDate').val(receivedDate);
+            $('#issuedDate').val(issuedDate);
+            if (status !== null && status !== false) {
+                $('#certificateStatus').val(status.toString()); // Convert status to string to match the <option> values
+            } else {
+                $('#certificateStatus').val('0'); // Default to "Pending" if status is null or false
+            }
 
             if (!certificateNumber || certificateNumber.trim() === '') {
                 // If certificateNumber is empty, fetch the next available number
@@ -972,6 +1004,75 @@ font-weight-bold
                         },
                     });
                 }
+            });
+        } else if (action === "3") {
+            swal({
+                title: "Mark as Issued",
+                text: "Please select the date issued (optional):",
+                content: {
+                    element: "input",
+                    attributes: {
+                        type: "date",
+                    },
+                },
+                icon: "info",
+                buttons: ["Cancel", "Proceed"],
+            }).then((selectedDate) => {
+                // If the user clicks "Cancel", selectedDate will be null, and we stop the process.
+                if (selectedDate === null) {
+                    return;
+                }
+
+                swal({
+                    title: "Processing...",
+                    text: "Your request is being processed. Please wait.",
+                    icon: "info",
+                    buttons: false,
+                    closeOnClickOutside: false,
+                });
+
+                // Automatically close the swal after 3 seconds
+                setTimeout(() => swal.close(), 3000);
+
+                // Send AJAX request to process the selected action
+                $.ajax({
+                    url: "{{ route('set-as-issued') }}",
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                    },
+                    data: {
+                        formIds: formIds,
+                        dateReceived: selectedDate || null, // Pass null if no date is selected
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            swal({
+                                title: "Success!",
+                                text: response.message,
+                                icon: "success",
+                                button: "OK",
+                            }).then(() => {
+                                $('#listCertificates').DataTable().draw(); // Refresh the table
+                            });
+                        } else {
+                            swal({
+                                title: "Error!",
+                                text: response.message || "Something went wrong while processing the request.",
+                                icon: "error",
+                                button: "OK",
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        swal({
+                            title: "Error!",
+                            text: "There was an error processing the request: " + xhr.responseText,
+                            icon: "error",
+                            button: "OK",
+                        });
+                    },
+                });
             });
         } else {
             // Handle other actions normally

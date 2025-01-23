@@ -76,12 +76,14 @@ class InfografisImport implements ToCollection, SkipsEmptyRows, WithBatchInserts
                         'kategori_program' => $row[19],
                         'realisasi' => $row[20],
                         'seafarer_code' => $row[8],
-                        'participant_id' => $row[1]
+                        'participant_id' => $row[1],
                     ],
                     [
                         'registration_number' => $row[7],
                         'birth_place' => $row[3],
                         'birth_date' => $this->getFormattedDate($row[4]),
+                        'harga_pelatihan' => preg_replace('/[^0-9]/', '', $row[15]),
+                        'tgl_pendaftaran' => $this->getFormattedDate($row[5]),
                         'isDuplicate' => false
                     ]
                 );

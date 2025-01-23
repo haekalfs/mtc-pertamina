@@ -364,6 +364,12 @@ class PDController extends Controller
 
             // Manually build the DataTables response
             return DataTables::of($certificates)
+                ->addColumn('jumlah_issued', function($item) {
+                    return $item->total_issued . ' ('. $item->participant->where('status', true)->count() .')';
+                })
+                ->addColumn('kategori_pelatihan', function($item) {
+                    return $item->batch->penlat->kategori_pelatihan;
+                })
                 ->addColumn('tgl_pelaksanaan', function($item) {
                     return Carbon::parse($item->batch->date)->format('d-M-Y');
                 })
@@ -395,7 +401,6 @@ class PDController extends Controller
         // Validate input data
         $validatedData = $request->validate([
             'keterangan' => 'required|max:255',
-            'status' => 'required',
             'startDate' => 'required|date',
             'endDate' => 'required|date',
             'regulator' => 'required', // Ensure regulator ID exists
@@ -407,7 +412,6 @@ class PDController extends Controller
         // Update the certificate fields
         $penlat->update([
             'keterangan' => $validatedData['keterangan'],
-            'status' => $validatedData['status'],
             'start_date' => $validatedData['startDate'],
             'end_date' => $validatedData['endDate'],
             'regulator' => $validatedData['regulator'],
@@ -667,6 +671,7 @@ class PDController extends Controller
             'startDate' => 'required',
             'endDate' => 'required',
             'numbering' => 'required',
+            'initial_number' => 'sometimes',
             'regulator' => 'required'
         ]);
 
@@ -719,6 +724,7 @@ class PDController extends Controller
                     'penlat_batch_id' => $penlatBatch->id,
                 ],
                 [
+                    'certificate_title' => $validated['program'],
                     'status' => $validated['status'],
                     'start_date' => $validated['startDate'],
                     'end_date' => $validated['endDate'],
@@ -730,17 +736,21 @@ class PDController extends Controller
                 ]
             );
 
+            $initialNumber = $validated['initial_number'];
+
             // Iterate over participants and update or create their certificates
             foreach ($participants as $participant) {
                 $data = [
-                    'status' => 'true',
                     'isInternal' => $isInternal,
                     'updated_at' => $currentTimestamp,
                 ];
 
                 // Add certificate_number only if numbering is 1
                 if ($validated['numbering'] == 1) {
-                    $data['certificate_number'] = $this->getNumberCerticates($isInternal);
+                    $data['certificate_number'] = $this->getNumberCerticates($validated['penlat']);
+                } elseif ($validated['numbering'] == 2 && $validated['initial_number']){
+                    $data['certificate_number'] = $initialNumber;
+                    $initialNumber++;
                 }
 
                 Receivables_participant_certificate::updateOrCreate(
@@ -791,9 +801,9 @@ class PDController extends Controller
                 return $row->peserta ? $row->peserta->nama_peserta : '-';
             })
             ->addColumn('status', function ($row) {
-                return $row->status == 'true'
-                    ? '<i class="fa fa-check"></i>'
-                    : '<i class="fa fa-ban"></i>';
+                return $row->status == 1
+                    ? '<i class="fa fa-check"></i> <small>Issued</small>'
+                    : '<i class="fa fa-spinner fa-spin"></i> <small>Pending</small>';
             })
             ->addColumn('actions', function ($row) {
                 return '<button class="btn btn-outline-secondary btn-md mb-2 mr-2 edit-button"
@@ -801,6 +811,8 @@ class PDController extends Controller
                             data-participant-name="' . ($row->peserta ? $row->peserta->nama_peserta : '-') . '"
                             data-expire-date="' . $row->expire_date . '"
                             data-received-date="' . $row->date_received . '"
+                            data-issued-date="' . $row->issued_date . '"
+                            data-certificate-status="' . $row->status . '"
                             data-certificate-number="' . $row->certificate_number . '">
                             <i class="fa fa-edit"></i>
                         </button>
@@ -1262,8 +1274,6 @@ class PDController extends Controller
             $formIds = $request->input('formIds');
             $dateReceived = $request->input('dateReceived');
 
-            $isExpire = Carbon::parse($dateReceived)->format('Y-m-d') < now() ? 'false' : 'true';
-
             // Convert formIds to an array if it's a string
             if (!is_array($formIds)) {
                 $formIds = explode(',', $formIds); // Split by commas into an array
@@ -1271,7 +1281,7 @@ class PDController extends Controller
 
             // Update the expire_date for the selected IDs
             Receivables_participant_certificate::whereIn('id', $formIds)
-                ->update(['expire_date' => $dateReceived, 'status' => $isExpire]);
+                ->update(['expire_date' => $dateReceived]);
 
             // Return a JSON response
             return response()->json(['success' => true, 'message' => 'Certificates marked as expired successfully.']);
@@ -1317,6 +1327,8 @@ class PDController extends Controller
         $request->validate([
             'receivedDate' => 'sometimes',
             'expireDate' => 'sometimes',
+            'certificateStatus' => 'sometimes',
+            'issuedDate' => 'sometimes',
             'certificateNumber' => 'required',
         ]);
 
@@ -1324,14 +1336,13 @@ class PDController extends Controller
             // Find the record by ID
             $certificate = Receivables_participant_certificate::findOrFail($id);
 
-            $isExpire = Carbon::parse($request->expireDate)->format('Y-m-d') < now() ? 'false' : 'true';
-
             // Update the record
             $certificate->update([
                 'date_received' => $request->receivedDate,
                 'expire_date' => $request->expireDate,
                 'certificate_number' => $request->certificateNumber,
-                'status' => $isExpire
+                'status' => $request->certificateStatus,
+                'issued_date' => $request->issuedDate,
             ]);
 
             // Return a JSON response
@@ -1509,6 +1520,47 @@ class PDController extends Controller
         }
     }
 
+    public function markAsIssued(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'formIds' => 'required', // Ensure formIds is provided
+            'dateReceived' => 'sometimes', // Ensure the date is valid
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed. Ensure all required fields are filled.',
+            ]);
+        }
+
+        $formIds = explode(',', $request->input('formIds'));
+
+        try {
+            foreach ($formIds as $formId) {
+                $data = Receivables_participant_certificate::find($formId);
+
+                if ($data) {
+                    // Update status and optionally the issued date
+                    $data->update([
+                        'status' => 1,
+                        'issued_date' => $request->input('dateReceived') ?: $data->issued_date,
+                    ]);
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Status has been updated successfully!',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while updating the status: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
     public function fetchRegulators(Request $request)
     {
         $search = $request->input('q');
@@ -1577,7 +1629,6 @@ class PDController extends Controller
                 ],
                 [
                     'isInternal' => $isInternal,
-                    'status' => 'true',
                     'updated_at' => $currentTimestamp,
                 ]
             );
@@ -1634,8 +1685,19 @@ class PDController extends Controller
         try {
             $getStatus = Receivables_participant_certificate::find($id);
 
+            if (!$getStatus) {
+                // Handle the case where the record is not found
+                return response()->json(['error' => 'Record not found'], 404);
+            }
+
+            // Get the related penlat_id
+            $getPenlatId = $getStatus->penlatCertificate->batch->penlat->id;
+
+            // Query to get matching records
             $query = Receivables_participant_certificate::whereYear('created_at', $year)
-                ->where('isInternal', $getStatus->isInternal);
+                ->whereHas('penlatCertificate.batch.penlat', function ($q) use ($getPenlatId) {
+                    $q->where('id', $getPenlatId);
+                });
 
             $existingID = $query->orderBy('certificate_number', 'desc')->lockForUpdate()->pluck('certificate_number')->first();
 
@@ -1651,7 +1713,7 @@ class PDController extends Controller
         return response()->json(['nextID' => $nextID, 'existingID' => $existingID]);
     }
 
-    private function getNumberCerticates($type)
+    private function getNumberCerticates($getPenlatId)
     {
         date_default_timezone_set("Asia/Jakarta");
         $year = date('Y');
@@ -1659,9 +1721,11 @@ class PDController extends Controller
         $existingID = null;
 
         try {
-
+            // Query to get matching records
             $query = Receivables_participant_certificate::whereYear('created_at', $year)
-                ->where('isInternal', $type);
+                ->whereHas('penlatCertificate.batch.penlat', function ($q) use ($getPenlatId) {
+                    $q->where('id', $getPenlatId);
+                });
 
             $existingID = $query->orderBy('certificate_number', 'desc')->lockForUpdate()->pluck('certificate_number')->first();
 

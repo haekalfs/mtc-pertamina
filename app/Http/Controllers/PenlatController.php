@@ -442,7 +442,7 @@ class PenlatController extends Controller
     public function batch(Request $request)
     {
         if ($request->ajax()) {
-            $query = Penlat_batch::with('penlat');
+            $query = Penlat_batch::with(['penlat', 'infografis_peserta']);
 
             // Apply filter based on selected values from dropdowns
             if ($request->namaPenlat && $request->namaPenlat != '-1') {
@@ -479,6 +479,10 @@ class PenlatController extends Controller
                 })
                 ->addColumn('batch', function($item) {
                     return $item->batch;
+                })
+                ->addColumn('harga_pelatihan', function ($item) {
+                    $totalHarga = $item->infografis_peserta->sum('harga_pelatihan');
+                    return 'Rp ' . number_format($totalHarga, 0, ',', '.');
                 })
                 ->addColumn('jenis_pelatihan', function($item) {
                     return $item->penlat->jenis_pelatihan;

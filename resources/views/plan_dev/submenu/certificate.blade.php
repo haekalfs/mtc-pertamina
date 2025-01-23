@@ -115,9 +115,10 @@ font-weight-bold
                                 <th>Tgl Pelaksanaan</th>
                                 <th>Nama Pelatihan</th>
                                 <th>Batch</th>
+                                <th>Kategori</th>
                                 <th>Status</th>
                                 <th>Keterangan</th>
-                                <th>Total</th>
+                                <th>Total Terbit</th>
                                 <th>Dibuat Oleh</th>
                                 <th>Created At</th>
                                 <th width="225px">Action</th>
@@ -192,7 +193,17 @@ font-weight-bold
                             <select class="form-control" id="numbering" name="numbering">
                                 <option value="1" selected>Get From Master Data</option>
                                 <option value="0">Manually Adding</option>
+                                <option value="2">Custom Number</option>
                             </select>
+                        </div>
+                    </div>
+
+                    <div class="align-items-center mb-4" id="initialNumberContainer" style="display: none;">
+                        <div style="width: 160px;" class="mr-2">
+                            <p style="margin: 0;">Initial Number <span class="text-danger">*</span> :</p>
+                        </div>
+                        <div class="flex-grow-1">
+                            <input type="number" id="initial_number" class="form-control" name="initial_number" style="max-width: 200px;">
                         </div>
                     </div>
                     <div class="d-flex align-items-center mb-4">
@@ -274,9 +285,10 @@ $(document).ready(function() {
             { data: 'tgl_pelaksanaan', name: 'tgl_pelaksanaan' },
             { data: 'batch.penlat.description', name: 'batch.penlat.description' },
             { data: 'batch.batch', name: 'batch.batch' },
+            { data: 'kategori_pelatihan', name: 'kategori_pelatihan' },
             { data: 'status', name: 'status' },
             { data: 'keterangan', name: 'keterangan' },
-            { data: 'total_issued', name: 'total_issued' },
+            { data: 'jumlah_issued', name: 'jumlah_issued' },
             { data: 'created_by', name: 'created_by' },
             { data: 'created_at', name: 'created_at' },
             { data: 'action', name: 'action', orderable: false, searchable: false, className: 'text-center' }
@@ -353,7 +365,7 @@ $(document).ready(function() {
 
     // Update hidden input on Penlat change
     $('#penlatSelect').on('change', function() {
-        var selectedOption = $(this).find('option:selected').text();
+        var selectedOption = $(this).find('option:selected').text().toUpperCase();
         $('#programInput').val(selectedOption);
 
         // Reinitialize the batch select dropdown, passing the selected penlat_id
@@ -361,9 +373,6 @@ $(document).ready(function() {
     });
 
     $('#penlat').on('change', function() {
-        var selectedOption = $(this).find('option:selected').text();
-        $('#programInput').val(selectedOption);
-
         // Reinitialize the batch select dropdown, passing the selected penlat_id
         initSelectFilter('batch', '{{ route('batches.fetch.certificate') }}', 'Select or add a Batch', $(this).val());
     });
@@ -589,5 +598,22 @@ function initSelect2WithRegulators() {
         }
     });
 }
+</script>
+
+<script>
+    document.getElementById('numbering').addEventListener('change', function () {
+        const selectedValue = this.value;
+        const initialNumberContainer = document.getElementById('initialNumberContainer');
+        const initialNumberInput = document.getElementById('initial_number');
+
+        if (selectedValue === '2') { // Show input for "Custom Number"
+            initialNumberContainer.style.display = 'flex';
+            initialNumberInput.setAttribute('required', 'required');
+        } else { // Hide input and remove "required"
+            initialNumberContainer.style.display = 'none';
+            initialNumberInput.removeAttribute('required');
+            initialNumberInput.value = ''; // Clear the input value if hidden
+        }
+    });
 </script>
 @endsection
