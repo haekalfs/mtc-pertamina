@@ -121,7 +121,7 @@ font-weight-bold
                                 </tr>
                                 <tr>
                                     <th>Batch</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $data->batch->penlat->kategori_pelatihan }}</td>
+                                    <td style="text-align: start; font-weight:500">: {{ $data->batch->batch }}</td>
                                 </tr>
                                 <tr>
                                     <th>Tanggal Pelaksanaan</th>
