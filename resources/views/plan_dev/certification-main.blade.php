@@ -89,21 +89,21 @@ font-weight-bold
         <div class="col-md-12">
             <div class="card mb-4">
                 <div class="card-header">
-                    <span class="text-primary font-weight-bold">Certificate Menu Guidelines</span>
+                    <span class="text-primary font-weight-bold">Panduan Menu Sertifikat</span>
                 </div>
                 <div class="card-body" style="background-color: rgb(247, 247, 247);">
-                    <h6 class="h6 mb-2 font-weight-bold text-gray-800">Overview</h6>
-                    <p>The Certificate menu provides two essential sub-menus for managing certifications within the MTC system:</p>
+                    <h6 class="h6 mb-2 font-weight-bold text-gray-800">Gambaran Umum</h6>
+                    <p>Menu Sertifikat menyediakan dua sub-menu utama untuk mengelola sertifikasi dalam sistem MTC:</p>
                     <ul class="ml-4">
-                        <li><strong>Sertifikasi Peserta</strong>: This menu is dedicated to managing the certification status of participants who have undergone training at the MTC. It provides details on their certification progress and outcomes.</li>
-                        <li><strong>Instructor Certificate</strong>: This menu is used to manage certifications for instructors or trainers within the MTC. It includes information on the certification status and other relevant details for instructors.</li>
+                        <li><strong>Sertifikasi Peserta</strong>: Menu ini digunakan untuk mengelola status sertifikasi peserta yang telah mengikuti pelatihan di MTC. Menu ini memberikan detail tentang kemajuan dan hasil sertifikasi mereka.</li>
+                        <li><strong>Sertifikat Instruktur</strong>: Menu ini digunakan untuk mengelola sertifikasi bagi instruktur atau pelatih di MTC. Menu ini mencakup informasi tentang status sertifikasi dan detail relevan lainnya untuk instruktur.</li>
                     </ul>
-                    <h6 class="h6 mb-2 font-weight-bold text-gray-800">Key Points</h6>
+                    <h6 class="h6 mb-2 font-weight-bold text-gray-800">Poin Penting</h6>
                     <ul class="ml-4">
-                        <li>Each sub-menu is tailored to manage and view certification details specific to either participants or instructors.</li>
-                        <li>Ensure that all certification data entered or modified is accurate and reflects the current status of the individuals involved.</li>
-                        <li>Access to these menus should be restricted to authorized personnel only to maintain data integrity.</li>
-                        <li>Regularly update the certification information to ensure it aligns with the latest training outcomes and instructor qualifications.</li>
+                        <li>Setiap sub-menu dirancang untuk mengelola dan melihat detail sertifikasi yang spesifik baik untuk peserta maupun instruktur.</li>
+                        <li>Pastikan semua data sertifikasi yang dimasukkan atau dimodifikasi akurat dan mencerminkan status terkini dari individu yang bersangkutan.</li>
+                        <li>Akses ke menu ini harus dibatasi hanya untuk personel yang berwenang guna menjaga integritas data.</li>
+                        <li>Perbarui informasi sertifikasi secara berkala agar sesuai dengan hasil pelatihan terbaru dan kualifikasi instruktur.</li>
                     </ul>
                 </div>
             </div>

@@ -29,7 +29,16 @@ class Penlat_certificate extends Model
     	return $this->belongsTo('App\Models\Regulator', 'regulator', 'id')->withDefault();
     }
 
+    public function regulation_amendments(){
+    	return $this->belongsTo('App\Models\Regulator_amendment', 'regulator_amendment', 'id')->withDefault();
+    }
+
     public function participant()
+    {
+        return $this->hasMany('App\Models\Receivables_participant_certificate', 'penlat_certificate_id', 'id');
+    }
+    // Use the plural name for participants
+    public function participants()
     {
         return $this->hasMany('App\Models\Receivables_participant_certificate', 'penlat_certificate_id', 'id');
     }

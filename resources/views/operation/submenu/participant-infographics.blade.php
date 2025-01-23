@@ -15,8 +15,8 @@ font-weight-bold
 @section('content')
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
-        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="menu-icon fa fa-users"></i> Participants Infographics</h1>
-        <p class="mb-4">Infographics about participant.</a></p>
+        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="menu-icon fa fa-users"></i> Realisasi Peserta</h1>
+        <p class="mb-4">Realisasi Peserta PMTC.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->
         <a href="{{ route('participant-infographics-import-page') }}" class="btn btn-sm btn-primary shadow-sm text-white"><i class="fa fa-file-text fa-sm"></i> Import Data</a>
@@ -461,8 +461,40 @@ font-weight-bold
         </div>
     </div>
 </div>
+
+<style>
+    /* Custom CSS to align the Select2 container */
+    .select2-container--default .select2-selection--single {
+        height: calc(2.25rem + 2px); /* Adjust this value to match your input height */
+        padding: 0.375rem 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: calc(2.25rem + 2px); /* Adjust this to vertically align the text */
+    }
+
+    .select2-container .select2-selection--single {
+        height: 100% !important; /* Ensure the height is consistent */
+    }
+
+    .select2-container {
+        width: 100% !important; /* Ensure the width matches the form control */
+    }
+</style>
 <script>
 $(document).ready(function() {
+    $('#namaPenlat').select2({
+        placeholder: "Select Pelatihan...",
+        width: '100%',
+        allowClear: true,
+        language: {
+            noResults: function() {
+                return "No result match your request... Import again!"; // Customize this message as needed
+            }
+        }
+    });
 
     var table = $('#listPeserta').DataTable({
         processing: true,

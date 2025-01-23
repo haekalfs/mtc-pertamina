@@ -329,6 +329,14 @@ font-weight-bold
                 @csrf
                 <div class="modal-body mr-2 ml-2">
                     <div class="d-flex align-items-center mb-4">
+                        <div style="width: 140px;" class="mr-2">
+                            <p style="margin: 0;">Judul Sertifikat <span class="text-danger">*</span> :</p>
+                        </div>
+                        <div class="flex-grow-1">
+                            <input type="text" id="programInput" class="form-control" name="program" value="{{ $data->certificate_title }}" required>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-4">
                         <div style="width: 140px; margin-right: 10px;">
                             <p style="margin: 0;">Periode <span class="text-danger">*</span> :</p>
                         </div>

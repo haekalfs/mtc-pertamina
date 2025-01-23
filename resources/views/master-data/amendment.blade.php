@@ -8,15 +8,15 @@ active font-weight-bold
 show
 @endsection
 
-@section('list-lokasi')
+@section('list-amendment')
 font-weight-bold
 @endsection
 
 @section('content')
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
-        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-map-marker mr-1"></i> List Locations</h1>
-        <p class="mb-4">List Locations.</a></p>
+        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-gavel mr-1"></i> List Amendments</h1>
+        <p class="mb-4">List Amendments PMTC.</a></p>
     </div>
 </div>
 <div class="overlay overlay-mid" style="display: none;"></div>
@@ -54,7 +54,7 @@ font-weight-bold
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold" id="judul">List Data</h6>
                     <div class="text-right">
-                        <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Register Location</a>
+                        <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Register Amendments</a>
                     </div>
                 </div>
                 <div class="card-body zoom90">
@@ -62,21 +62,21 @@ font-weight-bold
                         <thead class="thead-light">
                             <tr>
                                 <th>#</th>
-                                <th>Location Code</th>
-                                <th>Location Description</th>
+                                <th>Description</th>
+                                <th>Translation</th>
                                 <th width="150px">Action</th>
                             </tr>
                         </thead>
                         <tbody>@php $no = 1; @endphp
-                            @foreach($listLocation as $location)
+                            @foreach($listAmendments as $amendments)
                             <tr>
                                 <td>{{ $no++ }}</td>
-                                <td>{{ $location->location_code }}</td>
-                                <td>{{ $location->description }}</td>
+                                <td>{{ $amendments->description }}</td>
+                                <td>{{ $amendments->translation }}</td>
                                 <td class="actions text-center">
                                     <div>
-                                        <button onclick="openEditModal({{ $location->id }})" class="btn btn-outline-secondary btn-md mb-2 mr-2"><i class="fa fa-edit"></i></button>
-                                        <button class="btn btn-outline-danger btn-md mb-2" onclick="deleteLocation({{ $location->id }})">
+                                        <button onclick="openEditModal({{ $amendments->id }})" class="btn btn-outline-secondary btn-md mb-2 mr-2"><i class="fa fa-edit"></i></button>
+                                        <button class="btn btn-outline-danger btn-md mb-2" onclick="deleteAmendments({{ $amendments->id }})">
                                             <i class="fa fa-trash-o"></i>
                                         </button>
                                     </div>
@@ -92,7 +92,7 @@ font-weight-bold
                     <span class="text-danger font-weight-bold">Notes</span>
                 </div>
                 <div class="card-body" style="background-color: rgb(247, 247, 247);">
-                    <h6 class="h6 mb-2 font-weight-bold text-gray-800">Location Management Guidelines</h6>
+                    <h6 class="h6 mb-2 font-weight-bold text-gray-800">Amendments Guidelines</h6>
                     <ul class="ml-4">
                         <li>Adding new locations will affect the Locations Table.</li>
                         <li>Ensure that each location has a unique location code and an appropriate description.</li>
@@ -113,7 +113,7 @@ font-weight-bold
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="post" action="{{ route('store-new-location') }}">
+            <form method="post" action="{{ route('store-new-amendment') }}">
                 @csrf
                 <div class="modal-body mr-2 ml-2">
                     <div class="row no-gutters">
@@ -123,18 +123,18 @@ font-weight-bold
                                     <div class="col-md-12">
                                         <div class="d-flex align-items-center mb-4">
                                             <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Location Code :</p>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <input type="text" class="form-control" id="location_code" name="location_code" required>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
                                                 <p style="margin: 0;">Description :</p>
                                             </div>
                                             <div class="flex-grow-1">
                                                 <input type="text" class="form-control" id="description" name="description" required>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div style="width: 140px;" class="mr-2">
+                                                <p style="margin: 0;">Translation :</p>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="text" class="form-control" id="translation" name="translation" required>
                                             </div>
                                         </div>
                                     </div>
@@ -155,7 +155,7 @@ font-weight-bold
     <div class="modal-dialog modal-dialog-centered modal-md" role="document">
         <div class="modal-content">
             <div class="modal-header d-flex flex-row align-items-center justify-content-between">
-                <h5 class="modal-title" id="editDataModalLabel">Edit Location</h5>
+                <h5 class="modal-title" id="editDataModalLabel">Edit Regulator</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -171,18 +171,18 @@ font-weight-bold
                                     <div class="col-md-12">
                                         <div class="d-flex align-items-center mb-4">
                                             <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Location Code:</p>
+                                                <p style="margin: 0;">Description:</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <input type="text" class="form-control" id="edit_location_code" name="location_code" required>
+                                                <input type="text" class="form-control" id="edit_description" name="edit_description" required>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-4">
                                             <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Description:</p>
+                                                <p style="margin: 0;">Translation:</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <input type="text" class="form-control" id="edit_description" name="description" required>
+                                                <input type="text" class="form-control" id="edit_translation" name="edit_translation" required>
                                             </div>
                                         </div>
                                     </div>
@@ -200,10 +200,10 @@ font-weight-bold
     </div>
 </div>
 <script>
-function deleteLocation(locationId) {
+function deleteAmendments(locationId) {
     swal({
         title: "Are you sure?",
-        text: "Once deleted, you will not be able to recover this location!",
+        text: "Once deleted, you will not be able to recover this amendment!",
         icon: "warning",
         buttons: true,
         dangerMode: true,
@@ -211,7 +211,7 @@ function deleteLocation(locationId) {
         if (willDelete) {
             // Make an AJAX request to delete the location
             $.ajax({
-                url: `/locations/${locationId}`,
+                url: `/amendments/${locationId}`,
                 type: "DELETE",
                 data: {
                     _token: "{{ csrf_token() }}", // Laravel CSRF token
@@ -236,15 +236,15 @@ function deleteLocation(locationId) {
 function openEditModal(locationId) {
     // Fetch location data via AJAX
     $.ajax({
-        url: `/locations/${locationId}/edit`,
+        url: `/amendments/${locationId}/edit`,
         type: "GET",
         success: function (data) {
             // Fill modal with existing location data
-            $("#edit_location_code").val(data.location_code);
+            $("#edit_translation").val(data.translation);
             $("#edit_description").val(data.description);
 
             // Set the form action to the update route
-            $("#editForm").attr("action", `/locations/${locationId}`);
+            $("#editForm").attr("action", `/amendments/${locationId}`);
 
             // Show the modal
             $("#editDataModal").modal("show");

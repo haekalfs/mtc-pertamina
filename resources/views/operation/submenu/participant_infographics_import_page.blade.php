@@ -15,7 +15,7 @@ font-weight-bold
 @section('content')
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
-        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="menu-icon fa fa-users"></i> Importer Participants Infographics</h1>
+        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="menu-icon fa fa-users"></i> Importer Realisasi Peserta</h1>
         <p class="mb-4">Import Data From Excel.</a></p>
     </div>
     <div class="d-sm-flex"> <!-- Add this div to wrap the buttons -->

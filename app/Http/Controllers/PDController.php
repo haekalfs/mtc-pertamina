@@ -18,6 +18,7 @@ use App\Models\Position;
 use App\Models\Receivables_participant_certificate;
 use App\Models\Regulation;
 use App\Models\Regulator;
+use App\Models\Regulator_amendment;
 use App\Models\Role;
 use App\Models\Status;
 use App\Models\Training_reference;
@@ -339,6 +340,7 @@ class PDController extends Controller
         $penlatList = Penlat::all();
         $listBatch = Penlat_batch::all();
         $listRegulator = Regulator::all();
+        $listAmendment = Regulator_amendment::all();
 
         if ($request->ajax()) {
             $query = Penlat_certificate::with(['batch.penlat']);
@@ -346,6 +348,12 @@ class PDController extends Controller
             if ($request->penlat) {
                 $query->whereHas('batch.penlat', function($q) use ($request) {
                     $q->where('id', $request->penlat);
+                });
+            }
+
+            if ($request->kategori_pelatihan) {
+                $query->whereHas('batch.penlat', function($q) use ($request) {
+                    $q->where('kategori_pelatihan', $request->kategori_pelatihan);
                 });
             }
 
@@ -365,7 +373,12 @@ class PDController extends Controller
             // Manually build the DataTables response
             return DataTables::of($certificates)
                 ->addColumn('jumlah_issued', function($item) {
-                    return $item->total_issued . ' ('. $item->participant->where('status', true)->count() .')';
+                    $issuedCount = $item->participant->where('status', true)->count();
+                    $totalIssued = $item->total_issued;
+
+                    $class = $issuedCount == $totalIssued ? 'text-success' : '';
+
+                    return '<span class="' . $class . '">' . $issuedCount . '/' . $totalIssued . '</span>';
                 })
                 ->addColumn('kategori_pelatihan', function($item) {
                     return $item->batch->penlat->kategori_pelatihan;
@@ -385,6 +398,7 @@ class PDController extends Controller
                         <button class="btn btn-outline-danger btn-sm delete-certificate" data-id="'.$item->id.'"><i class="fa fa-trash"></i> Delete</button>
                     ';
                 })
+                ->rawColumns(['jumlah_issued', 'action']) // Ensure the HTML is rendered
                 ->make(true);
         }
 
@@ -392,7 +406,8 @@ class PDController extends Controller
         return view('plan_dev.submenu.certificate', [
             'penlatList' => $penlatList,
             'listBatch' => $listBatch,
-            'listRegulator' => $listRegulator
+            'listRegulator' => $listRegulator,
+            'listAmendment' => $listAmendment
         ]);
     }
 
@@ -401,9 +416,11 @@ class PDController extends Controller
         // Validate input data
         $validatedData = $request->validate([
             'keterangan' => 'required|max:255',
+            'program' => 'required',
             'startDate' => 'required|date',
             'endDate' => 'required|date',
             'regulator' => 'required', // Ensure regulator ID exists
+            'regulator_amendment' => 'required', // Ensure regulator ID exists
         ]);
 
         // Find the certificate by ID
@@ -411,10 +428,12 @@ class PDController extends Controller
 
         // Update the certificate fields
         $penlat->update([
+            'certificate_title' => $validatedData['program'],
             'keterangan' => $validatedData['keterangan'],
             'start_date' => $validatedData['startDate'],
             'end_date' => $validatedData['endDate'],
             'regulator' => $validatedData['regulator'],
+            'regulator_amendment' => $validatedData['regulator_amendment'],
         ]);
 
         // Redirect back with success message
@@ -670,6 +689,7 @@ class PDController extends Controller
             'program' => 'sometimes',
             'startDate' => 'required',
             'endDate' => 'required',
+            'regulator_amendment' => 'required',
             'numbering' => 'required',
             'initial_number' => 'sometimes',
             'regulator' => 'required'
@@ -728,6 +748,7 @@ class PDController extends Controller
                     'status' => $validated['status'],
                     'start_date' => $validated['startDate'],
                     'end_date' => $validated['endDate'],
+                    'regulator_amendment' => $validated['regulator_amendment'],
                     'regulator' => $validated['regulator'],
                     'keterangan' => $validated['keterangan'],
                     'total_issued' => $participants->count(),
@@ -751,6 +772,10 @@ class PDController extends Controller
                 } elseif ($validated['numbering'] == 2 && $validated['initial_number']){
                     $data['certificate_number'] = $initialNumber;
                     $initialNumber++;
+                }
+
+                if($validated['status'] == 'Issued'){
+                    $data['status'] = 1;
                 }
 
                 Receivables_participant_certificate::updateOrCreate(
@@ -1345,6 +1370,30 @@ class PDController extends Controller
                 'issued_date' => $request->issuedDate,
             ]);
 
+            // Check the related Penlat_certificate and update its status
+            $penlatCertificate = Penlat_certificate::find($certificate->penlat_certificate_id); // Assuming relationship exists
+
+            if ($penlatCertificate) {
+                // Retrieve all participants' statuses
+                $participantStatuses = $penlatCertificate->participants;
+
+                // Check if all statuses are true
+                $allIssued = true;
+                foreach ($participantStatuses as $participant) {
+                    if (!$participant->status) {
+                        $allIssued = false;
+                        break; // Exit loop early if any status is false
+                    }
+                }
+
+                // Update the Penlat_certificate status if all are issued
+                if ($allIssued) {
+                    $penlatCertificate->update(['status' => 'Issued']);
+                } else {
+                    $penlatCertificate->update(['status' => 'On Process']);
+                }
+            }
+
             // Return a JSON response
             return response()->json(['success' => true, 'message' => 'Certificate data updated successfully.']);
         } catch (\Exception $e) {
@@ -1446,7 +1495,7 @@ class PDController extends Controller
                 $sheet->setCellValueByColumnAndRow(35, 9, $formattedCertificate);
 
                 // Get the description
-                $description = $data->penlatCertificate->batch->penlat->description;
+                $description = $data->penlatCertificate->certificate_title;
 
                 // Set a maximum character count for normal font size
                 $maxCharCount = 40; // Example breakpoint
@@ -1472,6 +1521,9 @@ class PDController extends Controller
                 $sheet->setCellValueByColumnAndRow(25, 23, Carbon::parse($data->penlatCertificate->end_date)->format('d F Y'));
 
                 //regulator
+                $sheet->setCellValue('F26', $data->penlatCertificate->regulation_amendments->description);
+                $sheet->setCellValue('F27', $data->penlatCertificate->regulation_amendments->translation);
+
                 $sheet->setCellValueByColumnAndRow(25, 26, $data->penlatCertificate->regulation->description);
 
                 // Generate the QR code
@@ -1546,6 +1598,31 @@ class PDController extends Controller
                         'status' => 1,
                         'issued_date' => $request->input('dateReceived') ?: $data->issued_date,
                     ]);
+                }
+            }
+
+
+            // Check the related Penlat_certificate and update its status
+            $penlatCertificate = Penlat_certificate::find($data->penlat_certificate_id); // Assuming relationship exists
+
+            if ($penlatCertificate) {
+                // Retrieve all participants' statuses
+                $participantStatuses = $penlatCertificate->participants;
+
+                // Check if all statuses are true
+                $allIssued = true;
+                foreach ($participantStatuses as $participant) {
+                    if (!$participant->status) {
+                        $allIssued = false;
+                        break; // Exit loop early if any status is false
+                    }
+                }
+
+                // Update the Penlat_certificate status if all are issued
+                if ($allIssued) {
+                    $penlatCertificate->update(['status' => 'Issued']);
+                } else {
+                    $penlatCertificate->update(['status' => 'On Process']);
                 }
             }
 

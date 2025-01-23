@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AgreementController;
 use App\Http\Controllers\AkhlakController;
+use App\Http\Controllers\AmendmentController;
 use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\CertificateController;
@@ -358,6 +359,13 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
 
             //Certificate Number
             Route::get('/master-data/certificates-numbers', [CertificateController::class, 'index'])->name('certificate-number');
+
+            //List Amendment
+            Route::get('/master-data/list-amendment', [AmendmentController::class, 'index'])->name('list-amendment');
+            Route::post('/store-data-amendment', [AmendmentController::class, 'store'])->name('store-new-amendment');
+            Route::delete('/amendments/{id}', [AmendmentController::class, 'destroy'])->name('amendments.destroy');
+            Route::put('/amendments/{id}', [AmendmentController::class, 'update'])->name('amendments.update');
+            Route::get('/amendments/{id}/edit', [AmendmentController::class, 'edit'])->name('amendments.edit');
 
 
             //Finance

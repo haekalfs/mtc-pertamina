@@ -56,6 +56,7 @@ font-weight-bold
                     <table  id="docLetter" class="table table-striped table-bordered">
                         <thead>
                             <tr>
+                                <th>#</th>
                                 <th width='200px'>Name</th>
                                 <th>Email</th>
                                 <th>Department</th>
@@ -65,9 +66,10 @@ font-weight-bold
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody>@php $no = 1; @endphp
                             @foreach ($users as $item)
                             <tr>
+                                <td>{{ $no++ }}</td>
                                 <td>{{ $item->name }}</td>
                                 <td>{{ $item->email }}</td>
                                 <td>{{ $item->users_detail->department->department_name }}</td>

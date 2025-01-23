@@ -90,6 +90,17 @@ font-weight-bold
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
+                                        <label for="batch">Kategori Pelatihan:</label>
+                                        <select name="kategori_pelatihan" class="form-control" id="kategori_pelatihan">
+                                            <option value="">Show All</option>
+                                            @foreach ($penlatList->unique('kategori_pelatihan') as $item)
+                                                <option value="{{ $item->kategori_pelatihan }}">{{ $item->kategori_pelatihan }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
                                         <label for="email">Tahun :</label>
                                         <select class="form-control" id="periode" name="periode">
                                             <option value="-1" selected>Show All</option>
@@ -134,8 +145,8 @@ font-weight-bold
     </div>
 </div>
 
-<div class="modal fade" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 900px;" role="document">
+<div class="modal fade" id="inputDataModal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 1300px;" role="document">
         <div class="modal-content">
             <div class="modal-header d-flex flex-row align-items-center justify-content-between">
                 <h5 class="modal-title" id="inputDataModalLabel">Input Data</h5>
@@ -146,96 +157,110 @@ font-weight-bold
             <form method="post" enctype="multipart/form-data" action="{{ route('certificate.store') }}">
                 @csrf
                 <div class="modal-body mr-2 ml-2">
-                    <div class="d-flex align-items-center mb-4">
-                        <div style="width: 160px;" class="mr-2">
-                            <p style="margin: 0;">Nama Pelatihan <span class="text-danger">*</span> :</p>
-                        </div>
-                        <div class="flex-grow-1">
-                            <select id="penlatSelect" class="form-control" name="penlat">
-                                <option selected disabled>Select Pelatihan...</option>
-                                @foreach ($penlatList as $item)
-                                    <option value="{{ $item->id }}">{{ $item->description }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center mb-4">
-                        <div style="width: 160px;" class="mr-2">
-                            <p style="margin: 0;">Nama Program <span class="text-danger">*</span> :</p>
-                        </div>
-                        <div class="flex-grow-1">
-                            <input type="text" id="programInput" class="form-control" name="program" required>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center mb-4">
-                        <div style="width: 160px;" class="mr-2">
-                            <p style="margin: 0;">Batch <span class="text-danger">*</span> :</p>
-                        </div>
-                        <div class="flex-grow-1">
-                            <select id="mySelect2" class="form-control" name="batch"></select>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center mb-4">
-                        <div style="width: 160px; margin-right: 10px;">
-                            <p style="margin: 0;">Periode <span class="text-danger">*</span> :</p>
-                        </div>
-                        <div class="d-flex flex-grow-1 align-items-center">
-                            <input type="date" id="startDate" class="form-control mr-2" name="startDate" style="max-width: 200px;" required>
-                            <span style="margin: 0 10px;">to</span>
-                            <input type="date" id="endDate" class="form-control" name="endDate" style="max-width: 200px;" required>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center mb-4">
-                        <div style="width: 160px;" class="mr-2">
-                            <p style="margin: 0;">Cert. Numbering <span class="text-danger">*</span> :</p>
-                        </div>
-                        <div class="flex-grow-1">
-                            <select class="form-control" id="numbering" name="numbering">
-                                <option value="1" selected>Get From Master Data</option>
-                                <option value="0">Manually Adding</option>
-                                <option value="2">Custom Number</option>
-                            </select>
-                        </div>
-                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 160px;" class="mr-2">
+                                    <p style="margin: 0;">Nama Pelatihan <span class="text-danger">*</span> :</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <select id="penlatSelect" class="form-control" name="penlat">
+                                        <option selected disabled>Select Pelatihan...</option>
+                                        @foreach ($penlatList as $item)
+                                            <option value="{{ $item->id }}">{{ $item->description }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 160px;" class="mr-2">
+                                    <p style="margin: 0;">Judul Sertifikat <span class="text-danger">*</span> :</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="text" id="programInput" class="form-control" name="program" required>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 160px;" class="mr-2">
+                                    <p style="margin: 0;">Batch <span class="text-danger">*</span> :</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <select id="mySelect2" class="form-control" name="batch"></select>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 160px; margin-right: 10px;">
+                                    <p style="margin: 0;">Periode <span class="text-danger">*</span> :</p>
+                                </div>
+                                <div class="d-flex flex-grow-1 align-items-center">
+                                    <input type="date" id="startDate" class="form-control mr-2" name="startDate" style="max-width: 200px;" required>
+                                    <span style="margin: 0 10px;">to</span>
+                                    <input type="date" id="endDate" class="form-control" name="endDate" style="max-width: 200px;" required>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 160px;" class="mr-2">
+                                    <p style="margin: 0;">Cert. Numbering <span class="text-danger">*</span> :</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <select class="form-control" id="numbering" name="numbering">
+                                        <option value="1" selected>Get From Master Data</option>
+                                        <option value="0">Manually Adding</option>
+                                        <option value="2">Custom Number</option>
+                                    </select>
+                                </div>
+                            </div>
 
-                    <div class="align-items-center mb-4" id="initialNumberContainer" style="display: none;">
-                        <div style="width: 160px;" class="mr-2">
-                            <p style="margin: 0;">Initial Number <span class="text-danger">*</span> :</p>
+                            <div class="align-items-center mb-4" id="initialNumberContainer" style="display: none;">
+                                <div style="width: 160px;" class="mr-2">
+                                    <p style="margin: 0;">Initial Number <span class="text-danger">*</span> :</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="number" id="initial_number" class="form-control" name="initial_number" style="max-width: 200px;">
+                                </div>
+                            </div>
                         </div>
-                        <div class="flex-grow-1">
-                            <input type="number" id="initial_number" class="form-control" name="initial_number" style="max-width: 200px;">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 160px;" class="mr-2">
+                                    <p style="margin: 0;">Status <span class="text-danger">*</span> :</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <select class="form-control" id="status" name="status">
+                                        <option value="On Process" selected>On Process</option>
+                                        <option value="Issued">Issued</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 180px;" class="mr-2">
+                                    <p style="margin: 0;">Amendment <span class="text-danger">*</span> :</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <select class="form-control" id="regulator_amendment" name="regulator_amendment">
+                                        @foreach ($listAmendment as $amendment)
+                                            <option value="{{ $amendment->id }}">{{ $amendment->description }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 160px;" class="mr-2">
+                                    <p style="margin: 0;">Regulator <span class="text-danger">*</span> :</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <select class="form-control" id="regulator" name="regulator"></select>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-start mb-4">
+                                <div style="width: 160px;" class="mr-2">
+                                    <p style="margin: 0;">Keterangan <span class="text-danger">*</span> :</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <textarea class="form-control" rows="3" name="keterangan" required></textarea>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="d-flex align-items-center mb-4">
-                        <div style="width: 160px;" class="mr-2">
-                            <p style="margin: 0;">Status <span class="text-danger">*</span> :</p>
-                        </div>
-                        <div class="flex-grow-1">
-                            <select class="form-control" id="status" name="status">
-                                <option value="On Process" selected>On Process</option>
-                                <option value="Issued">Issued</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center mb-4">
-                        <div style="width: 160px;" class="mr-2">
-                            <p style="margin: 0;">Regulator <span class="text-danger">*</span> :</p>
-                        </div>
-                        <div class="flex-grow-1">
-                            <select class="form-control" id="regulator" name="regulator"></select>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-start mb-4">
-                        <div style="width: 160px;" class="mr-2">
-                            <p style="margin: 0;">Keterangan <span class="text-danger">*</span> :</p>
-                        </div>
-                        <div class="flex-grow-1">
-                            <textarea class="form-control" rows="3" name="keterangan" required></textarea>
-                        </div>
-                    </div>
-                    <div class="alert alert-warning alert-block">
-                        <button type="button" class="close" data-dismiss="alert">×</button>
-                        <strong>Sistem akan otomatis mencari data peserta dari infografis sesuai batch yang dipilih!</strong>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -278,6 +303,7 @@ $(document).ready(function() {
             data: function(d) {
                 d.penlat = $('#penlat').val();
                 d.batch = $('#batch').val();
+                d.kategori_pelatihan = $('#kategori_pelatihan').val();
                 d.periode = $('#periode').val();
             }
         },
@@ -352,7 +378,6 @@ $(document).ready(function() {
 
     $('#penlatSelect').select2({
         dropdownParent: $('#inputDataModal'),
-        theme: "classic",
         placeholder: "Select Pelatihan...",
         width: '100%',
         allowClear: true,
@@ -415,7 +440,6 @@ function initSelect2WithAjax(elementId, ajaxUrl, placeholderText, penlatId = nul
         placeholder: placeholderText,
         minimumInputLength: 1,
         dropdownParent: $('#inputDataModal'),
-        theme: 'classic',
         width: '100%',
         tags: true,
         allowClear: true,
@@ -545,7 +569,6 @@ function initSelect2WithRegulators() {
         },
         placeholder: 'Select or add a Regulator',
         minimumInputLength: 1,
-        theme: 'classic',
         width: '100%',
         dropdownParent: $('#inputDataModal'),
         tags: true, // Enable tagging for new entries

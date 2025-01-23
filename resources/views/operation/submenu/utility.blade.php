@@ -120,7 +120,7 @@ font-weight-bold
 <input type="hidden" id="pelatihanId" name="pelatihanId"/>
 <input type="hidden" id="batchId" name="batchId"/>
 
-<div class="modal fade" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
+<div class="modal fade" id="inputDataModal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-labelledby="inputDataModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" style="max-width: 950px;" role="document">
         <div class="modal-content">
             <div class="modal-header d-flex flex-row align-items-center justify-content-between">
