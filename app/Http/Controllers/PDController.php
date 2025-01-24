@@ -1406,7 +1406,7 @@ class PDController extends Controller
     {
         try {
             // Decrypt the asset ID
-            $id = Crypt::decryptString($encryptedId);
+            $id = $encryptedId;
 
             $data = Receivables_participant_certificate::with(['peserta', 'penlatCertificate'])->findOrFail($id);
 
@@ -1422,7 +1422,7 @@ class PDController extends Controller
         $item = Receivables_participant_certificate::findOrFail($id);
 
         // Encrypt the asset ID
-        $encryptedId = Crypt::encryptString($item->id);
+        $encryptedId = $item->id;
 
         // Generate the QR code for the validate-asset route with the encrypted ID
         $qrCodeData = QrCode::format('png')
@@ -1527,7 +1527,7 @@ class PDController extends Controller
                 $sheet->setCellValueByColumnAndRow(25, 26, $data->penlatCertificate->regulation->description);
 
                 // Generate the QR code
-                $encryptedId = Crypt::encryptString($data->id);
+                $encryptedId = $data->id;
                 $qrCodeData = QrCode::format('png')
                     ->size(200)
                     ->merge('/storage/app/MTC.png', 0.3) // Merge with a 30% size of the QR code
