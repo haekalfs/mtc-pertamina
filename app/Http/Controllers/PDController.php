@@ -1531,7 +1531,7 @@ class PDController extends Controller
                 $qrCodeData = QrCode::format('png')
                     ->size(200)
                     ->merge('/storage/app/MTC.png', 0.3) // Merge with a 30% size of the QR code
-                    ->errorCorrection('L') // Use high error correction level
+                    ->errorCorrection('M') // Use high error correction level
                     ->generate(route('validate-certificate', $encryptedId));
 
                 // Embed the QR Code in the template
