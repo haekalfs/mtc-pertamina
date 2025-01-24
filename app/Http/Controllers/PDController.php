@@ -415,26 +415,42 @@ class PDController extends Controller
     {
         // Validate input data
         $validatedData = $request->validate([
-            'keterangan' => 'required|max:255',
-            'program' => 'required',
-            'startDate' => 'required|date',
-            'endDate' => 'required|date',
-            'regulator' => 'required', // Ensure regulator ID exists
-            'regulator_amendment' => 'required', // Ensure regulator ID exists
+            'keterangan' => 'sometimes|max:255', // Optional, but validated if present
+            'program' => 'sometimes',           // Optional
+            'startDate' => 'sometimes|date',    // Optional
+            'endDate' => 'sometimes|date',      // Optional
+            'regulator' => 'sometimes',         // Optional
+            'regulator_amendment' => 'sometimes', // Optional
         ]);
 
         // Find the certificate by ID
         $penlat = Penlat_certificate::findOrFail($certId);
 
-        // Update the certificate fields
-        $penlat->update([
-            'certificate_title' => $validatedData['program'],
-            'keterangan' => $validatedData['keterangan'],
-            'start_date' => $validatedData['startDate'],
-            'end_date' => $validatedData['endDate'],
-            'regulator' => $validatedData['regulator'],
-            'regulator_amendment' => $validatedData['regulator_amendment'],
-        ]);
+        // Prepare the data to update, excluding empty values
+        $updateData = [];
+        if (!empty($validatedData['keterangan'])) {
+            $updateData['keterangan'] = $validatedData['keterangan'];
+        }
+        if (!empty($validatedData['program'])) {
+            $updateData['certificate_title'] = $validatedData['program'];
+        }
+        if (!empty($validatedData['startDate'])) {
+            $updateData['start_date'] = $validatedData['startDate'];
+        }
+        if (!empty($validatedData['endDate'])) {
+            $updateData['end_date'] = $validatedData['endDate'];
+        }
+        if (!empty($validatedData['regulator'])) {
+            $updateData['regulator'] = $validatedData['regulator'];
+        }
+        if (!empty($validatedData['regulator_amendment'])) {
+            $updateData['regulator_amendment'] = $validatedData['regulator_amendment'];
+        }
+
+        // Update the certificate fields only if there are changes
+        if (!empty($updateData)) {
+            $penlat->update($updateData);
+        }
 
         // Redirect back with success message
         return redirect()->back()->with('success', 'Program data updated successfully.');
@@ -685,7 +701,7 @@ class PDController extends Controller
             'penlat' => 'required',
             'batch' => 'required',
             'status' => 'required',
-            'keterangan' => 'required',
+            'keterangan' => 'sometimes',
             'program' => 'sometimes',
             'startDate' => 'required',
             'endDate' => 'required',
