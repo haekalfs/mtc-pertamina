@@ -84,7 +84,8 @@
 <body>
     <div class="document">
         <div class="header">
-            <img src="{{ asset('img/logo-certificate.png') }}" alt="Dummy Logo">
+            <img src="{{ asset('img/mtc-logo-cert.png') }}" style="padding-bottom: 10px;" alt="Dummy Logo"><br>
+            <span style="font-weight: 1200; font-style: bold; margin-top: 350px;"><b>MARITIME TRAINING CENTER</b></span>
             <p>Jl. Pemuda No.44, RT.2/RW.4, Jati, Kec. Pulo Gadung,<br>
             Kota Jakarta Timur, Daerah Khusus Ibukota Jakarta 13220</p>
         </div>
