@@ -1542,7 +1542,7 @@ class PDController extends Controller
                 $drawing->setRenderingFunction(MemoryDrawing::RENDERING_PNG);
                 $drawing->setMimeType(MemoryDrawing::MIMETYPE_PNG);
                 $drawing->setHeight(100); // Set image height
-                $drawing->setCoordinates('AO29'); // Specify the cell for placement
+                $drawing->setCoordinates('AO31'); // Specify the cell for placement
                 $drawing->setWorksheet($sheet); // Attach to the worksheet
 
                 // Set the date issued in the Excel sheet
@@ -1740,7 +1740,7 @@ class PDController extends Controller
         $drawing->setRenderingFunction(MemoryDrawing::RENDERING_PNG);
         $drawing->setMimeType(MemoryDrawing::MIMETYPE_PNG);
         $drawing->setHeight(100); // Set image height
-        $drawing->setCoordinates('AO32'); // Specify the cell for placement
+        $drawing->setCoordinates('AO31'); // Specify the cell for placement
         $drawing->setWorksheet($sheet); // Attach to the worksheet
 
         // Save the modified file
