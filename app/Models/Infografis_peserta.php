@@ -42,11 +42,17 @@ class Infografis_peserta extends Model
     	return $this->hasMany('App\Models\Receivables_participant_certificate', 'infografis_peserta_id', 'id');
     }
 
-    public function certificateCheck(){
-    	return $this->hasOne('App\Models\Receivables_participant_certificate', 'infografis_peserta_id', 'id');
+    public function certificateCheck()
+    {
+    	return $this->belongsTo('App\Models\Receivables_participant_certificate', 'id', 'infografis_peserta_id')->withDefault();
     }
 
     public function penlatBatch()
+    {
+        return $this->belongsTo('App\Models\Penlat_batch', 'batch', 'batch')->withDefault();
+    }
+
+    public function batches()
     {
         return $this->belongsTo('App\Models\Penlat_batch', 'batch', 'batch')->withDefault();
     }

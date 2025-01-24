@@ -824,7 +824,10 @@ class PDController extends Controller
     public function preview_certificate($id)
     {
         $data = Penlat_certificate::find($id);
-        return view('plan_dev.submenu.preview-certificate', ['data' => $data]);
+        $listAmendment = Regulator_amendment::all();
+        $listRegulator = Regulator::all();
+
+        return view('plan_dev.submenu.preview-certificate', ['data' => $data, 'listAmendment' => $listAmendment, 'listRegulator' => $listRegulator]);
     }
 
     public function getCertificates(Request $request, $id)
@@ -1513,20 +1516,34 @@ class PDController extends Controller
                 // Get the description
                 $description = $data->penlatCertificate->certificate_title;
 
-                // Set a maximum character count for normal font size
-                $maxCharCount = 40; // Example breakpoint
+                // Define breakpoints for font sizes
+                $fontSizes = [
+                    20 => 28, // Up to 60 characters, font size 24
+                    40 => 24, // Up to 60 characters, font size 24
+                    60 => 20, // Up to 80 characters, font size 20
+                    80 => 16, // Up to 100 characters, font size 16
+                ];
 
-                // Calculate font size based on the length
-                $fontSize = (strlen($description) > $maxCharCount) ? 20 : 28;
+                // Default font size for very long text
+                $defaultFontSize = 14;
+
+                // Determine the appropriate font size based on text length
+                $fontSize = $defaultFontSize;
+                foreach ($fontSizes as $charLimit => $size) {
+                    if (strlen($description) <= $charLimit) {
+                        $fontSize = $size;
+                        break;
+                    }
+                }
 
                 // Set the cell value
-                $cellCoordinates = 'F19'; // Use 'F19' instead of byColumnAndRow for simplicity
+                $cellCoordinates = 'F19';
                 $sheet->setCellValue($cellCoordinates, $description);
 
-                // Apply the dynamic font size
+                // Apply the calculated font size
                 $sheet->getStyle($cellCoordinates)->getFont()->setSize($fontSize);
 
-                // Optionally, align text to wrap within the cell
+                // Align text to wrap within the cell
                 $sheet->getStyle($cellCoordinates)->getAlignment()->setWrapText(true);
                 $sheet->getStyle($cellCoordinates)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                 $sheet->getStyle($cellCoordinates)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);

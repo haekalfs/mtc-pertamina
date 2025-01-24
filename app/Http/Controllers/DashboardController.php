@@ -11,6 +11,7 @@ use App\Models\MorningBriefing;
 use App\Models\Penlat;
 use App\Models\Penlat_batch;
 use App\Models\Profit;
+use App\Models\Receivables_participant_certificate;
 use App\Models\Regulation;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -464,47 +465,58 @@ class DashboardController extends Controller
             $start->addMonth();
         }
 
-        // Filter by type if provided
-        $filtersType = function ($query) use ($type, $stcw) {
-            if ($type && $type != '-1') {
-                $query->where('jenis_pelatihan', $type);
+        // Build the query for Infografis_peserta with optional filters
+        $infografisQuery = Infografis_peserta::select(DB::raw('DATE_FORMAT(tgl_pelaksanaan, "%Y-%m") as month'), 'id')
+            ->whereBetween('tgl_pelaksanaan', [$startDate, $endDate]);
+
+        if ($type && $type != '-1') {
+            $infografisQuery->where('jenis_pelatihan', $type);
+        }
+        if ($stcw && $stcw != '-1') {
+            $infografisQuery->where('kategori_program', $stcw);
+        }
+
+        // Fetch all relevant Infografis_peserta data
+        $infografisData = $infografisQuery->get();
+
+        // Get all `Receivables_participant_certificate` IDs
+        $certificateData = Receivables_participant_certificate::select('infografis_peserta_id', 'status')->get();
+
+        // Group the certificates by `infografis_peserta_id`
+        $certificatesById = $certificateData->groupBy('infografis_peserta_id');
+
+        // Calculate monthly statistics
+        $dataByMonth = $infografisData->groupBy('month')->map(function ($items, $month) use ($certificatesById) {
+            $registeredButNotYetIssued = 0;
+            $issued = 0;
+            $pending = 0;
+
+            foreach ($items as $item) {
+                $certificates = $certificatesById[$item->id] ?? collect();
+
+                // Issued certificates (status = 1)
+                $issued += $certificates->where('status', 1)->count();
+
+                // Registered but not yet issued (status = 0 or null)
+                $registeredButNotYetIssued += $certificates->whereIn('status', [0, null])->count();
+
+                // Pending (Infografis_peserta IDs without any matching certificate)
+                if ($certificates->isEmpty()) {
+                    $pending++;
+                }
             }
-            if ($stcw && $stcw != '-1') {
-                $query->where('kategori_program', $stcw);
-            }
-        };
 
-        // Fetch data and group by month
-        $dataByMonth = Infografis_peserta::with('certificateCheck')
-            ->select(DB::raw('DATE_FORMAT(tgl_pelaksanaan, "%Y-%m") as month'))
-            ->whereBetween('tgl_pelaksanaan', [$startDate, $endDate])
-            ->where($filtersType)
-            ->get()
-            ->groupBy('month')
-            ->map(function ($items, $month) {
-                $registeredButNotYetIssued = $items->sum(function ($item) {
-                    // Check if the certificateCheck relationship exists
-                    return $item->certificateCheck ? 1 : 0;
-                });
-
-                $issued = $items->sum(function ($item) {
-                    // Check if the certificateCheck relationship exists and status is "Issued"
-                    return $item->certificateCheck && $item->certificateCheck->penlatCertificate->status == 'Issued' ? 1 : 0;
-                });
-
-                $pending = $items->count() - $registeredButNotYetIssued; // Remaining items are pending
-
-                return [
-                    'registeredButNotYetIssued' => $registeredButNotYetIssued,
-                    'issued' => $issued,
-                    'pending' => $pending,
-                ];
-            });
+            return [
+                'registeredButNotYetIssued' => $registeredButNotYetIssued,
+                'issued' => $issued,
+                'pending' => $pending,
+            ];
+        });
 
         // Map results into dynamic months
         $dataPointsRegisteredButNotYetIssued = [];
         $dataPointsPending = [];
-        $dataPointsIssued = []; // New data points for truly issued certificates
+        $dataPointsIssued = [];
 
         foreach ($months as $month) {
             $registeredButNotYetIssued = $dataByMonth[$month]['registeredButNotYetIssued'] ?? 0;
@@ -527,7 +539,7 @@ class DashboardController extends Controller
 
         return response()->json([
             "dataPointsRegisteredButNotYetIssued" => $dataPointsRegisteredButNotYetIssued,
-            "dataPointsIssued" => $dataPointsIssued, // Include truly issued data
+            "dataPointsIssued" => $dataPointsIssued,
             "dataPointsPending" => $dataPointsPending,
         ]);
     }

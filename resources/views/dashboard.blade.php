@@ -330,6 +330,11 @@ active font-weight-bold
                                 <div id="certificateChart" style="height: 300px; width: 100%;"></div>
                                 <div id="loader" style="display: none;">Loading...</div>
                             </div>
+                            <div class="text-center mb-3">
+                                <span><strong>Pending:</strong> <span id="pendingCount">0</span></span>
+                                <span><strong>Issued:</strong> <span id="issuedCount">0</span></span>
+                                <span><strong>Not Registered:</strong> <span id="notRegisteredCount">0</span></span>
+                            </div>
                         </div>
                     </div> <!-- /.row -->
                 </div>
@@ -889,6 +894,27 @@ $(document).ready(function () {
             data: JSON.stringify(payload),
             contentType: "application/json",
             success: function (data) {
+                let totalPending = 0;
+                let totalIssued = 0;
+                let totalNotRegistered = 0;
+
+                // Sum up all the values for totals
+                data.dataPointsRegisteredButNotYetIssued.forEach(point => {
+                    totalPending += point.y;
+                });
+                data.dataPointsIssued.forEach(point => {
+                    totalIssued += point.y;
+                });
+                data.dataPointsPending.forEach(point => {
+                    totalNotRegistered += point.y;
+                });
+
+                // Update the summary section
+                $('#pendingCount').text(totalPending);
+                $('#issuedCount').text(totalIssued);
+                $('#notRegisteredCount').text(totalNotRegistered);
+
+                // Initialize the chart
                 const chart = new CanvasJS.Chart("certificateChart", {
                     animationEnabled: true,
                     theme: "light2",
@@ -910,9 +936,9 @@ $(document).ready(function () {
                     data: [
                         {
                             type: "stackedColumn",
-                            name: "Registered but Not Yet Issued",
+                            name: "Pending Certificates",
                             showInLegend: true,
-                            legendText: "Registered but Not Yet Issued",
+                            legendText: "Pending Certificates",
                             dataPoints: data.dataPointsRegisteredButNotYetIssued
                         },
                         {
@@ -920,13 +946,13 @@ $(document).ready(function () {
                             name: "Issued Certificates",
                             showInLegend: true,
                             legendText: "Issued Certificates",
-                            dataPoints: data.dataPointsIssued // Add truly issued data here
+                            dataPoints: data.dataPointsIssued
                         },
                         {
                             type: "stackedColumn",
-                            name: "Pending Participants",
+                            name: "Not Registered",
                             showInLegend: true,
-                            legendText: "Pending Participants",
+                            legendText: "Not Registered",
                             dataPoints: data.dataPointsPending
                         }
                     ]

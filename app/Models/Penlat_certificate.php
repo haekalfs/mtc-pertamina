@@ -18,10 +18,15 @@ class Penlat_certificate extends Model
         'start_date',
         'end_date',
         'regulator',
-        'certificate_title'
+        'certificate_title',
+        'regulator_amendment'
     ];
 
     public function batch(){
+    	return $this->belongsTo('App\Models\Penlat_batch', 'penlat_batch_id', 'id')->withDefault();
+    }
+
+    public function batches(){
     	return $this->belongsTo('App\Models\Penlat_batch', 'penlat_batch_id', 'id')->withDefault();
     }
 

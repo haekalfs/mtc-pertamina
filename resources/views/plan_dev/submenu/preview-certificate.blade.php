@@ -105,7 +105,7 @@ font-weight-bold
                 <h6 class="m-0 font-weight-bold text-secondary" id="judul">Detail Pelatihan</h6>
             </div>
             <div class="card-body" style="position: relative;">
-                <a href="#" data-toggle="modal" data-target="#editDataModal" class="position-absolute" style="top: 10px; right: 15px; z-index: 10;">
+                <a href="#" data-toggle="modal" data-target="#editDataModal" data-regulator-id="{{ $data->regulation_amendments }}" data-regulator-text="{{ $data->regulation_amendments->description }}" class="position-absolute" style="top: 10px; right: 15px; z-index: 10;">
                     <i class="fa fa-edit fa-lg ml-2" style="color: rgb(181, 181, 181);"></i>
                 </a>
                 <div class="col-md-12 mb-3">
@@ -160,7 +160,7 @@ font-weight-bold
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-secondary" id="judul">List Participants</h6>
+                    <h6 class="m-0 font-weight-bold text-secondary" id="judul">Bulk Actions</h6>
                     <div class="text-right">
                         <form id="refreshBatchForm">
                             @csrf
@@ -180,7 +180,6 @@ font-weight-bold
                                 <div class="col-md-3">
                                     <div class="dropdown">
                                         <select id="bulkActions">
-                                            <option value="bulk-actions" selected disabled>Bulk Actions</option>
                                             <option value="1">Export Certificate</option>
                                             <option value="2">Mark as Received</option>
                                             <option value="3">Mark as Issued</option>
@@ -273,7 +272,7 @@ font-weight-bold
                     </div>
                     <div class="d-flex align-items-center mb-4">
                         <div style="width: 140px;" class="mr-2">
-                            <p style="margin: 0;">Status <span class="text-danger">*</span> :</p>
+                            <p style="margin: 0;">Status :</p>
                         </div>
                         <div class="flex-grow-1">
                             <select class="form-control" id="certificateStatus" name="certificateStatus" required>
@@ -330,7 +329,7 @@ font-weight-bold
                 <div class="modal-body mr-2 ml-2">
                     <div class="d-flex align-items-center mb-4">
                         <div style="width: 140px;" class="mr-2">
-                            <p style="margin: 0;">Judul Sertifikat <span class="text-danger">*</span> :</p>
+                            <p style="margin: 0;">Judul Sertifikat :</p>
                         </div>
                         <div class="flex-grow-1">
                             <input type="text" id="programInput" class="form-control" name="program" value="{{ $data->certificate_title }}" required>
@@ -338,7 +337,7 @@ font-weight-bold
                     </div>
                     <div class="d-flex align-items-center mb-4">
                         <div style="width: 140px; margin-right: 10px;">
-                            <p style="margin: 0;">Periode <span class="text-danger">*</span> :</p>
+                            <p style="margin: 0;">Periode :</p>
                         </div>
                         <div class="d-flex flex-grow-1 align-items-center">
                             <input type="date" id="startDate" class="form-control mr-2" name="startDate" style="max-width: 200px;" value="{{ $data->start_date }}" required>
@@ -346,28 +345,33 @@ font-weight-bold
                             <input type="date" id="endDate" class="form-control" name="endDate" style="max-width: 200px;" value="{{ $data->end_date }}" required>
                         </div>
                     </div>
-                    {{-- <div class="d-flex align-items-center mb-4">
-                        <div style="width: 140px;" class="mr-2">
-                            <p style="margin: 0;">Status <span class="text-danger">*</span> :</p>
-                        </div>
-                        <div class="flex-grow-1">
-                            <select class="form-control" id="status" name="status">
-                                <option value="On Process" @if($data->status == 'On Process') selected @endif>On Process</option>
-                                <option value="Issued" @if($data->status == 'Issued') selected @endif>Issued</option>
-                            </select>
-                        </div>
-                    </div> --}}
                     <div class="d-flex align-items-center mb-4">
                         <div style="width: 140px;" class="mr-2">
-                            <p style="margin: 0;">Regulator <span class="text-danger">*</span> :</p>
+                            <p style="margin: 0;">Amendment :</p>
                         </div>
                         <div class="flex-grow-1">
-                            <select class="form-control" id="regulator" name="regulator"></select>
+                            <select class="form-control" id="regulator_amendment" name="regulator_amendment">
+                                @foreach ($listAmendment as $amendment)
+                                    <option value="{{ $amendment->id }}" @if($amendment->id == $data->regulator_amendment) selected @endif>{{ $amendment->description }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-4">
+                        <div style="width: 160px;" class="mr-2">
+                            <p style="margin: 0;">Regulator :</p>
+                        </div>
+                        <div class="flex-grow-1">
+                            <select class="form-control" id="regulator" name="regulator">
+                                @foreach ($listRegulator as $regulator)
+                                    <option value="{{ $regulator->id }}" @if($regulator->id == $data->regulator) selected @endif>{{ $regulator->description }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                     <div class="d-flex align-items-start mb-4">
                         <div style="width: 140px;" class="mr-2">
-                            <p style="margin: 0;">Keterangan <span class="text-danger">*</span> :</p>
+                            <p style="margin: 0;">Keterangan :</p>
                         </div>
                         <div class="flex-grow-1">
                             <textarea class="form-control" rows="3" name="keterangan">{{ $data->keterangan }}</textarea>
@@ -383,6 +387,27 @@ font-weight-bold
     </div>
 </div>
 
+<style>
+    /* Custom CSS to align the Select2 container */
+    .select2-container--default .select2-selection--single {
+        height: calc(2.25rem + 2px); /* Adjust this value to match your input height */
+        padding: 0.375rem 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: calc(2.25rem + 2px); /* Adjust this to vertically align the text */
+    }
+
+    .select2-container .select2-selection--single {
+        height: 100% !important; /* Ensure the height is consistent */
+    }
+
+    .select2-container {
+        width: 100% !important; /* Ensure the width matches the form control */
+    }
+</style>
 <script>
     $(document).ready(function () {
         var tableCertificate = $('#listCertificates').DataTable({
@@ -595,90 +620,6 @@ font-weight-bold
         });
         initSelect2WithRegulators();
     });
-
-    function initSelect2WithRegulators() {
-        $('#regulator').select2({
-            ajax: {
-                url: '{{ route('regulators.fetch') }}', // Define the route for fetching regulators
-                dataType: 'json',
-                delay: 250,
-                data: function (params) {
-                    return {
-                        q: params.term, // Search query
-                        page: params.page || 1, // Pagination
-                    };
-                },
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: $.map(data.items, function (item) {
-                            return {
-                                id: item.id,
-                                text: item.description,
-                            };
-                        }),
-                        pagination: {
-                            more: data.total_count > (params.page * 10),
-                        },
-                    };
-                },
-                cache: true,
-            },
-            placeholder: 'Select or add a Regulator',
-            minimumInputLength: 1,
-            theme: 'classic',
-            width: '100%',
-            dropdownParent: $('#editDataModal'),
-            tags: true, // Enable tagging for new entries
-            allowClear: true,
-            createTag: function (params) {
-                var term = $.trim(params.term);
-                if (term === '') {
-                    return null;
-                }
-                return {
-                    id: term,
-                    text: term,
-                    newTag: true, // Mark as new
-                };
-            },
-            templateResult: function (data) {
-                if (data.newTag) {
-                    return $('<span><em>Add new: "' + data.text + '"</em></span>');
-                }
-                return data.text;
-            },
-            templateSelection: function (data) {
-                return data.text;
-            },
-        });
-
-        // Listen for selection and handle new tag creation
-        $('#regulator').on('select2:select', function (e) {
-            var selectedData = e.params.data;
-            if (selectedData.newTag) {
-                // If it's a new entry, save it to the database
-                $.ajax({
-                    url: '{{ route('regulators.store') }}', // Define the route to save the new regulator
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}', // CSRF protection
-                    },
-                    data: {
-                        description: selectedData.text, // New regulator description
-                    },
-                    success: function (response) {
-                        // Replace the temporary new tag ID with the real one from the database
-                        var newOption = new Option(response.description, response.id, false, true);
-                        $('#regulator').append(newOption).trigger('change');
-                    },
-                    error: function () {
-                        alert('Failed to save the new regulator.');
-                    },
-                });
-            }
-        });
-    }
 
     function updateSelectedCount(count) {
         const badge = document.getElementById('selectedCountBadge');

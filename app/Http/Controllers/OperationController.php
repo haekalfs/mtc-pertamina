@@ -315,34 +315,94 @@ class OperationController extends Controller
         ];
 
         if ($request->ajax()) {
-            $query = Infografis_peserta::query();
+            // Start the query directly on the Eloquent model
+            $query = Infografis_peserta::with(['penlatBatch.penlat']);
 
             // Apply filters based on the request
-            if($request->namaPenlat != 1){
+            if ($request->namaPenlat != 1) {
                 $query->where('nama_program', $request->namaPenlat);
             }
 
-            if($request->stcw != 1){
+            if ($request->stcw != 1) {
                 $query->where('kategori_program', $request->stcw);
             }
 
-            if($request->jenisPenlat != 1){
+            if ($request->jenisPenlat != 1) {
                 $query->where('jenis_pelatihan', $request->jenisPenlat);
             }
 
-            if($request->tw != 1){
+            if ($request->tw != 1) {
                 $query->where('realisasi', $request->tw);
             }
 
-            if($request->periode != 1){
+            if ($request->periode != 1) {
                 $query->whereYear('tgl_pelaksanaan', $request->periode);
             }
 
             // Return the DataTables response
             return DataTables::of($query)
-                ->addColumn('action', function($row) {
-                    return '<a data-item-id="' . $row->id . '" class="btn btn-outline-secondary btn-sm mr-2 edit-btn"  href="#" data-toggle="modal" data-target="#editModal"><i class="fa fa-edit"></i> Edit</a>';
+                ->addColumn('nama_peserta', function ($row) {
+                    // If there's no related penlatBatch, just return the participant name
+                    if (!$row->penlatBatch) {
+                        return $row->nama_peserta ?? '-';
+                    }
+
+                    // Convert the date field to Carbon
+                    $currentDate = \Carbon\Carbon::parse($row->tgl_pelaksanaan);
+
+                    // Check for conflicts
+                    $hasConflict = Infografis_peserta::where('participant_id', $row->participant_id)
+                        ->whereHas('penlatBatch', function ($query) use ($row) {
+                            $query->where('penlat_id', $row->penlatBatch->penlat_id);
+                        })
+                        ->where('id', '!=', $row->id) // Exclude the current row
+                        ->get()
+                        ->filter(function ($otherRow) use ($currentDate) {
+                            // Ensure the other row has a related penlatBatch
+                            if (!$otherRow->penlatBatch) {
+                                return false;
+                            }
+
+                            $otherDate = \Carbon\Carbon::parse($otherRow->tgl_pelaksanaan);
+                            return $currentDate->diffInYears($otherDate) < 1;
+                        })
+                        ->isNotEmpty();
+
+                    // Add a warning icon if there's a conflict
+                    $warningIcon = $hasConflict ? '<i class="fa fa-exclamation-circle text-warning"></i>' : '';
+
+                    return $row->nama_peserta . ' ' . $warningIcon;
                 })
+                ->addColumn('action', function ($row) {
+                    return '<a data-item-id="' . $row->id . '" class="btn btn-outline-secondary btn-sm mr-2 edit-btn" href="#" data-toggle="modal" data-target="#editModal"><i class="fa fa-edit"></i> Edit</a>';
+                })
+                ->setRowClass(function ($row) {
+                    // Highlight rows with conflicts
+                    if (!$row->penlatBatch) {
+                        return '';
+                    }
+
+                    $currentDate = \Carbon\Carbon::parse($row->tgl_pelaksanaan);
+
+                    $hasConflict = Infografis_peserta::where('participant_id', $row->participant_id)
+                        ->whereHas('penlatBatch', function ($query) use ($row) {
+                            $query->where('penlat_id', $row->penlatBatch->penlat_id);
+                        })
+                        ->where('id', '!=', $row->id) // Exclude the current row
+                        ->get()
+                        ->filter(function ($otherRow) use ($currentDate) {
+                            if (!$otherRow->penlatBatch) {
+                                return false;
+                            }
+
+                            $otherDate = \Carbon\Carbon::parse($otherRow->tgl_pelaksanaan);
+                            return $currentDate->diffInYears($otherDate) < 1;
+                        })
+                        ->isNotEmpty();
+
+                    return $hasConflict ? 'conflict-row' : '';
+                })
+                ->rawColumns(['nama_peserta', 'action']) // Allow HTML rendering in these columns
                 ->make(true);
         }
 

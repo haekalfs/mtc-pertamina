@@ -3899,3 +3899,7 @@ a.spam-button:link {
 .loading-spinner {
     color: white; /* Spinner color */
 }
+
+.conflict-row {
+    background-color: yellow;
+}

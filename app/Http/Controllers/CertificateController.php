@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Penlat;
 use App\Models\Penlat_batch;
 use App\Models\Receivables_participant_certificate;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class CertificateController extends Controller
 {
@@ -42,22 +44,22 @@ class CertificateController extends Controller
                                 <i class="fa fa-qrcode"></i>
                             </a>';
                 })
-                ->editColumn('penlatBatch', function ($certificate) {
+                ->addColumn('penlatBatch', function ($certificate) {
                     return $certificate->penlatCertificate->batch->batch;
                 })
-                ->editColumn('penlatDescription', function ($certificate) {
+                ->addColumn('penlatDescription', function ($certificate) {
                     return $certificate->penlatCertificate->batch->penlat->description;
                 })
-                ->editColumn('nama_peserta', function ($certificate) {
+                ->addColumn('nama_peserta', function ($certificate) {
                     return $certificate->peserta->nama_peserta;
                 })
-                ->editColumn('created_by', function ($certificate) {
+                ->addColumn('created_by', function ($certificate) {
                     return $certificate->penlatCertificate->created_by;
                 })
-                ->editColumn('issued_date', function ($certificate) {
+                ->addColumn('issued_date', function ($certificate) {
                     return $certificate->issued_date ? \Carbon\Carbon::parse($certificate->issued_date)->format('d-M-Y') : '-';
                 })
-                ->editColumn('certificate', function ($certificate) {
+                ->addColumn('certificate', function ($certificate) {
                     $batchInfo = $certificate->penlatCertificate->batch->batch ?? 'N/A';
                     $batchParts = explode('/', $batchInfo);
                     $formattedNumber = $certificate->certificate_number
@@ -70,5 +72,67 @@ class CertificateController extends Controller
         }
 
         return view('master-data.certificates_number', compact('penlatList', 'listBatch'));
+    }
+
+    public function export(Request $request)
+    {
+        $templatePath = public_path('uploads/template/template_certificate_export.xlsx');
+        $spreadsheet = IOFactory::load($templatePath);
+
+        $sheet = $spreadsheet->getSheet(0);
+        $startRow = 5;
+
+        // Apply filters
+        $query = Receivables_participant_certificate::with([
+            'penlatCertificate.batch.penlat',
+            'peserta'
+        ]);
+
+        if ($request->penlat) {
+            $query->whereHas('penlatCertificate.batch.penlat', function ($q) use ($request) {
+                $q->where('id', $request->penlat);
+            });
+        }
+
+        if ($request->kategori_pelatihan) {
+            $query->whereHas('penlatCertificate.batch.penlat', function ($q) use ($request) {
+                $q->where('kategori_pelatihan', $request->kategori_pelatihan);
+            });
+        }
+
+        if ($request->periode && $request->periode != -1) {
+            $query->whereYear('created_at', $request->periode);
+        }
+
+        $getForm = $query->orderBy('penlat_certificate_id', 'desc')->orderBy('certificate_number', 'desc')->get();
+
+        foreach ($getForm as $row) {
+            $sheet->setCellValueByColumnAndRow(1, $startRow, $row->certificate_number);
+            $sheet->setCellValueByColumnAndRow(2, $startRow, Carbon::parse($row->issued_date)->format('d-M-Y'));
+            $sheet->setCellValueByColumnAndRow(3, $startRow, $row->penlatCertificate->batches->penlat->description ?? 'N/A');
+            $sheet->setCellValueByColumnAndRow(4, $startRow, $row->penlatCertificate->batches->batch ?? 'N/A');
+
+            $batchInfo = $row->penlatCertificate->batches->batch ?? 'N/A';
+            $batchParts = explode('/', $batchInfo);
+            $part0 = $batchParts[0] ?? '-';
+            $part2 = $batchParts[2] ?? '-';
+            $part3 = $batchParts[3] ?? '-';
+
+            $formattedNumber = $row->certificate_number ?: '-';
+            $sheet->setCellValueByColumnAndRow(5, $startRow, "$formattedNumber / $part0 / PMTC / $part2 / $part3");
+            $sheet->setCellValueByColumnAndRow(6, $startRow, $row->peserta->nama_peserta ?? 'N/A');
+            $sheet->setCellValueByColumnAndRow(7, $startRow, Carbon::parse($row->expire_date)->format('d-M-Y'));
+            $sheet->setCellValueByColumnAndRow(8, $startRow, Carbon::parse($row->created_at)->format('d-M-Y'));
+
+            $startRow++;
+        }
+
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $filePath = storage_path('app/public/output.xlsx');
+        $writer->save($filePath);
+
+        return response()->download($filePath, "Certificate_Master_Data.xlsx", [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ]);
     }
 }

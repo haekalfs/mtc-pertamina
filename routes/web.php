@@ -63,6 +63,8 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
         Route::get('/certificate-generate-qr/{id}', [PDController::class, 'generateQrCode'])->name('generate-qr-certificate');
         Route::get('/get-next-certificate-number/{id}', [PDController::class, 'getNumberCertificate'])->name('getCertificateNumber');
 
+        Route::post('/export-certificate-data', [CertificateController::class, 'export'])->name('export.certificate.data');
+
         //On Dev Notification
         Route::get('/closed-menu', function () {
             // Set the session flash message

@@ -54,7 +54,9 @@ font-weight-bold
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold" id="judul">List Data</h6>
                     <div class="text-right">
-                        {{-- <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Register Location</a> --}}
+                        <button type="button" id="exportBtn" class="btn btn-sm btn-secondary shadow-sm text-white">
+                            <i class="fa fa-cloud-download fa-sm"></i> Export Data
+                        </button>
                     </div>
                 </div>
                 <div class="card-body zoom90">
@@ -238,6 +240,70 @@ font-weight-bold
                 error: function() {
                     alert('Failed to generate QR code.');
                 }
+            });
+        });
+    });
+</script>
+<script>
+    document.getElementById('exportBtn').addEventListener('click', function () {
+        // Get filter values
+        const penlat = document.getElementById('penlat').value;
+        const kategori_pelatihan = document.getElementById('kategori_pelatihan').value;
+        const periode = document.getElementById('periode').value;
+
+        // Show processing dialog
+        swal({
+            title: "Processing...",
+            text: "Please wait while the data is being exported.",
+            icon: "info",
+            buttons: false,
+            closeOnClickOutside: false,
+        });
+
+        // Send POST request
+        fetch("{{ route('export.certificate.data') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                penlat: penlat,
+                kategori_pelatihan: kategori_pelatihan,
+                periode: periode
+            })
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.blob();
+            } else {
+                throw new Error('Export failed');
+            }
+        })
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "Certificate_Master_Data.xlsx";
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+
+            // Success message
+            swal({
+                title: "Success!",
+                text: "The data has been exported successfully.",
+                icon: "success",
+            });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+
+            // Error message
+            swal({
+                title: "Error!",
+                text: "Failed to export data. Please try again.",
+                icon: "error",
             });
         });
     });
