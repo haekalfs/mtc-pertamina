@@ -828,7 +828,7 @@ class PDController extends Controller
             ->addColumn('status', function ($row) {
                 return $row->status == 1
                     ? '<i class="fa fa-check"></i> <small>Issued</small>'
-                    : '<i class="fa fa-spinner fa-spin"></i> <small>Pending</small>';
+                    : '<small>Pending</small>';
             })
             ->addColumn('actions', function ($row) {
                 return '<button class="btn btn-outline-secondary btn-md mb-2 mr-2 edit-button"
