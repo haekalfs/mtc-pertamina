@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Asset_condition;
 use App\Models\Asset_item;
+use App\Models\Audit_log;
 use App\Models\Inventory_room;
 use App\Models\Inventory_tools;
 use App\Models\Location;
 use App\Models\Tool_img;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -18,6 +21,33 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class InventoryToolController extends Controller
 {
+    public function main()
+    {
+        return view('operation.inventory_management.index');
+    }
+
+    public function audit_log(Request $request)
+    {
+        $errors = Audit_log::with('user') // Eager load the user relationship
+            ->where('log_id', 1)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        if ($request->ajax()) {
+            return DataTables::of($errors)
+                ->addIndexColumn() // Automatically add index column
+                ->addColumn('user', function ($error) {
+                    return $error->user ? $error->user->name : 'Unknown'; // Get user name or default
+                })
+                ->editColumn('created_at', function ($error) {
+                    return $error->created_at->format('Y-m-d H:i:s'); // Format the date
+                })
+                ->make(true);
+        }
+
+        return view('operation.inventory_management.audit_log');
+    }
+
     public function tool_inventory(Request $request)
     {
         $locations = Location::all(); // For filter dropdown
@@ -205,6 +235,7 @@ class InventoryToolController extends Controller
         $tool->location_id = $request->input('location');
         $tool->last_maintenance = $request->input('last_maintenance');
         $tool->next_maintenance = $request->input('next_maintenance');
+        $tool->created_by = Auth::id();
 
         // If a maintenance guide file is uploaded, save the file path
         if ($request->hasFile('maintenance_guide')) {
@@ -222,6 +253,8 @@ class InventoryToolController extends Controller
             // Use str_pad to ensure asset codes like 01, 02, etc.
             $items->asset_code = $request->input('asset_number') . '-' . str_pad($i + 1, 2, '0', STR_PAD_LEFT);
             $items->asset_condition_id = $request->input('condition');
+            $items->asset_last_maintenance = $request->input('last_maintenance');
+            $items->asset_next_maintenance = $request->input('next_maintenance');
             $items->inventory_tool_id = $tool->id;
             $items->save();
         }
@@ -239,12 +272,40 @@ class InventoryToolController extends Controller
             $toolImage->save();
         }
 
+        Audit_log::createLog("New Asset has been added : " . $request->input('asset_name'), "critical", Auth::id(), 1);
+
         return redirect()->back()->with('success', 'Tool data and image uploaded successfully.');
     }
 
     public function preview_asset($id)
     {
-        // Load the inventory tool along with its items and their conditions
+        if (request()->ajax()) {
+            // Load the inventory tool along with its items and their conditions
+            $data = Inventory_tools::with(['img', 'items.condition'])->findOrFail($id);
+
+            // Transform items for DataTables
+            $items = $data->items->map(function ($item) {
+                $lastMaintenanceDate = $item->asset_last_maintenance ? Carbon::parse($item->asset_last_maintenance) : null;
+                $hoursDifference = $lastMaintenanceDate ? Carbon::now()->diffInHours($lastMaintenanceDate) : 0;
+
+                return [
+                    'id' => $item->id,
+                    'asset_code' => $item->asset_code,
+                    'condition' => $item->condition->condition,
+                    'isUsed' => $item->isUsed,
+                    'lastMaintenance' => $item->asset_last_maintenance,
+                    'nextMaintenance' => $item->asset_next_maintenance,
+                    'runningHours' => $hoursDifference . ' Hours',
+                    'urlUsed' => route('inventory-tools.mark-as-used', $item->id),
+                    'urlUnused' => route('inventory-tools.mark-as-unused', $item->id),
+                    'asset_condition_id' => $item->asset_condition_id,
+                ];
+            });
+
+            return DataTables::of($items)->make(true);
+        }
+
+        // Non-AJAX request: Return the view with additional data
         $data = Inventory_tools::with(['img', 'items.condition'])->findOrFail($id);
         $locations = Location::all();
         $assetCondition = Asset_condition::all();
@@ -253,7 +314,7 @@ class InventoryToolController extends Controller
         $itemConditions = $data->items->groupBy('asset_condition_id')->map(function ($group) {
             return [
                 'count' => $group->count(),
-                'condition' => $group->first()->condition->badge, // Assuming condition has a 'name' field
+                'condition' => $group->first()->condition->badge,
             ];
         });
 
@@ -413,6 +474,8 @@ class InventoryToolController extends Controller
             // Save the tool
             $tool->save();
 
+            Audit_log::createLog("Asset has been updated : " . $tool->asset_name, "critical", Auth::id(), 1);
+
             // Commit the transaction
             DB::commit();
 
@@ -515,6 +578,8 @@ class InventoryToolController extends Controller
             // Save the tool
             $tool->save();
 
+            Audit_log::createLog("Asset has been updated : " . $tool->asset_name, "critical", Auth::id(), 1);
+
             // Commit the transaction
             DB::commit();
 
@@ -547,6 +612,8 @@ class InventoryToolController extends Controller
             // Delete the asset
             $asset->delete();
 
+            Audit_log::createLog("Asset has been deleted : " . $asset->asset_name, "critical", Auth::id(), 1);
+
             return response()->json(['success' => 'Record deleted successfully.'], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json(['error' => 'Record not found.'], 404);
@@ -577,6 +644,9 @@ class InventoryToolController extends Controller
         }
 
         $message = "$item->asset_code | Asset marked as used successfully.";
+
+        Audit_log::createLog("Asset has been updated to state 'Used' : " . $item->asset_code, "critical", Auth::id(), 1);
+
         // Redirect back with success message
         return redirect()->back()->with('success', $message);
     }
@@ -652,6 +722,9 @@ class InventoryToolController extends Controller
         $request->validate([
             'asset_id' => 'required',
             'condition' => 'required', // Assuming you have a separate table for asset conditions
+            'lastMaintenance' => 'required', // Assuming you have a separate table for asset conditions
+            'nextMaintenance' => 'required', // Assuming you have a separate table for asset conditions
+            'status' => 'required', // Assuming you have a separate table for asset conditions
         ]);
 
         // Find the asset item by ID
@@ -659,12 +732,17 @@ class InventoryToolController extends Controller
 
         // Update the asset_condition_id column
         $asset->asset_condition_id = $request->condition;
+        $asset->asset_last_maintenance = $request->lastMaintenance;
+        $asset->asset_next_maintenance = $request->nextMaintenance;
+        $asset->isUsed = $request->status;
 
         // Save the updated asset
         $asset->save();
 
+        Audit_log::createLog("Asset item has been updated : " . $asset->asset_code, "critical", Auth::id(), 1);
+
         // Optionally, add a success message or return a response
-        return redirect()->back()->with('success', 'Asset condition updated successfully!');
+        return redirect()->back()->with('success', 'Asset '. $asset->asset_code . ' updated successfully!');
     }
 
     public function destroy_asset_per_item($id)
@@ -675,6 +753,7 @@ class InventoryToolController extends Controller
             // Find the asset
             $asset = Asset_item::findOrFail($id);
 
+            $assetCode = $asset->asset_code;
             // Check if the asset is currently in use
             if ($asset->isUsed) {
                 return response()->json([
@@ -695,6 +774,8 @@ class InventoryToolController extends Controller
             // Proceed with deletion if the asset is not in use
             $asset->delete();
 
+            Audit_log::createLog("Asset item has been deleted : " . $assetCode, "critical", Auth::id(), 1);
+
             DB::commit();
 
             return response()->json([
@@ -708,6 +789,165 @@ class InventoryToolController extends Controller
                 'success' => false,
                 'message' => 'Error deleting asset.'
             ], 500);
+        }
+    }
+
+    public function maintenanceUpdate(Request $request)
+    {
+        $request->validate([
+            'formIds' => 'required',
+            'lastMaintenanceDate' => 'required|date',
+            'nextMaintenanceDate' => 'required|date',
+        ]);
+
+        try {
+            $formIds = $request->input('formIds');
+            $lastMaintenanceDate = Carbon::parse($request->input('lastMaintenanceDate'))->format('Y-m-d');
+            $nextMaintenanceDate = Carbon::parse($request->input('nextMaintenanceDate'))->format('Y-m-d');
+
+            Audit_log::createLog("Asset item maintenance date has been updated : $formIds" . " | $lastMaintenanceDate to $nextMaintenanceDate", "critical", Auth::id(), 1);
+
+            // Convert formIds to an array if needed
+            if (!is_array($formIds)) {
+                $formIds = explode(',', $formIds);
+            }
+
+            // Update the database
+            Asset_item::whereIn('id', $formIds)
+                ->update([
+                    'asset_last_maintenance' => $lastMaintenanceDate,
+                    'asset_next_maintenance' => $nextMaintenanceDate
+                ]);
+
+            // Return a JSON response
+            return response()->json(['success' => true, 'message' => 'Certificates marked as expired successfully.']);
+        } catch (\Exception $e) {
+            // Handle errors and return a JSON error response
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function setAsUsed(Request $request)
+    {
+        $request->validate([
+            'formIds' => 'required',
+        ]);
+
+        try {
+            $formIds = $request->input('formIds');
+
+            Audit_log::createLog("Asset item has been set to Used : $formIds", "critical", Auth::id(), 1);
+
+            // Convert formIds to an array if needed
+            if (!is_array($formIds)) {
+                $formIds = explode(',', $formIds);
+            }
+
+            // Retrieve the assets based on IDs
+            $items = Asset_item::whereIn('id', $formIds)->get();
+
+            foreach ($items as $item) {
+                if (!$item->isUsed) { // Check if it's not already used
+                    $item->isUsed = true;
+                    $item->save();
+
+                    // Check if the item belongs to an Inventory_tool
+                    if ($item->tools) {
+                        $tool = $item->tools; // Ensure the relationship is correct
+
+                        // Increment the used amount and decrement the stock
+                        $tool->used_amount += 1;
+                        $tool->asset_stock -= 1;
+
+                        // Save the changes
+                        $tool->save();
+                    }
+                }
+            }
+
+            // Return a JSON response
+            return response()->json(['success' => true, 'message' => 'Items marked as used successfully.']);
+        } catch (\Exception $e) {
+            // Handle errors and return a JSON error response
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function setAsUnused(Request $request)
+    {
+        $request->validate([
+            'formIds' => 'required',
+        ]);
+
+        try {
+            $formIds = $request->input('formIds');
+
+            Audit_log::createLog("Asset item has been set to Unused : $formIds", "critical", Auth::id(), 1);
+
+            // Convert formIds to an array if needed
+            if (!is_array($formIds)) {
+                $formIds = explode(',', $formIds);
+            }
+
+            // Retrieve the assets based on IDs
+            $items = Asset_item::whereIn('id', $formIds)->get();
+
+            foreach ($items as $item) {
+                if ($item->isUsed) { // Check if it's not already used
+                    $item->isUsed = false;
+                    $item->save();
+
+                    // Check if the item belongs to an Inventory_tool
+                    if ($item->tools) {
+                        $tool = $item->tools; // Ensure the relationship is correct
+
+                        // Increment the used amount and decrement the stock
+                        $tool->used_amount -= 1;
+                        $tool->asset_stock += 1;
+
+                        // Save the changes
+                        $tool->save();
+                    }
+                }
+            }
+
+            // Return a JSON response
+            return response()->json(['success' => true, 'message' => 'Items marked as used successfully.']);
+        } catch (\Exception $e) {
+            // Handle errors and return a JSON error response
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function changeConditions(Request $request)
+    {
+        $request->validate([
+            'formIds' => 'required',
+            'assetCondition' => 'required',
+        ]);
+
+        try {
+            $formIds = $request->input('formIds');
+
+            // Convert formIds to an array if needed
+            if (!is_array($formIds)) {
+                $formIds = explode(',', $formIds);
+            }
+
+            $assetCondition = $request->input('assetCondition');
+
+            // Update the database
+            Asset_item::whereIn('id', $formIds)
+                ->update([
+                    'asset_condition_id' => $assetCondition
+                ]);
+
+            Audit_log::createLog("Asset item condition has been changed : $formIds", "critical", Auth::id(), 1);
+            // Return a JSON response
+            return response()->json(['success' => true, 'message' => 'Certificates marked as expired successfully.']);
+        } catch (\Exception $e) {
+            // Handle errors and return a JSON error response
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
 }

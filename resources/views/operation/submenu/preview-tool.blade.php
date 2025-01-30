@@ -50,14 +50,48 @@ font-weight-bold
     <strong>{{ $message }}</strong>
 </div>
 @endif
+<style>
+    /* Dropdown container */
+    .dropdown {
+        display: inline-block;
+        position: relative;
+    }
 
+    /* Select input */
+    .dropdown select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 5px 10px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    /* Apply button */
+    .apply-btn {
+        margin-left: 10px;
+        padding: 5px 10px;
+        font-size: 14px;
+        color: #fff;
+        background-color: #007bff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .apply-btn:hover {
+        background-color: #0056b3;
+    }
+</style>
 <div class="row zoom90">
     <div class="col-md-9">
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                        <h6 class="m-0 font-weight-bold" id="judul">Detail Asset</h6>
+                        <h6 class="m-0 font-weight-bold text-secondary">Detail Asset</h6>
                     </div>
                     <div class="card-body" style="position: relative;">
                         <a href="#" data-id="{{ $data->id }}" class="position-absolute edit-tool" style="top: 10px; right: 15px; z-index: 10;">
@@ -65,7 +99,7 @@ font-weight-bold
                         </a>
                         <div class="row mt-3 mb-3">
                             <div class="col-md-5 product_img d-flex justify-content-center align-items-center">
-                                <img src="{{ $data->img->filepath ? asset($data->img->filepath) : asset('img/default-img.png') }}" class="img-responsive">
+                                <img src="{{ $data->img->filepath ? asset($data->img->filepath) : asset('img/default-img.png') }}" style="height: 350px; width: 400px" class="img-responsive">
                             </div>
                             <div class="col-md-7 product_content">
                                 <h3 class="card-title font-weight-bold">{{ $data->asset_name }}</h3>
@@ -98,7 +132,7 @@ font-weight-bold
                                             </span>
                                         </td>
                                     </tr>
-                                    <tr>
+                                    {{-- <tr>
                                         <th style="width: 200px;">Running Hours</th>
                                         @php
                                             $purchaseDate = \Carbon\Carbon::parse($data->last_maintenance);
@@ -115,57 +149,17 @@ font-weight-bold
                                     <tr>
                                         <th>Next Maintenance At</th>
                                         <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ \Carbon\Carbon::parse($data->next_maintenance)->format('d-M-Y') }}</span></td>
-                                    </tr>
+                                    </tr> --}}
                                     <tr>
                                         <th>User Manual</th>
                                         <td style="text-align: start; font-weight:500">: @if($data->asset_guidance) <a href="{{ asset($data->asset_guidance) }}" target="_blank"><span class="ml-3 btn btn-sm btn-outline-secondary">Download File <i class="fa fa-download"></i></span></a> @else <span class="ml-3"> - </span> @endif</td>
                                     </tr>
+                                    <tr>
+                                        <th>Created By</th>
+                                        <td style="text-align: start; font-weight:500">: <span class="ml-3">{{ $data->created_by ? $data->user->name : '-' }}</span></td>
+                                    </tr>
                                 </table>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-12">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <span class="font-weight-bold">Asset Stocks Management</span>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-bordered zoom90" id="listAsset" width="100%" cellspacing="0">
-                                <thead class="thead-light">
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Asset Code</th>
-                                        <th>Asset Condition</th>
-                                        <th>Status</th>
-                                        <th>Action</th>
-                                </thead>@php $no = 1 @endphp
-                                    @foreach($data->items as $asset)
-                                    <tr>
-                                        <td>{{ $no++ }}</td>
-                                        <td class="font-weight-bold text-secondary">{{ $asset->asset_code }}</td>
-                                        <td><span class="ml-3">{{ $asset->condition->condition }}</span></td>
-                                        <td>@if($asset->isUsed) <i class="fa fa-lock text-danger"></i> @else <i class="fa fa-unlock text-primary"></i> @endif</td>
-                                        <td width='250' class="text-center">
-                                            <a class="btn btn-sm btn-secondary mr-2 edit-asset text-white"
-                                                data-asset-id="{{ $asset->id }}"
-                                                data-asset-code="{{ $asset->asset_code }}"
-                                                data-condition-id="{{ $asset->asset_condition_id }}"
-                                                data-is-used="{{ $asset->isUsed }}"
-                                                data-url-used="{{ route('inventory-tools.mark-as-used', $asset->id) }}"
-                                                data-url-unused="{{ route('inventory-tools.mark-as-unused', $asset->id) }}">
-                                                <i class="fa fa-fw fa-edit"></i> Edit
-                                            </a>
-                                            <a class="btn btn-sm btn-success mr-2 generateQR" data-id="{{ $asset->id }}" href="javascript:void(0)">
-                                                <i class="fa fa-qrcode"></i> Generate QR
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                <tbody>
-                            </table>
                         </div>
                     </div>
                 </div>
@@ -177,11 +171,11 @@ font-weight-bold
             <div class="col-md-12">
                 <div class="card mb-4 shadow">
                     <div class="card-header">
-                        <span class="font-weight-bold">Delete Asset</span>
+                        <span class="font-weight-bold text-secondary">Delete Asset</span>
                     </div>
                     <div class="card-body">
                         <div class="mb-4">
-                            <span>Deleting this asset is a permanent action and cannot be undone. If you are sure you want to delete this asset, select the button below.</span>
+                            <span>Deleting this asset is a permanent action and cannot be undone.</span>
                         </div>
                         <div>
                             <a data-id="{{ $data->id }}" class="btn btn-outline-danger btn-md text-danger">I Understand, delete the asset</a>
@@ -192,7 +186,7 @@ font-weight-bold
             <div class="col-md-12">
                 <div class="card mb-4 shadow">
                     <div class="card-header">
-                        <span class="font-weight-bold">Assets Conditions</span>
+                        <span class="font-weight-bold text-secondary">Assets Conditions</span>
                     </div>
                     <div class="card-body">
                         <table class="table table-borderless table-sm">
@@ -205,28 +199,59 @@ font-weight-bold
                     </div>
                 </div>
             </div>
-            <div class="col-md-12">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <span class="text-danger font-weight-bold">Notes</span>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="card mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-secondary">Asset Stocks Management</h6>
+                <div class="text-right">
+                    <input type="text" name="formId" id="formId" value="" />
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row d-flex justify-content-start mb-4">
+                    <div class="col-md-12">
+                        <div class="row align-items-center">
+                            <div class="col-md-3">
+                                <div class="dropdown">
+                                    <select id="bulkActions">
+                                        <option value="1">Set as Used</option>
+                                        <option value="2">Set as Unused</option>
+                                        <option value="3">Maintenance Update</option>
+                                        <option value="4">Change Conditions</option>
+                                    </select>
+                                    <button class="apply-btn">Execute</button>
+                                </div>
+                            </div>
+                            <div class="col-md-9 text-right">
+                                <span id="selectedCountBadge" class="badge bg-secondary text-white" style="display: none;">-</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body" style="background-color: rgb(247, 247, 247);">
-                        <h6 class="h6 mb-2 font-weight-bold text-gray-800">Asset Management Guidelines</h6>
-                        <ul class="ml-4">
-                            <li>Asset management impacts the overall inventory, reflecting changes directly in the system.</li>
-                            <li>Assets must be managed carefully, with updates to conditions and statuses performed manually to ensure accuracy.</li>
-                            <li>Legends :
-                                <ul>
-                                    <li><i class="fa fa-lock text-danger"></i> - Indicates the asset is currently in use and unavailable for allocation.</li>
-                                    <li><i class="fa fa-unlock text-primary"></i> - Indicates the asset is available and ready for use.</li>
-                                </ul>
-                            </li>
-                            <li>You can generate a QR Code for each asset, which encodes a link used for validating and verifying the asset information.</li>
-                            <li>Editing asset conditions is possible by selecting the appropriate action in the "Action" column. The system will reflect the asset’s updated status immediately after modification.</li>
-                            <li>The system displays a count of assets by their respective conditions, such as "Normal," "Damaged," or "Under Maintenance," giving you a quick overview of asset health.</li>
-                            <li>All images uploaded for assets must meet the required format and size specifications to maintain system standards.</li>
-                        </ul>
-                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered zoom90" id="assetsTable" width="100%" cellspacing="0">
+                        <thead class="thead-light">
+                            <tr>
+                                <th class="text-center" width="80px">
+                                    <div class="form-check form-check-inline larger-checkbox" style="transform: scale(1.5);">
+                                        <input class="form-check-input" type="checkbox" id="checkAll" onclick="toggleCheckboxes()">
+                                    </div>
+                                </th>
+                                <th>Asset Code</th>
+                                <th>Asset Condition</th>
+                                <th>Status</th>
+                                <th>Last Maintenance</th>
+                                <th>Running Hours</th>
+                                <th>Next Maintenance</th>
+                                <th width="150px">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be loaded dynamically via AJAX -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -241,7 +266,7 @@ font-weight-bold
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body ml-2 mr-2">
                 <form id="editConditionForm" action="{{ route('update-asset-condition') }}" method="POST">
                     @csrf
                     <!-- Hidden input for asset ID -->
@@ -249,7 +274,7 @@ font-weight-bold
 
                     <div class="d-flex align-items-center mb-4">
                         <div style="width: 160px;" class="mr-2">
-                            <p style="margin: 0;">Kondisi Alat :</p>
+                            <p style="margin: 0;">Asset Condition :</p>
                         </div>
                         <div class="flex-grow-1">
                             <select name="condition" id="edit_condition" class="form-control">
@@ -259,15 +284,36 @@ font-weight-bold
                             </select>
                         </div>
                     </div>
+                    <div class="d-flex align-items-center mb-4">
+                        <div style="width: 160px;" class="mr-2">
+                            <p style="margin: 0;">Last Maintenance :</p>
+                        </div>
+                        <div class="flex-grow-1">
+                            <input type="date" class="form-control" name="lastMaintenance" id="edit_lastMaintenance">
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-4">
+                        <div style="width: 160px;" class="mr-2">
+                            <p style="margin: 0;">Next Maintenance :</p>
+                        </div>
+                        <div class="flex-grow-1">
+                            <input type="date" class="form-control" name="nextMaintenance" id="edit_nextMaintenance">
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-4">
+                        <div style="width: 160px;" class="mr-2">
+                            <p style="margin: 0;">Status :</p>
+                        </div>
+                        <div class="flex-grow-1">
+                            <select name="status" id="edit_status" class="form-control">
+                                <option value="1">In Used</option>
+                                <option value="0">Available</option>
+                            </select>
+                        </div>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <div class="d-flex align-items-center justify-content-start mr-auto">
-                    <!-- Button will change dynamically based on the asset's condition -->
-                    <div id="markAsUsedUnused">
-                        <!-- The forms will be inserted dynamically here by JavaScript -->
-                    </div>
-                </div>
                 <button type="button" class="btn btn-danger" id="deleteAssetBtn">Delete Asset</button>
                 <button type="submit" form="editConditionForm" class="btn btn-primary">Save changes</button>
             </div>
@@ -434,6 +480,338 @@ font-weight-bold
     }
 </script>
 <script>
+    $(document).ready(function () {
+        var tableAssets = $('#assetsTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('preview-asset', $data->id) }}", // Route to fetch data
+            columns: [
+                {
+                    data: 'checkbox',
+                    name: 'checkbox',
+                    orderable: false,
+                    searchable: false,
+                    className: 'text-center',
+                    render: function (data, type, row) {
+                        return `
+                            <label class="switch switch-3d switch-primary mr-3" style="transform: scale(1.5);">
+                                <input type="checkbox" class="switch-input status-checkbox data-checkbox" data-form-id="${row.id}">
+                                <span class="switch-label"></span>
+                                <span class="switch-handle"></span>
+                            </label>
+                        `;
+                    }
+                },
+                { data: 'asset_code', name: 'asset_code' },
+                { data: 'condition', name: 'condition' },
+                {
+                    data: 'status',
+                    name: 'status',
+                    className: 'text-center',
+                    render: function (data, type, row) {
+                        return row.isUsed == true
+                            ? '<i class="fa fa-lock text-danger"></i> Used'
+                            : 'Available';
+                    }
+                },
+                { data: 'lastMaintenance', name: 'lastMaintenance' },
+                { data: 'runningHours', name: 'runningHours' },
+                { data: 'nextMaintenance', name: 'nextMaintenance' },
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false,
+                    className: 'text-center',
+                    render: function (data, type, row) {
+                        return `
+                            <a class="btn btn-outline-secondary btn-md mr-2 edit-asset"
+                                data-asset-id="${row.id}"
+                                data-asset-code="${row.asset_code}"
+                                data-condition-id="${row.asset_condition_id}"
+                                data-last-maintenance="${row.lastMaintenance}"
+                                data-next-maintenance="${row.nextMaintenance}"
+                                data-is-used="${row.isUsed}"
+                                data-url-used="${row.urlUsed}"
+                                data-url-unused="${row.urlUnused}">
+                                <i class="fa fa-fw fa-edit"></i>
+                            </a>
+                            <a class="btn btn-outline-success btn-md mr-2 generateQR" data-id="${row.id}" href="javascript:void(0)">
+                                <i class="fa fa-qrcode"></i>
+                            </a>
+                        `;
+                    }
+                }
+            ]
+        });
+
+        $('#assetsTable').on('click', '.generateQR', function () {
+            var assetId = $(this).data('id');
+            $.ajax({
+                url: '{{ route("generate-qr", "") }}/' + assetId,
+                type: 'GET',
+                success: function(response) {
+                    $('#qrAssetCode').text(response.asset_code);
+                    $('#qrTitle').text(response.asset_code);
+                    $('#link').attr('href', response.link);  // Use .attr() to set the href attribute
+                    $('#qrCodeContainer').html('<img src="' + response.qr_code + '" alt="QR Code" />');  // Embed the QR code as an image
+                    $('#qrModal').modal('show');  // Show the modal
+                },
+                error: function() {
+                    alert('Failed to generate QR code.');
+                }
+            });
+        });
+
+        tableAssets.on('draw', function () {
+            $('#assetsTable').on('change', '.data-checkbox', toggleCheckboxes2);
+            $('#checkAll').on('change', toggleCheckboxes);
+        });
+    });
+
+    // Event listener for individual checkboxes
+    document.querySelectorAll('.data-checkbox').forEach((checkbox) => {
+        checkbox.addEventListener('change', toggleCheckboxes2);
+    });
+
+
+    document.querySelector('.apply-btn').addEventListener('click', () => {
+        const action = document.getElementById('bulkActions').value;
+        const formIds = document.getElementById('formId').value;
+
+        if (formIds === '') {
+            swal({
+                title: "No items selected!",
+                text: "Please select at least one items to proceed.",
+                icon: "warning",
+                button: "OK",
+            });
+            return;
+        }
+
+        if (action === "1") {
+            swal({
+                title: "Processing...",
+                text: "Your request is being processed.",
+                icon: "info",
+                buttons: false,
+                closeOnClickOutside: false,
+            });
+
+            // Automatically close the swal after 5 seconds
+            setTimeout(() => swal.close(), 1000);
+
+            // Send AJAX request to process the selected action
+            $.ajax({
+                url: "{{ route('set.used') }}",
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                },
+                data: {
+                    formIds: formIds,
+                },
+                success: function (response) {
+                    if (response.success) {
+                        // Trigger file download
+                        $('#assetsTable').DataTable().draw();
+                    } else {
+                        swal({
+                            title: "Error!",
+                            text: response.message || "Something went wrong while processing the request.",
+                            icon: "error",
+                            button: "OK",
+                        });
+                    }
+                },
+                error: function (xhr, status, error) {
+                    swal({
+                        title: "Error!",
+                        text: "There was an error processing the request: " + xhr.responseText,
+                        icon: "error",
+                        button: "OK",
+                    });
+                },
+            });
+        } else if (action === "2") {
+            swal({
+                title: "Processing...",
+                text: "Your request is being processed.",
+                icon: "info",
+                buttons: false,
+                closeOnClickOutside: false,
+            });
+
+            // Automatically close the swal after 5 seconds
+            setTimeout(() => swal.close(), 1000);
+
+            // Send AJAX request to process the selected action
+            $.ajax({
+                url: "{{ route('set.unused') }}",
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                },
+                data: {
+                    formIds: formIds,
+                },
+                success: function (response) {
+                    if (response.success) {
+                        // Trigger file download
+                        $('#assetsTable').DataTable().draw();
+                    } else {
+                        swal({
+                            title: "Error!",
+                            text: response.message || "Something went wrong while processing the request.",
+                            icon: "error",
+                            button: "OK",
+                        });
+                    }
+                },
+                error: function (xhr, status, error) {
+                    swal({
+                        title: "Error!",
+                        text: "There was an error processing the request: " + xhr.responseText,
+                        icon: "error",
+                        button: "OK",
+                    });
+                },
+            });
+        } else if (action === "3") {
+            swal({
+                title: "Set Last Maintenance Date",
+                text: "Please select the last maintenance date:",
+                content: {
+                    element: "input",
+                    attributes: {
+                        type: "date",
+                        id: "lastMaintenanceDate"
+                    }
+                },
+                icon: "info",
+                buttons: ["Cancel", "Next"],
+            }).then((lastMaintenanceDate) => {
+                if (!lastMaintenanceDate) return;
+
+                swal({
+                    title: "Set Next Maintenance Date",
+                    text: "Please select the next maintenance date:",
+                    content: {
+                        element: "input",
+                        attributes: {
+                            type: "date",
+                            id: "nextMaintenanceDate"
+                        }
+                    },
+                    icon: "info",
+                    buttons: ["Cancel", "Proceed"],
+                }).then((nextMaintenanceDate) => {
+                    if (!nextMaintenanceDate) return;
+
+                    swal({
+                        title: "Processing...",
+                        text: `Marking maintenance dates as Last: ${lastMaintenanceDate}, Next: ${nextMaintenanceDate}`,
+                        icon: "info",
+                        buttons: false,
+                        closeOnClickOutside: false,
+                    });
+
+                    // Send AJAX request
+                    $.ajax({
+                        url: "{{ route('maintenance.update') }}",
+                        method: "POST",
+                        headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" },
+                        data: {
+                            formIds: formIds,
+                            lastMaintenanceDate: lastMaintenanceDate,
+                            nextMaintenanceDate: nextMaintenanceDate,
+                        },
+                        success: function (response) {
+                            swal({
+                                title: "Success!",
+                                text: "The maintenance dates have been set.",
+                                icon: "success",
+                                button: "OK",
+                            }).then(() => {
+                                location.reload();
+                            });
+                        },
+                        error: function (xhr) {
+                            swal({
+                                title: "Error!",
+                                text: "There was an error processing the request: " + xhr.responseText,
+                                icon: "error",
+                                button: "OK",
+                            });
+                        },
+                    });
+                });
+            });
+        } else if (action === "4") {
+            let assetConditionOptions = `@foreach($assetCondition as $item)
+                <option value="{{ $item->id }}">{{ $item->condition }}</option>
+            @endforeach`;
+
+            swal({
+                title: "Select Asset Condition",
+                content: (function () {
+                    let div = document.createElement("div");
+                    let select = document.createElement("select");
+                    select.className = "swal-select form-control";
+                    select.innerHTML = assetConditionOptions;
+                    div.appendChild(select);
+                    return div;
+                })(),
+                icon: "info",
+                buttons: ["Cancel", "Submit"],
+            }).then((value) => {
+                let selectedCondition = document.querySelector(".swal-select").value;
+                if (!selectedCondition) return;
+
+                swal({
+                    title: "Processing...",
+                    text: `Updating asset condition to: ${selectedCondition}`,
+                    icon: "info",
+                    buttons: false,
+                    closeOnClickOutside: false,
+                });
+
+                // Send AJAX request
+                $.ajax({
+                    url: "{{ route('updateConditions') }}",
+                    method: "POST",
+                    headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" },
+                    data: {
+                        formIds: formIds,
+                        assetCondition: selectedCondition,
+                    },
+                    success: function (response) {
+                        swal({
+                            title: "Success!",
+                            text: "The asset condition has been updated.",
+                            icon: "success",
+                            button: "OK",
+                        }).then(() => {
+                            $('#assetsTable').DataTable().draw();
+                        });
+                    },
+                    error: function (xhr) {
+                        swal({
+                            title: "Error!",
+                            text: "There was an error processing the request: " + xhr.responseText,
+                            icon: "error",
+                            button: "OK",
+                        });
+                    },
+                });
+            });
+        } else {
+            // Handle other actions normally
+            console.log(`Action: ${action}, Form IDs: ${formIds}`);
+            // Add further logic if needed for other actions
+        }
+    });
+
     $(document).on('click', '.edit-tool', function(e) {
         e.preventDefault();
         var toolId = $(this).data('id');
@@ -536,64 +914,28 @@ font-weight-bold
         });
     });
 
-    $(document).ready(function() {
-        $('.generateQR').click(function() {
-            var assetId = $(this).data('id');
-            $.ajax({
-                url: '{{ route("generate-qr", "") }}/' + assetId,
-                type: 'GET',
-                success: function(response) {
-                    $('#qrAssetCode').text(response.asset_code);
-                    $('#qrTitle').text(response.asset_code);
-                    $('#link').attr('href', response.link);  // Use .attr() to set the href attribute
-                    $('#qrCodeContainer').html('<img src="' + response.qr_code + '" alt="QR Code" />');  // Embed the QR code as an image
-                    $('#qrModal').modal('show');  // Show the modal
-                },
-                error: function() {
-                    alert('Failed to generate QR code.');
-                }
-            });
-        });
-    });
-
     $(document).on('click', '.edit-asset', function() {
         var assetId = $(this).data('asset-id');  // Get asset ID
         var conditionId = $(this).data('condition-id');  // Get current condition ID
         var isUsed = $(this).data('is-used');  // Get the current used status
         var assetCode = $(this).data('asset-code');  // Get the asset code
+        var lastMaintenance = $(this).data('last-maintenance');  // Get the asset code
+        var nextMaintenance = $(this).data('next-maintenance');  // Get the asset code
 
         // Set asset ID in hidden input
         $('#edit_asset_id').val(assetId);
 
         // Set selected condition in the dropdown
         $('#edit_condition').val(conditionId);
+        $('#edit_lastMaintenance').val(lastMaintenance);
+        $('#edit_nextMaintenance').val(nextMaintenance);
+        $('#edit_status').val(isUsed);
 
         // Update the delete button with the correct asset ID
         $('#deleteAssetBtn').data('id', assetId);
 
         // Give asset code
         $('#deleteAssetBtn').data('asset-code', assetCode);
-
-        // Get route URLs from data attributes
-        var usedRoute = $(this).data('url-used');
-        var unusedRoute = $(this).data('url-unused');
-
-        // Dynamically generate the Mark as Used/Unused buttons and forms with SweetAlert
-        var markAsButtonHtml = '';
-        if (isUsed) {
-            markAsButtonHtml = `
-                <button type="button" class='btn btn-primary mr-2' onclick="confirmMarkAsUnused('${unusedRoute}', '${assetCode}')">
-                    <i class="fa fa-unlock"></i>
-                </button>`;
-        } else {
-            markAsButtonHtml = `
-                <button type="button" class='btn btn-danger mr-2' onclick="confirmMarkAsUsed('${usedRoute}', '${assetCode}')">
-                    <i class="fa fa-lock"></i>
-                </button>`;
-        }
-
-        // Insert the buttons into the modal footer
-        $('#markAsUsedUnused').html(markAsButtonHtml);
 
         // Show the modal
         $('#editConditionModal').modal('show');
@@ -689,6 +1031,56 @@ font-weight-bold
                 form.submit();
             }
         });
+    }
+
+    function updateSelectedCount(count) {
+        const badge = document.getElementById('selectedCountBadge');
+        if (count > 0) {
+            badge.style.display = 'inline-block';
+            badge.textContent = `${count} selected`;
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+
+    function toggleCheckboxes() {
+        const checkboxes = document.querySelectorAll('.data-checkbox');
+        const checkAllCheckbox = document.getElementById('checkAll');
+        const formIdInput = document.getElementById('formId');
+
+        const checkedFormIds = [];
+
+        checkboxes.forEach((checkbox) => {
+            checkbox.checked = checkAllCheckbox.checked;
+            if (checkbox.checked) {
+                const formId = checkbox.getAttribute('data-form-id');
+                checkedFormIds.push(formId);
+            }
+        });
+
+        formIdInput.value = checkedFormIds.join(', ');
+
+        // Update badge with the count of selected checkboxes
+        updateSelectedCount(checkedFormIds.length);
+    }
+
+    function toggleCheckboxes2() {
+        const checkboxes = document.querySelectorAll('.data-checkbox');
+        const formIdInput = document.getElementById('formId');
+
+        const checkedFormIds = [];
+
+        checkboxes.forEach((checkbox) => {
+            if (checkbox.checked) {
+                const formId = checkbox.getAttribute('data-form-id');
+                checkedFormIds.push(formId);
+            }
+        });
+
+        formIdInput.value = checkedFormIds.join(', ');
+
+        // Update badge with the count of selected checkboxes
+        updateSelectedCount(checkedFormIds.length);
     }
 
     function printModalContent() {
