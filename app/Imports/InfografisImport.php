@@ -64,25 +64,25 @@ class InfografisImport implements ToCollection, SkipsEmptyRows, WithBatchInserts
 
                 Infografis_peserta::updateOrCreate(
                     [
-                        'nama_peserta' => $row[2],
-                        'nama_program' => $row[11],
+                        'nama_peserta' => $this->cleanString($row[2]), // Clean the input
+                        'nama_program' => $this->cleanString($row[11]),
                         'batch' => trim($row[10]),
-                        'tgl_pelaksanaan' => $this->getFormattedDate($row[12]), // Handle date parsing
-                        'tempat_pelaksanaan' => $row[13],
-                        'jenis_pelatihan' => $row[14],
-                        'keterangan' => $row[16],
-                        'subholding' => $row[17],
-                        'perusahaan' => $row[18],
-                        'kategori_program' => $row[19],
-                        'realisasi' => $row[20],
+                        'tgl_pelaksanaan' => $this->getFormattedDate($row[12]),
+                        'tempat_pelaksanaan' => $this->cleanString($row[13]),
+                        'jenis_pelatihan' => $this->cleanString($row[14]),
+                        'keterangan' => $this->cleanString($row[16]),
+                        'subholding' => $this->cleanString($row[17]),
+                        'perusahaan' => $this->cleanString($row[18]),
+                        'kategori_program' => $this->cleanString($row[19]),
+                        'realisasi' => $this->cleanString($row[20]),
                         'seafarer_code' => $row[8],
                         'participant_id' => $row[1],
                     ],
                     [
                         'registration_number' => $row[7],
-                        'birth_place' => $row[3],
+                        'birth_place' => $this->cleanString($row[3]),
                         'birth_date' => $this->getFormattedDate($row[4]),
-                        'harga_pelatihan' => preg_replace('/[^0-9]/', '', $row[15]),
+                        'harga_pelatihan' => (int) preg_replace('/[^0-9]/', '', round($row[15])),
                         'tgl_pendaftaran' => $this->getFormattedDate($row[5]),
                         'isDuplicate' => false
                     ]
@@ -121,6 +121,13 @@ class InfografisImport implements ToCollection, SkipsEmptyRows, WithBatchInserts
             Cache::forget('jobs_processing');
             Log::error('Error processing the file: ' . $e->getMessage());
         }
+    }
+
+    private function cleanString($string)
+    {
+        $string = preg_replace('/[\x00-\x1F\x7F\xA0]/u', '', mb_convert_encoding($string, 'UTF-8', 'ISO-8859-1'));
+        $string = preg_replace('/\s+/', ' ', $string); // Normalize spaces
+        return trim($string);
     }
 
     public function batchSize(): int

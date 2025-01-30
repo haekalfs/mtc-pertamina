@@ -28,7 +28,8 @@ class Inventory_tools extends Model
         'initial_stock',
         'location_id',
         'purchased_date',
-        'used_amount'
+        'used_amount',
+        'created_by'
     ];
 
     public function img(){
@@ -57,5 +58,9 @@ class Inventory_tools extends Model
     public function penlat_requirement()
     {
         return $this->hasMany('App\Models\Penlat_requirement', 'inventory_tool_id', 'id');
+    }
+
+    public function user(){
+    	return $this->belongsTo('App\Models\User', 'created_by', 'id')->withDefault();
     }
 }

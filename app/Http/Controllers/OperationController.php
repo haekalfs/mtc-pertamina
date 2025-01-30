@@ -347,26 +347,17 @@ class OperationController extends Controller
                         return $row->nama_peserta ?? '-';
                     }
 
-                    // Convert the date field to Carbon
-                    $currentDate = \Carbon\Carbon::parse($row->tgl_pelaksanaan);
+                    // Extract the year from tgl_pelaksanaan
+                    $currentYear = \Carbon\Carbon::parse($row->tgl_pelaksanaan)->year;
 
-                    // Check for conflicts
+                    // Check for conflicts where the same participant has another entry in the same year and same penlat_id
                     $hasConflict = Infografis_peserta::where('participant_id', $row->participant_id)
                         ->whereHas('penlatBatch', function ($query) use ($row) {
                             $query->where('penlat_id', $row->penlatBatch->penlat_id);
                         })
                         ->where('id', '!=', $row->id) // Exclude the current row
-                        ->get()
-                        ->filter(function ($otherRow) use ($currentDate) {
-                            // Ensure the other row has a related penlatBatch
-                            if (!$otherRow->penlatBatch) {
-                                return false;
-                            }
-
-                            $otherDate = \Carbon\Carbon::parse($otherRow->tgl_pelaksanaan);
-                            return $currentDate->diffInYears($otherDate) < 1;
-                        })
-                        ->isNotEmpty();
+                        ->whereYear('tgl_pelaksanaan', $currentYear) // Ensure it's in the same year
+                        ->exists(); // Check if any such entry exists
 
                     // Add a warning icon if there's a conflict
                     $warningIcon = $hasConflict ? '<i class="fa fa-exclamation-circle text-warning"></i>' : '';
@@ -377,28 +368,22 @@ class OperationController extends Controller
                     return '<a data-item-id="' . $row->id . '" class="btn btn-outline-secondary btn-sm mr-2 edit-btn" href="#" data-toggle="modal" data-target="#editModal"><i class="fa fa-edit"></i> Edit</a>';
                 })
                 ->setRowClass(function ($row) {
-                    // Highlight rows with conflicts
+                    // If there's no related penlatBatch, return an empty class
                     if (!$row->penlatBatch) {
                         return '';
                     }
 
-                    $currentDate = \Carbon\Carbon::parse($row->tgl_pelaksanaan);
+                    // Extract the year from tgl_pelaksanaan
+                    $currentYear = \Carbon\Carbon::parse($row->tgl_pelaksanaan)->year;
 
+                    // Check for conflicts where the same participant has another entry in the same year and same penlat_id
                     $hasConflict = Infografis_peserta::where('participant_id', $row->participant_id)
                         ->whereHas('penlatBatch', function ($query) use ($row) {
                             $query->where('penlat_id', $row->penlatBatch->penlat_id);
                         })
                         ->where('id', '!=', $row->id) // Exclude the current row
-                        ->get()
-                        ->filter(function ($otherRow) use ($currentDate) {
-                            if (!$otherRow->penlatBatch) {
-                                return false;
-                            }
-
-                            $otherDate = \Carbon\Carbon::parse($otherRow->tgl_pelaksanaan);
-                            return $currentDate->diffInYears($otherDate) < 1;
-                        })
-                        ->isNotEmpty();
+                        ->whereYear('tgl_pelaksanaan', $currentYear) // Ensure it's in the same year
+                        ->exists(); // Check if any such entry exists
 
                     return $hasConflict ? 'conflict-row' : '';
                 })

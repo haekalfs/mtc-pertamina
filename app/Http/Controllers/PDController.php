@@ -59,7 +59,7 @@ class PDController extends Controller
             'feedbacks' // This will count the number of feedbacks
         ])
         ->orderByDesc('average_feedback_score')
-        ->take(3)
+        ->take(5)
         ->get();
 
         // Count total instructors
@@ -729,6 +729,7 @@ class PDController extends Controller
                         'penlat_id' => $validated['penlat'],
                     ],
                     [
+                        'date' => $validated['startDate'],
                         'nama_program' => $validated['program'],
                         'updated_at' => $currentTimestamp,
                     ]
@@ -1424,15 +1425,20 @@ class PDController extends Controller
     public function validate_certificate($encryptedId)
     {
         try {
-            // Decrypt the asset ID
-            $id = $encryptedId;
+            // Trim and validate the input to ensure it's numeric
+            $id = trim($encryptedId);
 
+            if (!is_numeric($id)) {
+                throw new \Exception("Invalid ID format.");
+            }
+
+            // Fetch data with relationships, ensuring the ID is numeric and sanitized
             $data = Receivables_participant_certificate::with(['peserta', 'penlatCertificate'])->findOrFail($id);
 
             return view('plan_dev.submenu.validate-certificate', ['data' => $data]);
         } catch (\Exception $e) {
-            // Handle errors (e.g., invalid decryption or asset not found)
-            return redirect()->route('certificate', $id)->withErrors(['error' => 'Invalid QR code not found.']);
+            // Handle errors (e.g., invalid input or asset not found)
+            return redirect()->route('certificate')->withErrors(['error' => 'Invalid QR code or certificate not found.']);
         }
     }
 
@@ -1464,7 +1470,6 @@ class PDController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'formIds' => 'required', // Ensure formIds is provided
-            'dateReceived' => 'required|date', // Ensure the date is valid
         ]);
 
         if ($validator->fails()) {
@@ -1490,11 +1495,6 @@ class PDController extends Controller
 
                 $data = Receivables_participant_certificate::find($formId);
 
-                if ($data) {
-                    // Save the issued date
-                    $data->update(['issued_date' => $request->dateReceived]);
-                }
-
                 // Modify the spreadsheet
                 $certificateNumber = $data->certificate_number;
                 $batchParts = explode('/', $data->penlatCertificate->batch->batch);
@@ -1509,7 +1509,6 @@ class PDController extends Controller
                 $sheet->setCellValue('B41', $batchParts[1]);
 
                 $birthInfo = $data->peserta->birth_place . ', ' . Carbon::parse($data->peserta->birth_date)->format('d F Y');
-                $sheet->setCellValueByColumnAndRow(16, 11, $data->peserta->nama_peserta);
                 $sheet->setCellValueByColumnAndRow(16, 14, $birthInfo);
                 $sheet->setCellValueByColumnAndRow(35, 9, $formattedCertificate);
 
@@ -1525,7 +1524,7 @@ class PDController extends Controller
                 ];
 
                 // Default font size for very long text
-                $defaultFontSize = 14;
+                $defaultFontSize = 28;
 
                 // Determine the appropriate font size based on text length
                 $fontSize = $defaultFontSize;
@@ -1547,6 +1546,41 @@ class PDController extends Controller
                 $sheet->getStyle($cellCoordinates)->getAlignment()->setWrapText(true);
                 $sheet->getStyle($cellCoordinates)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                 $sheet->getStyle($cellCoordinates)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+
+                //Nama
+                $participantName = $data->peserta->nama_peserta;
+
+                // Define breakpoints for font sizes
+                $fontSizeBreakpoints = [
+                    18 => 22, // Up to 18 characters, font size 22
+                    28 => 16, // Up to 28 characters, font size 16
+                    40 => 14, // Up to 40 characters, font size 14
+                    80 => 10, // Up to 80 characters, font size 10
+                ];
+
+                // Default font size for very long text
+                $defaultFontSizeValue = 22;
+
+                // Determine the appropriate font size based on text length
+                $calculatedFontSize = $defaultFontSizeValue;
+                foreach ($fontSizeBreakpoints as $characterLimit => $fontSizeValue) {
+                    if (strlen($participantName) <= $characterLimit) {
+                        $calculatedFontSize = $fontSizeValue;
+                        break;
+                    }
+                }
+
+                // Set the cell value
+                $targetCell = 'P11';
+                $sheet->setCellValue($targetCell, $participantName);
+
+                // Apply the calculated font size
+                $sheet->getStyle($targetCell)->getFont()->setSize($calculatedFontSize);
+
+                // Align text to wrap within the cell
+                $sheet->getStyle($targetCell)->getAlignment()->setWrapText(true);
+                $sheet->getStyle($targetCell)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+                $sheet->getStyle($targetCell)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
 
 
                 //periode

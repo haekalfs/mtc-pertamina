@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Monitoring_approval;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Auth;
@@ -39,9 +40,12 @@ class NotificationServiceProvider extends ServiceProvider
                     ->where('created_at', '>', Carbon::now()->subDay())
                     ->count();
 
+                $expiredApprovals = Monitoring_approval::where('approval_date', '<', Carbon::now()->subYear())->count();
+
                 $view->with([
                     'notifications' => $notifications,
                     'notificationsCount' => $notificationsCount,
+                    'monitoringCount' => $expiredApprovals,
                 ]);
             }
         });

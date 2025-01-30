@@ -1,14 +1,14 @@
 @extends('layouts.main')
 
-@section('active-pd')
+@section('active-operation')
 active font-weight-bold
 @endsection
 
-@section('show-pd')
+@section('show-operation')
 show
 @endsection
 
-@section('certificate')
+@section('tool-inventory')
 font-weight-bold
 @endsection
 
@@ -45,16 +45,16 @@ font-weight-bold
 <div class="animated fadeIn">
     <div class="row">
         <div class="col-xl-4 col-md-6 animateBox">
-            <a href="{{ route('certificate') }}" class="clickable-card">
+            <a href="{{ route('tool-inventory') }}" class="clickable-card">
                 <div class="card border-left-primary shadow py-2">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="stat-heading mb-1 font-weight-bold">Training Certifications</div>
-                                <div class="h6 mb-0 text-gray-800"><span style="font-size: 14px;">Training Certifications Status</span></div>
+                                <div class="stat-heading mb-1 font-weight-bold">Inventory Tools</div>
+                                <div class="h6 mb-0 text-gray-800"><span style="font-size: 14px;">Inventory Tools PMTC</span></div>
                             </div>
                             <div class="col-auto">
-                                <i class="fa fa-trophy fa-2x text-primary"></i>
+                                <i class="fa fa-fire-extinguisher fa-2x text-primary"></i>
                             </div>
                         </div>
                     </div>
@@ -69,16 +69,16 @@ font-weight-bold
         </div>
 
         <div class="col-xl-4 col-md-6 animateBox">
-            <a href="{{ route('certificate-instructor') }}" class="clickable-card">
+            <a href="{{ route('audit-inventory') }}" class="clickable-card">
                 <div class="card border-left-success shadow py-2">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="stat-heading mb-1 font-weight-bold">Instructors Certificates</div>
-                                    <div class="h6 mb-0 text-gray-800"><span style="font-size: 14px;">List Certificates for Instructor</span></div>
+                                <div class="stat-heading mb-1 font-weight-bold">History</div>
+                                    <div class="h6 mb-0 text-gray-800"><span style="font-size: 14px;">Audit Log of Inventory Tools</span></div>
                             </div>
                             <div class="col-auto">
-                                <i class="fa fa-male fa-2x text-success"></i>
+                                <i class="fa fa-exclamation-circle fa-2x text-success"></i>
                             </div>
                         </div>
                     </div>
@@ -88,21 +88,21 @@ font-weight-bold
         <div class="col-md-12">
             <div class="card mb-4">
                 <div class="card-header">
-                    <span class="font-weight-bold">Certificate Menu Guide</span>
+                    <span class="font-weight-bold">Guide to the Inventory Management Menu</span>
                 </div>
                 <div class="card-body" style="background-color: rgb(247, 247, 247);">
                     <h6 class="h6 mb-2 font-weight-bold text-gray-800">Overview</h6>
-                    <p>The Certificate menu provides two main sub-menus for managing certifications in the MTC system:</p>
+                    <p>The Inventory Management menu in PMTC consists of two main sections to facilitate inventory tracking and auditing:</p>
                     <ul class="ml-4">
-                        <li><strong>Participant Certification</strong>: This menu is used to manage the certification status of participants who have completed training at MTC. It provides details on their progress and certification results.</li>
-                        <li><strong>Instructor Certification</strong>: This menu is used to manage certifications for instructors or trainers at MTC. It includes information on their certification status and other relevant details.</li>
+                        <li><strong>Inventory Tools Management</strong>: This section is designed to manage and oversee the inventory of tools and equipment in PMTC. It allows users to track the status, availability, and usage of each inventory item.</li>
+                        <li><strong>Audit Log for Inventory Management</strong>: This section provides a detailed log of all inventory-related activities, ensuring transparency and accountability. It records changes, updates, and actions taken within the inventory system.</li>
                     </ul>
                     <h6 class="h6 mb-2 font-weight-bold text-gray-800">Key Points</h6>
                     <ul class="ml-4">
-                        <li>Each sub-menu is designed to manage and view specific certification details for both participants and instructors.</li>
-                        <li>Ensure that all certification data entered or modified is accurate and reflects the current status of the respective individual.</li>
+                        <li>Each section is structured to streamline inventory tracking and auditing within PMTC.</li>
+                        <li>Ensure all inventory data entered or modified is accurate and reflects the latest status of tools and equipment.</li>
                         <li>Access to this menu should be restricted to authorized personnel to maintain data integrity.</li>
-                        <li>Update certification information regularly to align with the latest training outcomes and instructor qualifications.</li>
+                        <li>Regularly update inventory records to align with current stock levels and usage history.</li>
                     </ul>
                 </div>
             </div>

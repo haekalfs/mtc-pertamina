@@ -97,10 +97,22 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
             Route::post('/api/fetchAmountData', [DashboardController::class, 'fetchAmountData'])->name('fetchAmountData');
             Route::post('/api/chart-bar-data', [DashboardController::class, 'fetchChartsData'])->name('fetchChartData');
             Route::post('/api/chart-trend-revenue-data', [DashboardController::class, 'fetchTrendRevenueData']);
+            Route::post('/api/chart-drilldown-revenue-data', [DashboardController::class, 'fetchDrilldownRevenueData']);
+            Route::post('/api/fetch-participants-by-revenue', [DashboardController::class, 'fetchParticipantsByRevenue']);
+
             Route::post('/api/chart-location-data', [DashboardController::class, 'fetchLocationChartData']);
+            Route::post('/api/chart-location-drilldown', [DashboardController::class, 'fetchDrilldownChartData']);
+            Route::post('/api/fetch-participants-by-location', [DashboardController::class, 'fetchParticipantsByLocation']);
+
             Route::post('/api/chart-training-type-data', [DashboardController::class, 'fetchTrainingTypeChartData']);
+            Route::post('/api/chart-training-type-drilldown', [DashboardController::class, 'fetchTrainingTypeDrilldownData']);
+            Route::post('/api/fetch-participants-by-training-type', [DashboardController::class, 'fetchParticipantsByTrainingType']);
+
             Route::post('/api/chart-overall-data', [DashboardController::class, 'fetchOverallData']);
             Route::post('/api/chart-issued-certificate-data', [DashboardController::class, 'getIssuedCertificateData']);
+            Route::post('/api/get-participants', [DashboardController::class, 'getChartDetail']);
+            Route::post('/api/get-participants-stcw-non', [DashboardController::class, 'getParticipants']);
+
         });
 
         //Encrypt
@@ -165,6 +177,8 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
                 Route::get('/operation/participant-infographics/error-log', [OperationController::class, 'error_log'])->name('infographics.error.log');
 
                 //inventaris Alat
+                Route::get('/tool-inventory/index', [InventoryToolController::class, 'main'])->name('mainpage-inventory');
+                Route::get('/tool-inventory/audit-log', [InventoryToolController::class, 'audit_log'])->name('audit-inventory');
                 Route::get('/tool-inventory', [InventoryToolController::class, 'tool_inventory'])->name('tool-inventory');
                 Route::get('/tool-inventory/preview/{id}', [InventoryToolController::class, 'preview_asset'])->name('preview-asset');
                 //QR CODE PREVIEWER
@@ -181,6 +195,12 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
                 Route::get('/tool-inventory-generate-qr/{id}', [InventoryToolController::class, 'generateQrCode'])->name('generate-qr');
                 Route::post('/update-asset-condition', [InventoryToolController::class, 'updateAssetCondition'])->name('update-asset-condition');
                 Route::delete('/inventory-tools/delete/{id}', [InventoryToolController::class, 'destroy_asset_per_item'])->name('inventory-tools.delete');
+
+
+                Route::post('/tool-maintenance-update', [InventoryToolController::class, 'maintenanceUpdate'])->name('maintenance.update');
+                Route::post('/tool-set-as-used', [InventoryToolController::class, 'setAsUsed'])->name('set.used');
+                Route::post('/tool-set-as-unused', [InventoryToolController::class, 'setAsUnused'])->name('set.unused');
+                Route::post('/tool-change-state', [InventoryToolController::class, 'changeConditions'])->name('updateConditions');
 
 
                 //inventaris ruangan

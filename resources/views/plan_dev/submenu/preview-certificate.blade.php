@@ -824,76 +824,48 @@ font-weight-bold
             });
         } else if (action === "1") {
             swal({
-                title: "Export Certificates",
-                text: "Please select the date issued (required):",
-                content: {
-                    element: "input",
-                    attributes: {
-                        type: "date",
-                        required: true, // Makes the date field required
-                    },
-                },
+                title: "Processing...",
+                text: "Your request is being processed. The download will begin shortly.",
                 icon: "info",
-                buttons: ["Cancel", "Proceed"],
-            }).then((selectedDate) => {
-                if (selectedDate) {
-                    // Check if the date field is empty
-                    if (!selectedDate) {
+                buttons: false,
+                closeOnClickOutside: false,
+            });
+
+            // Automatically close the swal after 3 seconds
+            setTimeout(() => swal.close(), 3000);
+
+            // Send AJAX request to process the selected action
+            $.ajax({
+                url: "{{ route('certificate.export.selected') }}",
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                },
+                data: {
+                    formIds: formIds,
+                },
+                success: function (response) {
+                    if (response.success) {
+                        // Trigger file download
+                        window.location.href = response.fileUrl;
+                        $('#listCertificates').DataTable().draw();
+                    } else {
                         swal({
                             title: "Error!",
-                            text: "You must select a valid date to proceed.",
+                            text: response.message || "Something went wrong while processing the request.",
                             icon: "error",
                             button: "OK",
                         });
-                        return;
                     }
-
+                },
+                error: function (xhr, status, error) {
                     swal({
-                        title: "Processing...",
-                        text: "Your request is being processed. The download will begin shortly.",
-                        icon: "info",
-                        buttons: false,
-                        closeOnClickOutside: false,
+                        title: "Error!",
+                        text: "There was an error processing the request: " + xhr.responseText,
+                        icon: "error",
+                        button: "OK",
                     });
-
-                    // Automatically close the swal after 5 seconds
-                    setTimeout(() => swal.close(), 3000);
-
-                    // Send AJAX request to process the selected action
-                    $.ajax({
-                        url: "{{ route('certificate.export.selected') }}",
-                        method: "POST",
-                        headers: {
-                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                        },
-                        data: {
-                            formIds: formIds,
-                            dateReceived: selectedDate,
-                        },
-                        success: function (response) {
-                            if (response.success) {
-                                // Trigger file download
-                                window.location.href = response.fileUrl;
-                                $('#listCertificates').DataTable().draw();
-                            } else {
-                                swal({
-                                    title: "Error!",
-                                    text: response.message || "Something went wrong while processing the request.",
-                                    icon: "error",
-                                    button: "OK",
-                                });
-                            }
-                        },
-                        error: function (xhr, status, error) {
-                            swal({
-                                title: "Error!",
-                                text: "There was an error processing the request: " + xhr.responseText,
-                                icon: "error",
-                                button: "OK",
-                            });
-                        },
-                    });
-                }
+                },
             });
         } else if (action === "5") {
             swal({

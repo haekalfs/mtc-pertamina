@@ -85,7 +85,7 @@ font-weight-bold
                                         <div class="card mb-3">
                                             <div class="card-body custom-card" style="position: relative;">
                                                 <a href="{{ route('preview-regulation', $item->id) }}" class="position-absolute" style="top: 10px; right: 10px; z-index: 10;">
-                                                    <i class="fa fa-edit fa-lg text-secondary"></i>
+                                                    <i class="fa fa-share fa-lg text-secondary"></i>
                                                 </a>
                                                 <div class="row no-gutters">
                                                     <div class="col-md-12 mt-2">

@@ -53,19 +53,13 @@ font-weight-bold
 <div class="row zoom90">
     <div class="col-xl-12 col-lg-12">
         <div class="card" style="min-height: 500px;">
-            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between" style="position: relative;">
+                @mtd_acc(3)
+                <a href="#" data-id="{{ $data->id }}" data-name="{{ $data->description }}" data-status="{{ $data->statuses->id }}" data-filepath="{{ $data->filepath }}" class="position-absolute edit-regulation" style="top: 15px; right: 15px; z-index: 10;">
+                    <i class="fa fa-edit fa-lg ml-2" style="color: rgb(181, 181, 181);"></i>
+                </a>
+                @endmtd_acc
                 <h6 class="m-0 font-weight-bold text-secondary" id="judul">Document Preview</h6>
-                <div class="text-right">
-                    @mtd_acc(3)
-                    <a class="btn btn-secondary btn-sm text-white mr-2 edit-regulation" data-id="{{ $data->id }}" data-name="{{ $data->description }}" data-status="{{ $data->statuses->id }}" data-filepath="{{ $data->filepath }}"><i class="menu-Logo fa fa-edit"></i> Update</a>
-                    @endmtd_acc
-                    @mtd_acc(4)
-                    <a href="#" class="btn btn-danger btn-sm text-white delete-regulation mr-2" data-id="{{ $data->id }}"><i class="menu-Logo fa fa-trash-o"></i> Delete</a>
-                    @endmtd_acc
-                    @if($fileExists)
-                        <a class="btn btn-primary btn-sm text-white" href="{{ asset($data->filepath) }}" download><i class="menu-Logo fa fa-download"></i> Download</a>
-                    @endif
-                </div>
             </div>
             <div class="card-body d-flex justify-content-center align-items-center" style="min-height: 400px; height: 100%;">
                 @if(!$fileExists)
@@ -74,7 +68,7 @@ font-weight-bold
                     </div>
                 @elseif(!$isPdf)
                     <div class="alert alert-warning" role="alert">
-                        The file is not in PDF format. Proceed to download the file by clicking download button.
+                        The file is not in PDF format. Proceed to download the file by clicking download button. <a class="btn btn-primary btn-sm text-white" href="{{ asset($data->filepath) }}" download><i class="menu-Logo fa fa-download"></i> Download</a>
                     </div>
                 @else
                     <iframe src="{{ asset($data->filepath) }}" width="100%" style="height:900px; border:none;"></iframe>
@@ -128,7 +122,7 @@ font-weight-bold
                                             </div>
                                             <div class="flex-grow-1">
                                                 <input type="file" class="form-control" name="file">
-                                                <small id="currentFile"></small>
+                                                <small id="currentFile" class="d-inline-block" style="cursor: pointer;"></small>
                                             </div>
                                         </div>
                                     </div>
@@ -138,7 +132,9 @@ font-weight-bold
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    @mtd_acc(4)
+                    <a href="#" class="btn btn-danger text-white delete-regulation mr-2" data-id="{{ $data->id }}"><i class="menu-Logo fa fa-trash-o"></i> Delete</a>
+                    @endmtd_acc
                     <button type="submit" class="btn btn-primary">Update Regulation</button>
                 </div>
             </form>
@@ -198,7 +194,14 @@ document.addEventListener('DOMContentLoaded', function () {
         $('#editStatus').val(statusId);
 
         if (filePath) {
-            $('#currentFile').text('Current file: ' + filePath);
+            let fileUrl = "{{ asset('') }}" + filePath; // Adjust if needed
+            $('#currentFile')
+                .text('Current file: ' + filePath)
+                .attr('href', fileUrl)
+                .attr('download', '')
+                .on('click', function() {
+                    window.location.href = fileUrl;
+                });
         } else {
             $('#currentFile').text('No file uploaded');
         }

@@ -169,6 +169,12 @@ active font-weight-bold
                     <div class="card2 shadow">
                         <div class="card-header2 d-flex align-items-center">
                             <h4 class="mb-0">Training Trend by Type</h4>
+                            <button
+                                type="button"
+                                id="backButtonType"
+                                class="btn btn-outline-white btn-md ml-auto zoom90 invisible">
+                                <i class="fa fa-arrow-left fa-sm"></i> Back
+                            </button>
                         </div>
                         <div class="card-block2 bg-white">
                             <div class="row">
@@ -186,7 +192,7 @@ active font-weight-bold
         <div class="col-md-6">
             <div class="row">
                 <div class="col-lg-6 col-md-6 animateBox">
-                    <a href="{{ route('operation') }}" class="clickable-card">
+                    <a href="{{ route('participant-infographics') }}" class="clickable-card">
                         <div class="card">
                             <div class="card-body">
                                 <div class="stat-widget-five">
@@ -266,7 +272,7 @@ active font-weight-bold
                 </div>
 
                 <div class="col-lg-6 col-md-6 animateBox">
-                    <a href="{{ route('finance') }}" class="clickable-card">
+                    <a href="{{ route('batch-penlat') }}" class="clickable-card">
                         <div class="card">
                             <div class="card-body">
                                 <div class="stat-widget-five">
@@ -308,10 +314,16 @@ active font-weight-bold
             <div class="card2 shadow">
                 <div class="card-header2 d-flex align-items-center">
                     <h4 class="mb-0">Training Session by Location</h4>
+                    <button
+                        type="button"
+                        id="backButton"
+                        class="btn btn-outline-white btn-md ml-auto zoom90 invisible">
+                        <i class="fa fa-arrow-left fa-sm"></i> Back
+                    </button>
                 </div>
                 <div class="card-block2 bg-white">
                     <div class="row">
-                        <div class="col-lg-12 zoom90">
+                        <div class="col-lg-12">
                             <div class="card-body d-flex justify-content-center align-items-center">
                                 <div id="locationChart" style="height: 200px; width: 100%;"></div>
                             </div>
@@ -342,6 +354,12 @@ active font-weight-bold
             <div class="card2 shadow">
                 <div class="card-header2 d-flex align-items-center">
                     <h4 class="mb-0">Training Trend by Revenue</h4>
+                    <button
+                        type="button"
+                        id="backButtonRevenue"
+                        class="btn btn-outline-white btn-md ml-auto zoom90 invisible">
+                        <i class="fa fa-arrow-left fa-sm"></i> Back
+                    </button>
                 </div>
                 <div class="card-block2 bg-white">
                     <div class="row">
@@ -462,8 +480,45 @@ active font-weight-bold
         </div>
     </div>
 </div>
+<div id="participantModal" class="modal fade" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 1200px;" role="document">
+        <div class="modal-content">
+            <div class="modal-header d-flex flex-row align-items-center justify-content-between">
+                <h5 class="modal-title" id="modalTitle">Participant Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered" id="participantTable">
+                    <thead>
+                        <tr>
+                            <th>Tgl Pelaksanaan</th>
+                            <th>Nama Peserta</th>
+                            <th>Batch</th>
+                            <th>Jenis Pelatihan</th>
+                            <th>Kategori Program</th>
+                            <th>Realisasi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data populated dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
 $(document).ready(function () {
+    let isDrilldown = false; // Track drilldown state
+    let mainChartOptions; // Store the main chart options globally
+
+    let isTrainingDrilldown = false; // Track drilldown state for Training Type chart
+    let mainTrainingChartOptions; // Store the main chart options globally
+
+    let mainRevenueChartOptions = {}; // Store main chart options globally
+    let isRevenueDrilldown = false; // Track drilldown state
 
     // Attach change event listeners to the dropdowns
     $('#stcw, #type').on('change', function () {
@@ -585,7 +640,7 @@ $(document).ready(function () {
     function refreshChart() {
         const dateRange = $('#daterange').val(); // Default date range
         const type = $('#type').val() || "-1"; // Default type (show all)
-        const stcw = $('#stcw').val() || "-1"; // Default type to "Show All"
+        const stcw = $('#stcw').val() || "-1"; // Default STCW type (show all)
 
         // Prepare request payload
         const payload = {
@@ -603,97 +658,243 @@ $(document).ready(function () {
             contentType: "application/json",
             success: function (data) {
                 const chart = new CanvasJS.Chart("barChart", {
-                animationEnabled: true,
-                theme: "light2",
-                axisX: {
-                    interval: 1,
-                    labelAngle: -45, // Rotate labels for better readability
-                    labelFontSize: 12 // Reduce font size of X-axis labels
-                },
-                axisY: {
-                    title: "Participants",
-                    includeZero: true,
-                    titleFontSize: 14, // Reduce font size of Y-axis title
-                    labelFontSize: 12 // Reduce font size of Y-axis labels
-                },
-                legend: {
-                    cursor: "pointer",
-                    verticalAlign: "top", // Place the legend at the top
-                    horizontalAlign: "center", // Center the legend horizontally
-                    fontSize: 12, // Adjust the font size
-                    itemWidth: 150, // Add space for the legend text to prevent overlap
-                },
-                data: [
-                    {
-                        type: "bar",
-                        name: "STCW Participants",
-                        showInLegend: true,
-                        legendText: "STCW Participants",
-                        dataPoints: data.dataPoints1 // Updated data for STCW
+                    animationEnabled: true,
+                    zoomEnabled: true,
+                    theme: "light2",
+                    axisX: {
+                        interval: 1,
+                        labelAngle: -45,
+                        labelFontSize: 12
                     },
-                    {
-                        type: "bar",
-                        name: "NON STCW Participants",
-                        showInLegend: true,
-                        legendText: "NON STCW Participants",
-                        dataPoints: data.dataPoints2 // Updated data for NON STCW
-                    }
-                ]
-            });
-            chart.render();
+                    axisY: {
+                        title: "Participants",
+                        includeZero: true,
+                        titleFontSize: 14,
+                        labelFontSize: 12
+                    },
+                    legend: {
+                        cursor: "pointer",
+                        verticalAlign: "top",
+                        horizontalAlign: "center",
+                        fontSize: 12,
+                        itemWidth: 150
+                    },
+                    data: [
+                        {
+                            type: "bar",
+                            name: "STCW Participants",
+                            showInLegend: true,
+                            legendText: "STCW Participants",
+                            dataPoints: data.dataPoints1.map(point => ({
+                                ...point,
+                                click: function (e) {
+                                    handleStcwBarClick(e);
+                                }
+                            }))
+                        },
+                        {
+                            type: "bar",
+                            name: "NON STCW Participants",
+                            showInLegend: true,
+                            legendText: "NON STCW Participants",
+                            dataPoints: data.dataPoints2.map(point => ({
+                                ...point,
+                                click: function (e) {
+                                    handleNonStcwBarClick(e);
+                                }
+                            }))
+                        }
+                    ]
+                });
+                chart.render();
             },
             error: function (xhr, status, error) {
-                console.error("Error fetching data:", status, error);
+                console.error("Error fetching chart data:", status, error);
             }
         });
     }
 
+    // Initialize the main trend revenue chart
     function refreshTrendRevenueChart() {
-        const dateRange = $('#daterange').val(); // Default date range
-        const type = $('#type').val() || "-1"; // Default type (show all)
-        const stcw = $('#stcw').val() || "-1"; // Default type to "Show All"
+        const dateRange = $('#daterange').val();
+        const type = $('#type').val() || "-1";
 
-        // Prepare request payload
         const payload = {
             periode: dateRange,
             type: type,
-            stcw: stcw,
-            _token: '{{ csrf_token() }}' // Include CSRF token for Laravel
+            _token: '{{ csrf_token() }}'
         };
 
-        // Send data via AJAX POST request
         $.ajax({
             url: "/api/chart-trend-revenue-data",
             type: "POST",
             data: JSON.stringify(payload),
             contentType: "application/json",
             success: function (data) {
-                // Preprocess data for X-axis and tooltips
                 const chartData = data.map(item => ({
-                    label: shortenLabel(item.label), // Shorten label for display on X-axis
-                    y: item.y, // Use total_biaya as value
-                    fullLabel: item.label // Store full label for tooltip
+                    label: shortenLabel(item.label),
+                    y: item.y,
+                    fullLabel: item.label,
+                    click: function (e) {
+                        showDrilldownRevenueChart(item.label);
+                    }
                 }));
 
-                // Create and render the chart
+                mainRevenueChartOptions = {
+                    animationEnabled: true,
+                    zoomEnabled: true,
+                    theme: "light2",
+                    axisY: { title: "Revenue" },
+                    data: [{
+                        type: "column",
+                        toolTipContent: "{fullLabel}: {y}",
+                        dataPoints: chartData
+                    }]
+                };
+
+                const chart = new CanvasJS.Chart("trendRevenueChart", mainRevenueChartOptions);
+                chart.render();
+
+                $("#backButtonRevenue").addClass("invisible");
+                isRevenueDrilldown = false;
+            },
+            error: function () {
+                swal("An Error Occurred", "Failed to fetch trend data.", "error");
+            }
+        });
+    }
+
+    // Show drilldown chart with details
+    function showDrilldownRevenueChart(description) {
+        const dateRange = $('#daterange').val();
+
+        const payload = {
+            periode: dateRange,
+            description: description,
+            _token: '{{ csrf_token() }}'
+        };
+
+        $.ajax({
+            url: "/api/chart-drilldown-revenue-data",
+            type: "POST",
+            data: JSON.stringify(payload),
+            contentType: "application/json",
+            success: function (data) {
+                const chartData = data.map(item => ({
+                    label: item.label,
+                    y: item.y,
+                    click: function (e) {
+                        fetchParticipantsByRevenue(description, e.dataPoint.label);
+                    }
+                }));
+
                 const chart = new CanvasJS.Chart("trendRevenueChart", {
                     animationEnabled: true,
                     theme: "light2",
-                    axisY: {
-                        title: "Revenue"
-                    },
+                    title: { text: `Details for ${description}` },
+                    axisX: { title: "Date" },
+                    axisY: { title: "Revenue", includeZero: true },
                     data: [{
                         type: "column",
-                        toolTipContent: "{fullLabel}: {y}", // Tooltip shows full label
                         dataPoints: chartData
                     }]
                 });
 
                 chart.render();
+                $("#backButtonRevenue").removeClass("invisible");
+                isRevenueDrilldown = true;
+            },
+            error: function () {
+                swal("An Error Occurred", "Failed to fetch drilldown data.", "error");
+            }
+        });
+    }
+
+    // Fetch participant details and open modal
+    function fetchParticipantsByRevenue(description, period) {
+        const dateRange = $('#daterange').val();
+
+        const payload = {
+            periode: dateRange,
+            description: description,
+            period: period,
+            _token: '{{ csrf_token() }}'
+        };
+
+        $.ajax({
+            url: "/api/fetch-participants-by-revenue",
+            type: "POST",
+            data: JSON.stringify(payload),
+            contentType: "application/json",
+            success: function (data) {
+                initializeDataTable(data);
+                $('#participantModal').modal('show');
+            },
+            error: function () {
+                swal("An Error Occurred", "Failed to fetch participant details.", "error");
+            }
+        });
+    }
+
+    // Back button functionality
+    $("#backButtonRevenue").click(function () {
+        if (isRevenueDrilldown) {
+            refreshTrendRevenueChart();
+        }
+    });
+
+    function refreshLocationChart() {
+        const dateRange = $('#daterange').val();
+        const type = $('#type').val() || "-1";
+        const stcw = $('#stcw').val() || "-1";
+
+        const payload = {
+            periode: dateRange,
+            type: type,
+            stcw: stcw,
+            _token: '{{ csrf_token() }}'
+        };
+
+        $.ajax({
+            url: "/api/chart-location-data",
+            type: "POST",
+            data: JSON.stringify(payload),
+            contentType: "application/json",
+            success: function (data) {
+                const chartData = data.map(item => ({
+                    label: item.label, // Location name
+                    y: item.y, // Number of participants
+                    click: function (e) {
+                        showDrilldownChart(e.dataPoint.label); // Drill-down by location
+                    }
+                }));
+
+                // Store main chart options globally for resetting later
+                mainChartOptions = {
+                    animationEnabled: true,
+                    zoomEnabled: true,
+                    theme: "light2",
+                    axisY: {
+                        title: "Number of Participants",
+                        includeZero: true
+                    },
+                    data: [{
+                        type: "column",
+                        showInLegend: true,
+                        legendText: "{label}",
+                        dataPoints: chartData
+                    }]
+                };
+
+                const chart = new CanvasJS.Chart("locationChart", mainChartOptions);
+                chart.render();
+
+                // Hide the back button when rendering the main chart
+                $("#backButton").addClass("invisible");
+                isDrilldown = false; // Reset drilldown state
             },
             error: function (xhr, status, error) {
                 console.error("Error fetching data:", status, error);
-                // Generic error message for other errors
                 swal({
                     title: "An Error Occurred",
                     text: "Something went wrong. Please refresh your browser.",
@@ -703,36 +904,36 @@ $(document).ready(function () {
         });
     }
 
-    function refreshLocationChart() {
-        const dateRange = $('#daterange').val(); // Default date range
-        const type = $('#type').val() || "-1"; // Default type (show all)
-        const stcw = $('#stcw').val() || "-1"; // Default type to "Show All"
 
-        // Prepare request payload
+    function showDrilldownChart(location) {
+        const dateRange = $('#daterange').val();
         const payload = {
             periode: dateRange,
-            type: type,
-            stcw: stcw,
-            _token: '{{ csrf_token() }}' // Include CSRF token for Laravel
+            location: location,
+            _token: '{{ csrf_token() }}'
         };
 
-        // Send data via AJAX POST request
         $.ajax({
-            url: "/api/chart-location-data",
+            url: "/api/chart-location-drilldown",
             type: "POST",
             data: JSON.stringify(payload),
             contentType: "application/json",
             success: function (data) {
-                // Map data to CanvasJS format
                 const chartData = data.map(item => ({
-                    label: item.label, // Location name
+                    label: item.label, // Month-Year
                     y: item.y // Total participants
                 }));
 
-                // Create and render the chart
                 const chart = new CanvasJS.Chart("locationChart", {
                     animationEnabled: true,
                     theme: "light2",
+                    title: {
+                        text: `Participants in ${location}`,
+                        margin: 20
+                    },
+                    axisX: {
+                        title: "Month-Year",
+                    },
                     axisY: {
                         title: "Number of Participants",
                         includeZero: true
@@ -744,33 +945,80 @@ $(document).ready(function () {
                 });
 
                 chart.render();
+
+                // Show the back button when drilldown is triggered
+                $("#backButton").removeClass("invisible");
+                isDrilldown = true;
+
+                // Add click event to chart data points for drilldown
+                chart.options.data[0].click = function (e) {
+                    const selectedPeriod = e.dataPoint.label; // Get selected drilldown label (Month-Year)
+                    fetchParticipantsByLocation(location, selectedPeriod); // Fetch participants for this period
+                };
             },
             error: function (xhr, status, error) {
-                console.error("Error fetching data:", status, error);
-                // Generic error message for other errors
+                console.error("Error fetching drilldown data:", status, error);
                 swal({
                     title: "An Error Occurred",
-                    text: "Something went wrong. Please refresh your browser.",
+                    text: "Unable to fetch drilldown data.",
                     icon: "error",
                 });
             }
         });
     }
 
-    function refreshTrainingTypeChart() {
-        const dateRange = $('#daterange').val(); // Default date range
-        const type = $('#type').val() || "-1"; // Default type (show all)
-        const stcw = $('#stcw').val() || "-1"; // Default type to "Show All"
+    // Fetch participants by location and period
+    function fetchParticipantsByLocation(location, period) {
+        const dateRange = $('#daterange').val();
+        const payload = {
+            periode: dateRange,
+            location: location,
+            period: period,
+            _token: '{{ csrf_token() }}'
+        };
 
-        // Prepare request payload
+        $.ajax({
+            url: "/api/fetch-participants-by-location", // New endpoint to fetch participant details
+            type: "POST",
+            data: JSON.stringify(payload),
+            contentType: "application/json",
+            success: function (data) {
+                // Initialize the DataTable with participant data
+                initializeDataTable(data);
+
+                // Show the modal with participant details
+                $('#participantModal').modal('show');
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching participant data:", status, error);
+                swal({
+                    title: "An Error Occurred",
+                    text: "Unable to fetch participant data.",
+                    icon: "error",
+                });
+            }
+        });
+    }
+
+    // Back/Reset button functionality
+    $("#backButton").click(function () {
+        if (isDrilldown) {
+            refreshLocationChart(); // Call the main chart rendering function
+        }
+    });
+
+    function refreshTrainingTypeChart() {
+        const dateRange = $('#daterange').val();
+        const type = $('#type').val() || "-1";
+        const stcw = $('#stcw').val() || "-1";
+
         const payload = {
             periode: dateRange,
             type: type,
             stcw: stcw,
-            _token: '{{ csrf_token() }}' // Include CSRF token for Laravel
+            _token: '{{ csrf_token() }}'
         };
 
-        // Send data via AJAX POST request
         $.ajax({
             url: "/api/chart-training-type-data",
             type: "POST",
@@ -780,11 +1028,14 @@ $(document).ready(function () {
                 // Map data to CanvasJS format
                 const chartData = data.map(item => ({
                     label: item.label, // Training type name
-                    y: item.y // Total participants
+                    y: item.y, // Total participants
+                    click: function (e) {
+                        showDrilldownTrainingTypeChart(e.dataPoint.label); // Drill-down
+                    }
                 }));
 
-                // Create and render the pie chart
-                const chart = new CanvasJS.Chart("trainingTypeChart", {
+                // Store main chart options for resetting later
+                mainTrainingChartOptions = {
                     animationEnabled: true,
                     theme: "light2",
                     data: [{
@@ -795,13 +1046,17 @@ $(document).ready(function () {
                         yValueFormatString: "#,##0",
                         dataPoints: chartData
                     }]
-                });
+                };
 
+                const chart = new CanvasJS.Chart("trainingTypeChart", mainTrainingChartOptions);
                 chart.render();
+
+                // Hide back button when rendering the main chart
+                $("#backButtonType").addClass("invisible");
+                isTrainingDrilldown = false; // Reset drilldown state
             },
             error: function (xhr, status, error) {
                 console.error("Error fetching data:", status, error);
-                // Generic error message for other errors
                 swal({
                     title: "An Error Occurred",
                     text: "Something went wrong. Please refresh your browser.",
@@ -810,6 +1065,110 @@ $(document).ready(function () {
             }
         });
     }
+
+    function showDrilldownTrainingTypeChart(type) {
+        const dateRange = $('#daterange').val();
+
+        const payload = {
+            periode: dateRange,
+            type: type,
+            _token: '{{ csrf_token() }}'
+        };
+
+        $.ajax({
+            url: "/api/chart-training-type-drilldown", // Adjust endpoint if necessary
+            type: "POST",
+            data: JSON.stringify(payload),
+            contentType: "application/json",
+            success: function (data) {
+                const chartData = data.map(item => ({
+                    label: item.label, // Period (Month-Year)
+                    y: item.y, // Total participants
+                    period: item.label // Store the period for drilldown
+                }));
+
+                const chart = new CanvasJS.Chart("trainingTypeChart", {
+                    animationEnabled: true,
+                    theme: "light2",
+                    title: {
+                        text: `Details for ${type}`,
+                        margin: 20
+                    },
+                    axisX: {
+                        title: "Details",
+                    },
+                    axisY: {
+                        title: "Number of Participants",
+                        includeZero: true
+                    },
+                    data: [{
+                        type: "column",
+                        dataPoints: chartData
+                    }]
+                });
+
+                chart.render();
+
+                // Show back button when drilldown is triggered
+                $("#backButtonType").removeClass("invisible");
+                isTrainingDrilldown = true;
+
+                // Add click event to chart data points for drilldown
+                chart.options.data[0].click = function (e) {
+                    const selectedPeriod = e.dataPoint.period; // Get the selected drilldown label (Period)
+                    fetchParticipantsByTrainingType(type, selectedPeriod); // Fetch participant data for the selected period
+                };
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching drilldown data:", status, error);
+                swal({
+                    title: "An Error Occurred",
+                    text: "Unable to fetch drilldown data.",
+                    icon: "error",
+                });
+            }
+        });
+    }
+
+    function fetchParticipantsByTrainingType(type, period) {
+        const dateRange = $('#daterange').val();
+
+        const payload = {
+            periode: dateRange,
+            type: type,
+            period: period, // Pass the selected period (Month-Year)
+            _token: '{{ csrf_token() }}'
+        };
+
+        $.ajax({
+            url: "/api/fetch-participants-by-training-type", // New endpoint to fetch participant details
+            type: "POST",
+            data: JSON.stringify(payload),
+            contentType: "application/json",
+            success: function (data) {
+                // Initialize the DataTable with participant data
+                initializeDataTable(data);
+
+                // Show the modal with participant details
+                $('#participantModal').modal('show');
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching participant data:", status, error);
+                swal({
+                    title: "An Error Occurred",
+                    text: "Unable to fetch participant data.",
+                    icon: "error",
+                });
+            }
+        });
+    }
+
+    // Back/Reset button functionality
+    $("#backButtonType").click(function () {
+        if (isTrainingDrilldown) {
+            refreshTrainingTypeChart(); // Call the main chart rendering function
+        }
+    });
 
     function refreshOverallChart() {
         const dateRange = $('#daterange').val(); // Default date range
@@ -833,6 +1192,7 @@ $(document).ready(function () {
             success: function (data) {
                 const chart = new CanvasJS.Chart("overallChart", {
                     animationEnabled: true,
+                    zoomEnabled: true,
                     theme: "light2",
                     axisX: {
                         title: "Month",
@@ -917,6 +1277,7 @@ $(document).ready(function () {
                 // Initialize the chart
                 const chart = new CanvasJS.Chart("certificateChart", {
                     animationEnabled: true,
+                    zoomEnabled: true,
                     theme: "light2",
                     axisX: {
                         title: "Month",
@@ -939,21 +1300,36 @@ $(document).ready(function () {
                             name: "Pending Certificates",
                             showInLegend: true,
                             legendText: "Pending Certificates",
-                            dataPoints: data.dataPointsRegisteredButNotYetIssued
+                            dataPoints: data.dataPointsRegisteredButNotYetIssued.map(point => ({
+                                ...point,
+                                click: function (e) {
+                                    handleBarClick(e);
+                                }
+                            }))
                         },
                         {
                             type: "stackedColumn",
                             name: "Issued Certificates",
                             showInLegend: true,
                             legendText: "Issued Certificates",
-                            dataPoints: data.dataPointsIssued
+                            dataPoints: data.dataPointsIssued.map(point => ({
+                                ...point,
+                                click: function (e) {
+                                    handleBarClick(e);
+                                }
+                            }))
                         },
                         {
                             type: "stackedColumn",
                             name: "Not Registered",
                             showInLegend: true,
                             legendText: "Not Registered",
-                            dataPoints: data.dataPointsPending
+                            dataPoints: data.dataPointsPending.map(point => ({
+                                ...point,
+                                click: function (e) {
+                                    handleBarClick(e);
+                                }
+                            }))
                         }
                     ]
                 });
@@ -978,6 +1354,122 @@ $(document).ready(function () {
         return label; // Return the original label if it's 2 words or less
     }
 });
+
+function handleBarClick(e) {
+    // Split the label to extract the month and year
+    const [month, year] = e.dataPoint.label.split(' '); // "Jun 2024" -> ["Jun", "2024"]
+    const status = e.dataSeries.name; // Get the status from the series name
+
+    console.log(`Clicked Bar - Month: ${month}, Year: ${year}, Status: ${status}`); // Debugging
+
+    // AJAX request to fetch data
+    $.ajax({
+        url: '/api/get-participants',
+        type: 'POST',
+        data: JSON.stringify({
+            month: month, // Correct month (e.g., "Jun")
+            year: year,   // Correct year (e.g., "2024")
+            status: status,
+            _token: '{{ csrf_token() }}' // Pass CSRF token
+        }),
+        contentType: 'application/json',
+        success: function (response) {
+            // Populate the table with Yajra DataTables
+            initializeDataTable(response.data);
+            // Show the modal
+            $('#participantModal').modal('show');
+        },
+        error: function (xhr, status, error) {
+            console.error('Error fetching participants:', status, error);
+        }
+    });
+}
+
+function initializeDataTable(data) {
+    // Destroy existing DataTable if already initialized
+    if ($.fn.DataTable.isDataTable('#participantTable')) {
+        $('#participantTable').DataTable().clear().destroy();
+    }
+
+    // Initialize the DataTable
+    $('#participantTable').DataTable({
+        data: data,
+        columns: [
+            { data: 'tgl_pelaksanaan', title: 'Tgl Pelaksanaan' },
+            { data: 'nama_peserta', title: 'Nama Peserta' },
+            { data: 'batch', title: 'Batch' },
+            { data: 'jenis_pelatihan', title: 'Jenis Pelatihan' },
+            { data: 'kategori_program', title: 'Kategori Program' },
+            { data: 'realisasi', title: 'Realisasi' }
+        ],
+        responsive: true,
+        pageLength: 10,
+        searching: true,
+        lengthChange: true
+    });
+}
+
+
+function handleStcwBarClick(e) {
+    handleBarClickFetchProcess(e, "STCW");
+}
+
+function handleNonStcwBarClick(e) {
+    handleBarClickFetchProcess(e, "NON STCW");
+}
+
+function handleBarClickFetchProcess(e, status) {
+    // Extract month and year from the clicked bar
+    const [month, year] = e.dataPoint.label.split(' ');
+
+    console.log(`Clicked Bar - Month: ${month}, Year: ${year}, Status: ${status}`); // Debugging
+
+    // AJAX request to fetch data
+    $.ajax({
+        url: '/api/get-participants-stcw-non',
+        type: 'POST',
+        data: JSON.stringify({
+            month: month,
+            year: year,
+            status: status,
+            _token: '{{ csrf_token() }}'
+        }),
+        contentType: 'application/json',
+        success: function (response) {
+            // Populate the table with DataTables
+            initializeParticipantDataTable(response.data);
+            // Show the modal
+            $('#participantModal').modal('show');
+        },
+        error: function (xhr, status, error) {
+            console.error('Error fetching participants:', status, error);
+        }
+    });
+}
+
+function initializeParticipantDataTable(data) {
+    // Destroy existing DataTable if already initialized
+    if ($.fn.DataTable.isDataTable('#participantTable')) {
+        $('#participantTable').DataTable().clear().destroy();
+    }
+
+    // Initialize the DataTable
+    $('#participantTable').DataTable({
+        data: data,
+        columns: [
+            { data: 'tgl_pelaksanaan', title: 'Tgl Pelaksanaan' },
+            { data: 'nama_peserta', title: 'Nama Peserta' },
+            { data: 'batch', title: 'Batch' },
+            { data: 'jenis_pelatihan', title: 'Jenis Pelatihan' },
+            { data: 'kategori_program', title: 'Kategori Program' },
+            { data: 'realisasi', title: 'Realisasi' }
+        ],
+        responsive: true,
+        pageLength: 10,
+        searching: true,
+        lengthChange: true
+    });
+}
 
 function closeImage() {
     document.getElementById('welcome-container').style.display = 'none';

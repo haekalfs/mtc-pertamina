@@ -226,19 +226,20 @@ font-weight-bold
             table.draw();
         });
 
-        $('#listCertificatesMaster').on('click', '.generateQR', function () {
-            var certficateId = $(this).data('id');
-            $.ajax({
-                url: '{{ route("generate-qr-certificate", "") }}/' + certficateId,
-                type: 'GET',
-                success: function(response) {
-                    $('#qrTitle').text(response.nama_peserta);
-                    $('#link').attr('href', response.link);  // Use .attr() to set the href attribute
-                    $('#qrCodeContainer').html('<img src="' + response.qr_code + '" alt="QR Code" />');  // Embed the QR code as an image
-                    $('#qrModal').modal('show');  // Show the modal
-                },
-                error: function() {
-                    alert('Failed to generate QR code.');
+        $('#listCertificatesMaster').on('click', '.go-to-certificate', function (e) {
+            e.preventDefault(); // Prevent the default link action
+
+            var url = $(this).attr('href'); // Get the href of the clicked link
+
+            swal({
+                title: "Are you sure?",
+                text: "You are about to view the certificate.",
+                icon: "info",
+                buttons: ["Cancel", "Go"],
+                dangerMode: true,
+            }).then((willProceed) => {
+                if (willProceed) {
+                    window.location.href = url; // Redirect to the route
                 }
             });
         });

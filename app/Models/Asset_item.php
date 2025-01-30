@@ -9,7 +9,7 @@ class Asset_item extends Model
 {
     use HasFactory;
     protected $table = "asset_items";
-    protected $fillable = ["id", "asset_code", "asset_condition_id", "isUsed", 'inventory_tool_id',"created_at", "updated_at"];
+    protected $fillable = ["id", "asset_code", "asset_condition_id", "isUsed", "asset_last_maintenance", "asset_next_maintenance", 'inventory_tool_id',"created_at", "updated_at"];
 
     public function tools(){
     	return $this->belongsTo('App\Models\Inventory_tools', 'inventory_tool_id', 'id')->withDefault();

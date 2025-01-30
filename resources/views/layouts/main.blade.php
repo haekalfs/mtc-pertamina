@@ -106,22 +106,22 @@
                     <li class="menu-item-has-children dropdown @yield('active-penlat') @yield('show-penlat')">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="menu-icon ti-layout-list-thumb-alt"></i> Master Data</a>
                         <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-penlat')">
-                            <li><i class="fa fa-list-alt"></i><a href="{{ route('penlat') }}" class="@yield('penlat')">List Pelatihan</a></li>
-                            <li class="pl-3"><i class="fa fa-folder pl-3"></i><a href="{{ route('batch-penlat') }}" class="@yield('batch-penlat')">Batch Pelatihan</a></li>
-                            <li><i class="fa fa-users"></i><a href="{{ route('participant-infographics') }}" class="@yield('participant-infographics')">Realisasi Peserta</a></li>
-                            <li><i class="fa fa-certificate"></i><a href="{{ route('certificate-number') }}" class="@yield('list-certificates')">Nomor Sertifikat</a></li>
+                            <li><i class="fa fa-list-alt"></i><a href="{{ route('penlat') }}" class="@yield('penlat')">List Training</a></li>
+                            <li class="pl-3"><i class="fa fa-folder pl-3"></i><a href="{{ route('batch-penlat') }}" class="@yield('batch-penlat')">Training Batches</a></li>
+                            <li><i class="fa fa-users"></i><a href="{{ route('participant-infographics') }}" class="@yield('participant-infographics')">Participants Realization</a></li>
+                            <li><i class="fa fa-certificate"></i><a href="{{ route('certificate-number') }}" class="@yield('list-certificates')">Certificates Number</a></li>
                         </ul>
                     </li>
                     @endusr_acc
                     @usr_acc(101)
                     <li class="menu-item-has-children dropdown @yield('active-operation') @yield('show-operation')">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="menu-icon fa fa-cogs"></i> Operasi</a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="menu-icon fa fa-cogs"></i> Operation</a>
                         <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-operation')">
                             <li><i class="fa fa-tachometer"></i><a href="{{ route('operation') }}" class="@yield('operation')">Dashboard</a></li>
-                            <li><i class="fa fa-fire-extinguisher"></i><a href="{{ route('tool-inventory') }}" class="@yield('tool-inventory')">Inventaris Alat</a></li>
-                            <li><i class="fa fa-building-o"></i><a href="{{ route('room-inventory') }}" class="@yield('room-inventory')">Inventaris Ruangan</a></li>
-                            <li><i class="fa fa-check-square-o"></i><a href="{{ route('tool-requirement-penlat') }}" class="@yield('tool-requirement-penlat')">Kebutuhan Alat Penlat</a></li>
-                            <li><i class="fa fa-cog"></i><a href="{{ route('utility') }}" class="@yield('utility')">Utilitas</a></li>
+                            <li><i class="fa fa-fire-extinguisher"></i><a href="{{ route('mainpage-inventory') }}" class="@yield('tool-inventory')">Inventory Tools</a></li>
+                            <li><i class="fa fa-building-o"></i><a href="{{ route('room-inventory') }}" class="@yield('room-inventory')">Inventory Rooms</a></li>
+                            <li><i class="fa fa-check-square-o"></i><a href="{{ route('tool-requirement-penlat') }}" class="@yield('tool-requirement-penlat')">Penlat Tools Requirement</a></li>
+                            <li><i class="fa fa-cog"></i><a href="{{ route('utility') }}" class="@yield('utility')">Utilities Usage</a></li>
                         </ul>
                     </li>
                     @endusr_acc
@@ -131,12 +131,12 @@
                         <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-pd')">
                             <li><i class="fa fa-tachometer"></i><a href="{{ route('plan-dev') }}" class="@yield('plan-dev')">Dashboard</a></li>
                             <li><i class="fa fa-trophy"></i><a href="{{ route('feedback-report-main') }}" class="@yield('feedback-report')">Feedback Report</a></li>
-                            <li><i class="fa fa-tag"></i><a href="{{ route('training-reference') }}" class="@yield('training-reference')">Referensi Pelatihan</a></li>
+                            <li><i class="fa fa-tag"></i><a href="{{ route('training-reference') }}" class="@yield('training-reference')">Training References</a></li>
                             {{-- <li><i class="fa fa-cog"></i><a href="#">Monitoring Approval</a></li> --}}
-                            <li><i class="fa fa-male"></i><a href="{{ route('instructor') }}" class="@yield('instructor')">Instruktur</a></li>
-                            <li><i class="fa fa-certificate"></i><a href="{{ route('certificate-main') }}" class="@yield('certificate')">Sertifikasi</a></li>
-                            <li><i class="fa fa-file-text"></i><a href="{{ route('monitoring-approval') }}" class="@yield('monitoring-approval')">Monitoring Approvals<span class="badge badge-danger badge-counter">2</span></a></li>
-                            <li><i class="fa fa-warning"></i><a href="{{ route('regulation') }}" class="@yield('regulation')">Regulasi</a></li>
+                            <li><i class="fa fa-male"></i><a href="{{ route('instructor') }}" class="@yield('instructor')">Instructors</a></li>
+                            <li><i class="fa fa-certificate"></i><a href="{{ route('certificate-main') }}" class="@yield('certificate')">Certifications</a></li>
+                            <li><i class="fa fa-file-text"></i><a href="{{ route('monitoring-approval') }}" class="@yield('monitoring-approval')">Monitoring Approvals @if ($monitoringCount != 0) <span class="badge badge-danger badge-counter">{{ $monitoringCount }}</span> @endif</a></li>
+                            <li><i class="fa fa-warning"></i><a href="{{ route('regulation') }}" class="@yield('regulation')">Regulations</a></li>
                         </ul>
                     </li>
                     @endusr_acc
@@ -156,7 +156,7 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-money"></i>Finance</a>
                         <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-finance')">
                             <li><i class="fa fa-tachometer"></i><a href="{{ route('finance') }}" class="@yield('finance')">Dashboard</a></li>
-                            <li><i class="fa fa-list-alt"></i><a href="{{ route('vendor-payment') }}" class="@yield('vendor-payment')">Pembayaran Vendor</a></li>
+                            <li><i class="fa fa-list-alt"></i><a href="{{ route('vendor-payment') }}" class="@yield('vendor-payment')">Vendor Payments</a></li>
                             <li><i class="ti-stats-down"></i><a href="{{ route('profits') }}" class="@yield('cost')">Profits & Loss</a></li>
                         </ul>
                     </li>
@@ -167,7 +167,7 @@
                         <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-kpi')">
                             <li><i class="fa fa-tachometer"></i><a href="{{ route('kpi') }}" class="@yield('kpi')">Dashboard</a></li>
                             <li><i class="fa fa-cog"></i><a href="{{ route('manage-kpi') }}" class="@yield('manage-kpi')">Manage KPI</a></li>
-                            <li><i class="fa fa-file"></i><a href="{{ route('report-kpi') }}" class="@yield('report-kpi')">Laporan</a></li>
+                            <li><i class="fa fa-file"></i><a href="{{ route('report-kpi') }}" class="@yield('report-kpi')">Report</a></li>
                         </ul>
                     </li>
                     @endusr_acc
@@ -176,8 +176,8 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-star-half-empty"></i>Akhlak</a>
                         <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-akhlak')">
                             <li><i class="ti-signal"></i><a href="{{ route('morning-briefing') }}" class="@yield('morning-briefing')">Morning Briefing</a></li>
-                            <li><i class="ti-stats-up"></i><a href="{{ route('akhlak.achievements') }}" class="@yield('akhlak')">Pencapaian AKHLAK</a></li>
-                            <li><i class="fa fa-file"></i><a href="{{ route('report-akhlak') }}" class="@yield('report-akhlak')">Laporan</a></li>
+                            <li><i class="ti-stats-up"></i><a href="{{ route('akhlak.achievements') }}" class="@yield('akhlak')">AKHLAK Achievements</a></li>
+                            <li><i class="fa fa-file"></i><a href="{{ route('report-akhlak') }}" class="@yield('report-akhlak')">Report</a></li>
                         </ul>
                     </li>
                     @endusr_acc
@@ -188,8 +188,8 @@
                     <li class="menu-item-has-children dropdown @yield('active-templates') @yield('show-templates')">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="menu-icon ti-layout-list-thumb-alt"></i> Templates</a>
                         <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-templates')">
-                            <li><i class="fa fa-gears"></i><a href="{{ route('list-utilities') }}" class="@yield('list-utilitas')">List Utilitas</a></li>
-                            <li><i class="fa fa-map-marker"></i><a href="{{ route('list-location') }}" class="@yield('list-lokasi')">List Lokasi</a></li>
+                            <li><i class="fa fa-gears"></i><a href="{{ route('list-utilities') }}" class="@yield('list-utilitas')">List Utilities</a></li>
+                            <li><i class="fa fa-map-marker"></i><a href="{{ route('list-location') }}" class="@yield('list-lokasi')">List Locations</a></li>
                             <li><i class="fa fa-gavel"></i><a href="{{ route('list-amendment') }}" class="@yield('list-amendment')">List Regulator Amendment</a></li>
                         </ul>
                     </li>

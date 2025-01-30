@@ -18,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Yajra\DataTables\Facades\DataTables;
 
 class DashboardController extends Controller
 {
@@ -173,10 +174,14 @@ class DashboardController extends Controller
         foreach ($months as $month) {
             $dataPoints1[] = [
                 "label" => Carbon::createFromFormat('Y-m', $month)->format('M Y'),
+                "month" => Carbon::createFromFormat('Y-m', $month)->format('m'),
+                "year" => Carbon::createFromFormat('Y-m', $month)->year,
                 "y" => $dataByMonthSTCW[$month] ?? 0
             ];
             $dataPoints2[] = [
                 "label" => Carbon::createFromFormat('Y-m', $month)->format('M Y'),
+                "month" => Carbon::createFromFormat('Y-m', $month)->format('m'),
+                "year" => Carbon::createFromFormat('Y-m', $month)->year,
                 "y" => $dataByMonthNonSTCW[$month] ?? 0
             ];
         }
@@ -191,25 +196,23 @@ class DashboardController extends Controller
     {
         $periode = $request->input('periode', '2024-01-01 - 2024-12-31'); // Default range
         $type = $request->input('type');
-        [$startDate, $endDate] = explode(' - ', $periode); // Split into start and end dates
+        [$startDate, $endDate] = explode(' - ', $periode);
 
-        // Query profits within the selected date range
-        $profits = Profit::select(
-                'penlat.description', // Get the description from Penlat
-                DB::raw('SUM(CAST(profits.total_biaya_pendaftaran_peserta AS UNSIGNED)) as total_biaya')
+        $profits = Infografis_peserta::select(
+                'penlat.description',
+                DB::raw('SUM(CAST(infografis_peserta.harga_pelatihan AS UNSIGNED)) as total_biaya')
             )
-            ->join('penlat_batch', 'profits.pelaksanaan', '=', 'penlat_batch.batch') // Join with penlat_batch
-            ->join('penlat', 'penlat_batch.penlat_id', '=', 'penlat.id') // Join with penlat
-            ->whereBetween('profits.tgl_pelaksanaan', [$startDate, $endDate]) // Filter by date range
+            ->join('penlat_batch', 'infografis_peserta.batch', '=', 'penlat_batch.batch')
+            ->join('penlat', 'penlat_batch.penlat_id', '=', 'penlat.id')
+            ->whereBetween('infografis_peserta.tgl_pelaksanaan', [$startDate, $endDate])
             ->when($type && $type != '-1', function ($query) use ($type) {
-                // Apply type filter if a valid type is selected
                 $query->where('penlat.jenis_pelatihan', $type);
             })
-            ->groupBy('penlat_batch.penlat_id', 'penlat.description') // Group by penlat_id and description
-            ->orderByDesc('total_biaya') // Order by total_biaya
+            ->groupBy('penlat_batch.penlat_id', 'penlat.description')
+            ->orderBy('total_biaya', 'desc')
+            ->limit(10)
             ->get();
 
-        // Map results for JSON response
         $chartData = $profits->map(function ($item) {
             return [
                 "label" => $item->description,
@@ -218,6 +221,67 @@ class DashboardController extends Controller
         });
 
         return response()->json($chartData);
+    }
+
+    public function fetchDrilldownRevenueData(Request $request)
+    {
+        $periode = $request->input('periode', '2024-01-01 - 2024-12-31');
+        $description = $request->input('description');
+        [$startDate, $endDate] = explode(' - ', $periode);
+
+        // Query the participants grouped by month and year for the selected location
+        $drilldownData = Infografis_peserta::select(
+                DB::raw("DATE_FORMAT(tgl_pelaksanaan, '%Y-%m') as month_year"), // Month-Year format
+                DB::raw('count(*) as total')
+            )
+            ->join('penlat_batch', 'infografis_peserta.batch', '=', 'penlat_batch.batch')
+            ->join('penlat', 'penlat_batch.penlat_id', '=', 'penlat.id')
+            ->whereBetween('tgl_pelaksanaan', [$startDate, $endDate])
+            ->where('penlat.description', $description)
+            ->groupBy('month_year')
+            ->orderBy('month_year')
+            ->get();
+
+        // Map results for JSON response
+        $chartData = $drilldownData->map(function ($item) {
+            return [
+                "label" => $item->month_year, // Month-Year
+                "y" => (int) $item->total // Number of participants
+            ];
+        });
+
+        return response()->json($chartData);
+    }
+
+    public function fetchParticipantsByRevenue(Request $request)
+    {
+        $periode = $request->input('periode', '2024-01-01 - 2024-12-31'); // Default date range
+        $description = $request->input('description');
+        $period = $request->input('period');
+        [$startDate, $endDate] = explode(' - ', $periode);
+
+        // Query participants for the selected location and period
+        $participants = Infografis_peserta::whereBetween('tgl_pelaksanaan', [$startDate, $endDate]) // Filter by date range
+            ->join('penlat_batch', 'infografis_peserta.batch', '=', 'penlat_batch.batch')
+            ->join('penlat', 'penlat_batch.penlat_id', '=', 'penlat.id')
+            ->whereBetween('tgl_pelaksanaan', [$startDate, $endDate])
+            ->where('penlat.description', $description)
+            ->where(DB::raw("DATE_FORMAT(tgl_pelaksanaan, '%Y-%m')"), '=', $period) // Filter by period (Month-Year)
+            ->get(); // Select relevant fields
+
+        // Map results for JSON response
+        $participantData = $participants->map(function ($item) {
+            return [
+                'tgl_pelaksanaan' => $item->tgl_pelaksanaan,
+                'nama_peserta' => $item->nama_peserta,
+                'batch' => $item->batch,
+                'jenis_pelatihan' => $item->jenis_pelatihan,
+                'kategori_program' => $item->kategori_program,
+                'realisasi' => $item->realisasi,
+            ];
+        });
+
+        return response()->json($participantData);
     }
 
     public function fetchLocationChartData(Request $request)
@@ -254,6 +318,62 @@ class DashboardController extends Controller
         return response()->json($chartData);
     }
 
+    public function fetchDrilldownChartData(Request $request)
+    {
+        $periode = $request->input('periode', '2024-01-01 - 2024-12-31');
+        $location = $request->input('location');
+        [$startDate, $endDate] = explode(' - ', $periode);
+
+        // Query the participants grouped by month and year for the selected location
+        $drilldownData = Infografis_peserta::select(
+                DB::raw("DATE_FORMAT(tgl_pelaksanaan, '%Y-%m') as month_year"), // Month-Year format
+                DB::raw('count(*) as total')
+            )
+            ->whereBetween('tgl_pelaksanaan', [$startDate, $endDate])
+            ->where('tempat_pelaksanaan', $location)
+            ->groupBy('month_year')
+            ->orderBy('month_year')
+            ->get();
+
+        // Map results for JSON response
+        $chartData = $drilldownData->map(function ($item) {
+            return [
+                "label" => $item->month_year, // Month-Year
+                "y" => (int) $item->total // Number of participants
+            ];
+        });
+
+        return response()->json($chartData);
+    }
+
+    public function fetchParticipantsByLocation(Request $request)
+    {
+        $periode = $request->input('periode', '2024-01-01 - 2024-12-31'); // Default date range
+        $location = $request->input('location');
+        $period = $request->input('period');
+        [$startDate, $endDate] = explode(' - ', $periode);
+
+        // Query participants for the selected location and period
+        $participants = Infografis_peserta::whereBetween('tgl_pelaksanaan', [$startDate, $endDate]) // Filter by date range
+            ->where('tempat_pelaksanaan', $location) // Filter by location
+            ->where(DB::raw("DATE_FORMAT(tgl_pelaksanaan, '%Y-%m')"), '=', $period) // Filter by period (Month-Year)
+            ->get(['tgl_pelaksanaan', 'nama_peserta', 'batch', 'jenis_pelatihan', 'kategori_program', 'realisasi']); // Select relevant fields
+
+        // Map results for JSON response
+        $participantData = $participants->map(function ($item) {
+            return [
+                'tgl_pelaksanaan' => $item->tgl_pelaksanaan,
+                'nama_peserta' => $item->nama_peserta,
+                'batch' => $item->batch,
+                'jenis_pelatihan' => $item->jenis_pelatihan,
+                'kategori_program' => $item->kategori_program,
+                'realisasi' => $item->realisasi,
+            ];
+        });
+
+        return response()->json($participantData);
+    }
+
     public function fetchTrainingTypeChartData(Request $request)
     {
         $periode = $request->input('periode', '2024-01-01 - 2024-12-31'); // Default date range
@@ -286,6 +406,63 @@ class DashboardController extends Controller
         });
 
         return response()->json($chartData);
+    }
+
+    public function fetchTrainingTypeDrilldownData(Request $request)
+    {
+        $periode = $request->input('periode', '2024-01-01 - 2024-12-31'); // Default date range
+        $type = $request->input('type'); // Selected type
+        [$startDate, $endDate] = explode(' - ', $periode); // Split into start and end dates
+
+        // Query for drilldown data
+        $drilldownData = Infografis_peserta::select(
+                DB::raw('DATE_FORMAT(tgl_pelaksanaan, "%Y-%m") as period'), // Group by month
+                DB::raw('count(*) as total') // Count participants
+            )
+            ->whereBetween('tgl_pelaksanaan', [$startDate, $endDate]) // Filter by date range
+            ->where('jenis_pelatihan', $type) // Filter by type
+            ->groupBy('period') // Group by period
+            ->orderBy('period', 'asc') // Order by period
+            ->get();
+
+        // Map results for JSON response
+        $chartData = $drilldownData->map(function ($item) {
+            return [
+                "label" => $item->period, // Period (Month-Year)
+                "y" => (int) $item->total // Total participants
+            ];
+        });
+
+        return response()->json($chartData);
+    }
+
+    public function fetchParticipantsByTrainingType(Request $request)
+    {
+        $periode = $request->input('periode', '2024-01-01 - 2024-12-31'); // Default date range
+        $type = $request->input('type'); // Selected type
+        $period = $request->input('period'); // The selected period for drilldown (Month-Year)
+
+        [$startDate, $endDate] = explode(' - ', $periode); // Split into start and end dates
+
+        // Query participants for the selected training type and period
+        $participants = Infografis_peserta::whereBetween('tgl_pelaksanaan', [$startDate, $endDate]) // Filter by date range
+            ->where('jenis_pelatihan', $type) // Filter by training type
+            ->where(DB::raw('DATE_FORMAT(tgl_pelaksanaan, "%Y-%m")'), $period) // Filter by period (Month-Year)
+            ->get(['tgl_pelaksanaan', 'nama_peserta', 'batch', 'jenis_pelatihan', 'kategori_program', 'realisasi']); // Select relevant fields
+
+        // Map results for JSON response
+        $participantData = $participants->map(function ($item) {
+            return [
+                'tgl_pelaksanaan' => $item->tgl_pelaksanaan,
+                'nama_peserta' => $item->nama_peserta,
+                'batch' => $item->batch,
+                'jenis_pelatihan' => $item->jenis_pelatihan,
+                'kategori_program' => $item->kategori_program,
+                'realisasi' => $item->realisasi,
+            ];
+        });
+
+        return response()->json($participantData);
     }
 
     public function fetchOverallData(Request $request)
@@ -526,14 +703,17 @@ class DashboardController extends Controller
             $dataPointsRegisteredButNotYetIssued[] = [
                 "label" => Carbon::createFromFormat('Y-m', $month)->format('M Y'),
                 "y" => $registeredButNotYetIssued,
+                "year" => Carbon::createFromFormat('Y-m', $month)->year,
             ];
             $dataPointsIssued[] = [
                 "label" => Carbon::createFromFormat('Y-m', $month)->format('M Y'),
                 "y" => $issued,
+                "year" => Carbon::createFromFormat('Y-m', $month)->year,
             ];
             $dataPointsPending[] = [
                 "label" => Carbon::createFromFormat('Y-m', $month)->format('M Y'),
                 "y" => $pending,
+                "year" => Carbon::createFromFormat('Y-m', $month)->year,
             ];
         }
 
@@ -542,5 +722,63 @@ class DashboardController extends Controller
             "dataPointsIssued" => $dataPointsIssued,
             "dataPointsPending" => $dataPointsPending,
         ]);
+    }
+
+    public function getChartDetail(Request $request)
+    {
+        $month = Carbon::parse($request->month)->month; // Convert month name to number
+        $year = $request->year;
+        $status = $request->status;
+
+        // Base query filtered by month and year
+        $query = Infografis_peserta::query()
+            ->whereMonth('tgl_pelaksanaan', $month)
+            ->whereYear('tgl_pelaksanaan', $year);
+
+        // Adjust query based on status using the relationship
+        if ($status === 'Pending Certificates') {
+            $query->whereHas('certificateCheck', function ($q) {
+                $q->whereNull('status')->orWhere('status', 0);
+            });
+        } elseif ($status === 'Issued Certificates') {
+            $query->whereHas('certificateCheck', function ($q) {
+                $q->where('status', 1);
+            });
+        } elseif ($status === 'Not Registered') {
+            $query->doesntHave('certificateCheck');
+        }
+
+        // Return data for Yajra DataTables
+        return DataTables::of($query)
+            ->addColumn('tgl_pelaksanaan', function ($row) {
+                return Carbon::parse($row->tgl_pelaksanaan)->format('d-m-Y');
+            })
+            ->make(true);
+    }
+
+    public function getParticipants(Request $request)
+    {
+        $month = Carbon::parse($request->month)->month; // Convert month name to number
+        $year = $request->year;
+        $status = $request->status;
+
+        // Base query filtered by month and year
+        $query = Infografis_peserta::query()
+            ->whereMonth('tgl_pelaksanaan', $month)
+            ->whereYear('tgl_pelaksanaan', $year);
+
+        // Apply filters based on status
+        if ($status === 'STCW') {
+            $query->where('kategori_program', 'STCW');
+        } elseif ($status === 'NON STCW') {
+            $query->where('kategori_program', 'NON STCW');
+        }
+
+        // Return the DataTable response
+        return DataTables::of($query)
+            ->editColumn('tgl_pelaksanaan', function ($row) {
+                return Carbon::parse($row->tgl_pelaksanaan)->format('d-m-Y');
+            })
+            ->make(true);
     }
 }

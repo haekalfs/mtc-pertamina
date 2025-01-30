@@ -39,9 +39,8 @@ class CertificateController extends Controller
 
             return datatables()->eloquent($query)
                 ->addColumn('action', function ($certificate) {
-                    return '<a class="btn btn-outline-success btn-md mb-2 mr-2 generateQR" href="javascript:void(0)"
-                                data-id="' . $certificate->id . '">
-                                <i class="fa fa-qrcode"></i>
+                    return '<a class="btn btn-outline-secondary btn-md mb-2 mr-2 go-to-certificate" href="' . route('preview-certificate', ['id' => $certificate->penlat_certificate_id]) . '">
+                                <i class="fa fa-share"></i>
                             </a>';
                 })
                 ->addColumn('penlatBatch', function ($certificate) {
