@@ -660,6 +660,7 @@ $(document).ready(function () {
                 const chart = new CanvasJS.Chart("barChart", {
                     animationEnabled: true,
                     zoomEnabled: true,
+                    exportEnabled: true,
                     theme: "light2",
                     axisX: {
                         interval: 1,
@@ -743,6 +744,7 @@ $(document).ready(function () {
                 mainRevenueChartOptions = {
                     animationEnabled: true,
                     zoomEnabled: true,
+                    exportEnabled: true,
                     theme: "light2",
                     axisY: { title: "Revenue" },
                     data: [{
@@ -790,6 +792,7 @@ $(document).ready(function () {
 
                 const chart = new CanvasJS.Chart("trendRevenueChart", {
                     animationEnabled: true,
+                    exportEnabled: true,
                     theme: "light2",
                     title: { text: `Details for ${description}` },
                     axisX: { title: "Date" },
@@ -873,6 +876,7 @@ $(document).ready(function () {
                 mainChartOptions = {
                     animationEnabled: true,
                     zoomEnabled: true,
+                    exportEnabled: true,
                     theme: "light2",
                     axisY: {
                         title: "Number of Participants",
@@ -926,6 +930,7 @@ $(document).ready(function () {
 
                 const chart = new CanvasJS.Chart("locationChart", {
                     animationEnabled: true,
+                    exportEnabled: true,
                     theme: "light2",
                     title: {
                         text: `Participants in ${location}`,
@@ -1037,6 +1042,7 @@ $(document).ready(function () {
                 // Store main chart options for resetting later
                 mainTrainingChartOptions = {
                     animationEnabled: true,
+                    exportEnabled: true,
                     theme: "light2",
                     data: [{
                         type: "pie",
@@ -1089,6 +1095,7 @@ $(document).ready(function () {
 
                 const chart = new CanvasJS.Chart("trainingTypeChart", {
                     animationEnabled: true,
+                    exportEnabled: true,
                     theme: "light2",
                     title: {
                         text: `Details for ${type}`,
@@ -1192,6 +1199,7 @@ $(document).ready(function () {
             success: function (data) {
                 const chart = new CanvasJS.Chart("overallChart", {
                     animationEnabled: true,
+                    exportEnabled: true,
                     zoomEnabled: true,
                     theme: "light2",
                     axisX: {
@@ -1277,6 +1285,7 @@ $(document).ready(function () {
                 // Initialize the chart
                 const chart = new CanvasJS.Chart("certificateChart", {
                     animationEnabled: true,
+                    exportEnabled: true,
                     zoomEnabled: true,
                     theme: "light2",
                     axisX: {
@@ -1357,10 +1366,8 @@ $(document).ready(function () {
 
 function handleBarClick(e) {
     // Split the label to extract the month and year
-    const [month, year] = e.dataPoint.label.split(' '); // "Jun 2024" -> ["Jun", "2024"]
+    const [year, month] = e.dataPoint.label.split('-'); // "Jun 2024" -> ["Jun", "2024"]
     const status = e.dataSeries.name; // Get the status from the series name
-
-    console.log(`Clicked Bar - Month: ${month}, Year: ${year}, Status: ${status}`); // Debugging
 
     // AJAX request to fetch data
     $.ajax({
@@ -1420,9 +1427,7 @@ function handleNonStcwBarClick(e) {
 
 function handleBarClickFetchProcess(e, status) {
     // Extract month and year from the clicked bar
-    const [month, year] = e.dataPoint.label.split(' ');
-
-    console.log(`Clicked Bar - Month: ${month}, Year: ${year}, Status: ${status}`); // Debugging
+    const [year, month] = e.dataPoint.label.split('-');
 
     // AJAX request to fetch data
     $.ajax({

@@ -108,7 +108,7 @@
                         <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-penlat')">
                             <li><i class="fa fa-list-alt"></i><a href="{{ route('penlat') }}" class="@yield('penlat')">List Training</a></li>
                             <li class="pl-3"><i class="fa fa-folder pl-3"></i><a href="{{ route('batch-penlat') }}" class="@yield('batch-penlat')">Training Batches</a></li>
-                            <li><i class="fa fa-users"></i><a href="{{ route('participant-infographics') }}" class="@yield('participant-infographics')">Participants Realization</a></li>
+                            <li><i class="fa fa-users"></i><a href="{{ route('participant-infographics') }}" class="@yield('participant-infographics')">Training Participants</a></li>
                             <li><i class="fa fa-certificate"></i><a href="{{ route('certificate-number') }}" class="@yield('list-certificates')">Certificates Number</a></li>
                         </ul>
                     </li>

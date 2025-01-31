@@ -173,13 +173,13 @@ class DashboardController extends Controller
         $dataPoints2 = [];
         foreach ($months as $month) {
             $dataPoints1[] = [
-                "label" => Carbon::createFromFormat('Y-m', $month)->format('M Y'),
+                "label" => $month,
                 "month" => Carbon::createFromFormat('Y-m', $month)->format('m'),
                 "year" => Carbon::createFromFormat('Y-m', $month)->year,
                 "y" => $dataByMonthSTCW[$month] ?? 0
             ];
             $dataPoints2[] = [
-                "label" => Carbon::createFromFormat('Y-m', $month)->format('M Y'),
+                "label" => $month,
                 "month" => Carbon::createFromFormat('Y-m', $month)->format('m'),
                 "year" => Carbon::createFromFormat('Y-m', $month)->year,
                 "y" => $dataByMonthNonSTCW[$month] ?? 0
@@ -500,7 +500,7 @@ class DashboardController extends Controller
         $dataPoints = [];
         foreach ($months as $month) {
             $dataPoints[] = [
-                "label" => Carbon::createFromFormat('Y-m', $month)->format('M Y'),
+                "label" => $month,
                 "y" => $dataByMonth[$month] ?? 0
             ];
         }
@@ -701,17 +701,17 @@ class DashboardController extends Controller
             $pending = $dataByMonth[$month]['pending'] ?? 0;
 
             $dataPointsRegisteredButNotYetIssued[] = [
-                "label" => Carbon::createFromFormat('Y-m', $month)->format('M Y'),
+                "label" => $month,
                 "y" => $registeredButNotYetIssued,
                 "year" => Carbon::createFromFormat('Y-m', $month)->year,
             ];
             $dataPointsIssued[] = [
-                "label" => Carbon::createFromFormat('Y-m', $month)->format('M Y'),
+                "label" => $month,
                 "y" => $issued,
                 "year" => Carbon::createFromFormat('Y-m', $month)->year,
             ];
             $dataPointsPending[] = [
-                "label" => Carbon::createFromFormat('Y-m', $month)->format('M Y'),
+                "label" => $month,
                 "y" => $pending,
                 "year" => Carbon::createFromFormat('Y-m', $month)->year,
             ];
@@ -726,7 +726,7 @@ class DashboardController extends Controller
 
     public function getChartDetail(Request $request)
     {
-        $month = Carbon::parse($request->month)->month; // Convert month name to number
+        $month = $request->month; // Convert month name to number
         $year = $request->year;
         $status = $request->status;
 
@@ -758,7 +758,7 @@ class DashboardController extends Controller
 
     public function getParticipants(Request $request)
     {
-        $month = Carbon::parse($request->month)->month; // Convert month name to number
+        $month = $request->month; // Convert month name to number
         $year = $request->year;
         $status = $request->status;
 
