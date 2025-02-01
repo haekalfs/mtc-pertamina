@@ -93,7 +93,7 @@ font-weight-bold
                                 <td>{{ $item->instructor->feedbacks->count() / 5 }} Feedbacks</td>
                                 <td class="actions text-center">
                                     <div>
-                                        <a class="btn btn-outline-secondary btn-sm mr-2" href="{{ route('preview-instructor', ['id' => $item->instructor->id, 'penlatId' => '0']) }}"><i class="menu-Logo fa fa-eye"></i> Preview</a>
+                                        <a class="btn btn-outline-secondary btn-sm mr-2" href="{{ route('preview-instructor', ['id' => $item->instructor->id, 'penlatId' => '0']) }}"><i class="fa fa-external-link"></i> Preview</a>
                                     </div>
                                 </td>
                             </tr>

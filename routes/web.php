@@ -96,6 +96,7 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
             Route::get('/download-file/{filepath}', [DownloadController::class, 'downloadFile'])->name('download.file');
             Route::post('/api/fetchAmountData', [DashboardController::class, 'fetchAmountData'])->name('fetchAmountData');
             Route::post('/api/chart-bar-data', [DashboardController::class, 'fetchChartsData'])->name('fetchChartData');
+
             Route::post('/api/chart-trend-revenue-data', [DashboardController::class, 'fetchTrendRevenueData']);
             Route::post('/api/chart-drilldown-revenue-data', [DashboardController::class, 'fetchDrilldownRevenueData']);
             Route::post('/api/fetch-participants-by-revenue', [DashboardController::class, 'fetchParticipantsByRevenue']);

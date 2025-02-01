@@ -122,7 +122,7 @@ font-weight-bold
                                 <td>{{ $item->keterangan }}</td>
                                 <td>{{ $item->total_issued }}</td>
                                 <td class="text-center">
-                                    <a class="btn btn-outline-secondary btn-sm mr-2" href="{{ route('preview-certificate-catalog', $item->id) }}"><i class="menu-Logo fa fa-eye"></i> View</a>
+                                    <a class="btn btn-outline-secondary btn-sm mr-2" href="{{ route('preview-certificate-catalog', $item->id) }}"><i class="fa fa-external-link"></i> View</a>
                                     <a class="btn btn-outline-danger text-danger btn-sm delete-instructor-certificate" data-id="{{ $item->id }}">
                                         <i class="fa fa-trash-o"></i> Delete
                                     </a>

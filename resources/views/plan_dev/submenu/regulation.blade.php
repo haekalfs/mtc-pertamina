@@ -85,13 +85,13 @@ font-weight-bold
                                         <div class="card mb-3">
                                             <div class="card-body custom-card" style="position: relative;">
                                                 <a href="{{ route('preview-regulation', $item->id) }}" class="position-absolute" style="top: 10px; right: 10px; z-index: 10;">
-                                                    <i class="fa fa-share fa-lg text-secondary"></i>
+                                                    <i class="fa fa-external-link fa-lg text-secondary"></i>
                                                 </a>
                                                 <div class="row no-gutters">
                                                     <div class="col-md-12 mt-2">
                                                         <h5 class="card-title text-secondary font-weight-bold">{{ $item->description }}</h5>
                                                         <p>Status : <span class="badge {{ $item->statuses->badge }}">{{ $item->statuses->description }}</span></p>
-                                                        <a href="{{ asset($item->filepath) }}" class="card-text"><u>Lampiran Dokumen</u> <i class="fa fa-external-link fa-sm"></i> <small>{{ $item->filesize }} Kb</small></a>
+                                                        <a href="{{ asset($item->filepath) }}" class="card-text"><i class="fa fa-file-text fa-sm"></i> <u>Lampiran Dokumen</u> <small>{{ $item->filesize }} Kb</small></a>
                                                     </div>
                                                 </div>
                                             </div>

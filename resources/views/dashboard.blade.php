@@ -498,6 +498,7 @@ active font-weight-bold
                             <th>Batch</th>
                             <th>Jenis Pelatihan</th>
                             <th>Kategori Program</th>
+                            <th>Harga Pelatihan</th>
                             <th>Realisasi</th>
                         </tr>
                     </thead>
@@ -1366,7 +1367,7 @@ $(document).ready(function () {
 
 function handleBarClick(e) {
     // Split the label to extract the month and year
-    const [year, month] = e.dataPoint.label.split('-'); // "Jun 2024" -> ["Jun", "2024"]
+    const [month, year] = e.dataPoint.label.split(' ');
     const status = e.dataSeries.name; // Get the status from the series name
 
     // AJAX request to fetch data
@@ -1407,6 +1408,7 @@ function initializeDataTable(data) {
             { data: 'batch', title: 'Batch' },
             { data: 'jenis_pelatihan', title: 'Jenis Pelatihan' },
             { data: 'kategori_program', title: 'Kategori Program' },
+            { data: 'harga_pelatihan', title: 'Harga Pelatihan' },
             { data: 'realisasi', title: 'Realisasi' }
         ],
         responsive: true,
@@ -1427,7 +1429,7 @@ function handleNonStcwBarClick(e) {
 
 function handleBarClickFetchProcess(e, status) {
     // Extract month and year from the clicked bar
-    const [year, month] = e.dataPoint.label.split('-');
+    const [month, year] = e.dataPoint.label.split(' ');
 
     // AJAX request to fetch data
     $.ajax({
@@ -1467,6 +1469,7 @@ function initializeParticipantDataTable(data) {
             { data: 'batch', title: 'Batch' },
             { data: 'jenis_pelatihan', title: 'Jenis Pelatihan' },
             { data: 'kategori_program', title: 'Kategori Program' },
+            { data: 'harga_pelatihan', title: 'Harga Pelatihan' },
             { data: 'realisasi', title: 'Realisasi' }
         ],
         responsive: true,

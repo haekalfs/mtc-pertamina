@@ -394,7 +394,7 @@ class PDController extends Controller
                 })
                 ->addColumn('action', function($item) {
                     return '
-                        <a class="btn btn-outline-secondary mr-2 btn-sm" href="'.route('preview-certificate', $item->id).'"><i class="menu-Logo fa fa-eye"></i> Preview</a>
+                        <a class="btn btn-outline-secondary mr-2 btn-sm" href="'.route('preview-certificate', $item->id).'"><i class="menu-Logo fa fa-external-link"></i> Preview</a>
                         <button class="btn btn-outline-danger btn-sm delete-certificate" data-id="'.$item->id.'"><i class="fa fa-trash"></i> Delete</button>
                     ';
                 })
@@ -547,7 +547,7 @@ class PDController extends Controller
                     $editUrl = route('edit-instructor', $row->id);
                     return '
                         <a class="btn btn-outline-secondary btn-sm mr-2" href="' . $editUrl . '"><i class="fa fa-edit"></i> Update</a>
-                        <a class="btn btn-outline-secondary btn-sm" href="' . $previewUrl . '"><i class="fa fa-info-circle"></i> Preview</a>
+                        <a class="btn btn-outline-secondary btn-sm" href="' . $previewUrl . '"><i class="fa fa-external-link"></i> Preview</a>
                     ';
                 })
             ->rawColumns(['rate', 'action'])

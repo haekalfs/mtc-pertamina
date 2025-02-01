@@ -88,16 +88,18 @@ font-weight-bold
                         </div>
                     </form>
                     <div class="table-responsive">
-                        <table id="dataTable" class="table table-bordered mt-4 zoom90">
+                        <table id="agreementDatatable" class="table table-bordered mt-4 zoom90">
                             <thead class="thead-light">
                                 <tr>
+                                    <th>#</th>
                                     <th>Agreement</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody>@php $no = 1; @endphp
                                 @foreach($data as $item)
                                 <tr>
+                                    <td>{{ $no++ }}</td>
                                     <td data-th="Product">
                                         <div class="row">
                                             <div class="col-md-4 d-flex justify-content-center align-items-center text-center p-3">
@@ -132,7 +134,7 @@ font-weight-bold
                                     </td>
                                     <td class="actions text-center">
                                         <div>
-                                            <a class="btn btn-outline-secondary btn-sm" href="{{ route('preview-company', $item->id) }}"><i class="fa fa-info-circle"></i> Preview Agreement</a>
+                                            <a class="btn btn-outline-secondary btn-sm" href="{{ route('preview-company', $item->id) }}"><i class="fa fa-external-link"></i> Preview Agreement</a>
                                         </div>
                                     </td>
                                 </tr>

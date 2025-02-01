@@ -103,7 +103,7 @@ font-weight-bold
                                                         <!-- If the next approval date has passed, show "0 Days Left" -->
                                                         <span class="badge badge-danger ml-3">0 Days Left</span>
                                                     @endif
-                                                    <i class="fa fa-share fa-lg text-secondary ml-2"></i>
+                                                    <i class="fa fa-external-link fa-lg text-secondary ml-2"></i>
                                                 </a>
                                                 <div class="row no-gutters">
                                                     <div class="col-md-2 d-flex justify-content-center align-items-center text-center">
@@ -122,7 +122,7 @@ font-weight-bold
                                                             <p class="mb-1">Type : {{ $item->type }}</p>
                                                             <p class="mb-2">Approved Date : {{ $approvalDate->format('d-M-Y') }}</p>
 
-                                                            <a href="{{ asset($item->filepath) }}" class="card-text"><u>Lampiran Dokumen</u> <i class="fa fa-external-link fa-sm"></i> <small>{{ $item->filesize }} Kb</small></a>
+                                                            <a href="{{ asset($item->filepath) }}" class="card-text"><i class="fa fa-file-text fa-sm"></i> <u>Lampiran Dokumen</u> <small>{{ $item->filesize }} Kb</small></a>
                                                         </div>
                                                     </div>
                                                 </div>
