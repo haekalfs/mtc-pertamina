@@ -97,6 +97,7 @@ font-weight-bold
                     <table id="docLetter" class="table table-bordered">
                         <thead class="thead-light">
                             <tr>
+                                <th>#</th>
                                 <th>Judul Sertifikat</th>
                                 <th>Issuing Organization</th>
                                 <th>Related To</th>
@@ -105,9 +106,10 @@ font-weight-bold
                                 <th width="200px">Action</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody>@php $no = 1; @endphp
                             @foreach($data as $item)
                             <tr>
+                                <td>{{ $no++ }}</td>
                                 <td>{{ $item->certificate_name }}</td>
                                 <td>{{ $item->issuedBy }}</td>
                                 <td>

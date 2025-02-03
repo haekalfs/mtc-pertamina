@@ -545,6 +545,28 @@ class DashboardController extends Controller
         ]);
     }
 
+    public function fetchParticipantsByOverall(Request $request)
+    {
+        $month = Carbon::parse($request->month)->month;
+        $year = $request->year;
+        $status = $request->status;
+
+        // Base query filtered by month and year
+        $query = Infografis_peserta::query()
+            ->whereMonth('tgl_pelaksanaan', $month)
+            ->whereYear('tgl_pelaksanaan', $year);
+
+        // Return the DataTable response
+        return DataTables::of($query)
+            ->editColumn('tgl_pelaksanaan', function ($row) {
+                return Carbon::parse($row->tgl_pelaksanaan)->format('d-m-Y');
+            })
+            ->addColumn('harga_pelatihan', function ($row) {
+                return number_format($row->harga_pelatihan, 0, ',', '.');
+            })
+            ->make(true);
+    }
+
     public function fetchAmountData(Request $request)
     {
         $periode = $request->input('periode', "2024-01-03 - 2024-12-21");
@@ -826,5 +848,24 @@ class DashboardController extends Controller
                 return number_format($row->harga_pelatihan, 0, ',', '.');
             })
             ->make(true);
+    }
+
+    public function fetchClickedParticipantonCalendar(Request $request)
+    {
+        try {
+            // Ensure batch is correctly passed and sanitized
+            $batch = urldecode($request->query('batch'));
+
+            if (!$batch) {
+                return response()->json(['error' => 'Batch parameter is missing'], 400);
+            }
+
+            // Fetch participants
+            $participants = Infografis_peserta::where('batch', $batch)->get();
+
+            return DataTables::of($participants)->toJson();
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Internal Server Error', 'message' => $e->getMessage()], 500);
+        }
     }
 }

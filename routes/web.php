@@ -29,10 +29,13 @@ use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\SocialMediaController;
 use App\Http\Controllers\UserController;
+use App\Models\Infografis_peserta;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
+use Yajra\DataTables\Facades\DataTables;
 
 /*
 |--------------------------------------------------------------------------
@@ -64,6 +67,7 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
         Route::get('/get-next-certificate-number/{id}', [PDController::class, 'getNumberCertificate'])->name('getCertificateNumber');
 
         Route::post('/export-certificate-data', [CertificateController::class, 'export'])->name('export.certificate.data');
+        Route::post('/export-batches-data', [PenlatController::class, 'export'])->name('export.batches.data');
 
         //On Dev Notification
         Route::get('/closed-menu', function () {
@@ -110,9 +114,13 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
             Route::post('/api/fetch-participants-by-training-type', [DashboardController::class, 'fetchParticipantsByTrainingType']);
 
             Route::post('/api/chart-overall-data', [DashboardController::class, 'fetchOverallData']);
+            Route::post('/api/fetch-participants-by-overall', [DashboardController::class, 'fetchParticipantsByOverall']);
+
             Route::post('/api/chart-issued-certificate-data', [DashboardController::class, 'getIssuedCertificateData']);
             Route::post('/api/get-participants', [DashboardController::class, 'getChartDetail']);
             Route::post('/api/get-participants-stcw-non', [DashboardController::class, 'getParticipants']);
+
+            Route::get('/api/calendar/get-participants', [DashboardController::class, 'fetchClickedParticipantonCalendar']);
 
         });
 

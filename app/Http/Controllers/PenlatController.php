@@ -19,7 +19,9 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use Yajra\DataTables\Facades\DataTables;
+use PhpOffice\PhpSpreadsheet\Worksheet\Table;
 
 class PenlatController extends Controller
 {
@@ -750,5 +752,150 @@ class PenlatController extends Controller
                 'message' => 'Failed to initiate batch data refresh.',
             ], 500);
         }
+    }
+
+    public function export(Request $request)
+    {
+        $templatePath = public_path('uploads/template/template_batch_export.xlsx');
+        $spreadsheet = IOFactory::load($templatePath);
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $headerRow = 5; // Header row position
+        $startRow = $headerRow + 1; // Start writing data below the header
+
+        // Define headers explicitly
+        $headers = [
+            'A' => 'Date',
+            'B' => 'Pelatihan',
+            'C' => 'Batch',
+            'D' => 'Jenis Pelatihan',
+            'E' => 'Kategori Pelatihan',
+            'F' => 'Jumlah Peserta',
+            'G' => 'Total Harga Pelatihan',
+            'H' => 'Created At'
+        ];
+
+        foreach ($headers as $col => $text) {
+            $sheet->setCellValue("{$col}{$headerRow}", $text);
+        }
+
+        // **Apply AutoFilter to Header Row**
+        $sheet->setAutoFilter("A{$headerRow}:H{$headerRow}");
+
+        // Apply filters
+        $query = Penlat_batch::with(['penlat', 'infografis_peserta']);
+
+        if ($request->penlat && $request->penlat != -1) {
+            $query->whereHas('penlat', function ($q) use ($request) {
+                $q->where('id', $request->penlat);
+            });
+        }
+
+        if ($request->jenis_pelatihan && $request->jenis_pelatihan != -1) {
+            $query->whereHas('penlat', function ($q) use ($request) {
+                $q->where('jenis_pelatihan', $request->jenis_pelatihan);
+            });
+        }
+
+        if ($request->kategori_pelatihan && $request->kategori_pelatihan != -1) {
+            $query->whereHas('penlat', function ($q) use ($request) {
+                $q->where('kategori_pelatihan', $request->kategori_pelatihan);
+            });
+        }
+
+        if ($request->periode && $request->periode != -1) {
+            $query->whereYear('date', $request->periode);
+        }
+
+        $getForm = $query->orderBy('date', 'asc')->orderBy('batch', 'asc')->get();
+
+        foreach ($getForm as $row) {
+            $sheet->setCellValue("A{$startRow}", Carbon::parse($row->date)->format('d-M-Y'));
+            $sheet->setCellValue("B{$startRow}", $row->penlat->description ?? 'N/A');
+            $sheet->setCellValue("C{$startRow}", $row->batch ?? 'N/A');
+            $sheet->setCellValue("D{$startRow}", $row->penlat->jenis_pelatihan ?? 'N/A');
+            $sheet->setCellValue("E{$startRow}", $row->penlat->kategori_pelatihan ?? 'N/A');
+
+            // Column F: Count of participants
+            $totalParticipants = $row->infografis_peserta->count();
+            $sheet->setCellValue("F{$startRow}", $totalParticipants);
+
+            // Column G: Sum of harga_pelatihan
+            $totalHargaPelatihan = $row->infografis_peserta->sum('harga_pelatihan');
+            $sheet->setCellValue("G{$startRow}", $totalHargaPelatihan);
+
+            $sheet->setCellValue("H{$startRow}", Carbon::parse($row->created_at)->format('d-M-Y'));
+
+            $startRow++;
+        }
+
+        $lastRow = $startRow - 1; // Last row of data
+
+        // **Apply Styling to Header Row**
+        $headerStyle = [
+            'font' => [
+                'bold' => true,
+                'size' => 12,
+                'color' => ['rgb' => 'FFFFFF'], // White text
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                ],
+            ],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => ['rgb' => 'cf3e3e'], // Yellow header
+            ],
+        ];
+        $sheet->getStyle("A{$headerRow}:H{$headerRow}")->applyFromArray($headerStyle);
+
+        // **Apply Borders to Data Rows**
+        $borderStyle = [
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                ],
+            ],
+        ];
+        $sheet->getStyle("A{$headerRow}:H{$lastRow}")->applyFromArray($borderStyle);
+
+        // **Apply Zebra Striping for Readability**
+        for ($row = $headerRow + 1; $row <= $lastRow; $row++) {
+            if ($row % 2 == 0) { // Alternate row color (light gray)
+                $sheet->getStyle("A{$row}:H{$row}")->applyFromArray([
+                    'fill' => [
+                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                        'startColor' => ['rgb' => 'F2F2F2'],
+                    ],
+                ]);
+            }
+        }
+
+        // **Auto-size Columns**
+        foreach (range('A', 'H') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // **Set Document Properties**
+        $spreadsheet->getProperties()
+            ->setCreator("Your App Name")
+            ->setLastModifiedBy("Your App Name")
+            ->setTitle("Batches Master Data")
+            ->setSubject("Batch Data Export")
+            ->setDescription("Generated batch data report");
+
+        // **Save the File**
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->setPreCalculateFormulas(false); // Prevent recalculation issues
+        $filePath = storage_path('app/public/output.xlsx');
+        $writer->save($filePath);
+
+        return response()->download($filePath, "Batches_Master_Data.xlsx", [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ]);
     }
 }

@@ -65,7 +65,7 @@ font-weight-bold
                             <div class="row align-items-center">
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label for="penlat">Nama Pelatihan:</label>
+                                        <label for="penlat">Training Name:</label>
                                         <select class="form-control" name="penlat" id="penlat">
                                             <option value="">Show All</option>
                                             @foreach ($penlatList as $item)
@@ -76,7 +76,7 @@ font-weight-bold
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label for="batch">Kategori Pelatihan:</label>
+                                        <label for="batch">Training Category:</label>
                                         <select name="kategori_pelatihan" class="form-control" id="kategori_pelatihan">
                                             <option value="">Show All</option>
                                             @foreach ($penlatList->unique('kategori_pelatihan') as $item)
@@ -87,7 +87,7 @@ font-weight-bold
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label for="periode">Tahun:</label>
+                                        <label for="periode">Year:</label>
                                         <select class="form-control" id="periode" name="periode">
                                             <option value="-1" selected>Show All</option>
                                             @foreach(range(date('Y'), date('Y') - 5) as $year)
@@ -116,7 +116,7 @@ font-weight-bold
                                 <th>Batch</th>
                                 <th>Certificate</th>
                                 <th>Nama Peserta</th>
-                                <th>Dibuat Oleh</th>
+                                <th>Created By</th>
                                 <th>Action</th>
                             </tr>
                         </thead>

@@ -376,6 +376,12 @@ active font-weight-bold
             <div class="card2 shadow">
                 <div class="card-header2 d-flex align-items-center">
                     <h4 class="mb-0">Training Trend</h4>
+                    <button
+                        type="button"
+                        id="backOverallRevenue"
+                        class="btn btn-outline-white btn-md ml-auto zoom90 invisible">
+                        <i class="fa fa-arrow-left fa-sm"></i> Back
+                    </button>
                 </div>
                 <div class="card-block2 bg-white">
                     <div class="row">
@@ -1179,19 +1185,17 @@ $(document).ready(function () {
     });
 
     function refreshOverallChart() {
-        const dateRange = $('#daterange').val(); // Default date range
-        const type = $('#type').val() || "-1"; // Default type (show all)
-        const stcw = $('#stcw').val() || "-1"; // Default type to "Show All"
+        const dateRange = $('#daterange').val();
+        const type = $('#type').val() || "-1";
+        const stcw = $('#stcw').val() || "-1";
 
-        // Prepare request payload
         const payload = {
             periode: dateRange,
             type: type,
             stcw: stcw,
-            _token: '{{ csrf_token() }}' // Include CSRF token for Laravel
+            _token: '{{ csrf_token() }}'
         };
 
-        // Send data via AJAX POST request
         $.ajax({
             url: "/api/chart-overall-data",
             type: "POST",
@@ -1206,37 +1210,62 @@ $(document).ready(function () {
                     axisX: {
                         title: "Month",
                         interval: 1,
-                        labelAngle: -45 // Rotate labels for better readability
+                        labelAngle: -45
                     },
                     axisY: {
                         title: "Total Participants",
-                        includeZero: true,
+                        includeZero: true
                     },
                     legend: {
                         cursor: "pointer",
-                        verticalAlign: "top", // Place the legend at the top
-                        horizontalAlign: "center", // Center the legend horizontally
-                        fontSize: 12, // Adjust the font size
-                        itemWidth: 150, // Add space for the legend text to prevent overlap
+                        verticalAlign: "top",
+                        horizontalAlign: "center",
+                        fontSize: 12,
+                        itemWidth: 150
                     },
-                    data: [
-                        {
-                            type: "spline", // Spline chart for smooth lines
-                            name: "Overall Participants",
-                            showInLegend: true,
-                            legendText: "Overall Participants",
-                            dataPoints: data.dataPoints // Overall data
+                    data: [{
+                        type: "spline",
+                        name: "Overall Participants",
+                        showInLegend: true,
+                        legendText: "Overall Participants",
+                        dataPoints: data.dataPoints,
+                        click: function (e) {
+                            const [month, year] = e.dataPoint.label.split(' ');
+                            fetchParticipants(month, year);
                         }
-                    ]
+                    }]
                 });
                 chart.render();
             },
             error: function (xhr, status, error) {
                 console.error("Error fetching overall data:", status, error);
-                // Generic error message for other errors
                 swal({
                     title: "An Error Occurred",
                     text: "Something went wrong. Please refresh your browser.",
+                    icon: "error",
+                });
+            }
+        });
+    }
+
+    function fetchParticipants(month, year) {
+        $.ajax({
+            url: "/api/fetch-participants-by-overall",
+            type: "POST",
+            data: {
+                month: month,
+                year: year,
+                _token: '{{ csrf_token() }}'
+            },
+            success: function (response) {
+                initializeDataTable(response.data); // Pass data to DataTable function
+                $("#participantModal").modal("show"); // Show modal
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching participant data:", status, error);
+                swal({
+                    title: "Error",
+                    text: "Failed to load participant data. Please try again.",
                     icon: "error",
                 });
             }
