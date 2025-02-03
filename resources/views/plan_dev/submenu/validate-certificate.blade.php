@@ -79,6 +79,14 @@
             font-style: italic;
             margin-top: 3px;
         }
+
+        .verification-box {
+            margin-top: 30px;
+            padding: 10px;
+            border: 1px solid black;
+            font-size: 12px;
+            text-align: start;
+        }
     </style>
 </head>
 <body>
@@ -164,7 +172,12 @@
                     </td>
                 </tr>
             </table>
+        </div><br>
+        <div class="verification-box">
+            Dokumen ini hasil verifikasi tidak sebagai dokumen pengganti ; informasi lebih lanjut pada dokumen fisik<br>
+            <em><i>This document is the result of verification and is not used as a replacement document; more information on physical documents</i></em>
         </div>
+        <br>
     </div>
 </body>
 </html>
