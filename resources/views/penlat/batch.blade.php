@@ -70,7 +70,7 @@ font-weight-bold
                         <div class="col-md-12">
                             <div class="row align-items-center">
                                 <div class="col-md-3">
-                                    <div class="form-group">
+                                    <div class="form-group" id="penlatContainer">
                                         <label for="email">Nama Pelatihan :</label>
                                         <select class="custom-select" id="namaPenlat" name="namaPenlat">
                                             <option value="-1" selected>Show All</option>
@@ -102,7 +102,7 @@ font-weight-bold
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <div class="form-group">
                                         <label for="email">Tahun :</label>
                                         <select class="form-control" id="periode" name="periode">
@@ -111,6 +111,13 @@ font-weight-bold
                                                 <option value="{{ $year }}" @if ($year == date('Y')) selected @endif>{{ $year }}</option>
                                             @endforeach
                                         </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-1 d-flex align-self-end justify-content-start">
+                                    <div class="form-group">
+                                        <div class="align-self-center">
+                                            <button id="filterButton" class="btn btn-primary" style="padding-left: 1.2em; padding-right: 1.2em;"><i class="ti-search"></i></button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -299,6 +306,27 @@ font-weight-bold
     </div>
 </div>
 
+<style>
+    /* Custom CSS to align the Select2 container */
+    .select2-container--default .select2-selection--single {
+        height: calc(2.25rem + 2px); /* Adjust this value to match your input height */
+        padding: 0.375rem 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: calc(2.25rem + 2px); /* Adjust this to vertically align the text */
+    }
+
+    .select2-container .select2-selection--single {
+        height: 100% !important; /* Ensure the height is consistent */
+    }
+
+    .select2-container {
+        width: 100% !important; /* Ensure the width matches the form control */
+    }
+</style>
 
 <script>
     function previewImage(event) {
@@ -320,6 +348,17 @@ font-weight-bold
 </script>
 <script>
 $(document).ready(function() {
+    $('#namaPenlat').select2({
+        placeholder: "Select Pelatihan...",
+        width: '100%',
+        allowClear: true,
+        dropdownParent: $('#penlatContainer'),
+        language: {
+            noResults: function() {
+                return "No result match your request... Create new in Master Data Menu!"; // Customize this message as needed
+            }
+        }
+    });
     var table = $('#batchTables').DataTable({
         processing: true,
         serverSide: true,
@@ -404,7 +443,8 @@ $(document).ready(function() {
         });
     });
 
-    $('#namaPenlat, #jenis, #kategori, #periode').on('click', function() {
+    // Filter button click event
+    $('#filterButton').click(function() {
         table.draw();
     });
 

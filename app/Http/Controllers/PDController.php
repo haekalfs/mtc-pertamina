@@ -432,7 +432,7 @@ class PDController extends Controller
             $updateData['keterangan'] = $validatedData['keterangan'];
         }
         if (!empty($validatedData['program'])) {
-            $updateData['certificate_title'] = $validatedData['program'];
+            $updateData['certificate_title'] = strtoupper($validatedData['program']);
         }
         if (!empty($validatedData['startDate'])) {
             $updateData['start_date'] = $validatedData['startDate'];
@@ -755,13 +755,12 @@ class PDController extends Controller
             // Retrieve all participants for the specified batch
             $participants = Infografis_peserta::where('batch', $validated['batch'])->orderBy('nama_peserta', 'asc')->get();
 
-            // Create or update the Penlat_certificate entry
             $penlatCertificate = Penlat_certificate::updateOrCreate(
                 [
                     'penlat_batch_id' => $penlatBatch->id,
                 ],
                 [
-                    'certificate_title' => $validated['program'],
+                    'certificate_title' => strtoupper($validated['program']), // Convert to uppercase
                     'status' => $validated['status'],
                     'start_date' => $validated['startDate'],
                     'end_date' => $validated['endDate'],

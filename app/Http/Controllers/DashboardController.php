@@ -103,23 +103,34 @@ class DashboardController extends Controller
 
     public function getEvents(Request $request)
     {
-        $currentYear = date('Y');
-        // Fetch all records from Penlat_batch with batch and date
-        $batches = Penlat_batch::select('batch', 'date')->whereYear('date', $currentYear)->get();
+        // Get start and end date from request
+        $startDate = Carbon::parse($request->start_date)->format('Y-m-d');
+        $endDate = Carbon::parse($request->end_date)->format('Y-m-d');
 
-        // Create events array for FullCalendar
-        $events = [];
+        // Fetch only events within the selected range
+        $batches = Penlat_batch::select('batch', 'date')
+                            ->whereBetween('date', [$startDate, $endDate])
+                            ->get();
 
-        foreach ($batches as $batch) {
-            $events[] = [
+        $events = $batches->map(function ($batch) {
+            return [
                 'title' => $batch->batch,
-                'start' => $batch->date, // Using the date from the database
-                'end'   => $batch->date, // Assuming one-day events
-                'className' => 'bg-' . collect(['primary', 'success', 'danger', 'warning', 'info'])->random() // Random class
+                'start' => Carbon::parse($batch->date)->format('Y-m-d'),
+                'end' => Carbon::parse($batch->date)->format('Y-m-d'),
+                'className' => 'bg-' . collect(['primary', 'success', 'danger', 'warning', 'info'])->random()
             ];
-        }
+        });
 
         return response()->json($events);
+    }
+
+    public function getInfografisPeserta(Request $request)
+    {
+        $batch = $request->query('batch');
+
+        $query = Infografis_peserta::where('batch', $batch);
+
+        return DataTables::of($query)->make(true);
     }
 
     public function fetchChartsData(Request $request)

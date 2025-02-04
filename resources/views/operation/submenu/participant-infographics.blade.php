@@ -68,77 +68,74 @@ font-weight-bold
                     </div>
                 </div>
                 <div class="card-body zoom80">
-                    <form method="GET" action="{{ route('participant-infographics') }}">
-                        @csrf
-                        <div class="row d-flex justify-content-start mb-4">
-                            <div class="col-md-12">
-                                <div class="row align-items-center">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="email">Nama Penlat :</label>
-                                            <select class="custom-select" id="namaPenlat" name="namaPenlat">
-                                                <option value="1" selected>Show All</option>
-                                                @foreach($listPenlat as $participant)
-                                                    <option value="{{ $participant->nama_program }}" @if (in_array($participant->nama_program, $selectedArray)) selected @endif>{{ $participant->nama_program }}</option>
-                                                @endforeach
-                                            </select>
+                    <div class="row d-flex justify-content-start mb-4">
+                        <div class="col-md-12">
+                            <div class="row align-items-center">
+                                <div class="col-md-3">
+                                    <div class="form-group" id="penlatContainer">
+                                        <label for="email">Nama Penlat :</label>
+                                        <select class="custom-select" id="namaPenlat" name="namaPenlat">
+                                            <option value="1" selected>Show All</option>
+                                            @foreach($listPenlat as $participant)
+                                                <option value="{{ $participant->nama_program }}" @if (in_array($participant->nama_program, $selectedArray)) selected @endif>{{ $participant->nama_program }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label for="position_id">STCW/Non :</label>
+                                        <select name="stcw" class="form-control" id="stcw">
+                                            <option value="1">Show All</option>
+                                            @foreach($listStcw as $participant)
+                                                <option value="{{ $participant->kategori_program }}" @if (in_array($participant->kategori_program, $selectedArray)) selected @endif>{{ $participant->kategori_program }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label for="status">Jenis Penlat :</label>
+                                        <select class="form-control" id="jenisPenlat" name="jenisPenlat" required>
+                                            <option value="1" selected>Show All</option>
+                                            @foreach($listJenisPenlat as $participant)
+                                                <option value="{{ $participant->jenis_pelatihan }}" @if (in_array($participant->jenis_pelatihan, $selectedArray)) selected @endif>{{ $participant->jenis_pelatihan }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label for="position_id">TW :</label>
+                                        <select name="tw" class="form-control" id="tw">
+                                            <option value="1">Show All</option>
+                                            @foreach($listTw as $participant)
+                                                <option value="{{ $participant->realisasi }}" @if (in_array($participant->realisasi, $selectedArray)) selected @endif>{{ $participant->realisasi }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label for="position_id">Periode :</label>
+                                        <select name="periode" class="form-control" id="periode">
+                                            <option value="1" selected>Show All</option>
+                                            @foreach (array_reverse($yearsBefore) as $year)
+                                                <option value="{{ $year }}" @if (in_array($year, $selectedArray)) selected @endif>{{ $year }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-1 d-flex align-self-end justify-content-start">
+                                    <div class="form-group">
+                                        <div class="align-self-center">
+                                            <button id="filterButton" class="btn btn-primary" style="padding-left: 1.2em; padding-right: 1.2em;"><i class="ti-search"></i></button>
                                         </div>
                                     </div>
-                                    <div class="col-md-2">
-                                        <div class="form-group">
-                                            <label for="position_id">STCW/Non :</label>
-                                            <select name="stcw" class="form-control" id="stcw">
-                                                <option value="1">Show All</option>
-                                                @foreach($listStcw as $participant)
-                                                    <option value="{{ $participant->kategori_program }}" @if (in_array($participant->kategori_program, $selectedArray)) selected @endif>{{ $participant->kategori_program }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="form-group">
-                                            <label for="status">Jenis Penlat :</label>
-                                            <select class="form-control" id="jenisPenlat" name="jenisPenlat" required>
-                                                <option value="1" selected>Show All</option>
-                                                @foreach($listJenisPenlat as $participant)
-                                                    <option value="{{ $participant->jenis_pelatihan }}" @if (in_array($participant->jenis_pelatihan, $selectedArray)) selected @endif>{{ $participant->jenis_pelatihan }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="form-group">
-                                            <label for="position_id">TW :</label>
-                                            <select name="tw" class="form-control" id="tw">
-                                                <option value="1">Show All</option>
-                                                @foreach($listTw as $participant)
-                                                    <option value="{{ $participant->realisasi }}" @if (in_array($participant->realisasi, $selectedArray)) selected @endif>{{ $participant->realisasi }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="form-group">
-                                            <label for="position_id">Periode :</label>
-                                            <select name="periode" class="form-control" id="periode">
-                                                <option value="1" selected>Show All</option>
-                                                @foreach (array_reverse($yearsBefore) as $year)
-                                                    <option value="{{ $year }}" @if (in_array($year, $selectedArray)) selected @endif>{{ $year }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                    {{-- <div class="col-md-1 d-flex align-self-end justify-content-start">
-                                        <div class="form-group">
-                                            <div class="align-self-center">
-                                                <button type="submit" class="btn btn-primary" style="padding-left: 1.2em; padding-right: 1.2em;"><i class="ti-search"></i></button>
-                                            </div>
-                                        </div>
-                                    </div> --}}
                                 </div>
                             </div>
                         </div>
-                    </form>
+                    </div>
                     <div class="table-responsive">
                         <table id="listPeserta" class="table table-bordered">
                             <thead class="thead-light">
@@ -489,9 +486,10 @@ $(document).ready(function() {
         placeholder: "Select Pelatihan...",
         width: '100%',
         allowClear: true,
+        dropdownParent: $('#penlatContainer'),
         language: {
             noResults: function() {
-                return "No result match your request... Import again!"; // Customize this message as needed
+                return "No result match your request... Create new in Master Data Menu!"; // Customize this message as needed
             }
         }
     });
@@ -526,8 +524,8 @@ $(document).ready(function() {
     order: [[2, 'desc']]
     });
 
-    // Re-draw the table when filters are changed
-    $('#namaPenlat, #stcw, #jenisPenlat, #tw, #periode').change(function(){
+    // Filter button click event
+    $('#filterButton').click(function() {
         table.draw();
     });
 

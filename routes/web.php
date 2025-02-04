@@ -96,6 +96,8 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
             Route::get('/feedback-MTC-chart-data/{yearSelected}', [PDController::class, 'getFeedbackMTCChartData']);
             Route::get('/check-user-id/{userId}', [UserController::class, 'checkUserId']);
             Route::get('/api/get-penlat-batch-events', [DashboardController::class, 'getEvents'])->name('penlat.batch.events');
+            Route::get('/api/get-infografis-peserta', [DashboardController::class, 'getInfografisPeserta']);
+
             //will be used
             Route::get('/download-file/{filepath}', [DownloadController::class, 'downloadFile'])->name('download.file');
             Route::post('/api/fetchAmountData', [DashboardController::class, 'fetchAmountData'])->name('fetchAmountData');

@@ -65,7 +65,7 @@ font-weight-bold
                         <div class="col-md-12">
                             <div class="row align-items-center">
                                 <div class="col-md-3">
-                                    <div class="form-group">
+                                    <div class="form-group" id="penlatContainer">
                                         <label for="email">Nama Penlat :</label>
                                         <select class="custom-select" id="nama_pelatihan" name="nama_pelatihan">
                                             <option value="-1" selected>Show All</option>
@@ -240,8 +240,40 @@ font-weight-bold
         </div>
     </div>
 </div>
+<style>
+    /* Custom CSS to align the Select2 container */
+    .select2-container--default .select2-selection--single {
+        height: calc(2.25rem + 2px); /* Adjust this value to match your input height */
+        padding: 0.375rem 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: calc(2.25rem + 2px); /* Adjust this to vertically align the text */
+    }
+
+    .select2-container .select2-selection--single {
+        height: 100% !important; /* Ensure the height is consistent */
+    }
+
+    .select2-container {
+        width: 100% !important; /* Ensure the width matches the form control */
+    }
+</style>
 <script>
 $(document).ready(function() {
+    $('#nama_pelatihan').select2({
+        placeholder: "Select Pelatihan...",
+        width: '100%',
+        allowClear: true,
+        dropdownParent: $('#penlatContainer'),
+        language: {
+            noResults: function() {
+                return "No result match your request... Create new in Master Data Menu!"; // Customize this message as needed
+            }
+        }
+    });
     $('#listFeedback').DataTable({
         processing: true,
         serverSide: true,

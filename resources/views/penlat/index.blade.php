@@ -65,8 +65,8 @@ font-weight-bold
                         <div class="col-md-12">
                             <div class="row align-items-center">
                                 <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="namaPenlat">Nama Pelatihan :</label>
+                                    <div class="form-group" id="penlatContainer">
+                                        <label for="namaPenlat">Training Name :</label>
                                         <select class="custom-select" id="namaPenlat" name="namaPenlat">
                                             <option value="-1" selected>Show All</option>
                                             @foreach($data as $penlat)
@@ -77,7 +77,7 @@ font-weight-bold
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="jenisPenlat">Jenis Penlat :</label>
+                                        <label for="jenisPenlat">Type :</label>
                                         <select class="form-control" id="jenisPenlat" name="jenisPenlat">
                                             <option value="-1" selected>Show All</option>
                                             @foreach($data->unique('jenis_pelatihan') as $penlat)
@@ -86,7 +86,7 @@ font-weight-bold
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label for="stcw">STCW/Non :</label>
                                         <select name="stcw" class="form-control" id="stcw">
@@ -97,6 +97,13 @@ font-weight-bold
                                         </select>
                                     </div>
                                 </div>
+                                <div class="col-md-1 d-flex align-self-end justify-content-start">
+                                    <div class="form-group">
+                                        <div class="align-self-center">
+                                            <button id="filterButton" class="btn btn-primary" style="padding-left: 1.2em; padding-right: 1.2em;"><i class="ti-search"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -104,10 +111,10 @@ font-weight-bold
                         <thead class="thead-light">
                             <tr>
                                 <th>Display</th>
-                                <th>Nama Pelatihan</th>
+                                <th>Training Name</th>
                                 <th>Aliases</th>
-                                <th>Jenis Pelatihan</th>
-                                <th>Kategori</th>
+                                <th>Training Type</th>
+                                <th>Category</th>
                                 <th width="115px">Action</th>
                             </tr>
                         </thead>
@@ -348,6 +355,27 @@ font-weight-bold
     </div>
 </div>
 
+<style>
+    /* Custom CSS to align the Select2 container */
+    .select2-container--default .select2-selection--single {
+        height: calc(2.25rem + 2px); /* Adjust this value to match your input height */
+        padding: 0.375rem 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: calc(2.25rem + 2px); /* Adjust this to vertically align the text */
+    }
+
+    .select2-container .select2-selection--single {
+        height: 100% !important; /* Ensure the height is consistent */
+    }
+
+    .select2-container {
+        width: 100% !important; /* Ensure the width matches the form control */
+    }
+</style>
 <script>
 setupAliasInput('aliasDisplay');
 setupAliasInput('edit_alias');
@@ -386,6 +414,17 @@ document.getElementById('submitEditForm').addEventListener('click', function (ev
     });
 });
 $(document).ready(function () {
+    $('#namaPenlat').select2({
+        placeholder: "Select Pelatihan...",
+        width: '100%',
+        allowClear: true,
+        dropdownParent: $('#penlatContainer'),
+        language: {
+            noResults: function() {
+                return "No result match your request... Create new in Master Data Menu!"; // Customize this message as needed
+            }
+        }
+    });
     let aliasArray = [];
 
     // Handle Add Alias Button Click
@@ -598,8 +637,8 @@ $(document).ready(function() {
         });
     });
 
-    // Redraw the table based on filter changes
-    $('#namaPenlat, #jenisPenlat, #stcw').change(function() {
+    // Filter button click event
+    $('#filterButton').click(function() {
         table.draw();
     });
 });

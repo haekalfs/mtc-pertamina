@@ -516,6 +516,37 @@ active font-weight-bold
         </div>
     </div>
 </div>
+<div id="event-modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 1200px;" role="document">
+        <div class="modal-content">
+            <div class="modal-header d-flex flex-row align-items-center justify-content-between">
+                <h5 class="modal-title">Batch Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table id="infografis-table" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Tgl Pelaksanaan</th>
+                            <th>Nama Peserta</th>
+                            <th>Batch</th>
+                            <th>Jenis Pelatihan</th>
+                            <th>Kategori Program</th>
+                            <th>Harga Pelatihan</th>
+                            <th>Realisasi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be dynamically loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 $(document).ready(function () {
     let isDrilldown = false; // Track drilldown state

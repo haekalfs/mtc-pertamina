@@ -64,7 +64,7 @@ font-weight-bold
                         <div class="col-md-12">
                             <div class="row align-items-center">
                                 <div class="col-md-3">
-                                    <div class="form-group">
+                                    <div class="form-group" id="penlatContainer">
                                         <label for="penlat">Training Name:</label>
                                         <select class="form-control" name="penlat" id="penlat">
                                             <option value="">Show All</option>
@@ -189,6 +189,7 @@ font-weight-bold
         $('#penlat').select2({
             placeholder: "Select Pelatihan...",
             width: '100%',
+            dropdownParent: $('#penlatContainer'),
             allowClear: true,
             language: {
                 noResults: function() {

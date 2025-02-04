@@ -45,9 +45,6 @@
     CalendarApp.prototype.init = function() {
         this.enableDrag();
 
-        var today = new Date($.now());
-        var currentYear = today.getFullYear();  // Get current year
-
         var $this = this;
         $this.$calendarObj = $this.$calendar.fullCalendar({
             slotDuration: '00:15:00',
@@ -63,48 +60,65 @@
             },
             editable: true,
             droppable: true,
-            eventLimit: true,
+            eventLimit: 2,
             selectable: true,
+            displayEventTime: false,
 
-            // Prevent navigation beyond the current year
-            viewRender: function(view, element) {
-                if (view.intervalStart.year() !== currentYear) {
-                    $this.$calendar.fullCalendar('gotoDate', new Date());
-                }
-            },
-
-            // Fetch events from database
+            // Fetch events dynamically when navigating months/years
             events: function(start, end, timezone, callback) {
+                let startDate = start.format('YYYY-MM-DD'); // First day of visible month
+                let endDate = end.format('YYYY-MM-DD'); // Last day of visible month
+
                 $.ajax({
-                    url: '/api/get-penlat-batch-events',  // Use the named route
+                    url: '/api/get-penlat-batch-events',
+                    type: 'GET',
+                    data: { start_date: startDate, end_date: endDate }, // Pass date range
                     dataType: 'json',
+                    contentType: 'application/json',
+                    cache: false,
                     success: function(data) {
-                        var events = [];
-                        $(data).each(function() {
-                            events.push({
-                                title: this.title,
-                                start: this.start,
-                                end: this.end,
-                                className: this.className
-                            });
-                        });
+                        var events = data.map(event => ({
+                            title: event.title,
+                            start: moment(event.start).toDate(),
+                            end: moment(event.end).toDate(),
+                            className: event.className,
+                            extendedProps: {
+                                batch: event.batch // Ensure batch data is available
+                            }
+                        }));
                         callback(events);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error fetching events:", error);
                     }
                 });
             },
 
+            eventRender: function(event, element) {
+                let batch = event.title ? event.title : 'Unknown'; // Ensure batch data
+                let date = moment(event.start).format('YYYY-MM-DD'); // Get event date
+
+                // Predefined colors
+                const colors = ['#2980b9', '#CC9900'];
+                const randomColor = colors[new Date(event.start).getDate() % colors.length];
+
+                // Modify event element
+                element.css({
+                    'background-color': randomColor,
+                    'cursor': 'pointer',
+                    'padding': '5px',
+                    'border-radius': '5px',
+                    'color': '#fff' // Ensure text is visible
+                });
+
+                element.html(`
+                    <div class="event-container" data-batch="${batch}" data-date="${date}">
+                        <div class="event-title"><strong>${event.title}</strong></div>
+                    </div>
+                `);
+            },
+
             drop: function(date) { $this.onDrop($(this), date); }
-        });
-
-        //on new event
-        this.$saveCategoryBtn.on('click', function(){
-            var categoryName = $this.$categoryForm.find("input[name='category-name']").val();
-            var categoryColor = $this.$categoryForm.find("select[name='category-color']").val();
-            if (categoryName !== null && categoryName.length != 0) {
-                $this.$extEvents.append('<div class="external-event bg-' + categoryColor + '" data-class="bg-' + categoryColor + '" style="position: relative;"><i class="fa fa-move"></i>' + categoryName + '</div>')
-                $this.enableDrag();
-            }
-
         });
     },
 
@@ -118,3 +132,49 @@ function($) {
     "use strict";
     $.CalendarApp.init()
 }(window.jQuery);
+
+document.addEventListener('DOMContentLoaded', function () {
+    let dataTable;
+
+    document.addEventListener('click', function (event) {
+        if (event.target.closest('.event-container')) {
+            let eventEl = event.target.closest('.event-container');
+            let batch = eventEl.dataset.batch;
+            let date = eventEl.dataset.date;
+
+            console.log('Clicked Event:', batch, date);
+
+            // Destroy previous DataTable instance if exists
+            if ($.fn.DataTable.isDataTable('#infografis-table')) {
+                $('#infografis-table').DataTable().destroy();
+            }
+
+            // Initialize DataTable
+            dataTable = $('#infografis-table').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: '/api/get-infografis-peserta',
+                    type: 'GET',
+                    data: { batch: batch } // Send batch as a parameter
+                },
+                columns: [
+                    { data: 'tgl_pelaksanaan', title: 'Tgl Pelaksanaan' },
+                    { data: 'nama_peserta', title: 'Nama Peserta' },
+                    { data: 'batch', title: 'Batch' },
+                    { data: 'jenis_pelatihan', title: 'Jenis Pelatihan' },
+                    { data: 'kategori_program', title: 'Kategori Program' },
+                    { data: 'harga_pelatihan', title: 'Harga Pelatihan' },
+                    { data: 'realisasi', title: 'Realisasi' }
+                ],
+                lengthMenu: [10, 25, 50, 100],
+                pageLength: 10,
+                responsive: true,
+                autoWidth: false
+            });
+
+            // Show the modal
+            $('#event-modal').modal('show');
+        }
+    });
+});

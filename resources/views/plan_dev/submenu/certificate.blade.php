@@ -68,7 +68,7 @@ font-weight-bold
                             <div class="row align-items-center">
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label for="penlat">Nama Pelatihan :</label>
+                                        <label for="penlat">Training:</label>
                                         <select class="form-control" name="penlat" id="penlat">
                                             <option value="">Show All</option>
                                             @foreach ($penlatList as $item)
@@ -79,7 +79,7 @@ font-weight-bold
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label for="batch">Batch :</label>
+                                        <label for="batch">Batch:</label>
                                         <select name="batch" class="form-control" id="batch">
                                             <option value="">Show All</option>
                                             @foreach ($listBatch as $item)
@@ -90,7 +90,7 @@ font-weight-bold
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label for="batch">Kategori Pelatihan:</label>
+                                        <label for="batch">Training Category:</label>
                                         <select name="kategori_pelatihan" class="form-control" id="kategori_pelatihan">
                                             <option value="">Show All</option>
                                             @foreach ($penlatList->unique('kategori_pelatihan') as $item)
@@ -101,7 +101,7 @@ font-weight-bold
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-group">
-                                        <label for="email">Tahun :</label>
+                                        <label for="email">Year:</label>
                                         <select class="form-control" id="periode" name="periode">
                                             <option value="-1" selected>Show All</option>
                                             @foreach(range(date('Y'), date('Y') - 5) as $year)
@@ -123,15 +123,15 @@ font-weight-bold
                     <table id="listIssuedCertificates" class="table table-bordered">
                         <thead class="thead-light">
                             <tr>
-                                <th>Tgl Pelaksanaan</th>
-                                <th>Nama Pelatihan</th>
+                                <th>Date of Conduct</th>
+                                <th>Training</th>
                                 <th>Batch</th>
-                                <th>Kategori</th>
+                                <th>Category</th>
                                 <th>Status</th>
-                                <th>Keterangan</th>
-                                <th>Total Terbit</th>
-                                <th>Dibuat Oleh</th>
-                                <th>Created At</th>
+                                <th>Remarks</th>
+                                <th>Total Issued</th>
+                                <th>Created by</th>
+                                <th>Created at</th>
                                 <th width="225px">Action</th>
                             </tr>
                         </thead>
@@ -161,7 +161,7 @@ font-weight-bold
                         <div class="col-md-6">
                             <div class="d-flex align-items-center mb-4">
                                 <div style="width: 160px;" class="mr-2">
-                                    <p style="margin: 0;">Nama Pelatihan <span class="text-danger">*</span> :</p>
+                                    <p style="margin: 0;">Training Name <span class="text-danger">*</span> :</p>
                                 </div>
                                 <div class="flex-grow-1">
                                     <select id="penlatSelect" class="form-control" name="penlat">
@@ -174,7 +174,7 @@ font-weight-bold
                             </div>
                             <div class="d-flex align-items-center mb-4">
                                 <div style="width: 160px;" class="mr-2">
-                                    <p style="margin: 0;">Judul Sertifikat <span class="text-danger">*</span> :</p>
+                                    <p style="margin: 0;">Certificate Title <span class="text-danger">*</span> :</p>
                                 </div>
                                 <div class="flex-grow-1">
                                     <textarea id="programInput" class="form-control" name="program" required></textarea>
@@ -254,7 +254,7 @@ font-weight-bold
                             </div>
                             <div class="d-flex align-items-start mb-4">
                                 <div style="width: 160px;" class="mr-2">
-                                    <p style="margin: 0;">Keterangan <span class="text-danger">*</span> :</p>
+                                    <p style="margin: 0;">Remarks <span class="text-danger">*</span> :</p>
                                 </div>
                                 <div class="flex-grow-1">
                                     <textarea class="form-control" rows="3" name="keterangan" required></textarea>

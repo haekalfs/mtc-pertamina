@@ -116,19 +116,19 @@ font-weight-bold
                         <div class="col-md-9">
                             <table class="table table-borderless table-sm">
                                 <tr>
-                                    <th style="width: 200px;">Nama Pelatihan</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $data->batch->penlat->description }}</td>
+                                    <th style="width: 200px;">Certificate Title</th>
+                                    <td style="text-align: start; font-weight:500">: {{ $data->certificate_title }}</td>
                                 </tr>
                                 <tr>
                                     <th>Batch</th>
                                     <td style="text-align: start; font-weight:500">: {{ $data->batch->batch }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Kategori Pelatihan</th>
+                                    <th>Training Category</th>
                                     <td style="text-align: start; font-weight:500">: {{ $data->batch->penlat->kategori_pelatihan }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Tanggal Pelaksanaan</th>
+                                    <th>Date of Conduct</th>
                                     <td style="text-align: start; font-weight:500">: {{ \Carbon\Carbon::parse($data->batch->date)->format('d F Y') }} - {{ \Carbon\Carbon::parse($data->end_date)->format('d F Y') }}</td>
                                 </tr>
                                 <tr>
@@ -136,7 +136,7 @@ font-weight-bold
                                     <td style="text-align: start; font-weight:500">: {{ $data->regulation->description }}</td>
                                 </tr>
                                 <tr>
-                                    <th style="width: 200px;">Keterangan</th>
+                                    <th style="width: 200px;">Remarks</th>
                                     <td style="text-align: start; font-weight:500">: {{ $data->keterangan }}</td>
                                 </tr>
                               </tr>
@@ -203,12 +203,12 @@ font-weight-bold
                                         <input class="form-check-input" type="checkbox" id="checkAll" onclick="toggleCheckboxes()">
                                     </div>
                                 </th>
-                                <th>No. Registrasi</th>
-                                <th>Nama Peserta</th>
+                                <th>Registration Num.</th>
+                                <th>Participant Name</th>
                                 <th width="150px">Cert No.</th>
-                                <th width="150px">Tgl Terbit</th>
-                                <th width="150px">Tgl Expire</th>
-                                <th width="150px">Tgl Diterima</th>
+                                <th width="150px">Date of Issued</th>
+                                <th width="150px">Date of Expire</th>
+                                <th width="150px">Date of Received</th>
                                 <th width="50px">Status</th>
                                 <th width="150px">Action</th>
                             </tr>
