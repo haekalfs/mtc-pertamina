@@ -66,6 +66,8 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
         Route::get('/certificate-generate-qr/{id}', [PDController::class, 'generateQrCode'])->name('generate-qr-certificate');
         Route::get('/get-next-certificate-number/{id}', [PDController::class, 'getNumberCertificate'])->name('getCertificateNumber');
 
+        Route::get('/penlat/amendments', [PenlatController::class, 'getAmendments'])->name('penlat.getAmendments');
+
         Route::post('/export-certificate-data', [CertificateController::class, 'export'])->name('export.certificate.data');
         Route::post('/export-batches-data', [PenlatController::class, 'export'])->name('export.batches.data');
 

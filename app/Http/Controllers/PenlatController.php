@@ -898,4 +898,30 @@ class PenlatController extends Controller
             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         ]);
     }
+
+    public function getAmendments(Request $request)
+    {
+        $penlat = Penlat::with('amendments.regulators')->find($request->penlat_id);
+
+        if (!$penlat || $penlat->amendments->isEmpty()) {
+            return response()->json([
+                'amendment' => null // Return null instead of an error
+            ]);
+        }
+
+        // Get the first amendment (or modify this logic if multiple amendments are needed)
+        $amendment = $penlat->amendments->first();
+
+        return response()->json([
+            'amendment' => [
+                'id' => $amendment->id,
+                'description' => $amendment->description,
+                'regulator' => $amendment->regulators ? [
+                    'id' => $amendment->regulators->id,
+                    'description' => $amendment->regulators->description
+                ] : null
+            ]
+        ]);
+    }
+
 }

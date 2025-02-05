@@ -929,6 +929,8 @@ class InventoryToolController extends Controller
         try {
             $formIds = $request->input('formIds');
 
+            Audit_log::createLog("Asset item condition has been changed : $formIds", "critical", Auth::id(), 1);
+
             // Convert formIds to an array if needed
             if (!is_array($formIds)) {
                 $formIds = explode(',', $formIds);
@@ -942,7 +944,6 @@ class InventoryToolController extends Controller
                     'asset_condition_id' => $assetCondition
                 ]);
 
-            Audit_log::createLog("Asset item condition has been changed : $formIds", "critical", Auth::id(), 1);
             // Return a JSON response
             return response()->json(['success' => true, 'message' => 'Certificates marked as expired successfully.']);
         } catch (\Exception $e) {

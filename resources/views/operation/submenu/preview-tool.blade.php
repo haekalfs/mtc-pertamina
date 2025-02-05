@@ -614,7 +614,14 @@ font-weight-bold
                 success: function (response) {
                     if (response.success) {
                         // Trigger file download
-                        $('#assetsTable').DataTable().draw();
+                        swal({
+                            title: "Success!",
+                            text: "Asset has been set to Used.",
+                            icon: "success",
+                            button: "OK",
+                        }).then(() => {
+                            $('#assetsTable').DataTable().draw();
+                        });
                     } else {
                         swal({
                             title: "Error!",
@@ -657,8 +664,14 @@ font-weight-bold
                 },
                 success: function (response) {
                     if (response.success) {
-                        // Trigger file download
-                        $('#assetsTable').DataTable().draw();
+                        swal({
+                            title: "Success!",
+                            text: "Asset has been set to Unused.",
+                            icon: "success",
+                            button: "OK",
+                        }).then(() => {
+                            $('#assetsTable').DataTable().draw();
+                        });
                     } else {
                         swal({
                             title: "Error!",
@@ -733,7 +746,7 @@ font-weight-bold
                                 icon: "success",
                                 button: "OK",
                             }).then(() => {
-                                location.reload();
+                                $('#assetsTable').DataTable().draw();
                             });
                         },
                         error: function (xhr) {

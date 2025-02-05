@@ -237,17 +237,11 @@ font-weight-bold
                                     <p style="margin: 0;">Amendment <span class="text-danger">*</span> :</p>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <select class="form-control" id="regulator_amendment" name="regulator_amendment">
+                                    <select class="form-control custom-select" id="regulator_amendment" name="regulator_amendment">
                                         <option value="-1" selected>No Regulator</option>
                                         @foreach ($listAmendment as $amendment)
-                                            @php
-                                                $maxLength = 40; // Define max length before truncation
-                                                $shortDescription = strlen($amendment->description) > $maxLength
-                                                    ? substr($amendment->description, 0, $maxLength) . '...'
-                                                    : $amendment->description;
-                                            @endphp
                                             <option value="{{ $amendment->id }}" title="{{ $amendment->description }}">
-                                                {{ $shortDescription }}
+                                                {{ $amendment->description }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -258,16 +252,23 @@ font-weight-bold
                                 <div style="width: 160px;" class="mr-2">
                                     <p style="margin: 0;">Regulator <span class="text-danger">*</span> :</p>
                                 </div>
-                                <div class="flex-grow-1">
-                                    <select class="form-control" id="regulator" name="regulator"></select>
+                                <div class="flex-grow-1" id="regulator_container">
+                                    <select class="form-control" id="regulator" name="regulator">
+                                        <option value="-1" selected>No Regulator</option>
+                                        @foreach ($listRegulator as $regulator)
+                                            <option value="{{ $regulator->id }}" title="{{ $regulator->description }}">
+                                                {{ $regulator->description }}
+                                            </option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                             <div class="d-flex align-items-start mb-4">
                                 <div style="width: 160px;" class="mr-2">
-                                    <p style="margin: 0;">Remarks <span class="text-danger">*</span> :</p>
+                                    <p style="margin: 0;">Remarks :</p>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <textarea class="form-control" rows="3" name="keterangan" required></textarea>
+                                    <textarea class="form-control" rows="3" name="keterangan"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -283,25 +284,32 @@ font-weight-bold
 </div>
 
 <style>
-    /* Custom CSS to align the Select2 container */
-    .select2-container--default .select2-selection--single {
-        height: calc(2.25rem + 2px); /* Adjust this value to match your input height */
-        padding: 0.375rem 0.75rem;
-        border: 1px solid #ced4da;
-        border-radius: 0.25rem;
-    }
+/* Custom CSS to align the Select2 container */
+.select2-container--default .select2-selection--single {
+    height: calc(2.25rem + 2px); /* Adjust this value to match your input height */
+    padding: 0.375rem 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+}
 
-    .select2-container--default .select2-selection--single .select2-selection__rendered {
-        line-height: calc(2.25rem + 2px); /* Adjust this to vertically align the text */
-    }
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: calc(2.25rem + 2px); /* Adjust this to vertically align the text */
+}
 
-    .select2-container .select2-selection--single {
-        height: 100% !important; /* Ensure the height is consistent */
-    }
+.select2-container .select2-selection--single {
+    height: 100% !important; /* Ensure the height is consistent */
+}
 
-    .select2-container {
-        width: 100% !important; /* Ensure the width matches the form control */
-    }
+.select2-container {
+    width: 100% !important; /* Ensure the width matches the form control */
+}
+#regulator_container {
+    position: relative !important;
+}
+#regulator_field {
+    display: flex;
+    align-items: center;
+}
 </style>
 <script>
 $(document).ready(function() {
@@ -386,6 +394,27 @@ $(document).ready(function() {
         }
     });
 
+    $('#regulator_amendment').select2({
+        dropdownParent: $('#inputDataModal'),
+        placeholder: "Select Amendment...",
+        width: '100%',
+        allowClear: true,
+        language: {
+            noResults: function() {
+                return "No result match your request... Create new in Master Data Menu!";
+            }
+        }
+    }).on('select2:select', function (e) {
+        const selectedValue = $(this).val(); // Get selected value
+        const initialNumberContainer = $('#regulator_field');
+
+        if (selectedValue === '-1') {
+            initialNumberContainer.hide(); // Hide field
+        } else {
+            initialNumberContainer.show(); // Show field
+        }
+    });
+
     $('#penlatSelect').select2({
         dropdownParent: $('#inputDataModal'),
         placeholder: "Select Pelatihan...",
@@ -398,13 +427,67 @@ $(document).ready(function() {
         }
     });
 
-    // Update hidden input on Penlat change
+    $('#regulator').select2({
+        dropdownParent: $('#inputDataModal'),
+        placeholder: "Select Regulator...",
+        width: '100%',
+        allowClear: true,
+        language: {
+            noResults: function() {
+                return "No result match your request... Create new in Master Data Menu!"; // Customize this message as needed
+            }
+        }
+    });
+
     $('#penlatSelect').on('change', function() {
+        var selectedPenlatId = $(this).val(); // Get selected Training Name (Pelatihan) ID
+
         var selectedOption = $(this).find('option:selected').text().toUpperCase();
         $('#programInput').val(selectedOption);
 
         // Reinitialize the batch select dropdown, passing the selected penlat_id
         initSelect2WithAjax('mySelect2', '{{ route('batches.fetch.certificate') }}', 'Select or add a Batch', $(this).val());
+
+        if (!selectedPenlatId) return;
+
+        $.ajax({
+            url: '{{ route('penlat.getAmendments') }}', // Create this route in Laravel
+            method: 'GET',
+            data: { penlat_id: selectedPenlatId }, // Send selected penlat_id
+            success: function(response) {
+                const initialNumberContainer = $('#regulator_field');
+
+                if (!response.amendment) {
+                    // No amendments found, so hide the field and reset values
+                    initialNumberContainer.hide();
+                    $('#regulator_amendment').val('-1').trigger('change');
+                    return;
+                }
+
+                const selectedValue = response.amendment.id; // Get selected value
+
+                if (selectedValue === '-1') {
+                    initialNumberContainer.hide(); // Hide field
+                } else {
+                    initialNumberContainer.show(); // Show field
+                }
+
+                // Select the amendment in the dropdown
+                $('#regulator_amendment').val(response.amendment.id).trigger('change');
+
+                // Check if regulator exists
+                if (response.amendment.regulator) {
+                    setTimeout(() => { // Ensure it runs after amendment selection
+                        $('#regulator').val(response.amendment.regulator.id).trigger('change');
+                    }, 500);
+                }
+            },
+            error: function() {
+                const initialNumberContainer = $('#regulator_field');
+                initialNumberContainer.hide(); // Hide field
+                $('#regulator_amendment').val('-1').trigger('change');
+            }
+        });
     });
 
     $('#penlat').on('change', function() {
@@ -414,7 +497,6 @@ $(document).ready(function() {
     // Initialize Select2 with AJAX for the batch dropdown (default initialization)
     initSelect2WithAjax('mySelect2', '{{ route('batches.fetch.certificate') }}', 'Select or add a Batch', null);
     initSelectFilter('batch', '{{ route('batches.fetch.certificate') }}', 'Select or add a Batch', null);
-    initSelect2WithRegulators();
 });
 
 function initSelect2WithAjax(elementId, ajaxUrl, placeholderText, penlatId = null) {
@@ -549,88 +631,6 @@ function initSelectFilter(elementId, ajaxUrl, placeholderText, penlatId = null) 
         }
     });
 }
-function initSelect2WithRegulators() {
-    $('#regulator').select2({
-        ajax: {
-            url: '{{ route('regulators.fetch') }}', // Define the route for fetching regulators
-            dataType: 'json',
-            delay: 250,
-            data: function (params) {
-                return {
-                    q: params.term, // Search query
-                    page: params.page || 1, // Pagination
-                };
-            },
-            processResults: function (data, params) {
-                params.page = params.page || 1;
-                return {
-                    results: $.map(data.items, function (item) {
-                        return {
-                            id: item.id,
-                            text: item.description,
-                        };
-                    }),
-                    pagination: {
-                        more: data.total_count > (params.page * 10),
-                    },
-                };
-            },
-            cache: true,
-        },
-        placeholder: 'Select or add a Regulator',
-        minimumInputLength: 1,
-        width: '100%',
-        dropdownParent: $('#inputDataModal'),
-        tags: true, // Enable tagging for new entries
-        allowClear: true,
-        createTag: function (params) {
-            var term = $.trim(params.term);
-            if (term === '') {
-                return null;
-            }
-            return {
-                id: term,
-                text: term,
-                newTag: true, // Mark as new
-            };
-        },
-        templateResult: function (data) {
-            if (data.newTag) {
-                return $('<span><em>Add new: "' + data.text + '"</em></span>');
-            }
-            return data.text;
-        },
-        templateSelection: function (data) {
-            return data.text;
-        },
-    });
-
-    // Listen for selection and handle new tag creation
-    $('#regulator').on('select2:select', function (e) {
-        var selectedData = e.params.data;
-        if (selectedData.newTag) {
-            // If it's a new entry, save it to the database
-            $.ajax({
-                url: '{{ route('regulators.store') }}', // Define the route to save the new regulator
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}', // CSRF protection
-                },
-                data: {
-                    description: selectedData.text, // New regulator description
-                },
-                success: function (response) {
-                    // Replace the temporary new tag ID with the real one from the database
-                    var newOption = new Option(response.description, response.id, false, true);
-                    $('#regulator').append(newOption).trigger('change');
-                },
-                error: function () {
-                    alert('Failed to save the new regulator.');
-                },
-            });
-        }
-    });
-}
 </script>
 
 <script>
@@ -646,16 +646,6 @@ function initSelect2WithRegulators() {
             initialNumberContainer.style.display = 'none';
             initialNumberInput.removeAttribute('required');
             initialNumberInput.value = ''; // Clear the input value if hidden
-        }
-    });
-    document.getElementById('regulator_amendment').addEventListener('change', function () {
-        const selectedValue = this.value;
-        const initialNumberContainer = document.getElementById('regulator_field');
-
-        if (selectedValue === '-1') { // Show input for "Custom Number"
-            initialNumberContainer.style.display = 'none';
-        } else { // Hide input and remove "required"
-            initialNumberContainer.style.display = 'flex';
         }
     });
 </script>

@@ -440,11 +440,13 @@ class PDController extends Controller
         if (!empty($validatedData['endDate'])) {
             $updateData['end_date'] = $validatedData['endDate'];
         }
-        if (!empty($validatedData['regulator'])) {
-            $updateData['regulator'] = $validatedData['regulator'];
-        }
-        if (!empty($validatedData['regulator_amendment'])) {
+        if (!empty($validatedData['regulator_amendment']) || !empty($validatedData['regulator']) || $validatedData['regulator_amendment'] == -1 || $validatedData['regulator'] == -1) {
+            $updateData['regulator_amendment'] = NULL;
+            $updateData['regulator'] = NULL;
+        } else {
             $updateData['regulator_amendment'] = $validatedData['regulator_amendment'];
+            $updateData['regulator'] = $validatedData['regulator'];
+
         }
 
         // Update the certificate fields only if there are changes

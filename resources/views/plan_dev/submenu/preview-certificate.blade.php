@@ -105,8 +105,14 @@ font-weight-bold
                 <h6 class="m-0 font-weight-bold text-secondary" id="judul">Detail Pelatihan</h6>
             </div>
             <div class="card-body" style="position: relative;">
-                <a href="#" data-toggle="modal" data-target="#editDataModal" data-regulator-id="{{ $data->regulation_amendments }}" data-regulator-text="{{ $data->regulation_amendments->description }}" class="position-absolute" style="top: 10px; right: 15px; z-index: 10;">
-                    <i class="fa fa-edit fa-lg ml-2" style="color: rgb(181, 181, 181);"></i>
+                <a href="#"
+                    class="editButton position-absolute"
+                    data-toggle="modal"
+                    data-target="#editDataModal"
+                    data-amendment-id="{{ $data->regulator_amendment }}"
+                    data-regulator-id="{{ $data->regulator }}"
+                    style="top: 10px; right: 15px; z-index: 10;">
+                        <i class="fa fa-edit fa-lg ml-2" style="color: rgb(181, 181, 181);"></i>
                 </a>
                 <div class="col-md-12 mb-3">
                     <div class="row">
@@ -352,28 +358,24 @@ font-weight-bold
                         <div class="flex-grow-1">
                             <select class="form-control" id="regulator_amendment" name="regulator_amendment">
                                 <option disabled selected>Select Amendment...</option>
+                                <option value="-1" selected>No Regulator</option>
                                 @foreach ($listAmendment as $amendment)
-                                    <option value="{{ $amendment->id }}" @if($amendment->id == $data->regulator_amendment) selected @endif>{{ $amendment->description }}</option>
+                                    <option value="{{ $amendment->id }}">{{ $amendment->description }}</option>
                                 @endforeach
                             </select>
                         </div>
                     </div>
-                    <div class="d-flex align-items-center mb-4">
-                        <div style="width: 160px;" class="mr-2">
+                    <div class="d-flex align-items-center mb-4" id="regulator_field">
+                        <div style="width: 140px;" class="mr-2">
                             <p style="margin: 0;">Regulator :</p>
                         </div>
                         <div class="flex-grow-1">
                             <select class="form-control" id="regulator" name="regulator">
                                 <option disabled selected>Select Regulator...</option>
+                                <option value="-1" selected>No Regulator</option>
                                 @foreach ($listRegulator as $regulator)
-                                    @php
-                                        $maxLength = 80; // Define max length before truncation
-                                        $shortDescription = strlen($regulator->description) > $maxLength
-                                            ? substr($regulator->description, 0, $maxLength) . '...'
-                                            : $regulator->description;
-                                    @endphp
-                                    <option value="{{ $regulator->id }}" @if($regulator->id == $data->regulator) selected @endif>
-                                        {{ $shortDescription }}
+                                    <option value="{{ $regulator->id }}" title="{{ $regulator->description }}">
+                                        {{ $regulator->description }}
                                     </option>
                                 @endforeach
                             </select>
@@ -628,7 +630,41 @@ font-weight-bold
                 }
             });
         });
-        initSelect2WithRegulators();
+
+
+        $('#regulator_amendment').select2({
+            dropdownParent: $('#editDataModal'),
+            placeholder: "Select Amendment...",
+            width: '100%',
+            allowClear: true,
+            language: {
+                noResults: function() {
+                    return "No result match your request... Create new in Templates Menu!";
+                }
+            }
+        });
+        $('#regulator').select2({
+            dropdownParent: $('#editDataModal'),
+            placeholder: "Select Regulator...",
+            width: '100%',
+            allowClear: true,
+            language: {
+                noResults: function() {
+                    return "No result match your request... Create new in Templates Menu!";
+                }
+            }
+        });
+
+        $(document).on('click', '.editButton', function () {
+            var amendmentId = $(this).data('amendment-id');
+            var regulatorId = $(this).data('regulator-id');
+
+            // Set the selected value for amendment select
+            $('#regulator_amendment').val(amendmentId || -1).trigger('change');
+
+            // Set the selected value for regulator select
+            $('#regulator').val(regulatorId || -1).trigger('change');
+        });
     });
 
     function updateSelectedCount(count) {

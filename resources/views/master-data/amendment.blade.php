@@ -62,8 +62,10 @@ font-weight-bold
                         <thead class="thead-light">
                             <tr>
                                 <th>#</th>
+                                <th>Training Name</th>
                                 <th>Description</th>
                                 <th>Translation</th>
+                                <th>Regulator</th>
                                 <th width="150px">Action</th>
                             </tr>
                         </thead>
@@ -71,8 +73,10 @@ font-weight-bold
                             @foreach($listAmendments as $amendments)
                             <tr>
                                 <td>{{ $no++ }}</td>
+                                <td>{{ $amendments->penlats->description }}</td>
                                 <td>{{ $amendments->description }}</td>
                                 <td>{{ $amendments->translation }}</td>
+                                <td>{{ $amendments->regulators->description }}</td>
                                 <td class="actions text-center">
                                     <div>
                                         <button onclick="openEditModal({{ $amendments->id }})" class="btn btn-outline-secondary btn-md mb-2 mr-2"><i class="fa fa-edit"></i></button>
@@ -94,10 +98,10 @@ font-weight-bold
                 <div class="card-body" style="background-color: rgb(247, 247, 247);">
                     <h6 class="h6 mb-2 font-weight-bold text-gray-800">Amendments Guidelines</h6>
                     <ul class="ml-4">
-                        <li>Adding new locations will affect the Locations Table.</li>
+                        <li>Adding new Regulator will affect the Regulator Table.</li>
                         <li>Ensure that each location has a unique location code and an appropriate description.</li>
-                        <li>Locations linked to existing assets cannot be deleted; ensure relationships are properly managed before attempting deletion.</li>
-                        <li>Follow the correct procedure when updating or registering locations to maintain database integrity.</li>
+                        <li>Regulator linked to existing assets cannot be deleted; ensure relationships are properly managed before attempting deletion.</li>
+                        <li>Follow the correct procedure when updating or registering Regulator to maintain database integrity.</li>
                     </ul>
                 </div>
             </div>
@@ -105,7 +109,7 @@ font-weight-bold
     </div>
 </div>
 <div class="modal fade" id="inputDataModal" tabindex="-1" role="dialog" aria-labelledby="inputDataModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header d-flex flex-row align-items-center justify-content-between">
                 <h5 class="modal-title" id="inputDataModalLabel">Input Data</h5>
@@ -118,26 +122,41 @@ font-weight-bold
                 <div class="modal-body mr-2 ml-2">
                     <div class="row no-gutters">
                         <div class="col-md-12">
-                            <div class="card-body text-secondary">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Description :</p>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <input type="text" class="form-control" id="description" name="description" required>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Translation :</p>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <input type="text" class="form-control" id="translation" name="translation" required>
-                                            </div>
-                                        </div>
-                                    </div>
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Nama Pelatihan :</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <select id="penlatSelect" name="penlatId" class="form-control select2" required>
+                                        <option selected disabled>Select Pelatihan...</option>
+                                        @foreach($penlatList as $penlat)
+                                            <option value="{{ $penlat->id }}">{{ $penlat->description }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Description :</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="text" class="form-control" id="description" name="description" required>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Translation :</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="text" class="form-control" id="translation" name="translation" required>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Regulator :</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <select class="form-control" id="regulator" name="regulator"></select>
                                 </div>
                             </div>
                         </div>
@@ -152,7 +171,7 @@ font-weight-bold
     </div>
 </div>
 <div class="modal fade" id="editDataModal" tabindex="-1" role="dialog" aria-labelledby="editDataModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header d-flex flex-row align-items-center justify-content-between">
                 <h5 class="modal-title" id="editDataModalLabel">Edit Regulator</h5>
@@ -166,26 +185,41 @@ font-weight-bold
                 <div class="modal-body mr-2 ml-2">
                     <div class="row no-gutters">
                         <div class="col-md-12">
-                            <div class="card-body text-secondary">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Description:</p>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <input type="text" class="form-control" id="edit_description" name="edit_description" required>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Translation:</p>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <input type="text" class="form-control" id="edit_translation" name="edit_translation" required>
-                                            </div>
-                                        </div>
-                                    </div>
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Nama Pelatihan :</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <select id="penlatSelectEdit" name="penlatId" class="form-control select2" required>
+                                        <option selected disabled>Select Pelatihan...</option>
+                                        @foreach($penlatList as $penlat)
+                                            <option value="{{ $penlat->id }}">{{ $penlat->description }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Description:</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="text" class="form-control" id="edit_description" name="edit_description" required>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Translation:</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="text" class="form-control" id="edit_translation" name="edit_translation" required>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Regulator :</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <textarea class="form-control" id="edit_regulator" name="edit_regulator" rows="2" required></textarea>
                                 </div>
                             </div>
                         </div>
@@ -199,7 +233,51 @@ font-weight-bold
         </div>
     </div>
 </div>
+<style>
+    /* Custom CSS to align the Select2 container */
+    .select2-container--default .select2-selection--single {
+        height: calc(2.25rem + 2px); /* Adjust this value to match your input height */
+        padding: 0.375rem 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: calc(2.25rem + 2px); /* Adjust this to vertically align the text */
+    }
+
+    .select2-container .select2-selection--single {
+        height: 100% !important; /* Ensure the height is consistent */
+    }
+
+    .select2-container {
+        width: 100% !important; /* Ensure the width matches the form control */
+    }
+</style>
 <script>
+$(document).ready(function() {
+    $('#penlatSelect').select2({
+        dropdownParent: $('#inputDataModal'),
+        placeholder: "Select Pelatihan...",
+        width: '100%',
+        language: {
+            noResults: function() {
+                return "No result match your request... Create new in Master Data Menu!"; // Customize this message as needed
+            }
+        }
+    });
+    $('#penlatSelectEdit').select2({
+        dropdownParent: $('#editDataModal'),
+        placeholder: "Select Pelatihan...",
+        width: '100%',
+        language: {
+            noResults: function() {
+                return "No result match your request... Create new in Master Data Menu!"; // Customize this message as needed
+            }
+        }
+    });
+    initSelect2WithRegulators();
+});
 function deleteAmendments(locationId) {
     swal({
         title: "Are you sure?",
@@ -242,6 +320,8 @@ function openEditModal(locationId) {
             // Fill modal with existing location data
             $("#edit_translation").val(data.translation);
             $("#edit_description").val(data.description);
+            $("#penlatSelectEdit").val(data.penlat_id);
+            $("#edit_regulator").val(data.regulator_id);
 
             // Set the form action to the update route
             $("#editForm").attr("action", `/amendments/${locationId}`);
@@ -252,6 +332,89 @@ function openEditModal(locationId) {
         error: function () {
             swal("Error!", "Unable to fetch location data.", "error");
         },
+    });
+}
+
+function initSelect2WithRegulators() {
+    $('#regulator').select2({
+        ajax: {
+            url: '{{ route('regulators.fetch') }}', // Define the route for fetching regulators
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    q: params.term, // Search query
+                    page: params.page || 1, // Pagination
+                };
+            },
+            processResults: function (data, params) {
+                params.page = params.page || 1;
+                return {
+                    results: $.map(data.items, function (item) {
+                        return {
+                            id: item.id,
+                            text: item.description,
+                        };
+                    }),
+                    pagination: {
+                        more: data.total_count > (params.page * 10),
+                    },
+                };
+            },
+            cache: true,
+        },
+        placeholder: 'Select or add a Regulator',
+        minimumInputLength: 1,
+        width: '100%',
+        dropdownParent: $('#inputDataModal'),
+        tags: true, // Enable tagging for new entries
+        allowClear: true,
+        createTag: function (params) {
+            var term = $.trim(params.term);
+            if (term === '') {
+                return null;
+            }
+            return {
+                id: term,
+                text: term,
+                newTag: true, // Mark as new
+            };
+        },
+        templateResult: function (data) {
+            if (data.newTag) {
+                return $('<span><em>Add new: "' + data.text + '"</em></span>');
+            }
+            return data.text;
+        },
+        templateSelection: function (data) {
+            return data.text;
+        },
+    });
+
+    // Listen for selection and handle new tag creation
+    $('#regulator').on('select2:select', function (e) {
+        var selectedData = e.params.data;
+        if (selectedData.newTag) {
+            // If it's a new entry, save it to the database
+            $.ajax({
+                url: '{{ route('regulators.store') }}', // Define the route to save the new regulator
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}', // CSRF protection
+                },
+                data: {
+                    description: selectedData.text, // New regulator description
+                },
+                success: function (response) {
+                    // Replace the temporary new tag ID with the real one from the database
+                    var newOption = new Option(response.description, response.id, false, true);
+                    $('#regulator').append(newOption).trigger('change');
+                },
+                error: function () {
+                    alert('Failed to save the new regulator.');
+                },
+            });
+        }
     });
 }
 </script>

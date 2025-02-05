@@ -36,4 +36,9 @@ class Penlat extends Model
     {
         return $this->hasMany('App\Models\Penlat_alias', 'penlat_id', 'id');
     }
+
+    public function amendments()
+    {
+        return $this->hasMany('App\Models\Regulator_amendment', 'penlat_id', 'id');
+    }
 }

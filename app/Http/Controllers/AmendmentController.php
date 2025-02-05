@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Penlat;
 use App\Models\Regulator_amendment;
 use Illuminate\Http\Request;
 
@@ -10,21 +11,26 @@ class AmendmentController extends Controller
     public function index()
     {
         $listAmendments = Regulator_amendment::all();
-        return view('master-data.amendment', ['listAmendments' => $listAmendments]);
+        $penlatList = Penlat::all();
+        return view('master-data.amendment', ['listAmendments' => $listAmendments, 'penlatList' => $penlatList]);
     }
 
     public function store(Request $request)
     {
         // Validate input
         $request->validate([
-            'translation' => 'required|max:255',
-            'description' => 'required|max:255',
+            'penlatId' => 'required',
+            'translation' => 'required',
+            'description' => 'required',
+            'regulator' => 'required',
         ]);
 
         // Create a new location entry
         Regulator_amendment::create([
+            'penlat_id' => $request->input('penlatId'),
             'translation' => $request->input('translation'),
             'description' => $request->input('description'),
+            'regulator_id' => $request->input('regulator'),
         ]);
 
         // Redirect back with success message
@@ -65,8 +71,10 @@ class AmendmentController extends Controller
     {
         // Validate the input data
         $request->validate([
-            'edit_translation' => 'required|max:255',
-            'edit_description' => 'required|max:255',
+            'edit_translation' => 'required',
+            'edit_description' => 'required',
+            'penlatId' => 'required',
+            'edit_regulator' => 'required',
         ]);
 
         // Find the location by ID
@@ -79,8 +87,10 @@ class AmendmentController extends Controller
 
         // Update the location details
         $location->update([
+            'penlat_id' => $request->input('penlatId'),
             'translation' => $request->input('edit_translation'),
             'description' => $request->input('edit_description'),
+            'regulator_id' => $request->input('edit_regulator'),
         ]);
 
         return redirect()->back()->with('success', 'Regulator amendment has been successfully updated.');
