@@ -238,13 +238,15 @@ font-weight-bold
                                 </div>
                                 <div class="flex-grow-1">
                                     <select class="form-control" id="regulator_amendment" name="regulator_amendment">
+                                        <option value="-1" selected>No Regulator</option>
                                         @foreach ($listAmendment as $amendment)
                                             <option value="{{ $amendment->id }}">{{ $amendment->description }}</option>
                                         @endforeach
                                     </select>
                                 </div>
                             </div>
-                            <div class="d-flex align-items-center mb-4">
+
+                            <div class="align-items-center mb-4" id="regulator_field" style="display: none;">
                                 <div style="width: 160px;" class="mr-2">
                                     <p style="margin: 0;">Regulator <span class="text-danger">*</span> :</p>
                                 </div>
@@ -636,6 +638,16 @@ function initSelect2WithRegulators() {
             initialNumberContainer.style.display = 'none';
             initialNumberInput.removeAttribute('required');
             initialNumberInput.value = ''; // Clear the input value if hidden
+        }
+    });
+    document.getElementById('regulator_amendment').addEventListener('change', function () {
+        const selectedValue = this.value;
+        const initialNumberContainer = document.getElementById('regulator_field');
+
+        if (selectedValue === '-1') { // Show input for "Custom Number"
+            initialNumberContainer.style.display = 'none';
+        } else { // Hide input and remove "required"
+            initialNumberContainer.style.display = 'flex';
         }
     });
 </script>

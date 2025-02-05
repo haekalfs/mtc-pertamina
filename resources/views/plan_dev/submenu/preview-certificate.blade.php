@@ -133,7 +133,7 @@ font-weight-bold
                                 </tr>
                                 <tr>
                                     <th style="width: 200px;">Regulator</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $data->regulation->description }}</td>
+                                    <td style="text-align: start; font-weight:500">: {{ $data->regulation->description ?? '-' }}</td>
                                 </tr>
                                 <tr>
                                     <th style="width: 200px;">Remarks</th>
@@ -351,6 +351,7 @@ font-weight-bold
                         </div>
                         <div class="flex-grow-1">
                             <select class="form-control" id="regulator_amendment" name="regulator_amendment">
+                                <option disabled selected>Select Amendment...</option>
                                 @foreach ($listAmendment as $amendment)
                                     <option value="{{ $amendment->id }}" @if($amendment->id == $data->regulator_amendment) selected @endif>{{ $amendment->description }}</option>
                                 @endforeach
@@ -363,6 +364,7 @@ font-weight-bold
                         </div>
                         <div class="flex-grow-1">
                             <select class="form-control" id="regulator" name="regulator">
+                                <option disabled selected>Select Regulator...</option>
                                 @foreach ($listRegulator as $regulator)
                                     <option value="{{ $regulator->id }}" @if($regulator->id == $data->regulator) selected @endif>{{ $regulator->description }}</option>
                                 @endforeach

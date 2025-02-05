@@ -705,10 +705,10 @@ class PDController extends Controller
             'program' => 'sometimes',
             'startDate' => 'required',
             'endDate' => 'required',
-            'regulator_amendment' => 'required',
+            'regulator_amendment' => 'sometimes',
             'numbering' => 'required',
             'initial_number' => 'sometimes',
-            'regulator' => 'required'
+            'regulator' => 'sometimes'
         ]);
 
         // Store the current timestamp
@@ -755,22 +755,26 @@ class PDController extends Controller
             // Retrieve all participants for the specified batch
             $participants = Infografis_peserta::where('batch', $validated['batch'])->orderBy('nama_peserta', 'asc')->get();
 
+            $penlatCertificateData = [
+                'certificate_title' => strtoupper($validated['program']), // Convert to uppercase
+                'status' => $validated['status'],
+                'start_date' => $validated['startDate'],
+                'end_date' => $validated['endDate'],
+                'keterangan' => $validated['keterangan'],
+                'total_issued' => $participants->count(),
+                'created_by' => Auth::id(),
+                'updated_at' => $currentTimestamp,
+            ];
+
+            // Add regulator fields only if regulator_amendment is -1
+            if ($validated['regulator_amendment'] != -1) {
+                $penlatCertificateData['regulator_amendment'] = $validated['regulator_amendment'];
+                $penlatCertificateData['regulator'] = $validated['regulator'];
+            }
+
             $penlatCertificate = Penlat_certificate::updateOrCreate(
-                [
-                    'penlat_batch_id' => $penlatBatch->id,
-                ],
-                [
-                    'certificate_title' => strtoupper($validated['program']), // Convert to uppercase
-                    'status' => $validated['status'],
-                    'start_date' => $validated['startDate'],
-                    'end_date' => $validated['endDate'],
-                    'regulator_amendment' => $validated['regulator_amendment'],
-                    'regulator' => $validated['regulator'],
-                    'keterangan' => $validated['keterangan'],
-                    'total_issued' => $participants->count(),
-                    'created_by' => Auth::id(),
-                    'updated_at' => $currentTimestamp,
-                ]
+                ['penlat_batch_id' => $penlatBatch->id],
+                $penlatCertificateData
             );
 
             $initialNumber = $validated['initial_number'];
@@ -1585,10 +1589,13 @@ class PDController extends Controller
                 $sheet->setCellValueByColumnAndRow(25, 23, Carbon::parse($data->penlatCertificate->end_date)->format('d F Y'));
 
                 //regulator
-                $sheet->setCellValue('F26', $data->penlatCertificate->regulation_amendments->description);
-                $sheet->setCellValue('F27', $data->penlatCertificate->regulation_amendments->translation);
+                $sheet->setCellValue('F26', $data->penlatCertificate->regulation_amendments->description ?? ' ');
+                $sheet->setCellValue('F27', $data->penlatCertificate->regulation_amendments->translation ?? ' ');
 
-                $sheet->setCellValueByColumnAndRow(25, 26, $data->penlatCertificate->regulation->description);
+                if(!$data->penlatCertificate->regulation_amendments->description || !$data->penlatCertificate->regulation->description){
+                    $sheet->setCellValue('X26', ' ');
+                }
+                $sheet->setCellValueByColumnAndRow(25, 26, $data->penlatCertificate->regulation->description ?? ' ');
 
                 // Generate the QR code
                 $encryptedId = $data->id;
