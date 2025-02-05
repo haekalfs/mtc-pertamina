@@ -366,7 +366,15 @@ font-weight-bold
                             <select class="form-control" id="regulator" name="regulator">
                                 <option disabled selected>Select Regulator...</option>
                                 @foreach ($listRegulator as $regulator)
-                                    <option value="{{ $regulator->id }}" @if($regulator->id == $data->regulator) selected @endif>{{ $regulator->description }}</option>
+                                    @php
+                                        $maxLength = 80; // Define max length before truncation
+                                        $shortDescription = strlen($regulator->description) > $maxLength
+                                            ? substr($regulator->description, 0, $maxLength) . '...'
+                                            : $regulator->description;
+                                    @endphp
+                                    <option value="{{ $regulator->id }}" @if($regulator->id == $data->regulator) selected @endif>
+                                        {{ $shortDescription }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>

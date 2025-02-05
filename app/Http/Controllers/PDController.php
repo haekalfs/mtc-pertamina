@@ -1601,17 +1601,19 @@ class PDController extends Controller
 
                 // Define breakpoints for font sizes
                 $fontSizeThresholds = [
-                    175 => 14, // Up to 176 characters, font size 14
+                    175 => 14, // Up to 175 characters, font size 14
                     200 => 8,  // Up to 200 characters, font size 8
                 ];
 
                 // Default font size for very long text
-                $defaultFontSize = 14;
+                $defaultFontSize = 8; // Ensure long text uses the smallest font
 
                 // Determine the appropriate font size based on text length
+                $textLength = mb_strlen($certificateRegulationName); // Use mb_strlen for multibyte safety
                 $selectedFontSize = $defaultFontSize;
+
                 foreach ($fontSizeThresholds as $charLimit => $fontSizeOption) {
-                    if (strlen($certificateRegulationName) <= $charLimit) {
+                    if ($textLength <= $charLimit) {
                         $selectedFontSize = $fontSizeOption;
                         break;
                     }
