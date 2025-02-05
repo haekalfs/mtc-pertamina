@@ -1595,7 +1595,39 @@ class PDController extends Controller
                 if(!$data->penlatCertificate->regulation_amendments->description || !$data->penlatCertificate->regulation->description){
                     $sheet->setCellValue('X26', ' ');
                 }
-                $sheet->setCellValueByColumnAndRow(25, 26, $data->penlatCertificate->regulation->description ?? ' ');
+
+                // Get the description from related models
+                $certificateRegulationName = $data->penlatCertificate->regulation->description;
+
+                // Define breakpoints for font sizes
+                $fontSizeThresholds = [
+                    175 => 14, // Up to 176 characters, font size 14
+                    200 => 8,  // Up to 200 characters, font size 8
+                ];
+
+                // Default font size for very long text
+                $defaultFontSize = 14;
+
+                // Determine the appropriate font size based on text length
+                $selectedFontSize = $defaultFontSize;
+                foreach ($fontSizeThresholds as $charLimit => $fontSizeOption) {
+                    if (strlen($certificateRegulationName) <= $charLimit) {
+                        $selectedFontSize = $fontSizeOption;
+                        break;
+                    }
+                }
+
+                // Set the cell value
+                $excelCell = 'Y26';
+                $sheet->setCellValue($excelCell, $certificateRegulationName);
+
+                // Apply the calculated font size
+                $sheet->getStyle($excelCell)->getFont()->setSize($selectedFontSize);
+
+                // Align text to wrap within the cell
+                $sheet->getStyle($excelCell)->getAlignment()->setWrapText(true);
+                $sheet->getStyle($excelCell)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+                $sheet->getStyle($excelCell)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
 
                 // Generate the QR code
                 $encryptedId = $data->id;
@@ -1737,7 +1769,7 @@ class PDController extends Controller
     public function storeRegulator(Request $request)
     {
         $request->validate([
-            'description' => 'required|string|max:255',
+            'description' => 'required',
         ]);
 
         $regulator = Regulator::create([
