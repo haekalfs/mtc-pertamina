@@ -233,14 +233,22 @@ font-weight-bold
                                 </div>
                             </div>
                             <div class="d-flex align-items-center mb-4">
-                                <div style="width: 180px;" class="mr-2">
+                                <div style="width: 160px;" class="mr-2">
                                     <p style="margin: 0;">Amendment <span class="text-danger">*</span> :</p>
                                 </div>
                                 <div class="flex-grow-1">
                                     <select class="form-control" id="regulator_amendment" name="regulator_amendment">
                                         <option value="-1" selected>No Regulator</option>
                                         @foreach ($listAmendment as $amendment)
-                                            <option value="{{ $amendment->id }}">{{ $amendment->description }}</option>
+                                            @php
+                                                $maxLength = 40; // Define max length before truncation
+                                                $shortDescription = strlen($amendment->description) > $maxLength
+                                                    ? substr($amendment->description, 0, $maxLength) . '...'
+                                                    : $amendment->description;
+                                            @endphp
+                                            <option value="{{ $amendment->id }}" title="{{ $amendment->description }}">
+                                                {{ $shortDescription }}
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>
