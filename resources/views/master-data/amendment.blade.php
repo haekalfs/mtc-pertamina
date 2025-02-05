@@ -15,8 +15,8 @@ font-weight-bold
 @section('content')
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
-        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-gavel mr-1"></i> List Amendments</h1>
-        <p class="mb-4">List Amendments PMTC.</a></p>
+        <h1 class="h3 mb-2 font-weight-bold text-secondary"><i class="fa fa-gavel mr-1"></i> List Regulators</h1>
+        <p class="mb-4">List Regulators PMTC.</a></p>
     </div>
 </div>
 <div class="overlay overlay-mid" style="display: none;"></div>

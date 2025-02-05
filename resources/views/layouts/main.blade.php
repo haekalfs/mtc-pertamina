@@ -190,7 +190,7 @@
                         <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-templates')">
                             <li><i class="fa fa-gears"></i><a href="{{ route('list-utilities') }}" class="@yield('list-utilitas')">List Utilities</a></li>
                             <li><i class="fa fa-map-marker"></i><a href="{{ route('list-location') }}" class="@yield('list-lokasi')">List Locations</a></li>
-                            <li><i class="fa fa-gavel"></i><a href="{{ route('list-amendment') }}" class="@yield('list-amendment')">List Regulator Amendment</a></li>
+                            <li><i class="fa fa-gavel"></i><a href="{{ route('list-amendment') }}" class="@yield('list-amendment')">List Regulators</a></li>
                         </ul>
                     </li>
 
