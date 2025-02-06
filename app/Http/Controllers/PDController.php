@@ -393,10 +393,21 @@ class PDController extends Controller
                     return $item->created_at->format('d-M-Y');
                 })
                 ->addColumn('action', function($item) {
-                    return '
-                        <a class="btn btn-outline-secondary mr-2 btn-sm" href="'.route('preview-certificate', $item->id).'"><i class="menu-Logo fa fa-external-link"></i> Preview</a>
-                        <button class="btn btn-outline-danger btn-sm delete-certificate" data-id="'.$item->id.'"><i class="fa fa-trash"></i> Delete</button>
+                    $actionButtons = '
+                        <a class="btn btn-outline-secondary mr-2 btn-sm" href="'.route('preview-certificate', $item->id).'">
+                            <i class="menu-Logo fa fa-external-link"></i> Preview
+                        </a>
                     ';
+
+                    if ($item->status == 'On Process') {
+                        $actionButtons .= '
+                            <button class="btn btn-outline-danger btn-sm delete-certificate" data-id="'.$item->id.'">
+                                <i class="fa fa-trash"></i> Delete
+                            </button>
+                        ';
+                    }
+
+                    return $actionButtons;
                 })
                 ->rawColumns(['jumlah_issued', 'action']) // Ensure the HTML is rendered
                 ->make(true);
@@ -1796,26 +1807,58 @@ class PDController extends Controller
         $currentTimestamp = now();
         $isInternal = true;
 
-        // Fetch participants by batch
-        $participants = Infografis_peserta::where('batch', $validated['batch'])->orderBy('nama_peserta', 'asc')->get();
+        // Fetch participants ordered by nama_peserta
+        $participants = Infografis_peserta::where('batch', $validated['batch'])
+            ->orderBy('nama_peserta', 'asc')
+            ->pluck('id') // Get only IDs
+            ->toArray();
+
         $penlatBatch = Penlat_batch::where('batch', $validated['batch'])->first();
 
-        if(trim($penlatBatch->penlat->kategori_pelatihan) == trim('NON STCW')){
+        if (trim($penlatBatch->penlat->kategori_pelatihan) == trim('NON STCW')) {
             $isInternal = false;
         }
 
-        // Iterate over participants and update or create their certificates
-        foreach ($participants as $participant) {
-            Receivables_participant_certificate::updateOrCreate(
-                [
-                    'infografis_peserta_id' => $participant->id,
+        // Fetch existing receivables
+        $getReceivables = Receivables_participant_certificate::where('penlat_certificate_id', $request->penlatCertificateId)
+            ->orderBy('id', 'asc') // Maintain order
+            ->get();
+
+        $participantIndex = 0; // Track the participant index
+
+        if ($getReceivables->isEmpty()) {
+            // If there are no receivables, create for all participants
+            foreach ($participants as $participant) {
+                Receivables_participant_certificate::create([
+                    'infografis_peserta_id' => $participant,
                     'penlat_certificate_id' => $request->penlatCertificateId,
-                ],
-                [
                     'isInternal' => $isInternal,
                     'updated_at' => $currentTimestamp,
-                ]
-            );
+                ]);
+            }
+        } else {
+            // Assign existing receivables first
+            foreach ($getReceivables as $receivable) {
+                if (isset($participants[$participantIndex])) {
+                    $receivable->update([
+                        'infografis_peserta_id' => $participants[$participantIndex],
+                        'isInternal' => $isInternal,
+                        'updated_at' => $currentTimestamp,
+                    ]);
+                    $participantIndex++; // Move to the next participant
+                }
+            }
+
+            // If there are more participants than receivables, create new ones
+            while ($participantIndex < count($participants)) {
+                Receivables_participant_certificate::create([
+                    'infografis_peserta_id' => $participants[$participantIndex],
+                    'penlat_certificate_id' => $request->penlatCertificateId,
+                    'isInternal' => $isInternal,
+                    'updated_at' => $currentTimestamp,
+                ]);
+                $participantIndex++;
+            }
         }
 
         return response()->json([

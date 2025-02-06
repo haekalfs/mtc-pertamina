@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Infografis_peserta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
@@ -41,12 +42,24 @@ class RefractorController extends Controller
             return redirect()->back()->with('error', 'Invalid table name.');
         }
 
-        // Delete records based on date range and get the number of deleted rows
-        $totalRows = DB::table($tableName)
-            ->whereBetween('tgl_pelaksanaan', [$startDate, $endDate])
-            ->delete();
+        // Special handling for infografis_peserta
+        if ($tableName == 'infografis_peserta') {
+            // Get IDs of participants that have a related certificateCheck
+            $protectedIds = Infografis_peserta::has('certificateCheck')->pluck('id');
 
-        // Store the message in session and redirect back to the same page
+            // Delete only the records that are NOT linked to certificates
+            $totalRows = DB::table($tableName)
+                ->whereBetween('tgl_pelaksanaan', [$startDate, $endDate])
+                ->whereNotIn('id', $protectedIds) // Exclude linked rows
+                ->delete();
+        } else {
+            // Delete normally for other tables
+            $totalRows = DB::table($tableName)
+                ->whereBetween('tgl_pelaksanaan', [$startDate, $endDate])
+                ->delete();
+        }
+
+        // Store the message in session and redirect back
         return redirect()->back()->with('success', "$totalRows rows have been deleted successfully!");
     }
 }

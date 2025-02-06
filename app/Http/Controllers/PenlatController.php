@@ -723,6 +723,37 @@ class PenlatController extends Controller
         ]);
     }
 
+    public function getPenlatList(Request $request)
+    {
+        $search = $request->q; // Get search term
+
+        $penlats = Penlat::whereHas('aliases', function ($query) use ($search) {
+            $query->where('alias', 'LIKE', "%$search%");
+        })->with('aliases')->get();
+
+        // Grouping penlats by alias
+        $grouped = [];
+        foreach ($penlats as $penlat) {
+            foreach ($penlat->aliases as $alias) {
+                $grouped[$alias->alias][] = [
+                    'id' => $penlat->id,
+                    'text' => $penlat->description, // Select2 requires 'id' and 'text'
+                ];
+            }
+        }
+
+        // Formatting response for Select2
+        $formatted = [];
+        foreach ($grouped as $alias => $penlatList) {
+            $formatted[] = [
+                'text' => $alias, // This will be the optgroup label
+                'children' => $penlatList, // These will be the options under the optgroup
+            ];
+        }
+
+        return response()->json($formatted);
+    }
+
     public function refresh_batch_data(Request $request)
     {
         try {

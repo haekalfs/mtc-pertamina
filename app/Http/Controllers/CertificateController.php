@@ -122,6 +122,7 @@ class CertificateController extends Controller
             $sheet->setCellValueByColumnAndRow(6, $startRow, $row->peserta->nama_peserta ?? 'N/A');
             $sheet->setCellValueByColumnAndRow(7, $startRow, Carbon::parse($row->expire_date)->format('d-M-Y'));
             $sheet->setCellValueByColumnAndRow(8, $startRow, Carbon::parse($row->created_at)->format('d-M-Y'));
+            $sheet->setCellValueByColumnAndRow(9, $startRow, $row->penlatCertificate->created_by);
 
             $startRow++;
         }

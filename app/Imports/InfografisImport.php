@@ -77,9 +77,9 @@ class InfografisImport implements ToCollection, SkipsEmptyRows, WithBatchInserts
                         'realisasi' => $this->cleanString($row[20]),
                         'seafarer_code' => $row[8],
                         'participant_id' => $row[1],
+                        'registration_number' => $row[7],
                     ],
                     [
-                        'registration_number' => $row[7],
                         'birth_place' => $this->cleanString($row[3]),
                         'birth_date' => $this->getFormattedDate($row[4]),
                         'harga_pelatihan' => (int) preg_replace('/[^0-9]/', '', round($row[15])),

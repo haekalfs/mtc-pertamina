@@ -367,6 +367,7 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
             Route::get('/penlat/{id}/edit', [PenlatController::class, 'edit'])->name('penlat.edit');
             Route::put('/penlat-update/{id}', [PenlatController::class, 'update'])->name('penlat.update');
             Route::delete('/penlat-delete/{id}', [PenlatController::class, 'delete'])->name('delete.penlat');
+            Route::get('/penlat/list', [PenlatController::class, 'getPenlatList'])->name('penlat.list');
 
             //batch penlat
             Route::get('/penlat/list-batch', [PenlatController::class, 'batch'])->name('batch-penlat');

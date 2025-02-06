@@ -138,11 +138,11 @@ font-weight-bold
                                     <td style="text-align: start; font-weight:500">: {{ \Carbon\Carbon::parse($data->batch->date)->format('d F Y') }} - {{ \Carbon\Carbon::parse($data->end_date)->format('d F Y') }}</td>
                                 </tr>
                                 <tr>
-                                    <th style="width: 200px;">Regulator</th>
+                                    <th style="width: 200px;">Remarks</th>
                                     <td style="text-align: start; font-weight:500">: {{ $data->regulation->description ?? '-' }}</td>
                                 </tr>
                                 <tr>
-                                    <th style="width: 200px;">Remarks</th>
+                                    <th style="width: 200px;">Notes</th>
                                     <td style="text-align: start; font-weight:500">: {{ $data->keterangan }}</td>
                                 </tr>
                               </tr>
@@ -190,7 +190,7 @@ font-weight-bold
                                             <option value="2">Mark as Received</option>
                                             <option value="3">Mark as Issued</option>
                                             <option value="4">Mark as Expire</option>
-                                            <option value="5">Delete Permanently</option>
+                                            {{-- <option value="5">Delete Permanently</option> --}}
                                         </select>
                                         <button class="apply-btn">Execute</button>
                                     </div>
@@ -335,7 +335,7 @@ font-weight-bold
                 <div class="modal-body mr-2 ml-2">
                     <div class="d-flex align-items-center mb-4">
                         <div style="width: 140px;" class="mr-2">
-                            <p style="margin: 0;">Judul Sertifikat :</p>
+                            <p style="margin: 0;">Certificate Title :</p>
                         </div>
                         <div class="flex-grow-1">
                             <input type="text" id="programInput" class="form-control" name="program" value="{{ $data->certificate_title }}" required>
@@ -358,7 +358,7 @@ font-weight-bold
                         <div class="flex-grow-1">
                             <select class="form-control" id="regulator_amendment" name="regulator_amendment">
                                 <option disabled selected>Select Amendment...</option>
-                                <option value="-1" selected>No Regulator</option>
+                                <option value="-1" selected>No Amandment</option>
                                 @foreach ($listAmendment as $amendment)
                                     <option value="{{ $amendment->id }}">{{ $amendment->description }}</option>
                                 @endforeach
@@ -367,12 +367,12 @@ font-weight-bold
                     </div>
                     <div class="d-flex align-items-center mb-4" id="regulator_field">
                         <div style="width: 140px;" class="mr-2">
-                            <p style="margin: 0;">Regulator :</p>
+                            <p style="margin: 0;">Remarks :</p>
                         </div>
                         <div class="flex-grow-1">
                             <select class="form-control" id="regulator" name="regulator">
-                                <option disabled selected>Select Regulator...</option>
-                                <option value="-1" selected>No Regulator</option>
+                                <option disabled selected>Select Options...</option>
+                                <option value="-1" selected>No Remarks</option>
                                 @foreach ($listRegulator as $regulator)
                                     <option value="{{ $regulator->id }}" title="{{ $regulator->description }}">
                                         {{ $regulator->description }}
@@ -383,7 +383,7 @@ font-weight-bold
                     </div>
                     <div class="d-flex align-items-start mb-4">
                         <div style="width: 140px;" class="mr-2">
-                            <p style="margin: 0;">Keterangan :</p>
+                            <p style="margin: 0;">Notes :</p>
                         </div>
                         <div class="flex-grow-1">
                             <textarea class="form-control" rows="3" name="keterangan">{{ $data->keterangan }}</textarea>

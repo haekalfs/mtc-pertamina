@@ -166,9 +166,6 @@ font-weight-bold
                                 <div class="flex-grow-1">
                                     <select id="penlatSelect" class="form-control" name="penlat">
                                         <option selected disabled>Select Pelatihan...</option>
-                                        @foreach ($penlatList as $item)
-                                            <option value="{{ $item->id }}">{{ $item->description }}</option>
-                                        @endforeach
                                     </select>
                                 </div>
                             </div>
@@ -238,7 +235,7 @@ font-weight-bold
                                 </div>
                                 <div class="flex-grow-1">
                                     <select class="form-control custom-select" id="regulator_amendment" name="regulator_amendment">
-                                        <option value="-1" selected>No Regulator</option>
+                                        <option value="-1" selected>No Regulations</option>
                                         @foreach ($listAmendment as $amendment)
                                             <option value="{{ $amendment->id }}" title="{{ $amendment->description }}">
                                                 {{ $amendment->description }}
@@ -250,11 +247,11 @@ font-weight-bold
 
                             <div class="align-items-center mb-4" id="regulator_field" style="display: none;">
                                 <div style="width: 160px;" class="mr-2">
-                                    <p style="margin: 0;">Regulator <span class="text-danger">*</span> :</p>
+                                    <p style="margin: 0;">Remarks <span class="text-danger">*</span> :</p>
                                 </div>
                                 <div class="flex-grow-1" id="regulator_container">
                                     <select class="form-control" id="regulator" name="regulator">
-                                        <option value="-1" selected>No Regulator</option>
+                                        <option value="-1" selected>No Remarks</option>
                                         @foreach ($listRegulator as $regulator)
                                             <option value="{{ $regulator->id }}" title="{{ $regulator->description }}">
                                                 {{ $regulator->description }}
@@ -265,7 +262,7 @@ font-weight-bold
                             </div>
                             <div class="d-flex align-items-start mb-4">
                                 <div style="width: 160px;" class="mr-2">
-                                    <p style="margin: 0;">Remarks :</p>
+                                    <p style="margin: 0;">Notes :</p>
                                 </div>
                                 <div class="flex-grow-1">
                                     <textarea class="form-control" rows="3" name="keterangan"></textarea>
@@ -415,9 +412,9 @@ $(document).ready(function() {
         }
     });
 
-    $('#penlatSelect').select2({
+    $('#regulator').select2({
         dropdownParent: $('#inputDataModal'),
-        placeholder: "Select Pelatihan...",
+        placeholder: "Select Regulator...",
         width: '100%',
         allowClear: true,
         language: {
@@ -427,14 +424,39 @@ $(document).ready(function() {
         }
     });
 
-    $('#regulator').select2({
+    $('#penlatSelect').select2({
         dropdownParent: $('#inputDataModal'),
-        placeholder: "Select Regulator...",
+        placeholder: "Select Pelatihan...",
         width: '100%',
         allowClear: true,
+        ajax: {
+            url: '{{ route('penlat.list') }}',
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    q: params.term // Pass search term
+                };
+            },
+            processResults: function (data) {
+                return {
+                    results: data // Directly map to results since optgroup is already formatted
+                };
+            },
+            cache: true
+        },
+        templateResult: function (data) {
+            if (!data.id) {
+                return $('<b>' + data.text + '</b>'); // Show alias (optgroup)
+            }
+            return $('<span>' + data.text + '</span>'); // Show description as selectable option
+        },
+        templateSelection: function (data) {
+            return data.text || "Select Pelatihan..."; // Ensure placeholder works
+        },
         language: {
-            noResults: function() {
-                return "No result match your request... Create new in Master Data Menu!"; // Customize this message as needed
+            noResults: function () {
+                return "No result match your request... Create new in Master Data Menu!";
             }
         }
     });
