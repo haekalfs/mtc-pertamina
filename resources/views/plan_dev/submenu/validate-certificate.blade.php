@@ -173,11 +173,15 @@
                 </tr>
             </table>
         </div><br>
-        <div class="verification-box">
-            Dokumen ini hasil verifikasi tidak sebagai dokumen pengganti ; informasi lebih lanjut pada dokumen fisik<br>
-            <em><i>This document is the result of verification and is not used as a replacement document; more information on physical documents</i></em>
-        </div>
         <br>
+        <div class="verification-box">
+            <p style="margin-bottom: 5px; margin-top: 0;">
+                Dokumen ini hasil verifikasi tidak sebagai dokumen pengganti ; informasi lebih lanjut pada dokumen fisik melalui <br> Email : mtc.helpdesk@pertamina.com ; Official Whatsapp: 0811-1935-4952
+            </p>
+            <span><em><i>
+                This document is the result of verification and is not used as a replacement document; more information on physical documents through Email : mtc.helpdesk@pertamina.com ; Official Whatsapp: 0811-1935-4952
+            </i></em></span>
+        </div>
     </div>
 </body>
 </html>
