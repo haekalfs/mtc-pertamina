@@ -1533,8 +1533,8 @@ class PDController extends Controller
 
                 // Define breakpoints for font sizes
                 $fontSizes = [
-                    20 => 28, // Up to 60 characters, font size 24
-                    40 => 24, // Up to 60 characters, font size 24
+                    35 => 28, // Up to 60 characters, font size 24
+                    45 => 24, // Up to 60 characters, font size 24
                     60 => 20, // Up to 80 characters, font size 20
                     80 => 16, // Up to 100 characters, font size 16
                 ];
