@@ -12,8 +12,9 @@ class AmendmentController extends Controller
     public function index()
     {
         $listAmendments = Regulator_amendment::all();
+        $listRegulator = Regulator::all();
         $penlatList = Penlat::all();
-        return view('master-data.amendment', ['listAmendments' => $listAmendments, 'penlatList' => $penlatList]);
+        return view('master-data.amendment', ['listAmendments' => $listAmendments, 'penlatList' => $penlatList, 'listRegulator' => $listRegulator]);
     }
 
     public function store(Request $request)
@@ -88,31 +89,38 @@ class AmendmentController extends Controller
 
     public function update(Request $request, $id)
     {
-        // Validate the input data
+        // Validate required fields, but allow optional fields
         $request->validate([
-            'edit_translation' => 'required',
-            'edit_description' => 'required',
-            'penlatId' => 'required',
-            'edit_regulator' => 'required',
+            'edit_translation' => 'nullable',
+            'edit_description' => 'nullable',
+            'penlatId' => 'nullable',
+            'edit_regulator' => 'nullable',
         ]);
 
         // Find the location by ID
         $location = Regulator_amendment::find($id);
 
-        // Check if location exists
         if (!$location) {
-            return redirect()->back()->with('failed', 'Regulator amendment fail to update!.');
+            return redirect()->back()->with('failed', 'Regulator amendment failed to update!');
         }
 
-        // Update the location details
-        $location->update([
+        // Prepare the update data (excluding null/empty values)
+        $updateData = array_filter([
             'penlat_id' => $request->input('penlatId'),
             'translation' => $request->input('edit_translation'),
             'description' => $request->input('edit_description'),
             'regulator_id' => $request->input('edit_regulator'),
-        ]);
+        ], function ($value) {
+            return !is_null($value) && $value !== ''; // Exclude null and empty values
+        });
 
-        return redirect()->back()->with('success', 'Regulator amendment has been successfully updated.');
+        // Update only if there are fields to update
+        if (!empty($updateData)) {
+            $location->update($updateData);
+            return redirect()->back()->with('success', 'Regulator amendment has been successfully updated.');
+        }
+
+        return redirect()->back()->with('info', 'No changes were made.');
     }
 
     public function edit($id)

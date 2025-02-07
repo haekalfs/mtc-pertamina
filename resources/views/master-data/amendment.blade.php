@@ -216,10 +216,15 @@ font-weight-bold
                             </div>
                             <div class="d-flex align-items-center mb-4">
                                 <div style="width: 140px;" class="mr-2">
-                                    <p style="margin: 0;">Regulator :</p>
+                                    <p style="margin: 0;">Remarks :</p>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <select class="form-control" id="edit_regulator" name="edit_regulator"></select>
+                                    <select class="form-control" id="edit_regulator" name="edit_regulator">
+                                        <option selected disabled>Select Remarks...</option>
+                                        @foreach($listRegulator as $regulator)
+                                            <option value="{{ $regulator->id }}">{{ $regulator->description }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -276,6 +281,16 @@ $(document).ready(function() {
             }
         }
     });
+    $('#edit_regulator').select2({
+        dropdownParent: $('#editDataModal'),
+        placeholder: "Select Pelatihan...",
+        width: '100%',
+        language: {
+            noResults: function() {
+                return "No result match your request... Create new in Master Data Menu!"; // Customize this message as needed
+            }
+        }
+    });
     initSelect2WithRegulators();
 });
 function deleteAmendments(locationId) {
@@ -321,8 +336,7 @@ function openEditModal(locationId) {
             $("#edit_translation").val(data.translation);
             $("#edit_description").val(data.description);
             $("#penlatSelectEdit").val(data.penlat_id);
-            $("#edit_regulator").val(data.regulator_id);
-
+            $('#regulator_amendment').val(data.regulator_id).trigger('change');
             // Set the form action to the update route
             $("#editForm").attr("action", `/amendments/${locationId}`);
 
