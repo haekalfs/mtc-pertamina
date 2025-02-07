@@ -1505,11 +1505,21 @@ class PDController extends Controller
         $zip = new ZipArchive;
         if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
             foreach ($formIds as $formId) {
-                $templatePath = public_path('uploads/template/template_certificate.xlsx');
+                $data = Receivables_participant_certificate::find($formId);
+
+                // Get the description from related models
+                $certificateRegulationName = $data->penlatCertificate->regulation->description;
+                // Determine the appropriate font size based on text length
+                $textLength = mb_strlen($certificateRegulationName); // Use mb_strlen for multibyte safety
+
+                if ($textLength < 100) {
+                    $templatePath = public_path('uploads/template/template_certificate.xlsx');
+                } else {
+                    $templatePath = public_path('uploads/template/template_certificate_2.xlsx');
+                }
+
                 $spreadsheet = IOFactory::load($templatePath);
                 $sheet = $spreadsheet->getActiveSheet();
-
-                $data = Receivables_participant_certificate::find($formId);
 
                 // Modify the spreadsheet
                 $certificateNumber = $data->certificate_number;
@@ -1536,7 +1546,7 @@ class PDController extends Controller
                     50 => 28, // Up to 60 characters, font size 24
                     70 => 24, // Up to 60 characters, font size 24
                     80 => 20, // Up to 80 characters, font size 20
-                    90 => 16, // Up to 100 characters, font size 16
+                    100 => 16, // Up to 100 characters, font size 16
                 ];
 
                 // Default font size for very long text
@@ -1609,40 +1619,38 @@ class PDController extends Controller
                     $sheet->setCellValue('X26', ' ');
                 }
 
-                // Get the description from related models
-                $certificateRegulationName = $data->penlatCertificate->regulation->description;
+                // // Define breakpoints for font sizes
+                // $fontSizeThresholds = [
+                //     175 => 14, // Up to 175 characters, font size 14
+                //     200 => 8,  // Up to 200 characters, font size 8
+                // ];
 
-                // Define breakpoints for font sizes
-                $fontSizeThresholds = [
-                    175 => 14, // Up to 175 characters, font size 14
-                    200 => 8,  // Up to 200 characters, font size 8
-                ];
+                // // Default font size for very long text
+                // $defaultFontSize = 8; // Ensure long text uses the smallest font
 
-                // Default font size for very long text
-                $defaultFontSize = 8; // Ensure long text uses the smallest font
+                // $selectedFontSize = $defaultFontSize;
 
-                // Determine the appropriate font size based on text length
-                $textLength = mb_strlen($certificateRegulationName); // Use mb_strlen for multibyte safety
-                $selectedFontSize = $defaultFontSize;
+                // foreach ($fontSizeThresholds as $charLimit => $fontSizeOption) {
+                //     if ($textLength <= $charLimit) {
+                //         $selectedFontSize = $fontSizeOption;
+                //         break;
+                //     }
+                // }
 
-                foreach ($fontSizeThresholds as $charLimit => $fontSizeOption) {
-                    if ($textLength <= $charLimit) {
-                        $selectedFontSize = $fontSizeOption;
-                        break;
-                    }
+                if ($textLength < 120) {
+                    $excelCell = 'Y26';
+                    $sheet->setCellValue($excelCell, $certificateRegulationName);
+                } else {
+                    $excelCell = 'P26';
+                    $sheet->setCellValue($excelCell, $certificateRegulationName);
                 }
-
-                // Set the cell value
-                $excelCell = 'Y26';
-                $sheet->setCellValue($excelCell, $certificateRegulationName);
-
                 // Apply the calculated font size
-                $sheet->getStyle($excelCell)->getFont()->setSize($selectedFontSize);
+                // $sheet->getStyle($excelCell)->getFont()->setSize($selectedFontSize);
 
-                // Align text to wrap within the cell
-                $sheet->getStyle($excelCell)->getAlignment()->setWrapText(true);
-                $sheet->getStyle($excelCell)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
-                $sheet->getStyle($excelCell)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+                // // Align text to wrap within the cell
+                // $sheet->getStyle($excelCell)->getAlignment()->setWrapText(true);
+                // $sheet->getStyle($excelCell)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+                // $sheet->getStyle($excelCell)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
 
                 // Generate the QR code
                 $encryptedId = $data->id;
