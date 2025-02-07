@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Penlat;
+use App\Models\Regulator;
 use App\Models\Regulator_amendment;
 use Illuminate\Http\Request;
 
@@ -25,16 +26,34 @@ class AmendmentController extends Controller
             'regulator' => 'required',
         ]);
 
-        // Create a new location entry
+        // Check if regulator is numeric
+        if (!is_numeric($request->regulator)) {
+            // Create a new regulator entry
+            $regulator = Regulator::create([
+                'description' => $request->regulator,
+            ]);
+        } else {
+            // Check if regulator ID exists
+            $regulator = Regulator::find($request->regulator);
+
+            // If not found, create a new regulator
+            if (!$regulator) {
+                $regulator = Regulator::create([
+                    'description' => 'New Regulator ID ' . $request->regulator, // You can change this message
+                ]);
+            }
+        }
+
+        // Create a new regulator amendment entry
         Regulator_amendment::create([
             'penlat_id' => $request->input('penlatId'),
             'translation' => $request->input('translation'),
             'description' => $request->input('description'),
-            'regulator_id' => $request->input('regulator'),
+            'regulator_id' => $regulator->id,
         ]);
 
         // Redirect back with success message
-        return redirect()->back()->with('success', 'Regulator_amendment has been successfully added.');
+        return redirect()->back()->with('success', 'Regulator amendment has been successfully added.');
     }
 
     public function destroy(Request $request, $id)

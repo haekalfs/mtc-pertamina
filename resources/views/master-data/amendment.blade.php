@@ -219,7 +219,7 @@ font-weight-bold
                                     <p style="margin: 0;">Regulator :</p>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <textarea class="form-control" id="edit_regulator" name="edit_regulator" rows="2" required></textarea>
+                                    <select class="form-control" id="edit_regulator" name="edit_regulator"></select>
                                 </div>
                             </div>
                         </div>
