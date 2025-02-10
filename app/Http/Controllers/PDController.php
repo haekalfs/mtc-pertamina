@@ -721,7 +721,8 @@ class PDController extends Controller
             'regulator_amendment' => 'sometimes',
             'numbering' => 'required',
             'initial_number' => 'sometimes',
-            'regulator' => 'sometimes'
+            'regulator' => 'sometimes',
+            'photo_placeholder' => 'nullable|boolean',
         ]);
 
         // Store the current timestamp
@@ -777,6 +778,7 @@ class PDController extends Controller
                 'total_issued' => $participants->count(),
                 'created_by' => Auth::id(),
                 'updated_at' => $currentTimestamp,
+                'photo_placeholder' => request()->has('photo_placeholder') ? 1 : 0,
             ];
 
             // Add regulator fields only if regulator_amendment is -1
@@ -1512,11 +1514,10 @@ class PDController extends Controller
                 // Determine the appropriate font size based on text length
                 $textLength = mb_strlen($certificateRegulationName); // Use mb_strlen for multibyte safety
 
-                if ($textLength < 100) {
-                    $templatePath = public_path('uploads/template/template_certificate.xlsx');
-                } else {
-                    $templatePath = public_path('uploads/template/template_certificate_2.xlsx');
-                }
+                $templateBase = $textLength < 100 ? 'template_certificate' : 'template_certificate_2';
+                $placeholderSuffix = ($data->penlatCertificate->photo_placeholder == 1) ? '_placeholdered' : '';
+
+                $templatePath = public_path("uploads/template/{$templateBase}{$placeholderSuffix}.xlsx");
 
                 $spreadsheet = IOFactory::load($templatePath);
                 $sheet = $spreadsheet->getActiveSheet();
@@ -1619,24 +1620,6 @@ class PDController extends Controller
                     $sheet->setCellValue('X26', ' ');
                 }
 
-                // // Define breakpoints for font sizes
-                // $fontSizeThresholds = [
-                //     175 => 14, // Up to 175 characters, font size 14
-                //     200 => 8,  // Up to 200 characters, font size 8
-                // ];
-
-                // // Default font size for very long text
-                // $defaultFontSize = 8; // Ensure long text uses the smallest font
-
-                // $selectedFontSize = $defaultFontSize;
-
-                // foreach ($fontSizeThresholds as $charLimit => $fontSizeOption) {
-                //     if ($textLength <= $charLimit) {
-                //         $selectedFontSize = $fontSizeOption;
-                //         break;
-                //     }
-                // }
-
                 if ($textLength < 120) {
                     $excelCell = 'Y26';
                     $sheet->setCellValue($excelCell, $certificateRegulationName);
@@ -1644,13 +1627,6 @@ class PDController extends Controller
                     $excelCell = 'P26';
                     $sheet->setCellValue($excelCell, $certificateRegulationName);
                 }
-                // Apply the calculated font size
-                // $sheet->getStyle($excelCell)->getFont()->setSize($selectedFontSize);
-
-                // // Align text to wrap within the cell
-                // $sheet->getStyle($excelCell)->getAlignment()->setWrapText(true);
-                // $sheet->getStyle($excelCell)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
-                // $sheet->getStyle($excelCell)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
 
                 // Generate the QR code
                 $encryptedId = $data->id;

@@ -268,6 +268,17 @@ font-weight-bold
                                     <textarea class="form-control" rows="3" name="keterangan"></textarea>
                                 </div>
                             </div>
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 160px;" class="mr-2">
+                                    <p style="margin: 0;">Placeholder <span class="text-danger">*</span> :</p>
+                                </div>
+                                <div class="flex-grow-1 ml-3">
+                                    <div class="custom-control custom-switch">
+                                        <input type="checkbox" class="custom-control-input" id="autoSubmit" name="photo_placeholder" value="0" onchange="togglePlaceholderText()">
+                                        <label class="custom-control-label" for="autoSubmit" id="placeholderLabel">Hide Photo Placeholder</label>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -333,7 +344,8 @@ $(document).ready(function() {
             { data: 'created_by', name: 'created_by' },
             { data: 'created_at', name: 'created_at' },
             { data: 'action', name: 'action', orderable: false, searchable: false, className: 'text-center' }
-        ]
+        ],
+        order: [[8, 'desc']],
     });
 
     // Filter button click event
@@ -652,6 +664,11 @@ function initSelectFilter(elementId, ajaxUrl, placeholderText, penlatId = null) 
             return data.text;
         }
     });
+}
+function togglePlaceholderText() {
+    let checkbox = document.getElementById("autoSubmit");
+    let label = document.getElementById("placeholderLabel");
+    label.textContent = checkbox.checked ? "Show Photo Placeholder" : "Hide Photo Placeholder";
 }
 </script>
 

@@ -101,8 +101,11 @@
                     <li class="@yield('active-dashboard')">
                         <a href="{{ route('dashboard') }}"><i class="menu-icon fa fa-laptop"></i>Home </a>
                     </li>
+                    @usr_acc(101, 102, 100, 103, 104, 105, 106)
                     <li class="menu-title">Main Menu</li><!-- /.menu-title -->
-                    @usr_acc(101)
+                    @endusr_acc
+
+                    @usr_acc(100)
                     <li class="menu-item-has-children dropdown @yield('active-penlat') @yield('show-penlat')">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="menu-icon ti-layout-list-thumb-alt"></i> Master Data</a>
                         <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-penlat')">
@@ -113,6 +116,7 @@
                         </ul>
                     </li>
                     @endusr_acc
+
                     @usr_acc(101)
                     <li class="menu-item-has-children dropdown @yield('active-operation') @yield('show-operation')">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="menu-icon fa fa-cogs"></i> Operation</a>
@@ -182,9 +186,11 @@
                     </li>
                     @endusr_acc
 
-                    @usr_acc(201)
+                    @usr_acc(201, 202, 203)
                     <li class="menu-title">Settings</li><!-- /.menu-title -->
+                    @endusr_acc
 
+                    @usr_acc(203)
                     <li class="menu-item-has-children dropdown @yield('active-templates') @yield('show-templates')">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="menu-icon ti-layout-list-thumb-alt"></i> Templates</a>
                         <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-templates')">
@@ -193,7 +199,9 @@
                             <li><i class="fa fa-gavel"></i><a href="{{ route('list-amendment') }}" class="@yield('list-amendment')">List Regulators</a></li>
                         </ul>
                     </li>
+                    @endusr_acc
 
+                    @usr_acc(201)
                     <li class="menu-item-has-children dropdown @yield('active-user') @yield('show-user')">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-users"></i>Users</a>
                         <ul class="sub-menu children dropdown-menu font-weight-normal @yield('show-user')">
@@ -215,12 +223,18 @@
                     @endusr_acc
 
                     <li class="menu-title">Tools</li><!-- /.menu-title -->
+
+                    @usr_acc(204)
                     <li class="@yield('active-refractor')">
                         <a href="{{ route('refractor') }}"><i class="menu-icon fa fa-trash-o"></i>Data Cleansing</a>
                     </li>
+                    @endusr_acc
+
+                    @usr_acc(205)
                     <li class="@yield('active-barcode_page')">
                         <a href="{{ route('barcode_page') }}"><i class="menu-icon fa fa-qrcode"></i>QR Code Generator </a>
                     </li>
+                    @endusr_acc
                     <li style="padding-bottom: 15%;">
                         <a href="/telescope"><i class="menu-icon fa fa-signal"></i>Web Monitoring</a>
                     </li>

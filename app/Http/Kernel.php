@@ -23,8 +23,7 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
         \App\Http\Middleware\ValidateRequest::class,
         \App\Http\Middleware\SuspiciousActivityDetection::class,
-        \App\Http\Middleware\SuspiciousTextCheck::class,
-        // \App\Http\Middleware\SanitizeGetRequests::class,
+        // \App\Http\Middleware\SuspiciousTextCheck::class,
         \App\Http\Middleware\PreventDirectoryTraversal::class,
         \App\Http\Middleware\PreventSSRFMiddleware::class,
     ];
@@ -70,11 +69,14 @@ class Kernel extends HttpKernel
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+        //Custom MMiddleware
         'checkForErrors' => \App\Http\Middleware\CheckForErrors::class,
         'checkUserAccess' => \App\Http\Middleware\CheckUserAccess::class,
         'suspicious' => \App\Http\Middleware\SuspiciousFileCheck::class,
         'suspiciousTexts' => \App\Http\Middleware\SuspiciousTextCheck::class,
+        'filterGetRequest' => \App\Http\Middleware\SanitizeGetRequests::class,
         'restrictRequestbyRole' => \App\Http\Middleware\RestrictRequestRole::class,
+        //Unused
         'encrypt.params' => \App\Http\Middleware\EncryptParams::class,
         'decrypt.params' => \App\Http\Middleware\DecryptParams::class,
     ];

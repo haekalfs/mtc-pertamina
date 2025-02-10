@@ -135,7 +135,7 @@ font-weight-bold
                                 </tr>
                                 <tr>
                                     <th>Date of Conduct</th>
-                                    <td style="text-align: start; font-weight:500">: {{ \Carbon\Carbon::parse($data->batch->date)->format('d F Y') }} - {{ \Carbon\Carbon::parse($data->end_date)->format('d F Y') }}</td>
+                                    <td style="text-align: start; font-weight:500">: {{ \Carbon\Carbon::parse($data->start_date)->format('d F Y') }} - {{ \Carbon\Carbon::parse($data->end_date)->format('d F Y') }}</td>
                                 </tr>
                                 <tr>
                                     <th style="width: 200px;">Remarks</th>
@@ -190,7 +190,9 @@ font-weight-bold
                                             <option value="2">Mark as Received</option>
                                             <option value="3">Mark as Issued</option>
                                             <option value="4">Mark as Expire</option>
-                                            {{-- <option value="5">Delete Permanently</option> --}}
+                                            @usr_acc(206)
+                                            <option value="5">Delete Permanently</option>
+                                            @endusr_acc
                                         </select>
                                         <button class="apply-btn">Execute</button>
                                     </div>

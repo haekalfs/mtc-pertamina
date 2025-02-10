@@ -27,7 +27,6 @@ use App\Http\Controllers\PenlatController;
 use App\Http\Controllers\RefractorController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\RolesController;
-use App\Http\Controllers\SocialMediaController;
 use App\Http\Controllers\UserController;
 use App\Models\Infografis_peserta;
 use Illuminate\Support\Facades\Crypt;
@@ -51,32 +50,24 @@ use Yajra\DataTables\Facades\DataTables;
 Route::middleware('checkForErrors', 'suspiciousTexts', 'suspicious', 'throttle:60,1')->group(function () {
     Route::get('/certificate-validation/qr-code/preview-certificate/{id}', [PDController::class, 'validate_certificate'])->name('validate-certificate');
 });
+
+
 // Throttle middleware for 10 requests per minute
 Route::get('/', function () {
     return redirect('/dashboard');
-})->middleware(['auth', 'suspicious', 'suspiciousTexts', 'verified', 'throttle:10,1']);
+})->middleware(['auth', 'suspicious', 'suspiciousTexts', 'verified', 'throttle:30,1']);
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'suspicious', 'suspiciousTexts', 'verified']) // 60 requests per minute
     ->name('dashboard');
 
+
 Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
     Route::middleware('suspiciousTexts')->group(function () {
 
-        Route::get('/certificate-generate-qr/{id}', [PDController::class, 'generateQrCode'])->name('generate-qr-certificate');
-        Route::get('/get-next-certificate-number/{id}', [PDController::class, 'getNumberCertificate'])->name('getCertificateNumber');
-
-        Route::get('/penlat/amendments', [PenlatController::class, 'getAmendments'])->name('penlat.getAmendments');
-
-        Route::post('/export-certificate-data', [CertificateController::class, 'export'])->name('export.certificate.data');
-        Route::post('/export-batches-data', [PenlatController::class, 'export'])->name('export.batches.data');
-
         //On Dev Notification
         Route::get('/closed-menu', function () {
-            // Set the session flash message
             Session::flash('warning', 'The menu you try to access is locked 🔒, thank you for your patience.');
-
-            // Redirect back to the current page or any other specific page
             return redirect()->back();
         })->name('on.development');
 
@@ -125,7 +116,6 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
             Route::post('/api/get-participants-stcw-non', [DashboardController::class, 'getParticipants']);
 
             Route::get('/api/calendar/get-participants', [DashboardController::class, 'fetchClickedParticipantonCalendar']);
-
         });
 
         //Encrypt
@@ -140,43 +130,7 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
         });
 
         Route::middleware(['restrictRequestbyRole'])->group(function () {
-            //KPI
-            Route::middleware(['checkUserAccess:105'])->group(function () {
-                //KPI
-                Route::get('/key-performance-indicators/index/{quarterSelected?}/{yearSelected?}', [KPIController::class, 'index'])->name('kpi');
-                Route::post('/kpi-store', [KPIController::class, 'store'])->name('kpis.store');
-                Route::get('/kpi/{id}/edit', [KPIController::class, 'edit'])->name('kpis.edit');
-                Route::put('/kpi-update/{id}', [KPIController::class, 'update'])->name('kpis.update');
-                Route::post('/pencapaian-kpi/store/{kpi}', [KPIController::class, 'store_pencapaian'])->name('pencapaian.kpi.store');
-                Route::get('/pencapaian-kpi/edit/{id}', [KPIController::class, 'edit_pencapaian'])->name('pencapaian.kpi.edit');
-                Route::delete('/pencapaian-kpi/delete/{id}', [KPIController::class, 'delete_pencapaian'])->name('pencapaian.kpi.delete');
-                Route::post('/pencapaian-kpi/update/{id}', [KPIController::class, 'update_pencapaian'])->name('pencapaian.update');
-                Route::get('/key-performance-indicators/achievements/{id}/{quarter}/{year}', [KPIController::class, 'pencapaian'])->name('pencapaian-kpi');
-                Route::delete('/delete-kpi/{id}', [KPIController::class, 'destroy'])->name('kpi.destroy');
-                Route::delete('/delete-pencapaian-kpi/{id}', [KPIController::class, 'destroy_pencapaian'])->name('pencapaian.kpi.destroy');
-                Route::get('/key-performance-indicators/manage-items/{yearSelected?}', [KPIController::class, 'manage'])->name('manage-kpi');
-                Route::get('/key-performance-indicators/report', [KPIController::class, 'report'])->name('report-kpi');
-                Route::post('/duplicate-kpis/{year}', [KPIController::class, 'duplicateKpis'])->name('kpis.duplicate');
-                Route::post('/key-performance-indicators/downloadPdf', [KPIController::class, 'downloadPdf'])->name('kpi.downloadPdf');
-                //KPI Unused
-                Route::get('/key-performance-indicators/preview/{id}', [KPIController::class, 'preview'])->name('preview-kpi');
-            });
-
-            //Pencapaian AKhlak
-            Route::middleware(['checkUserAccess:106'])->group(function () {
-                Route::get('/akhlak-achievements', [AkhlakController::class, 'index'])->name('akhlak.achievements');
-                Route::get('/akhlak/preview-achievements/{coreValue}/{quarter}/{periode}', [AkhlakController::class, 'preview_achievements'])->name('preview.achievements');
-                Route::get('/akhlak-report', [AkhlakController::class, 'report'])->name('report-akhlak');
-                Route::post('/akhlak-store', [AkhlakController::class, 'store'])->name('akhlak.store');
-                Route::get('/akhlak/edit/{id}', [AkhlakController::class, 'edit'])->name('akhlak.edit');
-                Route::put('/akhlak/update/{id}', [AkhlakController::class, 'update'])->name('akhlak.update');
-                Route::delete('/akhlak-destroy/{id}', [AkhlakController::class, 'destroy'])->name('akhlak.destroy');
-                Route::post('/akhlak/downloadPdf', [AkhlakController::class, 'downloadPdf'])->name('akhlak.downloadPdf');
-            });
-
             Route::middleware(['checkUserAccess:101'])->group(function () {
-                //Operation
-                Route::get('/operation-dashboard/{yearSelected?}', [OperationController::class, 'index'])->name('operation');
                 //participant-infographics
                 Route::get('/operation/participant-infographics', [OperationController::class, 'participant_infographics'])->name('participant-infographics');
                 Route::get('/operation/participant-infographics/import-page', [OperationController::class, 'participant_infographics_import_page'])->name('participant-infographics-import-page');
@@ -188,6 +142,35 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
 
                 //Error Log
                 Route::get('/operation/participant-infographics/error-log', [OperationController::class, 'error_log'])->name('infographics.error.log');
+
+                //penlat
+                Route::get('/penlat/list-pelatihan', [PenlatController::class, 'index'])->name('penlat');
+                Route::get('/penlat/pelatihan-preview/{penlatId}', [PenlatController::class, 'preview_penlat'])->name('preview-penlat');
+                Route::get('/penlat/list-pelatihan/import-data', [PenlatController::class, 'penlat_import'])->name('penlat-import');
+                Route::post('/import-list-penlat', [ImportController::class, 'import_penlat'])->name('penlat.import');
+                Route::post('/store-penlat', [PenlatController::class, 'store'])->name('penlat.store');
+                Route::get('/penlat/{id}/edit', [PenlatController::class, 'edit'])->name('penlat.edit');
+                Route::put('/penlat-update/{id}', [PenlatController::class, 'update'])->name('penlat.update');
+                Route::delete('/penlat-delete/{id}', [PenlatController::class, 'delete'])->name('delete.penlat');
+                Route::get('/penlat/list', [PenlatController::class, 'getPenlatList'])->name('penlat.list');
+
+                //batch penlat
+                Route::get('/penlat/list-batch', [PenlatController::class, 'batch'])->name('batch-penlat');
+                Route::get('/penlat/list-batch/preview-batch/{id}', [PenlatController::class, 'preview_batch'])->name('preview-batch');
+                Route::post('/store-batch-penlat', [PenlatController::class, 'batch_store'])->name('batch.store');
+                Route::get('/penlat-batch/{id}/edit', [PenlatController::class, 'fetch_batch'])->name('batch.data');
+                Route::put('/penlat-batch-update/{id}', [PenlatController::class, 'update_batch'])->name('batch.update');
+                Route::delete('/penlat-batch-delete/{id}', [PenlatController::class, 'delete_batch'])->name('delete.batch');
+                Route::get('/fetch-penlat-batches', [PenlatController::class, 'fetchBatches'])->name('batches.fetch');
+                Route::get('/fetch-certificate-batches', [PenlatController::class, 'fetchBatchesCertificates'])->name('batches.fetch.certificate');
+                Route::post('/penlat-batch/refresh', [PenlatController::class, 'refresh_batch_data'])->name('refresh.batch');
+                //Certificate Number
+                Route::get('/master-data/certificates-numbers', [CertificateController::class, 'index'])->name('certificate-number');
+            });
+
+            Route::middleware(['checkUserAccess:101'])->group(function () {
+                //Operation
+                Route::get('/operation-dashboard/{yearSelected?}', [OperationController::class, 'index'])->name('operation');
 
                 //inventaris Alat
                 Route::get('/tool-inventory/index', [InventoryToolController::class, 'main'])->name('mainpage-inventory');
@@ -235,6 +218,15 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
                 Route::post('/insert-new-item-penlat-utility/{id}', [OperationController::class, 'utility_insert_new_item'])->name('utility.insert');
                 Route::delete('/penlat-utility-item-usage-delete/{id}', [OperationController::class, 'delete_item_usage'])->name('delete.item.usage');
                 Route::delete('/penlat-utility-usage-delete/{id}', [OperationController::class, 'delete_batch_usage'])->name('delete.usage');
+
+                //Penlat Requirement
+                Route::get('/penlat/tool-requirement-penlat', [PenlatController::class, 'tool_requirement_penlat'])->name('tool-requirement-penlat');
+                Route::post('/store-penlat-requirement', [PenlatController::class, 'requirement_store'])->name('requirement.store');
+                Route::post('/insert-item-to-penlat-requirement/{penlatId}', [PenlatController::class, 'requirement_insert_item'])->name('requirement.insert.item');
+                Route::get('/penlat/tool-requirement-penlat/preview-item/{id}', [PenlatController::class, 'preview_requirement'])->name('preview-requirement');
+                Route::put('/penlat-requirement-update/{id}', [PenlatController::class, 'update_requirement'])->name('requirement.update');
+                Route::delete('/penlat-requirement-delete/{id}', [PenlatController::class, 'delete_requirement'])->name('delete.requirement');
+                Route::delete('/penlat-item-requirement-delete/{id}', [PenlatController::class, 'delete_item_requirement'])->name('delete.item.requirement');
             });
 
             // P&D
@@ -284,6 +276,11 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
                 Route::post('/certificates/export/selected-items', [PDController::class, 'export_selected'])->name('certificate.export.selected');
                 Route::post('/certificates/set-as-issued/selected-items', [PDController::class, 'markAsIssued'])->name('set-as-issued');
                 Route::post('/refresh-participants-certificate', [PDController::class, 'refreshParticipants'])->name('refresh.participants');
+                Route::post('/export-certificate-data', [CertificateController::class, 'export'])->name('export.certificate.data');
+                Route::post('/export-batches-data', [PenlatController::class, 'export'])->name('export.batches.data');
+                Route::get('/certificate-generate-qr/{id}', [PDController::class, 'generateQrCode'])->name('generate-qr-certificate');
+                Route::get('/get-next-certificate-number/{id}', [PDController::class, 'getNumberCertificate'])->name('getCertificateNumber');
+                Route::get('/penlat/amendments', [PenlatController::class, 'getAmendments'])->name('penlat.getAmendments');
 
 
                 Route::get('/regulators/fetch', [PDController::class, 'fetchRegulators'])->name('regulators.fetch');
@@ -332,14 +329,6 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
                 Route::put('/update-campaign/{itemId}', [CampaignController::class, 'update'])->name('campaign.update');
                 Route::delete('/marketing-campaign/delete-item/{id}', [CampaignController::class, 'delete_campaign'])->name('delete-campaign');
 
-                //Insights
-                Route::get('/marketing/social-media/insight', [SocialMediaController::class, 'index'])->name('insight-socmed');
-                Route::post('/social-media/update-facebook-token/{id}', [SocialMediaController::class, 'updateFacebookToken']);
-                Route::get('/marketing/social-media/getTotalPostFacebook', [SocialMediaController::class, 'getTotalPostFacebook'])->name('getTotalPostFacebook');
-                Route::get('/marketing/social-media/getTotalLikesFacebook', [SocialMediaController::class, 'getTotalLikesFacebook'])->name('getTotalLikesFacebook');
-                Route::get('/marketing/social-media/getTotalCommentsFacebook', [SocialMediaController::class, 'getTotalCommentsFacebook'])->name('getTotalCommentsFacebook');
-                Route::get('/marketing/social-media/getTotalVisitorsFacebook', [SocialMediaController::class, 'getTotalVisitorsFacebook'])->name('getTotalVisitorsFacebook');
-
                 //Company Agreement
                 Route::get('/marketing/company-agreement', [MarketingController::class, 'company_agreement'])->name('company-agreement');
                 Route::post('/store-agreement', [AgreementController::class, 'store'])->name('agreement.store');
@@ -349,59 +338,28 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
                 Route::delete('/marketing-agreement/delete-item/{id}', [AgreementController::class, 'delete_agreement'])->name('delete-agreement');
             });
 
-            //Penlat Requirement
-            Route::get('/penlat/tool-requirement-penlat', [PenlatController::class, 'tool_requirement_penlat'])->name('tool-requirement-penlat');
-            Route::post('/store-penlat-requirement', [PenlatController::class, 'requirement_store'])->name('requirement.store');
-            Route::post('/insert-item-to-penlat-requirement/{penlatId}', [PenlatController::class, 'requirement_insert_item'])->name('requirement.insert.item');
-            Route::get('/penlat/tool-requirement-penlat/preview-item/{id}', [PenlatController::class, 'preview_requirement'])->name('preview-requirement');
-            Route::put('/penlat-requirement-update/{id}', [PenlatController::class, 'update_requirement'])->name('requirement.update');
-            Route::delete('/penlat-requirement-delete/{id}', [PenlatController::class, 'delete_requirement'])->name('delete.requirement');
-            Route::delete('/penlat-item-requirement-delete/{id}', [PenlatController::class, 'delete_item_requirement'])->name('delete.item.requirement');
+            Route::middleware(['checkUserAccess:203'])->group(function () {
+                //Master Data
+                Route::get('/utilities/list-utilities', [OperationController::class, 'list_utilities'])->name('list-utilities');
+                Route::post('/store-data-utilities', [OperationController::class, 'store_new_utility'])->name('store-new-utility');
+                Route::delete('/delete-utility-data', [OperationController::class, 'deleteUtility'])->name('delete-utility');
+                Route::get('/get-utility/{id}', [OperationController::class, 'getUtility'])->name('get-utility');
+                Route::post('/update-utility', [OperationController::class, 'updateUtility'])->name('update-utility');
 
-            //penlat
-            Route::get('/penlat/list-pelatihan', [PenlatController::class, 'index'])->name('penlat');
-            Route::get('/penlat/pelatihan-preview/{penlatId}', [PenlatController::class, 'preview_penlat'])->name('preview-penlat');
-            Route::get('/penlat/list-pelatihan/import-data', [PenlatController::class, 'penlat_import'])->name('penlat-import');
-            Route::post('/import-list-penlat', [ImportController::class, 'import_penlat'])->name('penlat.import');
-            Route::post('/store-penlat', [PenlatController::class, 'store'])->name('penlat.store');
-            Route::get('/penlat/{id}/edit', [PenlatController::class, 'edit'])->name('penlat.edit');
-            Route::put('/penlat-update/{id}', [PenlatController::class, 'update'])->name('penlat.update');
-            Route::delete('/penlat-delete/{id}', [PenlatController::class, 'delete'])->name('delete.penlat');
-            Route::get('/penlat/list', [PenlatController::class, 'getPenlatList'])->name('penlat.list');
+                Route::get('/master-data/list-location', [LocationController::class, 'index'])->name('list-location');
+                Route::post('/store-data-location', [LocationController::class, 'store'])->name('store-new-location');
+                Route::delete('/locations/{id}', [LocationController::class, 'destroy'])->name('locations.destroy');
+                Route::put('/locations/{id}', [LocationController::class, 'update'])->name('locations.update');
+                Route::get('/locations/{id}/edit', [LocationController::class, 'edit'])->name('locations.edit');
 
-            //batch penlat
-            Route::get('/penlat/list-batch', [PenlatController::class, 'batch'])->name('batch-penlat');
-            Route::get('/penlat/list-batch/preview-batch/{id}', [PenlatController::class, 'preview_batch'])->name('preview-batch');
-            Route::post('/store-batch-penlat', [PenlatController::class, 'batch_store'])->name('batch.store');
-            Route::get('/penlat-batch/{id}/edit', [PenlatController::class, 'fetch_batch'])->name('batch.data');
-            Route::put('/penlat-batch-update/{id}', [PenlatController::class, 'update_batch'])->name('batch.update');
-            Route::delete('/penlat-batch-delete/{id}', [PenlatController::class, 'delete_batch'])->name('delete.batch');
-            Route::get('/fetch-penlat-batches', [PenlatController::class, 'fetchBatches'])->name('batches.fetch');
-            Route::get('/fetch-certificate-batches', [PenlatController::class, 'fetchBatchesCertificates'])->name('batches.fetch.certificate');
-            Route::post('/penlat-batch/refresh', [PenlatController::class, 'refresh_batch_data'])->name('refresh.batch');
 
-            //Master Data
-            Route::get('/utilities/list-utilities', [OperationController::class, 'list_utilities'])->name('list-utilities');
-            Route::post('/store-data-utilities', [OperationController::class, 'store_new_utility'])->name('store-new-utility');
-            Route::delete('/delete-utility-data', [OperationController::class, 'deleteUtility'])->name('delete-utility');
-            Route::get('/get-utility/{id}', [OperationController::class, 'getUtility'])->name('get-utility');
-            Route::post('/update-utility', [OperationController::class, 'updateUtility'])->name('update-utility');
-
-            Route::get('/master-data/list-location', [LocationController::class, 'index'])->name('list-location');
-            Route::post('/store-data-location', [LocationController::class, 'store'])->name('store-new-location');
-            Route::delete('/locations/{id}', [LocationController::class, 'destroy'])->name('locations.destroy');
-            Route::put('/locations/{id}', [LocationController::class, 'update'])->name('locations.update');
-            Route::get('/locations/{id}/edit', [LocationController::class, 'edit'])->name('locations.edit');
-
-            //Certificate Number
-            Route::get('/master-data/certificates-numbers', [CertificateController::class, 'index'])->name('certificate-number');
-
-            //List Amendment
-            Route::get('/master-data/list-amendment', [AmendmentController::class, 'index'])->name('list-amendment');
-            Route::post('/store-data-amendment', [AmendmentController::class, 'store'])->name('store-new-amendment');
-            Route::delete('/amendments/{id}', [AmendmentController::class, 'destroy'])->name('amendments.destroy');
-            Route::put('/amendments/{id}', [AmendmentController::class, 'update'])->name('amendments.update');
-            Route::get('/amendments/{id}/edit', [AmendmentController::class, 'edit'])->name('amendments.edit');
+                //List Amendment
+                Route::get('/master-data/list-amendment', [AmendmentController::class, 'index'])->name('list-amendment');
+                Route::post('/store-data-amendment', [AmendmentController::class, 'store'])->name('store-new-amendment');
+                Route::delete('/amendments/{id}', [AmendmentController::class, 'destroy'])->name('amendments.destroy');
+                Route::put('/amendments/{id}', [AmendmentController::class, 'update'])->name('amendments.update');
+                Route::get('/amendments/{id}/edit', [AmendmentController::class, 'edit'])->name('amendments.edit');
+            });
 
 
             //Finance
@@ -423,6 +381,39 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
                 Route::get('/finances/error-log', [FinanceController::class, 'error_log'])->name('finance.error.log');
             });
 
+            //KPI
+            Route::middleware(['checkUserAccess:105'])->group(function () {
+                //KPI
+                Route::get('/key-performance-indicators/index/{quarterSelected?}/{yearSelected?}', [KPIController::class, 'index'])->name('kpi');
+                Route::post('/kpi-store', [KPIController::class, 'store'])->name('kpis.store');
+                Route::get('/kpi/{id}/edit', [KPIController::class, 'edit'])->name('kpis.edit');
+                Route::put('/kpi-update/{id}', [KPIController::class, 'update'])->name('kpis.update');
+                Route::post('/pencapaian-kpi/store/{kpi}', [KPIController::class, 'store_pencapaian'])->name('pencapaian.kpi.store');
+                Route::get('/pencapaian-kpi/edit/{id}', [KPIController::class, 'edit_pencapaian'])->name('pencapaian.kpi.edit');
+                Route::delete('/pencapaian-kpi/delete/{id}', [KPIController::class, 'delete_pencapaian'])->name('pencapaian.kpi.delete');
+                Route::post('/pencapaian-kpi/update/{id}', [KPIController::class, 'update_pencapaian'])->name('pencapaian.update');
+                Route::get('/key-performance-indicators/achievements/{id}/{quarter}/{year}', [KPIController::class, 'pencapaian'])->name('pencapaian-kpi');
+                Route::delete('/delete-kpi/{id}', [KPIController::class, 'destroy'])->name('kpi.destroy');
+                Route::delete('/delete-pencapaian-kpi/{id}', [KPIController::class, 'destroy_pencapaian'])->name('pencapaian.kpi.destroy');
+                Route::get('/key-performance-indicators/manage-items/{yearSelected?}', [KPIController::class, 'manage'])->name('manage-kpi');
+                Route::get('/key-performance-indicators/report', [KPIController::class, 'report'])->name('report-kpi');
+                Route::post('/duplicate-kpis/{year}', [KPIController::class, 'duplicateKpis'])->name('kpis.duplicate');
+                Route::post('/key-performance-indicators/downloadPdf', [KPIController::class, 'downloadPdf'])->name('kpi.downloadPdf');
+                //KPI Unused
+                Route::get('/key-performance-indicators/preview/{id}', [KPIController::class, 'preview'])->name('preview-kpi');
+            });
+
+            //Pencapaian AKhlak
+            Route::middleware(['checkUserAccess:106'])->group(function () {
+                Route::get('/akhlak-achievements', [AkhlakController::class, 'index'])->name('akhlak.achievements');
+                Route::get('/akhlak/preview-achievements/{coreValue}/{quarter}/{periode}', [AkhlakController::class, 'preview_achievements'])->name('preview.achievements');
+                Route::get('/akhlak-report', [AkhlakController::class, 'report'])->name('report-akhlak');
+                Route::post('/akhlak-store', [AkhlakController::class, 'store'])->name('akhlak.store');
+                Route::get('/akhlak/edit/{id}', [AkhlakController::class, 'edit'])->name('akhlak.edit');
+                Route::put('/akhlak/update/{id}', [AkhlakController::class, 'update'])->name('akhlak.update');
+                Route::delete('/akhlak-destroy/{id}', [AkhlakController::class, 'destroy'])->name('akhlak.destroy');
+                Route::post('/akhlak/downloadPdf', [AkhlakController::class, 'downloadPdf'])->name('akhlak.downloadPdf');
+            });
 
             //my profile
             Route::get('/profile', [MyProfileController::class, 'index'])->name('profile.view');
@@ -465,35 +456,36 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
         });
     });
 
-
-    Route::middleware(['checkUserAccess:106'])->group(function () {
-        Route::get('/akhlak/morning-briefing', [MorningBriefingController::class, 'index'])->name('morning-briefing');
-        Route::get('/akhlak/morning-briefing/preview/{id}', [MorningBriefingController::class, 'preview_briefing'])->name('preview-briefing');
-        Route::post('/store-briefing', [MorningBriefingController::class, 'store'])->name('briefing.store');
-        Route::get('/fetch-briefing-data/{itemId}', [MorningBriefingController::class, 'show'])->name('briefing.show');
-        Route::put('/update-briefing/{itemId}', [MorningBriefingController::class, 'update'])->name('briefing.update');
-        Route::delete('/marketing-briefing/delete-item/{id}', [MorningBriefingController::class, 'delete_briefing'])->name('delete-briefing');
+    Route::middleware(['restrictRequestbyRole', 'checkUserAccess:105'])->group(function () {
+        Route::post('/key-performance-indicators/downloadPdf', [KPIController::class, 'downloadPdf'])->name('kpi.downloadPdf');
+    });
+    Route::middleware(['restrictRequestbyRole', 'checkUserAccess:106'])->group(function () {
+        Route::post('/akhlak/downloadPdf', [AkhlakController::class, 'downloadPdf'])->name('akhlak.downloadPdf');
     });
 
+    Route::middleware(['restrictRequestbyRole', 'suspiciousTexts'])->group(function () {
+        Route::middleware(['checkUserAccess:106'])->group(function () {
+            Route::get('/akhlak/morning-briefing', [MorningBriefingController::class, 'index'])->name('morning-briefing');
+            Route::get('/akhlak/morning-briefing/preview/{id}', [MorningBriefingController::class, 'preview_briefing'])->name('preview-briefing');
+            Route::post('/store-briefing', [MorningBriefingController::class, 'store'])->name('briefing.store');
+            Route::get('/fetch-briefing-data/{itemId}', [MorningBriefingController::class, 'show'])->name('briefing.show');
+            Route::put('/update-briefing/{itemId}', [MorningBriefingController::class, 'update'])->name('briefing.update');
+            Route::delete('/marketing-briefing/delete-item/{id}', [MorningBriefingController::class, 'delete_briefing'])->name('delete-briefing');
+        });
 
-    Route::get('/qr-code-generator', [BarcodeController::class, 'index'])->name('barcode_page');
-    Route::post('/generate-qr-code', [BarcodeController::class, 'generateQR'])->name('generate.Qr');
 
-
-    Route::middleware(['restrictRequestbyRole', 'checkUserAccess:104'])->group(function () {
-        //Marketing
-        Route::get('/marketing', [MarketingController::class, 'index'])->name('marketing');
-        Route::get('/marketing-campaign', [MarketingController::class, 'campaign'])->name('marketing-campaign');
-        Route::get('/marketing-campaign/preview/{id}', [CampaignController::class, 'preview_campaign'])->name('preview-campaign');
-        Route::post('/store-campaign', [CampaignController::class, 'store'])->name('campaign.store');
-        Route::get('/fetch-campaign-data/{itemId}', [CampaignController::class, 'show'])->name('campaign.show');
-        Route::put('/update-campaign/{itemId}', [CampaignController::class, 'update'])->name('campaign.update');
-        Route::delete('/marketing-campaign/delete-item/{id}', [CampaignController::class, 'delete_campaign'])->name('delete-campaign');
+        Route::middleware(['checkUserAccess:205', 'suspiciousTexts'])->group(function () {
+            Route::get('/qr-code-generator', [BarcodeController::class, 'index'])->name('barcode_page');
+            Route::post('/generate-qr-code', [BarcodeController::class, 'generateQR'])->name('generate.Qr');
+        });
     });
-    //alowed method
-    Route::get('/manage-allowed-method', [ManageAccessController::class, 'manage_request'])->name('manage.request');
-    Route::post('/assign-role-to-methods', [ManageAccessController::class, 'grant_method_access_to_roles'])->name('assign.roles.to.method');
-    Route::get('/reset-methods-access/{id}', [ManageAccessController::class, 'remove_methods_access'])->name('remove.method.access');
+
+    Route::middleware(['suspiciousTexts'])->group(function () {
+        //alowed method
+        Route::get('/manage-allowed-method', [ManageAccessController::class, 'manage_request'])->name('manage.request');
+        Route::post('/assign-role-to-methods', [ManageAccessController::class, 'grant_method_access_to_roles'])->name('assign.roles.to.method');
+        Route::get('/reset-methods-access/{id}', [ManageAccessController::class, 'remove_methods_access'])->name('remove.method.access');
+    });
 });
 
 require __DIR__.'/auth.php';

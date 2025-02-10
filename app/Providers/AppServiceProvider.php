@@ -30,13 +30,15 @@ class AppServiceProvider extends ServiceProvider
             return in_array($role, session('allowed_roles', []));
         });
 
-        Blade::if('usr_acc', function ($usr_acc) {
-            $allowedRole = User_access::where('page_id', $usr_acc)
+        Blade::if('usr_acc', function (...$usr_acc) { // Accept multiple parameters
+            $allowedRoles = User_access::whereIn('page_id', $usr_acc) // Directly pass as an array
                 ->join('roles', 'user_access.role_id', '=', 'roles.id')
                 ->pluck('roles.role')
                 ->toArray();
+
             $allowedRolesInSession = session('allowed_roles', []);
-            return array_intersect($allowedRole, $allowedRolesInSession);
+
+            return !empty(array_intersect($allowedRoles, $allowedRolesInSession)); // Ensure boolean return
         });
 
         Blade::if('mtd_acc', function ($usr_acc) {
