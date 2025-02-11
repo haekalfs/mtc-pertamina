@@ -8,6 +8,7 @@ use App\Models\Receivables_participant_certificate;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use Yajra\DataTables\Facades\DataTables;
 
 class CertificateController extends Controller
 {
@@ -37,7 +38,9 @@ class CertificateController extends Controller
                 $query->whereYear('issued_date', $request->periode);
             }
 
-            return datatables()->eloquent($query)
+            $query = $query->get();
+
+            return DataTables::of($query)
                 ->addColumn('action', function ($certificate) {
                     return '<a class="btn btn-outline-secondary btn-md mb-2 mr-2 go-to-certificate" href="' . route('preview-certificate', ['id' => $certificate->penlat_certificate_id]) . '">
                                 <i class="fa fa-external-link"></i>
