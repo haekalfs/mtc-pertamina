@@ -26,6 +26,7 @@
         }
 
         .header {
+            margin-top: 20px;
             text-align: center;
             margin-bottom: 30px;
         }
@@ -46,7 +47,7 @@
 
         .content {
             margin-top: 20px;
-            margin-left: 25px;
+            margin-left: 28px;
             margin-bottom: 70px;
         }
 
@@ -86,6 +87,20 @@
             border: 1px solid black;
             font-size: 12px;
             text-align: start;
+            zoom: 90%;
+            border-radius: 5px;
+        }
+
+        @media (max-width: 480px) {
+            .document {
+                zoom: 70%;
+            }
+            .content td.value {
+                width: 230px;
+            }
+            .content {
+                margin-left: 18px;
+            }
         }
     </style>
 </head>

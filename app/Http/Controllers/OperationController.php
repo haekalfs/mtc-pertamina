@@ -305,26 +305,27 @@ class OperationController extends Controller
 
         if ($request->ajax()) {
             // Start the query directly on the Eloquent model
-            $query = Infografis_peserta::with(['penlatBatch.penlat']);
+            $query = Infografis_peserta::with(['penlatBatch.penlat'])
+                ->orderBy('tgl_pelaksanaan', 'desc');
 
             // Apply filters based on the request
-            if ($request->namaPenlat != 1) {
+            if ($request->namaPenlat && $request->namaPenlat != 1) {
                 $query->where('nama_program', $request->namaPenlat);
             }
 
-            if ($request->stcw != 1) {
+            if ($request->stcw && $request->stcw != 1) {
                 $query->where('kategori_program', $request->stcw);
             }
 
-            if ($request->jenisPenlat != 1) {
+            if ($request->jenisPenlat && $request->jenisPenlat != 1) {
                 $query->where('jenis_pelatihan', $request->jenisPenlat);
             }
 
-            if ($request->tw != 1) {
+            if ($request->tw && $request->tw != 1) {
                 $query->where('realisasi', $request->tw);
             }
 
-            if ($request->periode != 1) {
+            if ($request->periode && $request->periode != 1) {
                 $query->whereYear('tgl_pelaksanaan', $request->periode);
             }
 
@@ -387,7 +388,6 @@ class OperationController extends Controller
         $listJenisPenlat = $filter->unique('jenis_pelatihan');
         $listTw = $filter->unique('realisasi');
 
-        $batches = Penlat_batch::all();
         $penlatList = Penlat::all();
 
         $checkIfAnyError = Error_log_import::where('import_id', 1)
