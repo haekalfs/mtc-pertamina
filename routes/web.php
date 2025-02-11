@@ -65,6 +65,10 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
     Route::middleware('suspiciousTexts')->group(function () {
 
+        Route::get('/penlat/list', [PenlatController::class, 'getPenlatList'])->name('penlat.list');
+        Route::get('/fetch-penlat-batches', [PenlatController::class, 'fetchBatches'])->name('batches.fetch');
+        Route::get('/fetch-certificate-batches', [PenlatController::class, 'fetchBatchesCertificates'])->name('batches.fetch.certificate');
+
         //On Dev Notification
         Route::get('/closed-menu', function () {
             Session::flash('warning', 'The menu you try to access is locked 🔒, thank you for your patience.');
@@ -152,7 +156,6 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
                 Route::get('/penlat/{id}/edit', [PenlatController::class, 'edit'])->name('penlat.edit');
                 Route::put('/penlat-update/{id}', [PenlatController::class, 'update'])->name('penlat.update');
                 Route::delete('/penlat-delete/{id}', [PenlatController::class, 'delete'])->name('delete.penlat');
-                Route::get('/penlat/list', [PenlatController::class, 'getPenlatList'])->name('penlat.list');
 
                 //batch penlat
                 Route::get('/penlat/list-batch', [PenlatController::class, 'batch'])->name('batch-penlat');
@@ -161,8 +164,6 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
                 Route::get('/penlat-batch/{id}/edit', [PenlatController::class, 'fetch_batch'])->name('batch.data');
                 Route::put('/penlat-batch-update/{id}', [PenlatController::class, 'update_batch'])->name('batch.update');
                 Route::delete('/penlat-batch-delete/{id}', [PenlatController::class, 'delete_batch'])->name('delete.batch');
-                Route::get('/fetch-penlat-batches', [PenlatController::class, 'fetchBatches'])->name('batches.fetch');
-                Route::get('/fetch-certificate-batches', [PenlatController::class, 'fetchBatchesCertificates'])->name('batches.fetch.certificate');
                 Route::post('/penlat-batch/refresh', [PenlatController::class, 'refresh_batch_data'])->name('refresh.batch');
                 //Certificate Number
                 Route::get('/master-data/certificates-numbers', [CertificateController::class, 'index'])->name('certificate-number');

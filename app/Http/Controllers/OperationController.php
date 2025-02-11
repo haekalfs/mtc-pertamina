@@ -303,17 +303,6 @@ class OperationController extends Controller
         $nowYear = date('Y');
         $yearsBefore = range($nowYear - 4, $nowYear);
 
-        // Set the selected year
-        $currentYear = $periodeSelected ?? $nowYear;
-
-        $selectedArray = [
-            'namaPenlat' => $request->input('namaPenlat'),
-            'stcw' => $request->input('stcw'),
-            'jenisPenlat' => $request->input('jenisPenlat'),
-            'tw' => $request->input('tw'),
-            'periode' => $request->input('periode'),
-        ];
-
         if ($request->ajax()) {
             // Start the query directly on the Eloquent model
             $query = Infografis_peserta::with(['penlatBatch.penlat']);
@@ -415,8 +404,7 @@ class OperationController extends Controller
             'listStcw' => $listStcw,
             'listJenisPenlat' => $listJenisPenlat,
             'listTw' => $listTw,
-            'penlatList' => $penlatList,
-            'selectedArray' => $selectedArray
+            'penlatList' => $penlatList
         ]);
     }
 

@@ -77,7 +77,7 @@ font-weight-bold
                                         <select class="custom-select" id="namaPenlat" name="namaPenlat">
                                             <option value="1" selected>Show All</option>
                                             @foreach($listPenlat as $participant)
-                                                <option value="{{ $participant->nama_program }}" @if (in_array($participant->nama_program, $selectedArray)) selected @endif>{{ $participant->nama_program }}</option>
+                                                <option value="{{ $participant->nama_program }}">{{ $participant->nama_program }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -88,7 +88,7 @@ font-weight-bold
                                         <select name="stcw" class="form-control" id="stcw">
                                             <option value="1">Show All</option>
                                             @foreach($listStcw as $participant)
-                                                <option value="{{ $participant->kategori_program }}" @if (in_array($participant->kategori_program, $selectedArray)) selected @endif>{{ $participant->kategori_program }}</option>
+                                                <option value="{{ $participant->kategori_program }}">{{ $participant->kategori_program }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -99,7 +99,7 @@ font-weight-bold
                                         <select class="form-control" id="jenisPenlat" name="jenisPenlat" required>
                                             <option value="1" selected>Show All</option>
                                             @foreach($listJenisPenlat as $participant)
-                                                <option value="{{ $participant->jenis_pelatihan }}" @if (in_array($participant->jenis_pelatihan, $selectedArray)) selected @endif>{{ $participant->jenis_pelatihan }}</option>
+                                                <option value="{{ $participant->jenis_pelatihan }}">{{ $participant->jenis_pelatihan }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -110,7 +110,7 @@ font-weight-bold
                                         <select name="tw" class="form-control" id="tw">
                                             <option value="1">Show All</option>
                                             @foreach($listTw as $participant)
-                                                <option value="{{ $participant->realisasi }}" @if (in_array($participant->realisasi, $selectedArray)) selected @endif>{{ $participant->realisasi }}</option>
+                                                <option value="{{ $participant->realisasi }}">{{ $participant->realisasi }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -121,7 +121,7 @@ font-weight-bold
                                         <select name="periode" class="form-control" id="periode">
                                             <option value="1" selected>Show All</option>
                                             @foreach (array_reverse($yearsBefore) as $year)
-                                                <option value="{{ $year }}" @if (in_array($year, $selectedArray)) selected @endif>{{ $year }}</option>
+                                                <option value="{{ $year }}">{{ $year }}</option>
                                             @endforeach
                                         </select>
                                     </div>
