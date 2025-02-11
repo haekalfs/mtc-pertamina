@@ -1511,10 +1511,11 @@ class PDController extends Controller
 
                 // Get the description from related models
                 $certificateRegulationName = $data->penlatCertificate->regulation->description;
+                $certificateAmendmentName = $data->penlatCertificate->regulation_amendments->description;
                 // Determine the appropriate font size based on text length
-                $textLength = mb_strlen($certificateRegulationName); // Use mb_strlen for multibyte safety
+                $textLength = mb_strlen($certificateAmendmentName); // Use mb_strlen for multibyte safety
 
-                $templateBase = $textLength < 100 ? 'template_certificate' : 'template_certificate_2';
+                $templateBase = $textLength > 20 ? 'template_certificate' : 'template_certificate_2';
                 $placeholderSuffix = ($data->penlatCertificate->photo_placeholder == 1) ? '_placeholdered' : '';
 
                 $templatePath = public_path("uploads/template/{$templateBase}{$placeholderSuffix}.xlsx");
@@ -1620,9 +1621,16 @@ class PDController extends Controller
                     $sheet->setCellValue('X26', ' ');
                 }
 
-                if ($textLength < 120) {
+                if ($textLength > 20) {
+                    if (strlen($certificateRegulationName) > 100) {
+                        $fontSize = 9;
+                    } else {
+                        $fontSize = 14;
+                    }
+
                     $excelCell = 'Y26';
                     $sheet->setCellValue($excelCell, $certificateRegulationName);
+                    $sheet->getStyle($excelCell)->getFont()->setSize($fontSize);
                 } else {
                     $excelCell = 'P26';
                     $sheet->setCellValue($excelCell, $certificateRegulationName);

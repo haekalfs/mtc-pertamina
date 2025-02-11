@@ -94,8 +94,6 @@ class InventoryToolController extends Controller
 
             return DataTables::of($query)
                 ->addColumn('tool', function ($item) {
-                    $hoursDifference = \Carbon\Carbon::now()->diffInHours(\Carbon\Carbon::parse($item->last_maintenance));
-
                     $html = '
                     <div class="row">
                         <div class="col-md-4 d-flex justify-content-center align-items-start mt-2">
@@ -116,12 +114,21 @@ class InventoryToolController extends Controller
                                         <td style="text-align: start;">: ' . $item->location->description . '</td>
                                     </tr>
                                     <tr>
-                                        <td style="width: 200px;" class="mb-2"><i class="fa fa-chevron-right mr-2"></i> Running Hour</td>
-                                        <td style="text-align: start;">: ' . $hoursDifference . ' hours</td>
+                                        <td style="width: 200px;" class="mb-2"><i class="fa fa-chevron-right mr-2"></i> Maker</td>
+                                        <td style="text-align: start;">: ' . $item->asset_maker . '</td>
                                     </tr>
                                     <tr>
-                                        <td style="width: 200px;" class="mb-2"><i class="fa fa-chevron-right mr-2"></i> Next Maintenance</td>
-                                        <td style="text-align: start;">: ' . \Carbon\Carbon::parse($item->next_maintenance)->format('d-M-Y') . '</td>
+                                        <td style="width: 200px;" class="mb-2"><i class="fa fa-chevron-right mr-2"></i> User Manual</td>
+                                        <td style="text-align: start;">: ';
+                                        if (!empty($item->asset_guidance)) {
+                                            $html .= '<a href="' . asset($item->asset_guidance) . '" target="_blank">
+                                                        <span class="">Download File <i class="fa fa-download"></i></span>
+                                                    </a>';
+                                        } else {
+                                            $html .= '<span class=""> - </span>';
+                                        }
+
+                                        $html .= '</td>
                                     </tr>
                                 </table>
                             </div>
@@ -517,8 +524,6 @@ class InventoryToolController extends Controller
             $tool->initial_stock = $initialStocks;
             $tool->used_amount = $newUsedAmount;
             $tool->asset_stock = $stocks;
-            $tool->last_maintenance = $request->input('last_maintenance');
-            $tool->next_maintenance = $request->input('next_maintenance');
 
             // Sync the used items based on the new used amount
             if ($newUsedAmount > $currentUsedAmount) {

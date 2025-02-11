@@ -341,7 +341,7 @@ font-weight-bold
                                         <input type="text" class="form-control" name="stock" id="edit_initial_stock" hidden>
                                         <div class="d-flex align-items-center mb-4">
                                             <div style="width: 160px;" class="mr-1">
-                                                <p style="margin: 0;">Used :</p>
+                                                <p style="margin: 0;">Asset In Used :</p>
                                             </div>
                                             <div class="flex-grow-1">
                                                 <div class="input-group">
@@ -360,22 +360,6 @@ font-weight-bold
                                                         </span>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 160px;" class="mr-1">
-                                                <p style="margin: 0;">Last Maintenance :</p>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <input type="date" class="form-control" name="last_maintenance" id="edit_last_maintenance">
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 160px;" class="mr-1">
-                                                <p style="margin: 0;">Next Maintenance :</p>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <input type="date" class="form-control" name="next_maintenance" id="edit_next_maintenance">
                                             </div>
                                         </div>
                                         <div class="text-right">
@@ -564,8 +548,6 @@ $(document).on('click', '.edit-tool', function(e) {
             $('#tool_id').val(response.id);
             $('#edit_initial_stock').val(response.initial_stock);
             $('#edit_used_amount').val(response.used_amount ? response.used_amount : '0');
-            $('#edit_last_maintenance').val(response.last_maintenance);
-            $('#edit_next_maintenance').val(response.next_maintenance);
             $('#edit-image-preview').attr('src', response.tool_image ? response.tool_image : 'https://via.placeholder.com/150x150');
             $('#advance_edit_asset_page').attr('href', routeUrl);
 
