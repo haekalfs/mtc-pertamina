@@ -134,7 +134,7 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
         });
 
         Route::middleware(['restrictRequestbyRole'])->group(function () {
-            Route::middleware(['checkUserAccess:101'])->group(function () {
+            Route::middleware(['checkUserAccess:100'])->group(function () {
                 //participant-infographics
                 Route::get('/operation/participant-infographics', [OperationController::class, 'participant_infographics'])->name('participant-infographics');
                 Route::get('/operation/participant-infographics/import-page', [OperationController::class, 'participant_infographics_import_page'])->name('participant-infographics-import-page');
