@@ -392,6 +392,9 @@ class PDController extends Controller
                 ->addColumn('created_at', function($item) {
                     return $item->created_at->format('d-M-Y');
                 })
+                ->editColumn('keterangan', function($item) {
+                    return $item->keterangan ?? '-';
+                })
                 ->addColumn('action', function($item) {
                     $actionButtons = '
                         <a class="btn btn-outline-secondary mr-2 btn-sm" href="'.route('preview-certificate', $item->id).'">
@@ -439,9 +442,8 @@ class PDController extends Controller
 
         // Prepare the data to update, excluding empty values
         $updateData = [];
-        if (!empty($validatedData['keterangan'])) {
-            $updateData['keterangan'] = $validatedData['keterangan'];
-        }
+        $updateData['keterangan'] = $validatedData['keterangan'];
+
         if (!empty($validatedData['program'])) {
             $updateData['certificate_title'] = strtoupper($validatedData['program']);
         }

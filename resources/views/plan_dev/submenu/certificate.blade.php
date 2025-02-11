@@ -128,7 +128,7 @@ font-weight-bold
                                 <th>Batch</th>
                                 <th>Category</th>
                                 <th>Status</th>
-                                <th>Remarks</th>
+                                <th>Notes</th>
                                 <th>Total Issued</th>
                                 <th>Created by</th>
                                 <th>Created at</th>

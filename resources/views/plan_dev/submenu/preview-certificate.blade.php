@@ -143,7 +143,7 @@ font-weight-bold
                                 </tr>
                                 <tr>
                                     <th style="width: 200px;">Notes</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $data->keterangan }}</td>
+                                    <td style="text-align: start; font-weight:500">: {{ $data->keterangan ?? '-' }}</td>
                                 </tr>
                               </tr>
                           </table>
