@@ -123,7 +123,7 @@ class CertificateController extends Controller
             $formattedNumber = $row->certificate_number ?: '-';
             $sheet->setCellValueByColumnAndRow(5, $startRow, "$formattedNumber / $part0 / PMTC / $part2 / $part3");
             $sheet->setCellValueByColumnAndRow(6, $startRow, $row->peserta->nama_peserta ?? 'N/A');
-            $sheet->setCellValueByColumnAndRow(7, $startRow, Carbon::parse($row->expire_date)->format('d-M-Y'));
+            $sheet->setCellValueByColumnAndRow(7, $startRow, Carbon::parse($row->expire_date)->format('d-M-Y') ?? '-');
             $sheet->setCellValueByColumnAndRow(8, $startRow, Carbon::parse($row->created_at)->format('d-M-Y'));
             $sheet->setCellValueByColumnAndRow(9, $startRow, $row->penlatCertificate->created_by);
 

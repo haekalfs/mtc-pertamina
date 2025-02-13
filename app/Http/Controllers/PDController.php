@@ -1621,6 +1621,7 @@ class PDController extends Controller
 
                 if(!$data->penlatCertificate->regulation_amendments->description || !$data->penlatCertificate->regulation->description){
                     $sheet->setCellValue('X26', ' ');
+                    $sheet->setCellValue('O26', ' ');
                 }
 
                 if ($textLength > 20) {

@@ -67,7 +67,7 @@ font-weight-bold
                         <div class="col-md-12">
                             <div class="row align-items-center">
                                 <div class="col-md-3">
-                                    <div class="form-group">
+                                    <div class="form-group" id="penlatContainer">
                                         <label for="penlat">Training:</label>
                                         <select class="form-control" name="penlat" id="penlat">
                                             <option value="">Show All</option>
@@ -78,7 +78,7 @@ font-weight-bold
                                     </div>
                                 </div>
                                 <div class="col-md-3">
-                                    <div class="form-group">
+                                    <div class="form-group" id="batchContainer">
                                         <label for="batch">Batch:</label>
                                         <select name="batch" class="form-control" id="batch">
                                             <option value="">Show All</option>
@@ -395,6 +395,7 @@ $(document).ready(function() {
     $('#penlat').select2({
         placeholder: "Select Pelatihan...",
         width: '100%',
+        dropdownParent: $('#penlatContainer'),
         allowClear: true,
         language: {
             noResults: function() {
@@ -641,6 +642,7 @@ function initSelectFilter(elementId, ajaxUrl, placeholderText, penlatId = null) 
         placeholder: placeholderText,
         minimumInputLength: 1,
         width: '100%',
+        dropdownParent: $('#batchContainer'),
         tags: true,
         allowClear: true,
         createTag: function (params) {
