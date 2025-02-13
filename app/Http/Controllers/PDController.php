@@ -445,7 +445,7 @@ class PDController extends Controller
         $updateData['keterangan'] = $validatedData['keterangan'];
 
         if (!empty($validatedData['program'])) {
-            $updateData['certificate_title'] = strtoupper($validatedData['program']);
+            $updateData['certificate_title'] = $validatedData['program'];
         }
         if (!empty($validatedData['startDate'])) {
             $updateData['start_date'] = $validatedData['startDate'];
