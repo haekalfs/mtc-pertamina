@@ -373,23 +373,22 @@ iframe {
 }
 
 @media (max-width: 768px) {
-  .wrap-login100 {
-    padding: 120px 80px 33px 80px;
-  }
+    .wrap-login100 {
+        padding: 120px 80px 33px 80px;
+    }
+    .login100-pic {
+        display: none;
+    }
+    .wrap-input100 {
+        width: 100%;
+    }
+    .container-login100-form-btn {
+        width: 100%;
+    }
 
-  .login100-pic {
-    display: none;
-  }
-  .wrap-input100 {
-    width: 100%;
-  }
-  .container-login100-form-btn {
-    width: 100%;
-  }
-
-  .login100-form {
-    width: 100%;
-  }
+    .login100-form {
+        width: 100%;
+    }
 }
 
 @media (max-width: 576px) {
@@ -399,15 +398,28 @@ iframe {
     .corner-text p{
         font-size: 12px;
     }
-  .wrap-login100 {
-    padding: 120px 15px 33px 15px;
-  }
-  .wrap-input100 {
-    width: 100%;
-  }
+    .wrap-login100 {
+        padding: 120px 15px 33px 15px;
+    }
+    .wrap-input100 {
+        width: 100%;
+    }
+    .login100-form{
+        padding-right: 10px;
+        padding-left: 10px;
+    }
 }
 
 
+@media (max-width: 360px) {
+    .login-text{
+        zoom: 80%;
+    }
+    .login100-form{
+        padding-right: 10px;
+        padding-left: 10px;
+    }
+}
 /*------------------------------------------------------------------
 [ Alert validate ]*/
 
