@@ -772,7 +772,7 @@ class PDController extends Controller
             $participants = Infografis_peserta::where('batch', $validated['batch'])->orderBy('nama_peserta', 'asc')->get();
 
             $penlatCertificateData = [
-                'certificate_title' => strtoupper($validated['program']), // Convert to uppercase
+                'certificate_title' => $validated['program'],
                 'status' => $validated['status'],
                 'start_date' => $validated['startDate'],
                 'end_date' => $validated['endDate'],
