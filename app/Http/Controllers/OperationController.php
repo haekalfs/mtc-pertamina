@@ -21,6 +21,7 @@ use App\Models\Utility;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
@@ -341,7 +342,7 @@ class OperationController extends Controller
                     $currentYear = \Carbon\Carbon::parse($row->tgl_pelaksanaan)->year;
 
                     // Check for conflicts where the same participant has another entry in the same year and same penlat_id
-                    $hasConflict = Infografis_peserta::where('participant_id', $row->participant_id)
+                    $hasConflict = Infografis_peserta::where('participant_id', Crypt::decryptString($row->participant_id))
                         ->whereHas('penlatBatch', function ($query) use ($row) {
                             $query->where('penlat_id', $row->penlatBatch->penlat_id);
                         })
@@ -367,7 +368,7 @@ class OperationController extends Controller
                     $currentYear = \Carbon\Carbon::parse($row->tgl_pelaksanaan)->year;
 
                     // Check for conflicts where the same participant has another entry in the same year and same penlat_id
-                    $hasConflict = Infografis_peserta::where('participant_id', $row->participant_id)
+                    $hasConflict = Infografis_peserta::where('participant_id', Crypt::decryptString($row->participant_id))
                         ->whereHas('penlatBatch', function ($query) use ($row) {
                             $query->where('penlat_id', $row->penlatBatch->penlat_id);
                         })
