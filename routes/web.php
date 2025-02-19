@@ -58,7 +58,7 @@ Route::get('/', function () {
 })->middleware(['auth', 'suspicious', 'suspiciousTexts', 'verified', 'throttle:30,1']);
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->middleware(['auth', 'suspicious', 'suspiciousTexts', 'verified']) // 60 requests per minute
+    ->middleware(['auth', 'suspicious', 'suspiciousTexts', 'restrictRequestbyRole', 'verified']) // 60 requests per minute
     ->name('dashboard');
 
 
@@ -164,7 +164,7 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
                 Route::get('/penlat-batch/{id}/edit', [PenlatController::class, 'fetch_batch'])->name('batch.data');
                 Route::put('/penlat-batch-update/{id}', [PenlatController::class, 'update_batch'])->name('batch.update');
                 Route::delete('/penlat-batch-delete/{id}', [PenlatController::class, 'delete_batch'])->name('delete.batch');
-                Route::post('/penlat-batch/refresh', [PenlatController::class, 'refresh_batch_data'])->name('refresh.batch');
+                Route::post('/penlat-batch/refresh', [PenlatController::class, 'encryptInfografis'])->name('refresh.batch');
                 //Certificate Number
                 Route::get('/master-data/certificates-numbers', [CertificateController::class, 'index'])->name('certificate-number');
             });

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Jobs\RefreshBatchData;
 use App\Jobs\RefreshExistingBatch;
+use App\Jobs\RefreshParticipantsData;
 use App\Models\Inventory_tools;
 use App\Models\Location;
 use App\Models\Penlat;
@@ -955,4 +956,33 @@ class PenlatController extends Controller
         ]);
     }
 
+    public function encryptInfografis(Request $request)
+    {
+        try {
+            // Validate the year input to ensure it's a 4-digit number
+            $request->validate([
+                'year' => ['required', 'digits:4', 'integer', 'min:1900', 'max:2500'],
+            ]);
+
+            $year = $request->input('year'); // Get the sanitized year input
+
+            // Dispatch the job to refresh the batch data with the given year
+            RefreshParticipantsData::dispatch($year); // Pass the year to the job
+
+            // Cache to indicate job is processing
+            if (!Cache::has('jobs_processing')) {
+                Cache::put('jobs_processing', true, now()->addMinutes(3));
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Batch data refresh initiated successfully for year ' . $year,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to initiate batch data refresh.',
+            ], 500);
+        }
+    }
 }

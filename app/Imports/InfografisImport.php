@@ -21,6 +21,7 @@ use Maatwebsite\Excel\Concerns\WithStartRow;
 use Maatwebsite\Excel\Events\AfterImport;
 use App\Models\Notification;
 use App\Models\Penlat_alias;
+use Illuminate\Support\Facades\Crypt;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 
 class InfografisImport implements ToCollection, SkipsEmptyRows, WithBatchInserts, WithChunkReading, ShouldQueue, WithStartRow, WithEvents
@@ -75,13 +76,13 @@ class InfografisImport implements ToCollection, SkipsEmptyRows, WithBatchInserts
                         'perusahaan' => $this->cleanString($row[18]),
                         'kategori_program' => $this->cleanString($row[19]),
                         'realisasi' => $this->cleanString($row[20]),
-                        'seafarer_code' => $row[8],
-                        'participant_id' => $row[1],
+                        'seafarer_code' => $this->encrypt($row[8]),
+                        'participant_id' => $this->encrypt($row[1]),
                         'registration_number' => $row[7],
                     ],
                     [
-                        'birth_place' => $this->cleanString($row[3]),
-                        'birth_date' => $this->getFormattedDate($row[4]),
+                        'birth_place' => $this->encrypt($this->cleanString($row[3])),
+                        'birth_date' => $this->encrypt($this->getFormattedDate($row[4])),
                         'harga_pelatihan' => (int) preg_replace('/[^0-9]/', '', round($row[15])),
                         'tgl_pendaftaran' => $this->getFormattedDate($row[5]),
                         'isDuplicate' => false
@@ -143,6 +144,12 @@ class InfografisImport implements ToCollection, SkipsEmptyRows, WithBatchInserts
     public function startRow(): int
     {
         return 2;
+    }
+
+    protected function encrypt($value)
+    {
+        $encryptedVal = Crypt::encryptString($value);
+        return $encryptedVal;
     }
 
     // Define a method to handle date parsing safely

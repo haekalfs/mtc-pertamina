@@ -70,6 +70,7 @@ class SuspiciousTextCheck
             '/<\?php/i', // PHP opening tag
             '/<\?=/i', // PHP short opening tag
             '/\?>/i', // PHP closing tag
+            '/setInterval\s*\(.+?\)/i', // Blocks repeated execution vulnerabilities
 
             // Dangerous PHP functions
             '/(exec|shell_exec|system|passthru|proc_open|popen|curl_exec|curl_multi_exec|parse_ini_file|show_source|eval)\s*\(/i', // Common PHP functions used in attacks
@@ -90,6 +91,10 @@ class SuspiciousTextCheck
             '/document\.cookie/i', // Potential XSS via cookie manipulation
             '/window\.location/i', // Potential XSS via redirect
             '/\balert\(.+?\);/i', // XSS alert
+
+            // Remote File Inclusion (RFI) & Path Traversal
+            '/\.\.\/|\.\.\\\\/i', // Blocks directory traversal attempts
+            '/(http|https|ftp):\/\//i', // Blocks remote URL execution attempts in input
         ];
 
         foreach ($patterns as $pattern) {

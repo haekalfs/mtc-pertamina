@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Location;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class LocationController extends Controller
 {
@@ -16,19 +17,28 @@ class LocationController extends Controller
     public function store(Request $request)
     {
         // Validate input
-        $request->validate([
-            'location_code' => 'required|string|max:255',
+        $validatedData = $request->validate([
+            'location_code' => 'required|string|max:25', // Ensure unique location codes
             'description' => 'required|string|max:255',
         ]);
 
-        // Create a new location entry
-        Location::create([
-            'location_code' => $request->input('location_code'),
-            'description' => $request->input('description'),
-        ]);
+        try {
+            // Sanitize input
+            $validatedData['location_code'] = trim(strip_tags($validatedData['location_code']));
+            $validatedData['description'] = trim(strip_tags($validatedData['description']));
 
-        // Redirect back with success message
-        return redirect()->back()->with('success', 'Location has been successfully added.');
+            // Create a new location entry
+            Location::create($validatedData);
+
+            // Redirect back with success message
+            return redirect()->back()->with('success', 'Location has been successfully added.');
+        } catch (\Exception $e) {
+            // Log the error for debugging
+            Log::error('Error storing location: ' . $e->getMessage());
+
+            // Redirect back with error message
+            return redirect()->back()->with('failed', 'Failed to add location. Please try again.');
+        }
     }
 
     public function destroy(Request $request, $id)
@@ -63,27 +73,32 @@ class LocationController extends Controller
 
     public function update(Request $request, $id)
     {
-        // Validate the input data
-        $request->validate([
-            'location_code' => 'required|string|max:255',
-            'description' => 'required|string|max:255',
-        ]);
-
-        // Find the location by ID
+        // Find the location by ID early
         $location = Location::find($id);
 
         // Check if location exists
         if (!$location) {
-            return redirect()->back()->with('failed', 'Location fail to update!.');
+            return redirect()->back()->with('failed', 'Location failed to update. Not found.');
         }
 
-        // Update the location details
-        $location->update([
-            'location_code' => $request->input('location_code'),
-            'description' => $request->input('description'),
+        // Validate the input data
+        $validatedData = $request->validate([
+            'location_code' => 'required|string|max:25', // Ensure uniqueness except for current record
+            'description' => 'required|string|max:255',
         ]);
 
-        return redirect()->back()->with('success', 'Location has been successfully updated.');
+        try {
+            // Sanitize input
+            $validatedData['location_code'] = trim(strip_tags($validatedData['location_code']));
+            $validatedData['description'] = trim(strip_tags($validatedData['description']));
+
+            // Update the location details
+            $location->update($validatedData);
+
+            return redirect()->back()->with('success', 'Location has been successfully updated.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('failed', 'An error occurred while updating the location.');
+        }
     }
 
     public function edit($id)
