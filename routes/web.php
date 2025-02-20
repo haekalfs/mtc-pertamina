@@ -82,9 +82,6 @@ Route::middleware(['suspiciousTexts', 'checkForErrors', 'suspicious', 'guest'])-
         ->middleware('throttle:5,1'); // Allow only 5 attempts per minute
 });
 
-// Generate QR Code for Authenticator App
-Route::get('/user/two-factor-qr-code', [TwoFactorQrCodeController::class, 'show'])->middleware('throttle:5,1', 'auth');
-
 Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
     Route::middleware('suspiciousTexts')->group(function () {
         // Enable Two-Factor Authentication
@@ -93,6 +90,8 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
         // Get Recovery Codes
         Route::get('/user/two-factor-recovery-codes', [RecoveryCodeController::class, 'index']);
         Route::post('/user/two-factor-recovery-codes', [RecoveryCodeController::class, 'store']);
+        // Generate QR Code for Authenticator App
+        Route::get('/user/two-factor-qr-code', [TwoFactorQrCodeController::class, 'show']);
         // Generate Secret Key
         Route::get('/user/two-factor-secret-key', [TwoFactorSecretKeyController::class, 'show']);
 
