@@ -145,15 +145,9 @@ return [
     */
 
     'features' => [
-        Features::registration(),
-        Features::resetPasswords(),
-        // Features::emailVerification(),
-        Features::updateProfileInformation(),
-        Features::updatePasswords(),
         Features::twoFactorAuthentication([
-            'confirm' => true,
+            'confirm' => true, // Requires password confirmation before enabling 2FA
             'confirmPassword' => true,
-            // 'window' => 0,
         ]),
     ],
 

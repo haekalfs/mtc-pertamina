@@ -214,9 +214,20 @@ iframe {
   line-height: 1.2;
   text-align: center;
 
-  width: 100%;
+  width: 120%;
   display: block;
   padding-bottom: 54px;
+}
+.login100-form-title-2 {
+  font-family: Poppins-Bold;
+  font-size: 24px;
+  color: #333333;
+  line-height: 1.2;
+  text-align: center;
+
+  width: 120%;
+  display: block;
+  padding-bottom: 20px;
 }
 
 
@@ -310,7 +321,7 @@ iframe {
 /*------------------------------------------------------------------
 [ Button ]*/
 .container-login100-form-btn {
-  width: 110%;
+  width: 120%;
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-box;
@@ -389,6 +400,15 @@ iframe {
     .login100-form {
         width: 100%;
     }
+    .login100-form-title {
+        width: 100%;
+        font-size: 24px;
+        padding-bottom: 24px;
+    }
+    .login100-form-title-2 {
+        width: 100%;
+        font-size: 12px;
+    }
 }
 
 @media (max-width: 576px) {
@@ -408,16 +428,41 @@ iframe {
         padding-right: 10px;
         padding-left: 10px;
     }
+    .login100-form-title {
+        width: 100%;
+        font-size: 24px;
+        padding-bottom: 24px;
+    }
+    .login100-form-title-2 {
+        width: 100%;
+        font-size: 12px;
+    }
 }
 
 
 @media (max-width: 360px) {
+    .corner-text{
+        font-size: 16px;
+        margin-bottom: 7px;
+    }
+    .corner-text p{
+        font-size: 10px;
+    }
     .login-text{
         zoom: 80%;
     }
     .login100-form{
         padding-right: 10px;
         padding-left: 10px;
+    }
+    .login100-form-title {
+        width: 100%;
+        font-size: 12px;
+        padding-bottom: 24px;
+    }
+    .login100-form-title-2 {
+        width: 100%;
+        font-size: 12px;
     }
 }
 /*------------------------------------------------------------------
@@ -485,4 +530,53 @@ iframe {
     visibility: visible;
     opacity: 1;
   }
+}
+
+.otp-form {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+}
+/* OTP input styles */
+.otp-container, .email-otp-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.otp-input, .email-otp-input {
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    font-size: 18px;
+    margin: 0 5px;
+    border: 1px solid #000000;
+    border-radius: 4px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.otp-input:focus, .email-otp-input:focus {
+    border-color: #000000 !important;
+}
+
+#verificationCode,
+#emailverificationCode {
+    width: 100%;
+    margin-top: 15px;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+#verificationCode:focus,
+#emailverificationCode:focus {
+    border-color: #007bff;
 }

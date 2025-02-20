@@ -3,6 +3,7 @@
 use App\Http\Controllers\AgreementController;
 use App\Http\Controllers\AkhlakController;
 use App\Http\Controllers\AmendmentController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\CertificateController;
@@ -34,7 +35,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
+use Laravel\Fortify\Http\Controllers\TwoFactorAuthenticationController;
+use Laravel\Fortify\Http\Controllers\TwoFactorQrCodeController;
+use Laravel\Fortify\Http\Controllers\TwoFactorSecretKeyController;
+use Laravel\Fortify\Http\Controllers\RecoveryCodeController;
 use Yajra\DataTables\Facades\DataTables;
+use Laravel\Fortify\Http\Controllers\TwoFactorAuthenticatedSessionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -61,9 +67,33 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'suspicious', 'suspiciousTexts', 'restrictRequestbyRole', 'verified']) // 60 requests per minute
     ->name('dashboard');
 
+// Protect the Two-Factor Verification Route
+Route::post('/two-factor-verify', [AuthenticatedSessionController::class, 'verifyTwoFactor'])
+    ->name('two-factor.verify')
+    ->middleware('throttle:5,1', 'suspiciousTexts', 'checkForErrors', 'suspicious'); // Allow only 5 attempts per minute
+
+// Protect Two-Factor Challenge Routes
+Route::middleware(['suspiciousTexts', 'checkForErrors', 'suspicious', 'guest'])->group(function () {
+    Route::get('/two-factor-challenge', [TwoFactorAuthenticatedSessionController::class, 'create'])
+        ->name('two-factor.login')
+        ->middleware('throttle:10,1'); // Allow 10 requests per minute
+
+    Route::post('/two-factor-challenge', [TwoFactorAuthenticatedSessionController::class, 'store'])
+        ->middleware('throttle:5,1'); // Allow only 5 attempts per minute
+});
 
 Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
     Route::middleware('suspiciousTexts')->group(function () {
+        // Enable Two-Factor Authentication
+        Route::post('/user/two-factor-authentication', [TwoFactorAuthenticationController::class, 'store']);
+        Route::delete('/user/two-factor-authentication', [TwoFactorAuthenticationController::class, 'destroy']);
+        // Get Recovery Codes
+        Route::get('/user/two-factor-recovery-codes', [RecoveryCodeController::class, 'index']);
+        Route::post('/user/two-factor-recovery-codes', [RecoveryCodeController::class, 'store']);
+        // Generate QR Code for Authenticator App
+        Route::get('/user/two-factor-qr-code', [TwoFactorQrCodeController::class, 'show']);
+        // Generate Secret Key
+        Route::get('/user/two-factor-secret-key', [TwoFactorSecretKeyController::class, 'show']);
 
         Route::get('/penlat/list', [PenlatController::class, 'getPenlatList'])->name('penlat.list');
         Route::get('/fetch-penlat-batches', [PenlatController::class, 'fetchBatches'])->name('batches.fetch');
@@ -446,14 +476,18 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
                 Route::delete('/delete-department/{id}', [DepartmentPositionController::class, 'delete_department'])->name('department.destroy');
             });
 
-            //manage access
-            Route::get('/manage-access', [ManageAccessController::class, 'index'])->name('manage.access');
-            Route::post('/assign-role-to-page', [ManageAccessController::class, 'grant_access_to_roles'])->name('assign.roles.to.page');
-            Route::get('/reset-access/{id}', [ManageAccessController::class, 'remove_access'])->name('remove.access');
+            Route::middleware(['checkUserAccess:202'])->group(function () {
+                //manage access
+                Route::get('/manage-access', [ManageAccessController::class, 'index'])->name('manage.access');
+                Route::post('/assign-role-to-page', [ManageAccessController::class, 'grant_access_to_roles'])->name('assign.roles.to.page');
+                Route::get('/reset-access/{id}', [ManageAccessController::class, 'remove_access'])->name('remove.access');
+            });
 
-            //Refractore Data
-            Route::get('/data-management/refractor', [RefractorController::class, 'index'])->name('refractor');
-            Route::post('/refractor-data-deletion', [RefractorController::class, 'data_deletion'])->name('delete.data');
+            Route::middleware(['checkUserAccess:204'])->group(function () {
+                //Refractore Data
+                Route::get('/data-management/refractor', [RefractorController::class, 'index'])->name('refractor');
+                Route::post('/refractor-data-deletion', [RefractorController::class, 'data_deletion'])->name('delete.data');
+            });
         });
     });
 

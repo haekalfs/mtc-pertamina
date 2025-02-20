@@ -6,8 +6,10 @@ use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
 use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
+use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -28,17 +30,37 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Fortify::loginView(function () {
-            return view('auth.login');
+        Fortify::authenticateUsing(function (Request $request) {
+            $user = User::where('email', $request->email)->first();
+
+            if ($user && Hash::check($request->password, $user->password)) {
+                return $user;
+            }
         });
 
-        Fortify::registerView(function () {
-            return view('auth.register');
-        });
+        Fortify::twoFactorChallengeView(fn () => view('auth.two-factor-challenge'));
+        // Fortify::authenticateUsing(function (Request $request) {
+        //     $user = \App\Models\User::where('email', $request->email)->first();
 
-        Fortify::twoFactorChallengeView(function () {
-            return view('auth.two-factor-challenge');
-        });
+        //     if ($user && Hash::check($request->password, $user->password)) {
+        //         if ($user->two_factor_secret) {
+        //             session(['two-factor' => true]);
+        //         }
+        //         return $user;
+        //     }
+        // });
+
+        // Fortify::loginView(function () {
+        //     return view('auth.login');
+        // });
+
+        // Fortify::registerView(function () {
+        //     return view('auth.register');
+        // });
+
+        // Fortify::twoFactorChallengeView(function () {
+        //     return view('auth.two-factor-challenge');
+        // });
         // Fortify::createUsersUsing(CreateNewUser::class);
         // Fortify::updateUserProfileInformationUsing(UpdateUserProfileInformation::class);
         // Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);

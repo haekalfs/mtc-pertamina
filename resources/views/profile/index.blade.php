@@ -149,16 +149,31 @@ active font-weight-bold
                 <div class="col-md-12">
                     <div class="card mb-4">
                         <div class="card-header">
-                            <span class="text-danger font-weight-bold">User Data Verification</span>
+                            <span class="font-weight-bold">Two-Factor Authentication</span>
                         </div>
                         <div class="card-body" style="background-color: rgb(247, 247, 247);">
-                            <h6 class="h6 mb-2 font-weight-bold text-gray-800">General Guidelines</h6>
-                            <ul class="ml-4">
-                                <li>Ensure all user data is accurately updated in accordance with company policies.</li>
-                                <li>Verify and validate user information to maintain data integrity.</li>
-                                <li>Unauthorized modifications to user records are strictly prohibited.</li>
-                                <li>Double-check user details for completeness and correctness before saving changes.</li>
-                            </ul>
+                            @if(auth()->user()->two_factor_secret)
+                                <form method="POST" action="/user/two-factor-authentication">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-outline-danger btn-sm" type="submit">Disable</button>
+                                </form>
+                                <h6 class="h6 mb-2 font-weight-bold text-gray-800 mt-3">Scan the QR Code with your authenticator app:</h6>
+                                <img style="width: 150px; height: 150px;" src="{{ url('/user/two-factor-qr-code') }}" alt="Two-Factor QR Code">
+                            @else
+                                <form method="POST" action="/user/two-factor-authentication">
+                                    @csrf
+                                    <button class="btn btn-outline-secondary btn-sm" type="submit">Enable</button>
+                                </form>
+                            @endif
+                            @if(auth()->user()->two_factor_recovery_codes)
+                                <h6 class="h6 mb-2 font-weight-bold text-gray-800 mt-3">Backup Codes:</h6>
+                                <ul class="ml-4">
+                                    @foreach(auth()->user()->recoveryCodes() as $code)
+                                        <li>{{ $code }}</li>
+                                    @endforeach
+                                </ul>
+                            @endif
                         </div>
                     </div>
                 </div>
