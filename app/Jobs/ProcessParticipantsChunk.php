@@ -12,6 +12,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Log;
 
 class ProcessParticipantsChunk implements ShouldQueue
 {
@@ -63,13 +64,19 @@ class ProcessParticipantsChunk implements ShouldQueue
     private function isEncrypted($value)
     {
         if (is_null($value) || $value === '') {
+            Log::info('isEncrypted check: Value is empty or null', ['value' => $value]);
             return false; // Empty values are NOT encrypted
         }
 
         try {
             Crypt::decryptString($value);
+            Log::info('isEncrypted check: Value is encrypted', ['value' => $value]);
             return true; // Successfully decrypted, meaning it's encrypted
         } catch (\Exception $e) {
+            Log::warning('isEncrypted check: Value is NOT encrypted', [
+                'value' => $value,
+                'error' => $e->getMessage()
+            ]);
             return false; // Failed to decrypt, so it's not encrypted
         }
     }
