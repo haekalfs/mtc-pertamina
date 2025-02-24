@@ -77,7 +77,7 @@ class Infografis_peserta extends Model
             $decrypted = Crypt::decryptString($value);
 
             switch ($type) {
-                case 'name': // Mask last name, keep first name
+                case 'nama_peserta': // Mask last name, keep first name
                     $parts = explode(' ', $decrypted);
                     if (count($parts) > 1) {
                         $lastName = array_pop($parts);
