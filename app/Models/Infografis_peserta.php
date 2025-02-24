@@ -146,10 +146,6 @@ class Infografis_peserta extends Model
     public function setNamaPesertaAttribute($value)
     {
         $this->attributes['nama_peserta'] = Crypt::encryptString($value);
-        $this->attributes['birth_place'] = Crypt::encryptString($value);
-        $this->attributes['birth_date'] = Crypt::encryptString($value);
-        $this->attributes['participant_id'] = Crypt::encryptString($value);
-        $this->attributes['seafarer_code'] = Crypt::encryptString($value);
     }
 
     public function certificate(){

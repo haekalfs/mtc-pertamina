@@ -7,7 +7,6 @@ use App\Models\Penlat_batch;
 use App\Models\Receivables_participant_certificate;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Crypt;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -54,12 +53,7 @@ class CertificateController extends Controller
                     return $certificate->penlatCertificate->batch->penlat->description;
                 })
                 ->addColumn('nama_peserta', function ($certificate) {
-                    try {
-                        $value = Crypt::decryptString($certificate->peserta->nama_peserta);
-                        return $value; // Successfully decrypted, it's already encrypted
-                    } catch (\Exception $e) {
-                        return $certificate->peserta->nama_peserta; // Decryption failed, it's not encrypted
-                    }
+                    return $certificate->peserta->nama_peserta;
                 })
                 ->addColumn('created_by', function ($certificate) {
                     return $certificate->penlatCertificate->created_by;
