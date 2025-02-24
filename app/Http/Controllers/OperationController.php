@@ -342,7 +342,7 @@ class OperationController extends Controller
                     $currentYear = \Carbon\Carbon::parse($row->tgl_pelaksanaan)->year;
 
                     // Check for conflicts where the same participant has another entry in the same year and same penlat_id
-                    $hasConflict = Infografis_peserta::where('participant_id', Crypt::decryptString($row->participant_id))
+                    $hasConflict = Infografis_peserta::where('participant_id', $row->participant_id)
                         ->whereHas('penlatBatch', function ($query) use ($row) {
                             $query->where('penlat_id', $row->penlatBatch->penlat_id);
                         })
@@ -368,7 +368,7 @@ class OperationController extends Controller
                     $currentYear = \Carbon\Carbon::parse($row->tgl_pelaksanaan)->year;
 
                     // Check for conflicts where the same participant has another entry in the same year and same penlat_id
-                    $hasConflict = Infografis_peserta::where('participant_id', Crypt::decryptString($row->participant_id))
+                    $hasConflict = Infografis_peserta::where('participant_id', $row->participant_id)
                         ->whereHas('penlatBatch', function ($query) use ($row) {
                             $query->where('penlat_id', $row->penlatBatch->penlat_id);
                         })
