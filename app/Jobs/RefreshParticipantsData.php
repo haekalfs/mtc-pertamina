@@ -24,13 +24,11 @@ class RefreshParticipantsData implements ShouldQueue
     // Handle method to process the job
     public function handle()
     {
-        // Get only records where nama_peserta is likely not encrypted (shortest length)
+        // Chunking the data filtered by year and dispatch jobs for each chunk
         Infografis_peserta::whereYear('tgl_pelaksanaan', $this->year)
-        ->whereRaw('CHAR_LENGTH(nama_peserta) < 50') // Adjust 50 based on expected encrypted length
-        ->select('id') // Only pass IDs
-        ->chunk(1000, function ($pesertaRecords) {
-            ProcessParticipantsChunk::dispatch($pesertaRecords->pluck('id'));
-        });
-
+            ->select('id') // Pass only IDs
+            ->chunk(1000, function ($pesertaRecords) {
+                ProcessParticipantsChunk::dispatch($pesertaRecords->pluck('id'));
+            });
     }
 }
