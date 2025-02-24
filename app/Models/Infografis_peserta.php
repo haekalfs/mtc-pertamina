@@ -120,7 +120,7 @@ class Infografis_peserta extends Model
 
     public function getNamaPesertaAttribute($value)
     {
-        return $this->decryptOrMask($value, 'name');
+        return $this->decryptOrMask($value, 'nama_peserta');
     }
 
     public function getParticipantIdAttribute($value)
