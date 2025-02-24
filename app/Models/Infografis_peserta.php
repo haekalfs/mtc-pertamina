@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Crypt;
 
 class Infografis_peserta extends Model
 {
@@ -37,6 +38,24 @@ class Infografis_peserta extends Model
         'harga_pelatihan',
         'tgl_pendaftaran'
     ];
+
+    public function getNamaPesertaAttribute($value)
+    {
+        try {
+            return Crypt::decryptString($value);
+        } catch (\Exception $e) {
+            return '[Decryption Failed]';
+        }
+    }
+
+    public function setNamaPesertaAttribute($value)
+    {
+        $this->attributes['nama_peserta'] = Crypt::encryptString($value);
+        $this->attributes['birth_place'] = Crypt::encryptString($value);
+        $this->attributes['birth_date'] = Crypt::encryptString($value);
+        $this->attributes['participant_id'] = Crypt::encryptString($value);
+        $this->attributes['seafarer_code'] = Crypt::encryptString($value);
+    }
 
     public function certificate(){
     	return $this->hasMany('App\Models\Receivables_participant_certificate', 'infografis_peserta_id', 'id');

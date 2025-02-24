@@ -77,7 +77,7 @@ class InfografisImport implements ToCollection, SkipsEmptyRows, WithBatchInserts
                         'kategori_program' => $this->cleanString($row[19]),
                         'realisasi' => $this->cleanString($row[20]),
                         'seafarer_code' => $row[8],
-                        'participant_id' => $this->encrypt($row[1]),
+                        'participant_id' => $row[1],
                         'registration_number' => $row[7],
                     ],
                     [

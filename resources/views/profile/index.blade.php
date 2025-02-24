@@ -153,10 +153,10 @@ active font-weight-bold
                         </div>
                         <div class="card-body" style="background-color: rgb(247, 247, 247);">
                             @if(auth()->user()->two_factor_secret)
-                                <form method="POST" action="/user/two-factor-authentication">
+                                <form id="disable-mfa-form" method="POST" action="/user/two-factor-authentication">
                                     @csrf
                                     @method('DELETE')
-                                    <button class="btn btn-outline-danger btn-sm" type="submit">Disable</button>
+                                    <button class="btn btn-outline-danger btn-sm" type="button" onclick="confirmDisableMFA()">Disable</button>
                                 </form>
                                 <h6 class="h6 mb-2 font-weight-bold text-gray-800 mt-3">Scan the QR Code with your authenticator app:</h6>
                                 <img style="width: 150px; height: 150px;" src="{{ url('/user/two-factor-qr-code') }}" alt="Two-Factor QR Code">
@@ -316,6 +316,21 @@ function generatePassword() {
     document.getElementById('password_reset').value = password;
     errorElement.style.display = 'none';
     submitButton.disabled = false; // Enable submit button
+}
+function confirmDisableMFA() {
+    swal({
+        title: "Are you sure?",
+        text: "Disabling Multi-Factor Authentication (MFA) will remove the additional security layer from your account. "
+            + "If you choose to re-enable MFA later, you will need to set it up again by scanning a new QR code using an authenticator app. "
+            + "Make sure you have access to your backup codes or another recovery method before proceeding.",
+        icon: "warning",
+        buttons: ["Cancel", "Yes, disable it"],
+        dangerMode: true,
+    }).then((willDisable) => {
+        if (willDisable) {
+            document.getElementById("disable-mfa-form").submit();
+        }
+    });
 }
 </script>
 @endsection

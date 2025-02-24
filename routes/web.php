@@ -148,8 +148,6 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
             Route::post('/api/chart-issued-certificate-data', [DashboardController::class, 'getIssuedCertificateData']);
             Route::post('/api/get-participants', [DashboardController::class, 'getChartDetail']);
             Route::post('/api/get-participants-stcw-non', [DashboardController::class, 'getParticipants']);
-
-            Route::get('/api/calendar/get-participants', [DashboardController::class, 'fetchClickedParticipantonCalendar']);
         });
 
         //Encrypt

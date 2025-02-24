@@ -38,11 +38,12 @@ class ProcessParticipantsChunk implements ShouldQueue
     public function handle()
     {
         Infografis_peserta::whereIn('id', $this->pesertaIds)->each(function ($row) {
-            // Encrypt sensitive data fields
-            $row->participant_id = Crypt::encryptString($row->participant_id);
-            // $row->birth_place = Crypt::encryptString($row->birth_place);
-            // $row->birth_date = Crypt::encryptString($row->birth_date);
-            // $row->seafarer_code = Crypt::encryptString($row->seafarer_code);
+            // Check and encrypt only if not already encrypted
+            $row->participant_id = $this->encryptIfNeeded($row->participant_id);
+            $row->nama_peserta = $this->encryptIfNeeded($row->nama_peserta);
+            $row->birth_place = $this->encryptIfNeeded($row->birth_place);
+            $row->birth_date = $this->encryptIfNeeded($row->birth_date);
+            $row->seafarer_code = $this->encryptIfNeeded($row->seafarer_code);
 
             // Save the updated record
             $row->save();
@@ -59,5 +60,25 @@ class ProcessParticipantsChunk implements ShouldQueue
     protected function getFormattedDate($date)
     {
         return \Carbon\Carbon::parse($date)->format('Y-m-d');
+    }
+
+    private function encryptIfNeeded($value)
+    {
+        if ($this->isEncrypted($value)) {
+            return $value; // Already encrypted, return as is
+        }
+
+        return Crypt::encryptString($value);
+    }
+
+    // Check if a value is already encrypted
+    private function isEncrypted($value)
+    {
+        try {
+            Crypt::decryptString($value); // Try decrypting
+            return true; // If successful, it's already encrypted
+        } catch (\Exception $e) {
+            return false; // Decryption failed, it's not encrypted
+        }
     }
 }
