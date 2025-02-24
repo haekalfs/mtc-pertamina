@@ -39,22 +39,12 @@ class ProcessParticipantsChunk implements ShouldQueue
     public function handle()
     {
         Infografis_peserta::whereIn('id', $this->pesertaIds)->each(function ($row) {
-            // Only assign values if not already encrypted
-            if (!$this->isEncrypted($row->participant_id)) {
-                $row->participant_id = $row->participant_id; // Triggers mutator
-            }
-            if (!$this->isEncrypted($row->nama_peserta)) {
-                $row->nama_peserta = $row->nama_peserta;
-            }
-            if (!$this->isEncrypted($row->birth_place)) {
-                $row->birth_place = $row->birth_place;
-            }
-            if (!$this->isEncrypted($row->birth_date)) {
-                $row->birth_date = $row->birth_date;
-            }
-            if (!$this->isEncrypted($row->seafarer_code)) {
-                $row->seafarer_code = $row->seafarer_code;
-            }
+            // Only assign values if not already encrypted\
+
+            $row->nama_peserta = $row->nama_peserta;
+            $row->birth_place = $row->birth_place;
+            $row->birth_date = $row->birth_date;
+            $row->seafarer_code = $row->seafarer_code;
 
             // Save only if any changes are made
             $row->save();
