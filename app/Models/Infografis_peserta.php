@@ -39,35 +39,14 @@ class Infografis_peserta extends Model
         'tgl_pendaftaran'
     ];
 
-    public function getNamaPesertaAttribute($value)
-    {
-        return $this->decryptOrMask($value, 'name');
-    }
-
-    public function getParticipantIdAttribute($value)
-    {
-        return $this->decryptOrMask($value, 'participant_id');
-    }
-
-    public function getBirthPlaceAttribute($value)
-    {
-        return $this->decryptOrMask($value, 'birth_place');
-    }
-
-    public function getBirthDateAttribute($value)
-    {
-        return $this->decryptOrMask($value, 'birth_date');
-    }
-
-    public function getSeafarerCodeAttribute($value)
-    {
-        return $this->decryptOrMask($value, 'seafarer_code');
-    }
-
     private function decryptOrMask($value, $type)
     {
+        if (!$this->isEncrypted($value)) {
+            return $value; // Return plaintext as is
+        }
+
         try {
-            // Fetch roles dynamically
+            // Fetch admin roles
             $adminRoles = Role::where('isSuperAdmin', 1)->pluck('role')->toArray();
 
             // Check if the user has admin role
@@ -75,10 +54,20 @@ class Infografis_peserta extends Model
                 return Crypt::decryptString($value);
             }
 
-            // If not an admin, return the masked value
+            // If not admin, return masked
             return $this->maskEncryptedValue($value, $type);
         } catch (\Exception $e) {
             return '[Decryption Failed]';
+        }
+    }
+
+    private function isEncrypted($value)
+    {
+        try {
+            Crypt::decryptString($value);
+            return true;
+        } catch (\Exception $e) {
+            return false;
         }
     }
 
@@ -127,6 +116,31 @@ class Infografis_peserta extends Model
         } catch (\Exception $e) {
             return '[Hidden]';
         }
+    }
+
+    public function getNamaPesertaAttribute($value)
+    {
+        return $this->decryptOrMask($value, 'name');
+    }
+
+    public function getParticipantIdAttribute($value)
+    {
+        return $this->decryptOrMask($value, 'participant_id');
+    }
+
+    public function getBirthPlaceAttribute($value)
+    {
+        return $this->decryptOrMask($value, 'birth_place');
+    }
+
+    public function getBirthDateAttribute($value)
+    {
+        return $this->decryptOrMask($value, 'birth_date');
+    }
+
+    public function getSeafarerCodeAttribute($value)
+    {
+        return $this->decryptOrMask($value, 'seafarer_code');
     }
 
     public function setNamaPesertaAttribute($value)
