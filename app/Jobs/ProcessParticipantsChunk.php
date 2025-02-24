@@ -64,6 +64,10 @@ class ProcessParticipantsChunk implements ShouldQueue
 
     private function encryptIfNeeded($value)
     {
+        if (is_null($value) || $value === '') {
+            return $value; // Skip encryption for NULL or empty values
+        }
+
         if ($this->isEncrypted($value)) {
             return $value; // Already encrypted, return as is
         }
@@ -71,12 +75,16 @@ class ProcessParticipantsChunk implements ShouldQueue
         return Crypt::encryptString($value);
     }
 
-    // Check if a value is already encrypted
     private function isEncrypted($value)
     {
+        // Encrypted values are base64-encoded, check its format
+        if (!preg_match('/^[a-zA-Z0-9\/+]+={0,2}$/', $value)) {
+            return false; // Not a valid base64 string
+        }
+
         try {
-            Crypt::decryptString($value); // Try decrypting
-            return true; // If successful, it's already encrypted
+            Crypt::decryptString($value);
+            return true; // Successfully decrypted, it's already encrypted
         } catch (\Exception $e) {
             return false; // Decryption failed, it's not encrypted
         }
