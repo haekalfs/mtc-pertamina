@@ -120,11 +120,7 @@ class Infografis_peserta extends Model
 
     public function getNamaPesertaAttribute($value)
     {
-        try {
-            return Crypt::decryptString($value);
-        } catch (\Exception $e) {
-            return '[Decryption Failed]';
-        }
+        return $this->decryptOrMask($value, 'name');
     }
 
     public function getParticipantIdAttribute($value)
