@@ -38,55 +38,39 @@ class ProcessParticipantsChunk implements ShouldQueue
     public function handle()
     {
         Infografis_peserta::whereIn('id', $this->pesertaIds)->each(function ($row) {
-            // Check and encrypt only if not already encrypted
-            $row->participant_id = $this->encryptIfNeeded($row->participant_id);
-            $row->nama_peserta = $this->encryptIfNeeded($row->nama_peserta);
-            $row->birth_place = $this->encryptIfNeeded($row->birth_place);
-            $row->birth_date = $this->encryptIfNeeded($row->birth_date);
-            $row->seafarer_code = $this->encryptIfNeeded($row->seafarer_code);
+            // Only assign values if not already encrypted
+            if (!$this->isEncrypted($row->participant_id)) {
+                $row->participant_id = $row->participant_id; // Triggers mutator
+            }
+            if (!$this->isEncrypted($row->nama_peserta)) {
+                $row->nama_peserta = $row->nama_peserta;
+            }
+            if (!$this->isEncrypted($row->birth_place)) {
+                $row->birth_place = $row->birth_place;
+            }
+            if (!$this->isEncrypted($row->birth_date)) {
+                $row->birth_date = $row->birth_date;
+            }
+            if (!$this->isEncrypted($row->seafarer_code)) {
+                $row->seafarer_code = $row->seafarer_code;
+            }
 
-            // Save the updated record
+            // Save only if any changes are made
             $row->save();
         });
     }
 
-    /**
-     * Helper function to format the date.
-     * Modify this as per your required format.
-     *
-     * @param string $date
-     * @return string
-     */
-    protected function getFormattedDate($date)
-    {
-        return \Carbon\Carbon::parse($date)->format('Y-m-d');
-    }
-
-    private function encryptIfNeeded($value)
-    {
-        if (is_null($value) || $value === '') {
-            return $value; // Skip encryption for NULL or empty values
-        }
-
-        if ($this->isEncrypted($value)) {
-            return $value; // Already encrypted, return as is
-        }
-
-        return $value;
-    }
-
     private function isEncrypted($value)
     {
-        // Encrypted values are base64-encoded, check its format
-        if (!preg_match('/^[a-zA-Z0-9\/+]+={0,2}$/', $value)) {
-            return false; // Not a valid base64 string
+        if (is_null($value) || $value === '') {
+            return false; // Empty values are NOT encrypted
         }
 
         try {
             Crypt::decryptString($value);
-            return true; // Successfully decrypted, it's already encrypted
+            return true; // Successfully decrypted, meaning it's encrypted
         } catch (\Exception $e) {
-            return false; // Decryption failed, it's not encrypted
+            return false; // Failed to decrypt, so it's not encrypted
         }
     }
 }
