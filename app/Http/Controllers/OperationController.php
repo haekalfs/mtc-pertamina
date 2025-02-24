@@ -353,7 +353,7 @@ class OperationController extends Controller
                     // Add a warning icon if there's a conflict
                     $warningIcon = $hasConflict ? '<i class="fa fa-exclamation-circle text-warning"></i>' : '';
 
-                    return $row->nama_peserta . ' ' . $warningIcon;
+                    return $row->participant_id . ' ' . $warningIcon;
                 })
                 ->addColumn('action', function ($row) {
                     return '<a data-item-id="' . $row->id . '" class="btn btn-outline-secondary btn-sm mr-2 edit-btn" href="#" data-toggle="modal" data-target="#editModal"><i class="fa fa-edit"></i> Edit</a>';
