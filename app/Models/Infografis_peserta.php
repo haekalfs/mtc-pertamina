@@ -76,7 +76,43 @@ class Infografis_peserta extends Model
         try {
             $decrypted = Crypt::decryptString($value);
 
-            return $decrypted;
+            switch ($type) {
+                case 'name': // Mask last name, keep first name
+                    $parts = explode(' ', $decrypted);
+                    if (count($parts) > 1) {
+                        $lastName = array_pop($parts);
+                        $maskedLastName = substr($lastName, 0, 1) . str_repeat('*', max(strlen($lastName) - 1, 0));
+                        $parts[] = $maskedLastName;
+                        return implode(' ', $parts);
+                    }
+                    return $decrypted; // Return as is if there's only one word
+
+                case 'participant_id': // Mask all but last 3 digits
+                    return strlen($decrypted) > 3
+                        ? str_repeat('*', strlen($decrypted) - 3) . substr($decrypted, -3)
+                        : str_repeat('*', strlen($decrypted)); // Mask all if shorter
+
+                case 'birth_place': // Show only first 2 characters
+                    return strlen($decrypted) > 2
+                        ? substr($decrypted, 0, 2) . str_repeat('*', strlen($decrypted) - 2)
+                        : str_repeat('*', strlen($decrypted)); // Mask fully if shorter
+
+                case 'birth_date': // Show full day & month, mask year
+                    try {
+                        $date = \Carbon\Carbon::parse($decrypted);
+                        return $date->format('d F ') . '****';
+                    } catch (\Exception $e) {
+                        return '[Invalid Date]';
+                    }
+
+                case 'seafarer_code': // Show only first 2 characters
+                    return strlen($decrypted) > 2
+                        ? substr($decrypted, 0, 2) . str_repeat('*', strlen($decrypted) - 2)
+                        : str_repeat('*', strlen($decrypted)); // Mask fully if shorter
+
+                default: // Fallback for unknown types
+                    return '[Hidden]';
+            }
         } catch (\Exception $e) {
             return '[Hidden]';
         }
@@ -84,7 +120,11 @@ class Infografis_peserta extends Model
 
     public function getNamaPesertaAttribute($value)
     {
-        return $this->decryptOrMask($value, 'nama_peserta');
+        try {
+            return Crypt::decryptString($value);
+        } catch (\Exception $e) {
+            return '[Decryption Failed]';
+        }
     }
 
     public function getParticipantIdAttribute($value)
