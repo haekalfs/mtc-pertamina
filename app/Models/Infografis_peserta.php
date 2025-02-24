@@ -39,109 +39,109 @@ class Infografis_peserta extends Model
         'tgl_pendaftaran'
     ];
 
-    private function decryptOrMask($value, $type)
-    {
-        if (!$this->isEncrypted($value)) {
-            return $value; // Return plaintext as is
-        }
+    // private function decryptOrMask($value, $type)
+    // {
+    //     if (!$this->isEncrypted($value)) {
+    //         return $value; // Return plaintext as is
+    //     }
 
-        try {
-            // Fetch admin roles
-            $adminRoles = Role::where('isSuperAdmin', 1)->pluck('role')->toArray();
+    //     try {
+    //         // Fetch admin roles
+    //         $adminRoles = Role::where('isSuperAdmin', 1)->pluck('role')->toArray();
 
-            // Check if the user has admin role
-            if (auth()->check() && array_intersect(session('allowed_roles', []), $adminRoles)) {
-                return Crypt::decryptString($value);
-            }
+    //         // Check if the user has admin role
+    //         if (auth()->check() && array_intersect(session('allowed_roles', []), $adminRoles)) {
+    //             return Crypt::decryptString($value);
+    //         }
 
-            // If not admin, return masked
-            return $this->maskEncryptedValue($value, $type);
-        } catch (\Exception $e) {
-            return '[Decryption Failed]';
-        }
-    }
+    //         // If not admin, return masked
+    //         return $this->maskEncryptedValue($value, $type);
+    //     } catch (\Exception $e) {
+    //         return '[Decryption Failed]';
+    //     }
+    // }
 
-    private function isEncrypted($value)
-    {
-        try {
-            Crypt::decryptString($value);
-            return true;
-        } catch (\Exception $e) {
-            return false;
-        }
-    }
+    // private function isEncrypted($value)
+    // {
+    //     try {
+    //         Crypt::decryptString($value);
+    //         return true;
+    //     } catch (\Exception $e) {
+    //         return false;
+    //     }
+    // }
 
-    public function maskEncryptedValue($value, $type = 'default')
-    {
-        try {
-            $decrypted = Crypt::decryptString($value);
+    // public function maskEncryptedValue($value, $type = 'default')
+    // {
+    //     try {
+    //         $decrypted = Crypt::decryptString($value);
 
-            switch ($type) {
-                case 'name': // Mask last name, keep first name
-                    $parts = explode(' ', $decrypted);
-                    if (count($parts) > 1) {
-                        $lastName = array_pop($parts);
-                        $maskedLastName = substr($lastName, 0, 1) . str_repeat('*', max(strlen($lastName) - 1, 0));
-                        $parts[] = $maskedLastName;
-                        return implode(' ', $parts);
-                    }
-                    return $decrypted; // Return as is if there's only one word
+    //         switch ($type) {
+    //             case 'name': // Mask last name, keep first name
+    //                 $parts = explode(' ', $decrypted);
+    //                 if (count($parts) > 1) {
+    //                     $lastName = array_pop($parts);
+    //                     $maskedLastName = substr($lastName, 0, 1) . str_repeat('*', max(strlen($lastName) - 1, 0));
+    //                     $parts[] = $maskedLastName;
+    //                     return implode(' ', $parts);
+    //                 }
+    //                 return $decrypted; // Return as is if there's only one word
 
-                case 'participant_id': // Mask all but last 3 digits
-                    return strlen($decrypted) > 3
-                        ? str_repeat('*', strlen($decrypted) - 3) . substr($decrypted, -3)
-                        : str_repeat('*', strlen($decrypted)); // Mask all if shorter
+    //             case 'participant_id': // Mask all but last 3 digits
+    //                 return strlen($decrypted) > 3
+    //                     ? str_repeat('*', strlen($decrypted) - 3) . substr($decrypted, -3)
+    //                     : str_repeat('*', strlen($decrypted)); // Mask all if shorter
 
-                case 'birth_place': // Show only first 2 characters
-                    return strlen($decrypted) > 2
-                        ? substr($decrypted, 0, 2) . str_repeat('*', strlen($decrypted) - 2)
-                        : str_repeat('*', strlen($decrypted)); // Mask fully if shorter
+    //             case 'birth_place': // Show only first 2 characters
+    //                 return strlen($decrypted) > 2
+    //                     ? substr($decrypted, 0, 2) . str_repeat('*', strlen($decrypted) - 2)
+    //                     : str_repeat('*', strlen($decrypted)); // Mask fully if shorter
 
-                case 'birth_date': // Show full day & month, mask year
-                    try {
-                        $date = \Carbon\Carbon::parse($decrypted);
-                        return $date->format('d F ') . '****';
-                    } catch (\Exception $e) {
-                        return '[Invalid Date]';
-                    }
+    //             case 'birth_date': // Show full day & month, mask year
+    //                 try {
+    //                     $date = \Carbon\Carbon::parse($decrypted);
+    //                     return $date->format('d F ') . '****';
+    //                 } catch (\Exception $e) {
+    //                     return '[Invalid Date]';
+    //                 }
 
-                case 'seafarer_code': // Show only first 2 characters
-                    return strlen($decrypted) > 2
-                        ? substr($decrypted, 0, 2) . str_repeat('*', strlen($decrypted) - 2)
-                        : str_repeat('*', strlen($decrypted)); // Mask fully if shorter
+    //             case 'seafarer_code': // Show only first 2 characters
+    //                 return strlen($decrypted) > 2
+    //                     ? substr($decrypted, 0, 2) . str_repeat('*', strlen($decrypted) - 2)
+    //                     : str_repeat('*', strlen($decrypted)); // Mask fully if shorter
 
-                default: // Fallback for unknown types
-                    return '[Hidden]';
-            }
-        } catch (\Exception $e) {
-            return '[Hidden]';
-        }
-    }
+    //             default: // Fallback for unknown types
+    //                 return '[Hidden]';
+    //         }
+    //     } catch (\Exception $e) {
+    //         return '[Hidden]';
+    //     }
+    // }
 
-    public function getNamaPesertaAttribute($value)
-    {
-        return $this->decryptOrMask($value, 'name');
-    }
+    // public function getNamaPesertaAttribute($value)
+    // {
+    //     return $this->decryptOrMask($value, 'name');
+    // }
 
-    public function getParticipantIdAttribute($value)
-    {
-        return $this->decryptOrMask($value, 'participant_id');
-    }
+    // public function getParticipantIdAttribute($value)
+    // {
+    //     return $this->decryptOrMask($value, 'participant_id');
+    // }
 
-    public function getBirthPlaceAttribute($value)
-    {
-        return $this->decryptOrMask($value, 'birth_place');
-    }
+    // public function getBirthPlaceAttribute($value)
+    // {
+    //     return $this->decryptOrMask($value, 'birth_place');
+    // }
 
-    public function getBirthDateAttribute($value)
-    {
-        return $this->decryptOrMask($value, 'birth_date');
-    }
+    // public function getBirthDateAttribute($value)
+    // {
+    //     return $this->decryptOrMask($value, 'birth_date');
+    // }
 
-    public function getSeafarerCodeAttribute($value)
-    {
-        return $this->decryptOrMask($value, 'seafarer_code');
-    }
+    // public function getSeafarerCodeAttribute($value)
+    // {
+    //     return $this->decryptOrMask($value, 'seafarer_code');
+    // }
 
 
     // Encrypt nama_peserta before saving
