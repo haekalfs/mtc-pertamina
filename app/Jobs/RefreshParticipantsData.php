@@ -27,7 +27,7 @@ class RefreshParticipantsData implements ShouldQueue
         // Chunking the data filtered by year and dispatch jobs for each chunk
         Infografis_peserta::whereYear('tgl_pelaksanaan', $this->year)
             ->select('id') // Pass only IDs
-            ->chunk(1000, function ($pesertaRecords) {
+            ->chunk(9000, function ($pesertaRecords) {
                 ProcessParticipantsChunk::dispatch($pesertaRecords->pluck('id'));
             });
     }
