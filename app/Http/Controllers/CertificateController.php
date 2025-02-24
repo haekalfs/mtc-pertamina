@@ -54,7 +54,12 @@ class CertificateController extends Controller
                     return $certificate->penlatCertificate->batch->penlat->description;
                 })
                 ->addColumn('nama_peserta', function ($certificate) {
-                    return $certificate->peserta->nama_peserta ? Crypt::decryptString($certificate->peserta->nama_peserta) : '-';
+                    try {
+                        $value = Crypt::decryptString($certificate->peserta->nama_peserta);
+                        return $value; // Successfully decrypted, it's already encrypted
+                    } catch (\Exception $e) {
+                        return $certificate->peserta->nama_peserta; // Decryption failed, it's not encrypted
+                    }
                 })
                 ->addColumn('created_by', function ($certificate) {
                     return $certificate->penlatCertificate->created_by;
