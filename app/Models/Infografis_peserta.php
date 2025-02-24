@@ -41,10 +41,84 @@ class Infografis_peserta extends Model
 
     public function getNamaPesertaAttribute($value)
     {
+        return $this->decryptOrMask($value, 'name');
+    }
+
+    public function getParticipantIdAttribute($value)
+    {
+        return $this->decryptOrMask($value, 'participant_id');
+    }
+
+    public function getBirthPlaceAttribute($value)
+    {
+        return $this->decryptOrMask($value, 'birth_place');
+    }
+
+    public function getBirthDateAttribute($value)
+    {
+        return $this->decryptOrMask($value, 'birth_date');
+    }
+
+    public function getSeafarerCodeAttribute($value)
+    {
+        return $this->decryptOrMask($value, 'seafarer_code');
+    }
+
+    private function decryptOrMask($value, $type)
+    {
         try {
-            return Crypt::decryptString($value);
+            // Fetch roles dynamically
+            $adminRoles = Role::where('isSuperAdmin', 1)->pluck('role')->toArray();
+
+            // Check if the user has admin role
+            if (auth()->check() && array_intersect(session('allowed_roles', []), $adminRoles)) {
+                return Crypt::decryptString($value);
+            }
+
+            // If not an admin, return the masked value
+            return $this->maskEncryptedValue($value, $type);
         } catch (\Exception $e) {
             return '[Decryption Failed]';
+        }
+    }
+
+    public function maskEncryptedValue($value, $type = 'default')
+    {
+        try {
+            $decrypted = Crypt::decryptString($value);
+
+            switch ($type) {
+                case 'name': // Mask last name, keep first name
+                    $parts = explode(' ', $decrypted);
+                    if (count($parts) > 1) {
+                        $lastName = $parts[count($parts) - 1];
+                        $maskedLastName = substr($lastName, 0, 1) . str_repeat('*', strlen($lastName) - 1);
+                        $parts[count($parts) - 1] = $maskedLastName;
+                    }
+                    return implode(' ', $parts);
+
+                case 'participant_id': // Mask all but last 3 digits (for ID numbers)
+                    return str_repeat('*', strlen($decrypted) - 3) . substr($decrypted, -3);
+
+                case 'birth_place': // Show only first 2 characters
+                    return substr($decrypted, 0, 2) . str_repeat('*', max(strlen($decrypted) - 2, 0));
+
+                case 'birth_date': // Show full day & month, mask year
+                    try {
+                        $date = \Carbon\Carbon::parse($decrypted);
+                        return $date->format('d F ') . '****';
+                    } catch (\Exception $e) {
+                        return '[Invalid Date]';
+                    }
+
+                case 'seafarer_code': // Show only first 2 characters
+                    return substr($decrypted, 0, 2) . str_repeat('*', max(strlen($decrypted) - 2, 0));
+
+                default: // Fallback for unknown types
+                    return '[Hidden]';
+            }
+        } catch (\Exception $e) {
+            return '[Hidden]';
         }
     }
 

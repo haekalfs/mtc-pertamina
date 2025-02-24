@@ -60,18 +60,37 @@ font-weight-bold
                                 <th>No.</th>
                                 <th>Role Name</th>
                                 <th>Role Description</th>
+                                <th>Super Admin</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody>@php $no = 1; @endphp
+                        <tbody>
+                            @php $no = 1; @endphp
                             @foreach ($roles as $item)
                             <tr>
                                 <td>{{ $no++ }}</td>
                                 <td>{{ $item->description }}</td>
                                 <td>{{ $item->role_description }}</td>
+                                <td>
+                                    <div class="custom-control custom-switch ml-3">
+                                        <input type="checkbox" class="custom-control-input" id="autoSubmit-{{ $item->id }}"
+                                               name="photo_placeholder" value="0"
+                                               {{ $item->isSuperAdmin ? 'checked' : '' }}
+                                               onchange="toggleSuperAdmin({{ $item->id }}, this)">
+                                        <label class="custom-control-label" for="autoSubmit-{{ $item->id }}"
+                                               id="placeholderLabel-{{ $item->id }}">
+                                            {{ $item->isSuperAdmin ? 'Yes' : 'No' }}
+                                        </label>
+                                    </div>
+                                </td>
                                 <td class="text-center">
-                                    <a href="#" class="btn btn-outline-danger btn-sm btn-details mr-2" onclick="confirmDelete('{{ $item->id }}'); return false;"><i class="fa fa-ban"></i> Delete</a>
-                                    <form id="delete-role-form-{{ $item->id }}" action="{{ route('roles.destroy', $item->id) }}" method="POST" style="display: none;">
+                                    <a href="#" class="btn btn-outline-danger btn-sm btn-details mr-2"
+                                       onclick="confirmDelete('{{ $item->id }}'); return false;">
+                                       <i class="fa fa-ban"></i> Delete
+                                    </a>
+                                    <form id="delete-role-form-{{ $item->id }}"
+                                          action="{{ route('roles.destroy', $item->id) }}"
+                                          method="POST" style="display: none;">
                                         @csrf
                                         @method('DELETE')
                                     </form>
@@ -152,5 +171,60 @@ font-weight-bold
             }
         });
     }
+
+    function toggleSuperAdmin(roleId, element) {
+    let isChecked = element.checked;
+    let label = document.getElementById("placeholderLabel-" + roleId);
+
+    if (isChecked) {
+        // Show SweetAlert confirmation only when switching to "Yes"
+        swal({
+            title: "Are you sure you want to set this role as Super Admin?",
+            text: "Once active, they will be able to see sensitive data!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+        .then((willConfirm) => {
+            if (willConfirm) {
+                // Proceed with update if confirmed
+                updateSuperAdminStatus(roleId, isChecked, label, element);
+            } else {
+                // Revert toggle switch if canceled
+                element.checked = false;
+                label.textContent = "No";
+            }
+        });
+    } else {
+        // Directly update if switching to "No"
+        updateSuperAdminStatus(roleId, isChecked, label, element);
+    }
+}
+
+// Function to send AJAX request
+function updateSuperAdminStatus(roleId, isChecked, label, element) {
+    $.ajax({
+        url: '/roles/update-superadmin/' + roleId,
+        type: 'POST',
+        data: {
+            _token: '{{ csrf_token() }}',
+            isSuperAdmin: isChecked ? 1 : 0
+        },
+        success: function(response) {
+            label.textContent = isChecked ? "Yes" : "No";
+            swal("Success! Settings have been applied successfully!", {
+                icon: "success",
+            });
+        },
+        error: function(xhr) {
+            console.error("Error updating role:", xhr.responseText);
+            alert("Failed to update role. Please try again.");
+            // Revert toggle if update fails
+            element.checked = !isChecked;
+            label.textContent = isChecked ? "No" : "Yes";
+        }
+    });
+}
+
 </script>
 @endsection

@@ -66,4 +66,13 @@ class RolesController extends Controller
         Session::flash('success', 'Role deleted successfully.');
         return redirect()->back();
     }
+
+    public function updateSuperAdmin(Request $request, $id)
+    {
+        $role = Role::findOrFail($id);
+        $role->isSuperAdmin = $request->isSuperAdmin;
+        $role->save();
+
+        return response()->json(['message' => 'Super Admin status updated successfully.']);
+    }
 }

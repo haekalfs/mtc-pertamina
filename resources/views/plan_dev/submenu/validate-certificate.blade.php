@@ -128,7 +128,7 @@
                         <span class="english">Place and date of birth</span>
                     </td>
                     <td class="separator">:</td>
-                    <td class="label">{{ $data->peserta->birth_place }}, {{ \Carbon\Carbon::parse($data->peserta->birth_date)->format('d F Y') }}</td>
+                    <td class="label">{{ $data->peserta->birth_place }}, {{ $data->peserta->birth_date }}</td>
                 </tr>
                 <tr>
                     <td class="value">
