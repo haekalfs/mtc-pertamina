@@ -143,9 +143,35 @@ class Infografis_peserta extends Model
         return $this->decryptOrMask($value, 'seafarer_code');
     }
 
+
+    // Encrypt nama_peserta before saving
     public function setNamaPesertaAttribute($value)
     {
         $this->attributes['nama_peserta'] = Crypt::encryptString($value);
+    }
+
+    // Encrypt participant_id before saving
+    public function setParticipantIdAttribute($value)
+    {
+        $this->attributes['participant_id'] = Crypt::encryptString($value);
+    }
+
+    // Encrypt birth_place before saving
+    public function setBirthPlaceAttribute($value)
+    {
+        $this->attributes['birth_place'] = Crypt::encryptString($value);
+    }
+
+    // Encrypt birth_date before saving
+    public function setBirthDateAttribute($value)
+    {
+        $this->attributes['birth_date'] = Crypt::encryptString($value);
+    }
+
+    // Encrypt seafarer_code before saving
+    public function setSeafarerCodeAttribute($value)
+    {
+        $this->attributes['seafarer_code'] = Crypt::encryptString($value);
     }
 
     public function certificate(){
