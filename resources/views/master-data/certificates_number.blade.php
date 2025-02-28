@@ -201,6 +201,8 @@ font-weight-bold
         const table = $('#listCertificatesMaster').DataTable({
             processing: true,
             serverSide: true,
+            responsive: true,
+            deferRender: true,
             ajax: {
                 url: "{{ route('certificate-number') }}",
                 data: function (d) {
