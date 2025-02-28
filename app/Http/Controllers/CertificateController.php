@@ -21,7 +21,7 @@ class CertificateController extends Controller
             $query = Receivables_participant_certificate::with([
                 'penlatCertificate.batch.penlat',
                 'peserta'
-            ])->orderBy('certificate_number', 'desc')->orderBy('issued_date', 'desc');
+            ]);
 
             // Apply filters
             if ($request->penlat && $request->penlat != -1) {
