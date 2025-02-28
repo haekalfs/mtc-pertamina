@@ -63,9 +63,9 @@ font-weight-bold
             <div class="card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold" id="judul">List Data</h6>
-                    <div class="text-right">
+                    {{-- <div class="text-right">
                         <a class="btn btn-primary btn-sm text-white" href="#" data-toggle="modal" data-target="#inputDataModal"><i class="menu-Logo fa fa-plus"></i> Register Participant</a>
-                    </div>
+                    </div> --}}
                 </div>
                 <div class="card-body zoom80">
                     <div class="row d-flex justify-content-start mb-4">
@@ -359,6 +359,34 @@ font-weight-bold
 
                             <div class="d-flex align-items-center mb-4">
                                 <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Birth Place:</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="text" class="form-control" id="editBirthPlace" name="birth_place" required>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Birth Date:</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="date" class="form-control" id="editBirthDate" name="birth_date" required>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
+                                    <p style="margin: 0;">Seafarer Code:</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="text" class="form-control" id="editSeafarerCode" name="seafarer_code" required>
+                                </div>
+                            </div>
+
+
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width: 140px;" class="mr-2">
                                     <p style="margin: 0;">Nama Program:</p>
                                 </div>
                                 <div class="flex-grow-1">
@@ -374,6 +402,8 @@ font-weight-bold
                                     <input type="text" class="form-control" id="editBatch" name="batch" required>
                                 </div>
                             </div>
+                        </div>
+                        <div class="col-md-6">
 
                             <div class="d-flex align-items-center mb-4">
                                 <div style="width: 140px;" class="mr-2">
@@ -384,16 +414,6 @@ font-weight-bold
                                 </div>
                             </div>
 
-                            <div class="d-flex align-items-center mb-4">
-                                <div style="width: 140px;" class="mr-2">
-                                    <p style="margin: 0;">Seafarer Code:</p>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <input type="text" class="form-control" id="editSeafarerCode" name="seafarer_code" required>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
                             <div class="d-flex align-items-center mb-4">
                                 <div style="width: 140px;" class="mr-2">
                                     <p style="margin: 0;">Jenis Pelatihan:</p>
@@ -546,6 +566,8 @@ $(document).ready(function() {
                 $('#editJenisPelatihan').val(data.jenis_pelatihan);
                 $('#editKeterangan').val(data.keterangan);
                 $('#editSubholding').val(data.subholding);
+                $('#editBirthPlace').val(data.birth_place);
+                $('#editBirthDate').val(data.birth_date);
                 $('#editBatch').val(data.batch);
                 $('#editSeafarerCode').val(data.seafarer_code);
                 $('#editPersonId').val(data.participant_id);
@@ -560,20 +582,39 @@ $(document).ready(function() {
     $('#editForm').submit(function(e) {
         e.preventDefault();
         var id = $('#editId').val();
-        $.ajax({
-            url: '/infografis-peserta/' + id,
-            method: 'PUT',
-            data: $(this).serialize(),
-            success: function(response) {
-                table.draw(); // Redraw the table
-                $('#editModal').modal('hide');
-                $('.alert-success-saving-mid').show();
-                $('.overlay-mid').show();
-                $('.alert-success-saving-mid').text(response.message);
-                setTimeout(function() {
-                    $('.alert-success-saving-mid').fadeOut('slow');
-                    $('.overlay-mid').fadeOut('slow');
-                }, 1000);
+
+        // First confirmation
+        swal({
+            title: "Are you sure?",
+            text: "Do you want to update this data?",
+            icon: "warning",
+            buttons: ["Cancel", "Yes, Proceed"],
+            dangerMode: true,
+        }).then((proceed) => {
+            if (proceed) {
+                // Second warning
+                swal({
+                    title: "Last Warning!",
+                    text: "Please confirm or make sure that there are no masked fields left (******).",
+                    icon: "warning",
+                    buttons: ["Cancel", "Keep Proceed"],
+                    dangerMode: true,
+                }).then((finalConfirm) => {
+                    if (finalConfirm) {
+                        $.ajax({
+                            url: '/infografis-peserta/' + id,
+                            method: 'PUT',
+                            data: $('#editForm').serialize(),
+                            success: function(response) {
+                                $('#editModal').modal('hide');
+                                swal("Success!", "Data has been updated.", "success")
+                                .then(() => {
+                                    table.draw(); // Redraw the DataTable to refresh the data
+                                });
+                            }
+                        });
+                    }
+                });
             }
         });
     });

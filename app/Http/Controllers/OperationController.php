@@ -500,11 +500,21 @@ class OperationController extends Controller
             'realisasi' => 'required|string|max:255', // Ensure this matches the correct column name
         ]);
 
-        $participant = Infografis_peserta::find($id);
-        if ($participant) {
+        DB::beginTransaction(); // Start transaction
+
+        try {
+            $participant = Infografis_peserta::find($id);
+
+            if (!$participant) {
+                return response()->json(['error' => 'Participant not found'], 404);
+            }
+
+            // Update participant details
             $participant->participant_id = $request->input('person_id');
             $participant->nama_peserta = $request->input('nama_peserta');
             $participant->nama_program = $request->input('nama_program');
+            $participant->birth_date = $request->input('birth_date');
+            $participant->birth_place = $request->input('birth_place');
             $participant->tgl_pelaksanaan = $request->input('tgl_pelaksanaan');
             $participant->tempat_pelaksanaan = $request->input('tempat_pelaksanaan');
             $participant->jenis_pelatihan = $request->input('jenis_pelatihan');
@@ -514,12 +524,13 @@ class OperationController extends Controller
             $participant->subholding = $request->input('subholding');
             $participant->perusahaan = $request->input('perusahaan');
             $participant->kategori_program = $request->input('kategori_program');
-            $participant->realisasi = $request->input('realisasi'); // Update this field as per your schema
+            $participant->realisasi = $request->input('realisasi');
             $participant->save();
 
+            // Check for batch and related records
             $findBatch = Penlat_batch::where('batch', $request->input('batch'))->first();
 
-            if($findBatch){
+            if ($findBatch) {
                 // Find the corresponding Penlat_certificate record
                 $penlatCert = Penlat_certificate::where('penlat_batch_id', $findBatch->id)->first();
 
@@ -537,9 +548,13 @@ class OperationController extends Controller
                 }
             }
 
+            DB::commit(); // Commit transaction if everything is successful
+
             return response()->json($participant);
-        } else {
-            return response()->json(['error' => 'Participant not found'], 404);
+        } catch (\Exception $e) {
+            DB::rollBack(); // Rollback transaction if an error occurs
+
+            return response()->json(['error' => 'Failed to update participant: ' . $e->getMessage()], 500);
         }
     }
 
