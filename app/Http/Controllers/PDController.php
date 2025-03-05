@@ -402,7 +402,7 @@ class PDController extends Controller
                         </a>
                     ';
 
-                    if ($item->status == 'On Process') {
+                    if ($item->status) {
                         $actionButtons .= '
                             <button class="btn btn-outline-danger btn-sm delete-certificate" data-id="'.$item->id.'">
                                 <i class="fa fa-trash"></i> Delete
