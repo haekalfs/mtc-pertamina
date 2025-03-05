@@ -769,7 +769,7 @@ class PDController extends Controller
             }
 
             // Retrieve all participants for the specified batch
-            $participants = Infografis_peserta::where('batch', $validated['batch'])->orderBy('nama_peserta', 'asc')->get();
+            $participants = Infografis_peserta::where('batch', $validated['batch'])->get()->sortBy('nama_peserta');
 
             $penlatCertificateData = [
                 'certificate_title' => $validated['program'],
