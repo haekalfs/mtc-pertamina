@@ -62,7 +62,7 @@ font-weight-bold
                                 <th>Department</th>
                                 <th>Position</th>
                                 <th>Roles</th>
-                                <th>Status</th>
+                                <th>MFA</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -85,7 +85,7 @@ font-weight-bold
                                     @endforeach
                                 </td>
                                 <td class="text-center">
-                                    @if($item->users_detail->employment_status == 1)
+                                    @if($item->two_factor_secret)
                                     <span class="m-0 font-weight-bold text-secondary"><i class="fa fa-check text-primary"></i></span>
                                     @else
                                     <span class="m-0 font-weight-bold text-danger"><i class="fa fa-times-circle" style="color: #ff0000;"></i></span>

@@ -30,11 +30,15 @@ use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\UserController;
 use App\Models\Infografis_peserta;
+use App\Models\User;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
+use Laravel\Fortify\Actions\DisableTwoFactorAuthentication;
+use Laravel\Fortify\Actions\EnableTwoFactorAuthentication;
+use Laravel\Fortify\Actions\GenerateNewRecoveryCodes;
 use Laravel\Fortify\Http\Controllers\TwoFactorAuthenticationController;
 use Laravel\Fortify\Http\Controllers\TwoFactorQrCodeController;
 use Laravel\Fortify\Http\Controllers\TwoFactorSecretKeyController;
@@ -474,6 +478,30 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
                 Route::post('/positions-post', [DepartmentPositionController::class, 'position_store'])->name('position.store');
                 Route::delete('/delete-position/{id}', [DepartmentPositionController::class, 'delete_position'])->name('position.destroy');
                 Route::delete('/delete-department/{id}', [DepartmentPositionController::class, 'delete_department'])->name('department.destroy');
+
+                // Enable MFA for another user
+                Route::post('/admin/user/{id}/enable-mfa', function ($id, EnableTwoFactorAuthentication $enable) {
+                    $user = User::findOrFail($id);
+                    $enable($user);
+                    app(GenerateNewRecoveryCodes::class)($user); // Generate recovery codes
+
+                    return back()->with('success', 'MFA enabled for the user.');
+                })->middleware('auth');
+
+                // Disable MFA for another user
+                Route::delete('/admin/user/{id}/disable-mfa', function ($id, DisableTwoFactorAuthentication $disable) {
+                    $user = User::findOrFail($id);
+                    $disable($user);
+                    $user->forceFill(['two_factor_recovery_codes' => null])->save();
+
+                    return back()->with('success', 'MFA disabled for the user.');
+                })->middleware('auth');
+
+                // Get QR Code for another user
+                Route::get('/admin/user/{id}/two-factor-qr-code', function ($id) {
+                    $user = User::findOrFail($id);
+                    return response($user->twoFactorQrCodeSvg())->header('Content-Type', 'image/svg+xml');
+                })->middleware('auth');
             });
 
             Route::middleware(['checkUserAccess:202'])->group(function () {
