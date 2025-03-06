@@ -43,6 +43,13 @@ font-weight-bold
 </div>
 @endif
 
+@if ($message = Session::get('error'))
+<div class="alert alert-danger alert-block">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>{!! $message !!}</strong>
+</div>
+@endif
+
 @if ($message = Session::get('warning'))
 <div class="alert alert-warning alert-block">
     <button type="button" class="close" data-dismiss="alert">×</button>
@@ -197,7 +204,7 @@ font-weight-bold
                                                 <p style="margin: 0;">Informasi Perusahaan :</p>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <textarea class="form-control" rows="3" name="company_details"></textarea>
+                                                <textarea class="form-control" rows="3" name="company_details" required></textarea>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-start mb-4">
