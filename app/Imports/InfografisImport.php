@@ -63,31 +63,48 @@ class InfografisImport implements ToCollection, SkipsEmptyRows, WithBatchInserts
                     continue;
                 }
 
-                Infografis_peserta::updateOrCreate(
-                    [
-                        'nama_peserta' => $this->cleanString($row[2]), // Clean the input
-                        'nama_program' => $this->cleanString($row[11]),
-                        'batch' => trim($row[10]),
-                        'tgl_pelaksanaan' => $this->getFormattedDate($row[12]),
-                        'tempat_pelaksanaan' => $this->cleanString($row[13]),
-                        'jenis_pelatihan' => $this->cleanString($row[14]),
-                        'keterangan' => $this->cleanString($row[16]),
-                        'subholding' => $this->cleanString($row[17]),
-                        'perusahaan' => $this->cleanString($row[18]),
-                        'kategori_program' => $this->cleanString($row[19]),
-                        'realisasi' => $this->cleanString($row[20]),
-                        'seafarer_code' => $row[8],
-                        'participant_id' => $row[1],
-                        'registration_number' => $row[7],
-                    ],
-                    [
-                        'birth_place' => $this->cleanString($row[3]),
-                        'birth_date' => $this->getFormattedDate($row[4]),
-                        'harga_pelatihan' => (int) preg_replace('/[^0-9]/', '', round($row[15])),
-                        'tgl_pendaftaran' => $this->getFormattedDate($row[5]),
-                        'isDuplicate' => false
-                    ]
-                );
+                // Clean and prepare values
+                $cleanData = [
+                    'nama_peserta' => $this->cleanString($row[2]),
+                    'nama_program' => $this->cleanString($row[11]),
+                    'batch' => trim($row[10]),
+                    'tgl_pelaksanaan' => $this->getFormattedDate($row[12]),
+                    'tempat_pelaksanaan' => $this->cleanString($row[13]),
+                    'jenis_pelatihan' => $this->cleanString($row[14]),
+                    'keterangan' => $this->cleanString($row[16]),
+                    'subholding' => $this->cleanString($row[17]),
+                    'perusahaan' => $this->cleanString($row[18]),
+                    'kategori_program' => $this->cleanString($row[19]),
+                    'realisasi' => $this->cleanString($row[20]),
+                    'seafarer_code' => $row[8],
+                    'participant_id' => $row[1],
+                    'registration_number' => $row[7],
+                ];
+
+                // Try to find an existing record manually
+                $existing = Infografis_peserta::all()->first(function ($item) use ($cleanData) {
+                    return $item->nama_peserta === $cleanData['nama_peserta'] &&
+                        $item->nama_program === $cleanData['nama_program'] &&
+                        $item->batch === $cleanData['batch'] &&
+                        $item->tgl_pelaksanaan === $cleanData['tgl_pelaksanaan'] &&
+                        $item->tempat_pelaksanaan === $cleanData['tempat_pelaksanaan'];
+                });
+
+                $updateData = [
+                    'birth_place' => $this->cleanString($row[3]),
+                    'birth_date' => $this->getFormattedDate($row[4]),
+                    'harga_pelatihan' => (int) preg_replace('/[^0-9]/', '', round($row[15])),
+                    'tgl_pendaftaran' => $this->getFormattedDate($row[5]),
+                    'isDuplicate' => false
+                ];
+
+                // If found, update it
+                if ($existing) {
+                    $existing->update($updateData);
+                } else {
+                    // Otherwise, create a new one
+                    Infografis_peserta::create(array_merge($cleanData, $updateData));
+                }
 
                 if (strpos($row[10], '/') !== false) {
                     // Check if the batch already exists
