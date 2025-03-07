@@ -143,35 +143,39 @@ class Infografis_peserta extends Model
         return $this->decryptOrMask($value, 'seafarer_code');
     }
 
-
-    // Encrypt nama_peserta before saving
     public function setNamaPesertaAttribute($value)
     {
-        $this->attributes['nama_peserta'] = Crypt::encryptString($value);
+        $this->attributes['nama_peserta'] = $this->encryptIfNotEncrypted($value);
     }
 
-    // Encrypt participant_id before saving
     public function setParticipantIdAttribute($value)
     {
-        $this->attributes['participant_id'] = Crypt::encryptString($value);
+        $this->attributes['participant_id'] = $this->encryptIfNotEncrypted($value);
     }
 
-    // Encrypt birth_place before saving
     public function setBirthPlaceAttribute($value)
     {
-        $this->attributes['birth_place'] = Crypt::encryptString($value);
+        $this->attributes['birth_place'] = $this->encryptIfNotEncrypted($value);
     }
 
-    // Encrypt birth_date before saving
     public function setBirthDateAttribute($value)
     {
-        $this->attributes['birth_date'] = Crypt::encryptString($value);
+        $this->attributes['birth_date'] = $this->encryptIfNotEncrypted($value);
     }
 
-    // Encrypt seafarer_code before saving
     public function setSeafarerCodeAttribute($value)
     {
-        $this->attributes['seafarer_code'] = Crypt::encryptString($value);
+        $this->attributes['seafarer_code'] = $this->encryptIfNotEncrypted($value);
+    }
+
+    // Helper function to prevent double encryption
+    private function encryptIfNotEncrypted($value)
+    {
+        if ($this->isEncrypted($value)) {
+            return $value; // Skip encryption if already encrypted
+        }
+
+        return Crypt::encryptString($value);
     }
 
     public function certificate(){
