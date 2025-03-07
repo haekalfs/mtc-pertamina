@@ -1803,10 +1803,15 @@ class PDController extends Controller
         $isInternal = true;
 
         // Fetch participants ordered by nama_peserta
-        $participants = Infografis_peserta::where('batch', $validated['batch'])
-            ->orderBy('nama_peserta', 'asc')
-            ->pluck('id') // Get only IDs
-            ->toArray();
+        //$participants = Infografis_peserta::where('batch', $validated['batch'])
+        //    ->orderBy('nama_peserta', 'asc')
+         //   ->pluck('id') // Get only IDs
+          //  ->toArray();
+	$participants = Infografis_peserta::where('batch', $validated['batch'])
+    		->get() // Retrieve all records first
+    		->sortBy('nama_peserta') // Sort by decrypted value
+    		->pluck('id') // Get only IDs
+    		->toArray();
 
         $penlatBatch = Penlat_batch::where('batch', $validated['batch'])->first();
 
