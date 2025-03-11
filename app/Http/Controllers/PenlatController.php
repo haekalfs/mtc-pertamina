@@ -44,9 +44,7 @@ class PenlatController extends Controller
                 $query->where('kategori_pelatihan', $request->stcw);
             }
 
-            $data = $query->get();
-
-            return DataTables::of($data)
+            return DataTables::eloquent($query)
             ->addColumn('display', function($item) {
                 $filePath = $item->filepath;
                 if($filePath){
@@ -470,9 +468,7 @@ class PenlatController extends Controller
                 $query->whereYear('date', $request->periode);
             }
 
-            $data = $query->orderBy('date', 'desc')->get();
-
-            return DataTables::of($data)
+            return DataTables::eloquent($query)
                 ->addColumn('display', function($item) {
                     $imageUrl = $item->filepath ? asset($item->filepath) : asset('img/default-img.png');
                     return '<a href="' . route('preview-batch', $item->id) . '"><img src="' . $imageUrl . '" style="height: 100px; width: 100px;" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow animateBox"></a>';

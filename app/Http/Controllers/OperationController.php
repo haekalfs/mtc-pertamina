@@ -306,8 +306,7 @@ class OperationController extends Controller
 
         if ($request->ajax()) {
             // Start the query directly on the Eloquent model
-            $query = Infografis_peserta::with(['penlatBatch.penlat'])
-                ->orderBy('tgl_pelaksanaan', 'desc');
+            $query = Infografis_peserta::with(['penlatBatch.penlat']);
 
             // Apply filters based on the request
             if ($request->namaPenlat && $request->namaPenlat != 1) {
@@ -331,30 +330,7 @@ class OperationController extends Controller
             }
 
             // Return the DataTables response
-            return DataTables::of($query)
-                ->addColumn('nama_peserta', function ($row) {
-                    // If there's no related penlatBatch, just return the participant name
-                    if (!$row->penlatBatch) {
-                        return $row->nama_peserta ?? '-';
-                    }
-
-                    // Extract the year from tgl_pelaksanaan
-                    $currentYear = \Carbon\Carbon::parse($row->tgl_pelaksanaan)->year;
-
-                    // Check for conflicts where the same participant has another entry in the same year and same penlat_id
-                    $hasConflict = Infografis_peserta::where('participant_id', $row->participant_id)
-                        ->whereHas('penlatBatch', function ($query) use ($row) {
-                            $query->where('penlat_id', $row->penlatBatch->penlat_id);
-                        })
-                        ->where('id', '!=', $row->id) // Exclude the current row
-                        ->whereYear('tgl_pelaksanaan', $currentYear) // Ensure it's in the same year
-                        ->exists(); // Check if any such entry exists
-
-                    // Add a warning icon if there's a conflict
-                    $warningIcon = $hasConflict ? '<i class="fa fa-exclamation-circle text-warning"></i>' : '';
-
-                    return $row->nama_peserta . ' ' . $warningIcon;
-                })
+            return DataTables::eloquent($query)
                 ->addColumn('action', function ($row) {
                     return '<a data-item-id="' . $row->id . '" class="btn btn-outline-secondary btn-sm mr-2 edit-btn" href="#" data-toggle="modal" data-target="#editModal"><i class="fa fa-edit"></i> Edit</a>';
                 })
@@ -378,7 +354,7 @@ class OperationController extends Controller
 
                     return $hasConflict ? 'conflict-row' : '';
                 })
-                ->rawColumns(['nama_peserta', 'action']) // Allow HTML rendering in these columns
+                ->rawColumns(['action']) // Allow HTML rendering in these columns
                 ->make(true);
         }
 

@@ -38,7 +38,7 @@ class CertificateController extends Controller
                 $query->whereYear('issued_date', $request->periode);
             }
 
-            return DataTables::of($query)
+            return DataTables::eloquent($query)
                 ->addColumn('action', function ($certificate) {
                     return '<a class="btn btn-outline-secondary btn-md mb-2 mr-2 go-to-certificate" href="' . route('preview-certificate', ['id' => $certificate->penlat_certificate_id]) . '">
                                 <i class="fa fa-external-link"></i>

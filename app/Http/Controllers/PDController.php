@@ -343,10 +343,10 @@ class PDController extends Controller
         $listAmendment = Regulator_amendment::all();
 
         if ($request->ajax()) {
-            $query = Penlat_certificate::with(['batch.penlat']);
+            $query = Penlat_certificate::with(['batches.penlat']);
 
             if ($request->penlat) {
-                $query->whereHas('batch.penlat', function($q) use ($request) {
+                $query->whereHas('batches.penlat', function($q) use ($request) {
                     $q->where('id', $request->penlat);
                 });
             }
@@ -367,11 +367,8 @@ class PDController extends Controller
                 $query->whereYear('start_date', $request->periode);
             }
 
-            // Fetch the correct records
-            $certificates = $query->get();
-
             // Manually build the DataTables response
-            return DataTables::of($certificates)
+            return DataTables::eloquent($query)
                 ->addColumn('jumlah_issued', function($item) {
                     $issuedCount = $item->participant->where('status', true)->count();
                     $totalIssued = $item->total_issued;
@@ -381,10 +378,10 @@ class PDController extends Controller
                     return '<span class="' . $class . '">' . $issuedCount . '/' . $totalIssued . '</span>';
                 })
                 ->addColumn('kategori_pelatihan', function($item) {
-                    return $item->batch->penlat->kategori_pelatihan;
+                    return $item->batches->penlat->kategori_pelatihan;
                 })
                 ->addColumn('tgl_pelaksanaan', function($item) {
-                    return Carbon::parse($item->batch->date)->format('d-M-Y');
+                    return Carbon::parse($item->batches->date)->format('d-M-Y');
                 })
                 ->addColumn('created_by', function($item) {
                     return $item->created_by;

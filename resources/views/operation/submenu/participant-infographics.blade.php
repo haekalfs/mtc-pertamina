@@ -517,8 +517,6 @@ $(document).ready(function() {
     var table = $('#listPeserta').DataTable({
         processing: true,
         serverSide: true,
-        responsive: true,
-        deferRender: true,
         ajax: {
             url: "{{ route('participant-infographics') }}",
             data: function (d) {
@@ -543,7 +541,7 @@ $(document).ready(function() {
             { data: 'realisasi', name: 'realisasi' },
             { data: 'action', name: 'action', orderable: false, searchable: false },
         ],
-    order: [[2, 'desc']]
+        order: [[2, 'desc']]
     });
 
     // Filter button click event

@@ -335,8 +335,8 @@ $(document).ready(function() {
         },
         columns: [
             { data: 'tgl_pelaksanaan', name: 'tgl_pelaksanaan' },
-            { data: 'batch.penlat.description', name: 'batch.penlat.description' },
-            { data: 'batch.batch', name: 'batch.batch' },
+            { data: 'batches.penlat.description', name: 'batches.penlat.description' },
+            { data: 'batches.batch', name: 'batches.batch' },
             { data: 'kategori_pelatihan', name: 'kategori_pelatihan' },
             { data: 'status', name: 'status' },
             { data: 'keterangan', name: 'keterangan' },
