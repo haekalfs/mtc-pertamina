@@ -186,6 +186,18 @@
                     </li>
                     @endusr_acc
 
+
+                    @usr_acc(204, 205)
+                    <li class="menu-title">Approval</li><!-- /.menu-title -->
+                    @endusr_acc
+
+                    @usr_acc(204)
+                    <li class="@yield('active-approval')">
+                        <a href="{{ route('index-approval') }}"><i class="menu-icon fa fa-file-text-o"></i>Approval</a>
+                    </li>
+                    @endusr_acc
+
+
                     @usr_acc(201, 202, 203)
                     <li class="menu-title">Settings</li><!-- /.menu-title -->
                     @endusr_acc
@@ -222,7 +234,9 @@
                     </li>
                     @endusr_acc
 
+                    @usr_acc(204, 205)
                     <li class="menu-title">Tools</li><!-- /.menu-title -->
+                    @endusr_acc
 
                     @usr_acc(204)
                     <li class="@yield('active-refractor')">
@@ -231,13 +245,10 @@
                     @endusr_acc
 
                     @usr_acc(205)
-                    <li class="@yield('active-barcode_page')">
+                    <li class="@yield('active-barcode_page')" style="padding-bottom: 15%;">
                         <a href="{{ route('barcode_page') }}"><i class="menu-icon fa fa-qrcode"></i>QR Code Generator </a>
                     </li>
                     @endusr_acc
-                    <li style="padding-bottom: 15%;">
-                        <a href="/telescope"><i class="menu-icon fa fa-signal"></i>Web Monitoring</a>
-                    </li>
                 </ul>
             </div><!-- /.navbar-collapse -->
         </nav>

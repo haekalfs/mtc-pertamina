@@ -87,23 +87,6 @@ font-weight-bold
                 </div>
             </div>
         </div>
-        <div class="col-md-12 zoom90">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <span class="text-danger font-weight-bold">User Manual</span>
-                </div>
-                <div class="card-body" style="background-color: rgb(247, 247, 247);">
-                    <h6 class="h6 mb-2 font-weight-bold text-gray-800">General Guidelines</h6>
-                    <ul class="ml-4" style="line-height:200%">
-                        <li>Table diatas adalah List Pelatihan beserta Revenue, Cost & Profit.</li>
-                        <li>Nominal dari table diatas, diambil dari semua batch yang dimiliki oleh pelatihan tersebut.</li>
-                        <li>List Pelatihan adalah Induk Data dari Penlat, yang mana 1 Pelatihan bisa memiliki banyak batch.</li>
-                        <li>Data di samping adalah summary dari semua revenue, cost & profit data pelatihan.</li>
-                        <li class="text-danger font-weight-bold">Untuk menampilkan summary & grafik, anda perlu memilih periode tahun.</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 <script>

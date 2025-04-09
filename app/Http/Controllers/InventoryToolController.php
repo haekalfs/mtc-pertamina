@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Asset_approval;
 use App\Models\Asset_condition;
 use App\Models\Asset_item;
 use App\Models\Audit_log;
@@ -181,9 +182,6 @@ class InventoryToolController extends Controller
                 ->addColumn('action', function ($item) {
                     return '
                     <div class="text-center">
-                        <a data-id="' . $item->id . '" href="#" class="btn btn-outline-secondary btn-md mr-2 edit-tool">
-                            <i class="fa fa-edit"></i>
-                        </a>
                         <button data-id="' . $item->id . '" class="btn btn-outline-secondary btn-md mr-2 view-tool">
                             <i class="fa fa-info-circle"></i>
                         </button>
@@ -288,28 +286,42 @@ class InventoryToolController extends Controller
     {
         if (request()->ajax()) {
             // Load the inventory tool along with its items and their conditions
-            $data = Inventory_tools::with(['img', 'items.condition'])->findOrFail($id);
+            $data = Inventory_tools::with(['img', 'items.condition', 'items.approvals'])->findOrFail($id);
 
             // Transform items for DataTables
             $items = $data->items->map(function ($item) {
-                $lastMaintenanceDate = $item->asset_last_maintenance ? Carbon::parse($item->asset_last_maintenance) : null;
+                $approval = $item->approvals;
+
+                // Check if approval exists meaningfully (e.g., has data)
+                $useApproval = $approval && $approval->asset_code !== null;
+
+                $lastMaintenanceDate = $useApproval
+                    ? ($approval->asset_last_maintenance ? Carbon::parse($approval->asset_last_maintenance) : null)
+                    : ($item->asset_last_maintenance ? Carbon::parse($item->asset_last_maintenance) : null);
+
                 $hoursDifference = $lastMaintenanceDate ? Carbon::now()->diffInHours($lastMaintenanceDate) : 0;
 
                 return [
                     'id' => $item->id,
                     'asset_code' => $item->asset_code,
-                    'condition' => $item->condition->condition,
-                    'isUsed' => $item->isUsed,
-                    'lastMaintenance' => $item->asset_last_maintenance,
-                    'nextMaintenance' => $item->asset_next_maintenance,
+                    'condition' => $useApproval ? optional($approval->condition)->condition : optional($item->condition)->condition,
+                    'isUsed' => $useApproval ? $approval->isUsed : $item->isUsed,
+                    'lastMaintenance' => $useApproval ? $approval->asset_last_maintenance : $item->asset_last_maintenance,
+                    'nextMaintenance' => $useApproval ? $approval->asset_next_maintenance : $item->asset_next_maintenance,
                     'runningHours' => $hoursDifference . ' Hours',
                     'urlUsed' => route('inventory-tools.mark-as-used', $item->id),
                     'urlUnused' => route('inventory-tools.mark-as-unused', $item->id),
                     'asset_condition_id' => $item->asset_condition_id,
+                    'asset_status' => $item->asset_status,
+                    'approval_asset_status' => $item->asset_status, // still actual since approval is temp
                 ];
             });
 
-            return DataTables::of($items)->make(true);
+            return DataTables::of($items)
+                ->setRowClass(function ($row) {
+                    return $row['approval_asset_status'] == 1 ? 'conflict-row' : '';
+                })
+                ->make(true);
         }
 
         // Non-AJAX request: Return the view with additional data
@@ -735,14 +747,46 @@ class InventoryToolController extends Controller
         // Find the asset item by ID
         $asset = Asset_item::findOrFail($request->asset_id);
 
-        // Update the asset_condition_id column
-        $asset->asset_condition_id = $request->condition;
-        $asset->asset_last_maintenance = $request->lastMaintenance;
-        $asset->asset_next_maintenance = $request->nextMaintenance;
-        $asset->isUsed = $request->status;
+        // delaying updates
+        // $asset->asset_condition_id = $request->condition;
+        // $asset->asset_last_maintenance = $request->lastMaintenance;
+        // $asset->asset_next_maintenance = $request->nextMaintenance;
+        // $asset->isUsed = $request->status;
+        $asset->asset_status = 1;
 
         // Save the updated asset
         $asset->save();
+
+        // if ($asset->tools && $asset->isUsed != 1) {
+        //     $tool = $asset->tools; // Ensure the relationship is correct
+
+        //     // Increment the used amount and decrement the stock
+        //     $tool->used_amount += 1;
+        //     $tool->asset_stock -= 1;
+
+        //     // Save the changes
+        //     $tool->save();
+        // } else {
+        //     $tool = $asset->tools; // Ensure the relationship is correct
+
+        //     // Increment the used amount and decrement the stock
+        //     $tool->used_amount -= 1;
+        //     $tool->asset_stock += 1;
+
+        //     // Save the changes
+        //     $tool->save();
+        // }
+
+        $approval = Asset_approval::updateOrCreate(
+            ['asset_item_id' => $asset->id], // Search condition
+            [
+                'asset_code' => $asset->asset_code,
+                'asset_condition_id' => $request->condition,
+                'asset_last_maintenance' => $request->lastMaintenance,
+                'asset_next_maintenance' => $request->nextMaintenance,
+                'isUsed' => $request->status,
+            ]
+        );
 
         Audit_log::createLog("Asset item has been updated : " . $asset->asset_code, "critical", Auth::id(), 1);
 
@@ -817,13 +861,38 @@ class InventoryToolController extends Controller
                 $formIds = explode(',', $formIds);
             }
 
-            // Update the database
-            Asset_item::whereIn('id', $formIds)
-                ->update([
-                    'asset_last_maintenance' => $lastMaintenanceDate,
-                    'asset_next_maintenance' => $nextMaintenanceDate
-                ]);
+            // Delay Update the database
+            // Asset_item::whereIn('id', $formIds)
+            //     ->update([
+            //         'asset_last_maintenance' => $lastMaintenanceDate,
+            //         'asset_next_maintenance' => $nextMaintenanceDate
+            //     ]);
 
+            foreach ($formIds as $formId) {
+                $asset = Asset_item::find($formId);
+
+                $asset->asset_status = 1;
+                $asset->save();
+
+                if ($asset) {
+                    $updateData = [
+                        'asset_code' => $asset->asset_code,
+                        'asset_last_maintenance' => $lastMaintenanceDate,
+                        'asset_next_maintenance' => $nextMaintenanceDate,
+                    ];
+
+                    // Conditionally add isUsed and asset_condition_id
+                    if (!is_null($asset->isUsed) || !is_null($asset->asset_condition_id)) {
+                        $updateData['isUsed'] = $asset->isUsed;
+                        $updateData['asset_condition_id'] = $asset->asset_condition_id;
+                    }
+
+                    Asset_approval::updateOrCreate(
+                        ['asset_item_id' => $asset->id],
+                        $updateData
+                    );
+                }
+            }
             // Return a JSON response
             return response()->json(['success' => true, 'message' => 'Certificates marked as expired successfully.']);
         } catch (\Exception $e) {
@@ -853,20 +922,38 @@ class InventoryToolController extends Controller
 
             foreach ($items as $item) {
                 if (!$item->isUsed) { // Check if it's not already used
-                    $item->isUsed = true;
+
+                    $item->asset_status = 1;
                     $item->save();
 
-                    // Check if the item belongs to an Inventory_tool
-                    if ($item->tools) {
-                        $tool = $item->tools; // Ensure the relationship is correct
+                    $dataToUpdate = [
+                        'asset_code' => $item->asset_code,
+                        'asset_condition_id' => $item->asset_condition_id,
+                        'isUsed' => true,
+                    ];
 
-                        // Increment the used amount and decrement the stock
-                        $tool->used_amount += 1;
-                        $tool->asset_stock -= 1;
-
-                        // Save the changes
-                        $tool->save();
+                    // Conditionally include maintenance dates only if at least one exists
+                    if ($item->asset_last_maintenance || $item->asset_next_maintenance) {
+                        $dataToUpdate['asset_last_maintenance'] = $item->asset_last_maintenance;
+                        $dataToUpdate['asset_next_maintenance'] = $item->asset_next_maintenance;
                     }
+
+                    Asset_approval::updateOrCreate(
+                        ['asset_item_id' => $item->id], // Unique key
+                        $dataToUpdate
+                    );
+
+                    // Check if the item belongs to an Inventory_tool
+                    // if ($item->tools) {
+                    //     $tool = $item->tools; // Ensure the relationship is correct
+
+                    //     // Increment the used amount and decrement the stock
+                    //     $tool->used_amount += 1;
+                    //     $tool->asset_stock -= 1;
+
+                    //     // Save the changes
+                    //     $tool->save();
+                    // }
                 }
             }
 
@@ -898,21 +985,38 @@ class InventoryToolController extends Controller
             $items = Asset_item::whereIn('id', $formIds)->get();
 
             foreach ($items as $item) {
-                if ($item->isUsed) { // Check if it's not already used
-                    $item->isUsed = false;
+                if ($item->isUsed) { // Check if it's already used
+
+                    $item->asset_status = 1;
                     $item->save();
 
-                    // Check if the item belongs to an Inventory_tool
-                    if ($item->tools) {
-                        $tool = $item->tools; // Ensure the relationship is correct
+                    $dataToUpdate = [
+                        'asset_code' => $item->asset_code,
+                        'asset_condition_id' => $item->asset_condition_id,
+                        'isUsed' => false,
+                    ];
 
-                        // Increment the used amount and decrement the stock
-                        $tool->used_amount -= 1;
-                        $tool->asset_stock += 1;
-
-                        // Save the changes
-                        $tool->save();
+                    // Conditionally include maintenance dates only if at least one exists
+                    if ($item->asset_last_maintenance || $item->asset_next_maintenance) {
+                        $dataToUpdate['asset_last_maintenance'] = $item->asset_last_maintenance;
+                        $dataToUpdate['asset_next_maintenance'] = $item->asset_next_maintenance;
                     }
+
+                    Asset_approval::updateOrCreate(
+                        ['asset_item_id' => $item->id], // Unique key
+                        $dataToUpdate
+                    );
+                    // Check if the item belongs to an Inventory_tool
+                    // if ($item->tools) {
+                    //     $tool = $item->tools; // Ensure the relationship is correct
+
+                    //     // Increment the used amount and decrement the stock
+                    //     $tool->used_amount -= 1;
+                    //     $tool->asset_stock += 1;
+
+                    //     // Save the changes
+                    //     $tool->save();
+                    // }
                 }
             }
 
@@ -944,16 +1048,64 @@ class InventoryToolController extends Controller
             $assetCondition = $request->input('assetCondition');
 
             // Update the database
-            Asset_item::whereIn('id', $formIds)
-                ->update([
-                    'asset_condition_id' => $assetCondition
-                ]);
+            // Asset_item::whereIn('id', $formIds)
+            //     ->update([
+            //         'asset_condition_id' => $assetCondition
+            //     ]);
 
+            foreach ($formIds as $formId) {
+                $asset = Asset_item::find($formId);
+
+                $asset->asset_status = 1;
+                $asset->save();
+
+                if ($asset) {
+                    $data = [
+                        'asset_code' => $asset->asset_code,
+                        'asset_condition_id' => $assetCondition,
+                    ];
+
+                    if (!is_null($asset->asset_last_maintenance)) {
+                        $data['asset_last_maintenance'] = $asset->asset_last_maintenance;
+                    }
+
+                    if (!is_null($asset->asset_next_maintenance)) {
+                        $data['asset_next_maintenance'] = $asset->asset_next_maintenance;
+                    }
+
+                    if (!is_null($asset->isUsed)) {
+                        $data['isUsed'] = $asset->isUsed;
+                    }
+
+                    Asset_approval::updateOrCreate(
+                        ['asset_item_id' => $asset->id],
+                        $data
+                    );
+                }
+            }
             // Return a JSON response
             return response()->json(['success' => true, 'message' => 'Certificates marked as expired successfully.']);
         } catch (\Exception $e) {
             // Handle errors and return a JSON error response
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
+    }
+
+    public function getAssetChartData($id)
+    {
+        $used = Asset_item::where('isUsed', 1)
+            ->where('inventory_tool_id', $id)
+            ->count();
+
+        $unused = Asset_item::where(function ($query) {
+                $query->whereNull('isUsed')->orWhere('isUsed', 0);
+            })
+            ->where('inventory_tool_id', $id)
+            ->count();
+
+        return response()->json([
+            ['label' => 'Used', 'y' => $used],
+            ['label' => 'Unused', 'y' => $unused],
+        ]);
     }
 }

@@ -3975,3 +3975,20 @@ a.spam-button:link {
     content: "";
     background: no-repeat 50%/50% 50%;
 }
+
+.timesheet:hover .card {
+    animation-name: zoomIn;
+    animation-duration: 0.5s;
+    animation-fill-mode: forwards;
+}
+
+
+@keyframes zoomIn {
+    from {
+        transform: scale(1);
+    }
+
+    to {
+        transform: scale(1.05);
+    }
+}

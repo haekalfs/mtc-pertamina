@@ -177,25 +177,21 @@ font-weight-bold
                         <div class="mb-4">
                             <span>Deleting this asset is a permanent action and cannot be undone.</span>
                         </div>
-                        <div>
-                            <a data-id="{{ $data->id }}" class="btn btn-outline-danger btn-md text-danger">I Understand, delete the asset</a>
-                        </div>
+                        <a data-id="{{ $data->id }}"
+                            class="btn btn-outline-danger btn-md text-danger text-wrap d-block"
+                            style="white-space: normal;">
+                            I Understand, delete the asset
+                         </a>
                     </div>
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="card mb-4 shadow">
                     <div class="card-header">
-                        <span class="font-weight-bold text-secondary">Assets Conditions</span>
+                        <span class="font-weight-bold text-secondary">Assets Useable Graphic</span>
                     </div>
                     <div class="card-body">
-                        <table class="table table-borderless table-sm">
-                            @foreach($itemConditions as $condition)
-                            <tr>
-                                <td><i class="ti-minus mr-2"></i>{{ $condition['count'] }} Items are {!! $condition['condition'] !!}</td>
-                            </tr>
-                            @endforeach
-                        </table>
+                        <div id="assetPieChart" style="height: 150px; width: 100%;"></div>
                     </div>
                 </div>
             </div>
@@ -213,7 +209,7 @@ font-weight-bold
                 <div class="row d-flex justify-content-start mb-4">
                     <div class="col-md-12">
                         <div class="row align-items-center">
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <div class="dropdown">
                                     <select id="bulkActions">
                                         <option value="1">Set as Used</option>
@@ -224,7 +220,7 @@ font-weight-bold
                                     <button class="apply-btn">Execute</button>
                                 </div>
                             </div>
-                            <div class="col-md-9 text-right">
+                            <div class="col-md-8 text-right">
                                 <span id="selectedCountBadge" class="badge bg-secondary text-white" style="display: none;">-</span>
                             </div>
                         </div>
@@ -406,7 +402,7 @@ font-weight-bold
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="row">
+                                        {{-- <div class="row">
                                             <div class="col-md-12">
                                                 <div class="d-flex align-items-center mb-4">
                                                     <div style="width: 170px;" class="mr-2">
@@ -417,8 +413,8 @@ font-weight-bold
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-4">
+                                        </div> --}}
+                                        {{-- <div class="d-flex align-items-center mb-4">
                                             <div style="width: 170px;" class="mr-2">
                                                 <p style="margin: 0;">Last Maintenance :</p>
                                             </div>
@@ -433,7 +429,7 @@ font-weight-bold
                                             <div class="flex-grow-1">
                                                 <input type="date" class="form-control" name="next_maintenance" id="edit_next_maintenance">
                                             </div>
-                                        </div>
+                                        </div> --}}
                                         <div class="d-flex align-items-start mb-2">
                                             <div style="width: 170px;" class="mr-2">
                                                 <p style="margin: 0;">Update Panduan (Optional) :</p> <small id="existing-file"></small>
@@ -502,7 +498,16 @@ font-weight-bold
                         `;
                     }
                 },
-                { data: 'asset_code', name: 'asset_code' },
+                {
+                    data: 'asset_code',
+                    name: 'asset_code',
+                    render: function (data, type, row) {
+                        if (row.approval_asset_status == 1) {
+                            return `<i class="fa fa-spinner fa-spin text-dark mr-1"></i> ${data}`;
+                        }
+                        return data;
+                    }
+                },
                 { data: 'condition', name: 'condition' },
                 {
                     data: 'status',
@@ -524,18 +529,26 @@ font-weight-bold
                     searchable: false,
                     className: 'text-center',
                     render: function (data, type, row) {
+                        let editButton = '';
+
+                        if (!row.asset_status) { // Show edit if false or null
+                            editButton = `
+                                <a class="btn btn-outline-secondary btn-md mr-2 edit-asset"
+                                    data-asset-id="${row.id}"
+                                    data-asset-code="${row.asset_code}"
+                                    data-condition-id="${row.asset_condition_id}"
+                                    data-last-maintenance="${row.lastMaintenance}"
+                                    data-next-maintenance="${row.nextMaintenance}"
+                                    data-is-used="${row.isUsed}"
+                                    data-url-used="${row.urlUsed}"
+                                    data-url-unused="${row.urlUnused}">
+                                    <i class="fa fa-fw fa-edit"></i>
+                                </a>
+                            `;
+                        }
+
                         return `
-                            <a class="btn btn-outline-secondary btn-md mr-2 edit-asset"
-                                data-asset-id="${row.id}"
-                                data-asset-code="${row.asset_code}"
-                                data-condition-id="${row.asset_condition_id}"
-                                data-last-maintenance="${row.lastMaintenance}"
-                                data-next-maintenance="${row.nextMaintenance}"
-                                data-is-used="${row.isUsed}"
-                                data-url-used="${row.urlUsed}"
-                                data-url-unused="${row.urlUnused}">
-                                <i class="fa fa-fw fa-edit"></i>
-                            </a>
+                            ${editButton}
                             <a class="btn btn-outline-success btn-md mr-2 generateQR" data-id="${row.id}" href="javascript:void(0)">
                                 <i class="fa fa-qrcode"></i>
                             </a>
@@ -566,6 +579,34 @@ font-weight-bold
         tableAssets.on('draw', function () {
             $('#assetsTable').on('change', '.data-checkbox', toggleCheckboxes2);
             $('#checkAll').on('change', toggleCheckboxes);
+        });
+
+        $.ajax({
+            url: "{{ route('asset.chart.data', $data->id) }}",
+            method: "GET",
+            success: function (data) {
+                var chart = new CanvasJS.Chart("assetPieChart", {
+                    animationEnabled: true,
+                    theme: "light2",
+                    data: [{
+                        type: "pie",
+                        showInLegend: true, // enable legend
+                        legendText: "{label}: {y}", // what shows below
+                        yValueFormatString: "#,##0",
+                        dataPoints: data
+                    }],
+                    legend: {
+                        verticalAlign: "bottom", // push it below the chart
+                        horizontalAlign: "center",
+                        fontSize: 14,
+                        fontColor: "#555"
+                    }
+                });
+                chart.render();
+            },
+            error: function () {
+                console.error("Failed to load asset chart data.");
+            }
         });
     });
 

@@ -3,6 +3,7 @@
 use App\Http\Controllers\AgreementController;
 use App\Http\Controllers\AkhlakController;
 use App\Http\Controllers\AmendmentController;
+use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\CampaignController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\InstructorController;
+use App\Http\Controllers\InventoryApprovalController;
 use App\Http\Controllers\InventoryToolController;
 use App\Http\Controllers\KPIController;
 use App\Http\Controllers\LocationController;
@@ -153,6 +155,11 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
             Route::post('/api/get-participants', [DashboardController::class, 'getChartDetail']);
             Route::post('/api/get-participants-stcw-non', [DashboardController::class, 'getParticipants']);
 
+            Route::get('/api/asset-charts/{id}', [InventoryToolController::class, 'getAssetChartData'])->name('asset.chart.data');
+            Route::get('/approval/inventory-tool/data', [InventoryApprovalController::class, 'getData'])->name('approval.inventory-tool.data');
+            Route::post('/approval/inventory-tool/approve', [InventoryApprovalController::class, 'approveChanges'])->name('approval.inventory-tool.approve');
+            Route::post('/approval/inventory-tool/reject', [InventoryApprovalController::class, 'rejectChanges'])->name('approval.inventory-tool.approve.reject');
+
             Route::post('/roles/update-superadmin/{id}', [RolesController::class, 'updateSuperAdmin'])->name('roles.updateSuperAdmin');
         });
 
@@ -226,6 +233,10 @@ Route::middleware('checkForErrors', 'suspicious', 'auth')->group(function () {
                 Route::get('/tool-inventory-generate-qr/{id}', [InventoryToolController::class, 'generateQrCode'])->name('generate-qr');
                 Route::post('/update-asset-condition', [InventoryToolController::class, 'updateAssetCondition'])->name('update-asset-condition');
                 Route::delete('/inventory-tools/delete/{id}', [InventoryToolController::class, 'destroy_asset_per_item'])->name('inventory-tools.delete');
+
+                //approval
+                Route::get('/approval', [ApprovalController::class, 'index'])->name('index-approval');
+                Route::get('/approval/inventory-tools', [InventoryApprovalController::class, 'index'])->name('inventory-tools-approval');
 
 
                 Route::post('/tool-maintenance-update', [InventoryToolController::class, 'maintenanceUpdate'])->name('maintenance.update');

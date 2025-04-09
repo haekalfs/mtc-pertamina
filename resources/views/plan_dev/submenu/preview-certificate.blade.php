@@ -183,7 +183,7 @@ font-weight-bold
                     <div class="row d-flex justify-content-start mb-4">
                         <div class="col-md-12">
                             <div class="row align-items-center">
-                                <div class="col-md-3">
+                                <div class="col-md-4">
                                     <div class="dropdown">
                                         <select id="bulkActions">
                                             <option value="1">Export Certificate</option>
@@ -197,7 +197,7 @@ font-weight-bold
                                         <button class="apply-btn">Execute</button>
                                     </div>
                                 </div>
-                                <div class="col-md-9 text-right">
+                                <div class="col-md-8 text-right">
                                     <span id="selectedCountBadge" class="badge bg-secondary text-white" style="display: none;">-</span>
                                 </div>
                             </div>
