@@ -386,8 +386,11 @@ class PDController extends Controller
                 ->addColumn('created_by', function($item) {
                     return $item->created_by;
                 })
-                ->addColumn('created_at', function($item) {
-                    return $item->created_at->format('d-M-Y');
+                ->editColumn('created_at', function($item) {
+                    return [
+                        'display' => $item->created_at->format('d-M-Y'),
+                        'timestamp' => $item->created_at->format('Y-m-d'),
+                    ];
                 })
                 ->editColumn('keterangan', function($item) {
                     return $item->keterangan ?? '-';
@@ -1597,7 +1600,7 @@ class PDController extends Controller
 
                 // Set the cell value
                 $targetCell = 'P11';
-                $sheet->setCellValue($targetCell, $participantName);
+                $sheet->setCellValue($targetCell, strtoupper($participantName));
 
                 // Apply the calculated font size
                 $sheet->getStyle($targetCell)->getFont()->setSize($calculatedFontSize);

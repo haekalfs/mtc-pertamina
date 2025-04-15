@@ -342,7 +342,16 @@ $(document).ready(function() {
             { data: 'keterangan', name: 'keterangan' },
             { data: 'jumlah_issued', name: 'jumlah_issued' },
             { data: 'created_by', name: 'created_by' },
-            { data: 'created_at', name: 'created_at' },
+            {
+                data: 'created_at',
+                name: 'created_at',
+                render: function(data, type, row) {
+                    if (type === 'display') {
+                        return data.display;
+                    }
+                    return data.timestamp; // used for sorting/filtering
+                }
+            },
             { data: 'action', name: 'action', orderable: false, searchable: false, className: 'text-center' }
         ],
         order: [[8, 'desc']],
