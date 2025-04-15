@@ -1538,7 +1538,7 @@ class PDController extends Controller
                 );
                 $sheet->setCellValue('B41', $batchParts[1]);
 
-                $birthInfo = $data->peserta->birth_place . ', ' . Carbon::parse($data->peserta->birth_date)->format('d F Y');
+                $birthInfo = strtoupper($data->peserta->birth_place) . ', ' . Carbon::parse($data->peserta->birth_date)->format('d F Y');
                 $sheet->setCellValueByColumnAndRow(16, 14, $birthInfo);
                 $sheet->setCellValueByColumnAndRow(35, 9, $formattedCertificate);
 
