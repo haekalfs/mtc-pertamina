@@ -381,8 +381,7 @@ $(document).ready(function() {
             { data: 'tgl_pelaksanaan', name: 'date' },
             { data: 'harga_pelatihan', name: 'harga_pelatihan' },
             { data: 'action', name: 'action', orderable: false, searchable: false }
-        ],
-    order: [[1, 'asc']]
+        ]
     });
 
     // Edit functionality
