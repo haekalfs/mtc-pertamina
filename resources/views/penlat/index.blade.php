@@ -387,7 +387,7 @@ function setupAliasInput(inputId) {
         value = value.replace(/\s+/g, '-');
 
         // Remove numbers, commas, and dots, and only allow alphabetic characters and dashes
-        value = value.replace(/[^a-zA-Z\-]/g, '');
+        value = value.replace(/[^a-zA-Z0-9\-]/g, '');
 
         // Set the updated value back to the input
         e.target.value = value;
