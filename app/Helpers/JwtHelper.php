@@ -11,7 +11,7 @@ class JwtHelper
     {
         $key = env('JWT_SECRET');
         $issuedAt = time();
-        $expire = $issuedAt + ($minutes * 10);
+        $expire = $issuedAt + ($minutes * 60);
 
         $tokenPayload = array_merge($payload, [
             'iat' => $issuedAt,
