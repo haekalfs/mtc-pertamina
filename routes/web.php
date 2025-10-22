@@ -64,6 +64,8 @@ Route::middleware('checkForErrors', 'suspiciousTexts', 'suspicious', 'throttle:6
 });
 
 
+// Route::get('/api/master-data-training/{year}', [OperationController::class, 'sendMasterDataTraining'])->middleware('throttle:60,1')->name('api.master.data.training');
+
 // Throttle middleware for 10 requests per minute
 Route::get('/', function () {
     return redirect('/dashboard');

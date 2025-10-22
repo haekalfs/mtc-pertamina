@@ -21,6 +21,7 @@ class SuspiciousActivityDetection
         $whitelistedIps = [
             '192.168.1.25', // PC HO
             '180.252.161.240', // CCD HO
+            '192.168.2.235', // PC CMO
         ];
 
         $userAgent = $request->header('User-Agent');

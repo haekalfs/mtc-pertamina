@@ -79,5 +79,6 @@ class Kernel extends HttpKernel
         //Unused
         'encrypt.params' => \App\Http\Middleware\EncryptParams::class,
         'decrypt.params' => \App\Http\Middleware\DecryptParams::class,
+        'verify.domain.jwt' => \App\Http\Middleware\VerifyDomainAndJwt::class,
     ];
 }

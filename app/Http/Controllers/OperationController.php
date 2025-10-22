@@ -9,6 +9,7 @@ use App\Models\Inventory_room;
 use App\Models\Inventory_tools;
 use App\Models\Location;
 use App\Models\Penlat;
+use App\Models\Penlat_alias;
 use App\Models\Penlat_batch;
 use App\Models\Penlat_certificate;
 use App\Models\Penlat_requirement;
@@ -1475,5 +1476,33 @@ class OperationController extends Controller
         }
 
         return view('operation.import.error_log');
+    }
+
+    public function sendMasterDataTraining($year)
+    {
+        // Load penlat relationship
+        $aliases = Penlat_alias::with('penlat')->get();
+
+        // Transform the data
+        $data = $aliases->map(function ($alias) {
+            $penlat = $alias->penlat;
+
+            return [
+                'penlat_id'   => $alias->penlat_id,
+                'alias'       => $alias->alias,
+                'training'    => [
+                    [
+                        'name'               => $penlat->description ?? null,
+                        'jenis_pelatihan'    => $penlat->jenis_pelatihan ?? null,
+                        'kategori_pelatihan' => $penlat->kategori_pelatihan ?? null,
+                    ]
+                ],
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'penlat_alias' => $data
+        ]);
     }
 }
