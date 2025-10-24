@@ -22,6 +22,7 @@ class SuspiciousActivityDetection
             '192.168.1.25', // PC HO
             '180.252.161.240', // CCD HO
             '192.168.2.235', // PC CMO
+            '103.47.132.99',
         ];
 
         $userAgent = $request->header('User-Agent');
